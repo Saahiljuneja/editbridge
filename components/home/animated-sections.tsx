@@ -1025,7 +1025,6 @@ const EDITORS = [
 ];
 
 export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEditor[] }) {
-  const [active, setActive] = useState(0);
   const displayEditors = realEditors && realEditors.length > 0
     ? realEditors.map((e, i) => ({
         name: e.displayName ?? e.name,
@@ -1037,151 +1036,122 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
         price: e.minPrice ? `₹${Math.round(e.minPrice / 100).toLocaleString("en-IN")}` : "₹1,500",
         time: e.minDeliveryDays ? `${e.minDeliveryDays} day${e.minDeliveryDays === 1 ? "" : "s"}` : "3 days",
         col: (["#7c3aed","#059669","#ea580c","#2563eb","#db2777"] as string[])[i % 5],
-        badge: e.isFeatured ? "Featured" : "KYC Verified",
-        badgeCls: (["bg-amber-50 text-amber-700 border-amber-200","bg-emerald-50 text-emerald-700 border-emerald-200","bg-blue-50 text-blue-700 border-blue-200","bg-violet-50 text-violet-700 border-violet-200","bg-rose-50 text-rose-700 border-rose-200"] as string[])[i % 5],
+        isFeatured: e.isFeatured,
         skills: (e.skills ?? []).slice(0, 3),
         orders: e.totalOrders,
         href: `/editor/${e.id}`,
       }))
-    : EDITORS;
-  const ed = displayEditors[active];
-  const editorHref = (ed as { href?: string }).href ?? "/browse";
+    : EDITORS.map(e => ({ ...e, isFeatured: false }));
 
   return (
     <section className="bg-white py-28 px-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="flex items-end justify-between mb-14 flex-wrap gap-6">
           <Reveal>
-            <div className="flex items-center gap-3 mb-5"><div className="h-px w-10 bg-[#0EA5E9]"/><span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Our editors</span></div>
-            <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-none">Verified talent.<br /><span className="text-gray-200">Ready now.</span></h2>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px w-10 bg-[#0EA5E9]"/>
+              <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Our editors</span>
+            </div>
+            <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-none">
+              Verified talent.<br /><span className="text-gray-200">Ready now.</span>
+            </h2>
           </Reveal>
           <Link href="/browse" className="inline-flex items-center gap-2 border border-gray-200 text-gray-500 hover:text-[#0EA5E9] hover:border-[#0EA5E9]/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
             All editors <ArrowUpRight className="w-4 h-4"/>
           </Link>
         </div>
 
-        <div className="grid lg:grid-cols-[260px_1fr] gap-5">
-          {/* Name list */}
-          <div className="flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0">
-            {displayEditors.map((e, i) => (
-              <motion.button key={e.name} onClick={() => setActive(i)} whileTap={{ scale: 0.97 }}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
+        {/* 3-column grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayEditors.map((e, i) => {
+            const editorHref = (e as { href?: string }).href ?? "/browse";
+            return (
+              <motion.div key={e.name}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.06, type: "spring", stiffness: 600, damping: 26 }}
-                className={cn("relative text-left px-4 py-3.5 rounded-2xl transition-all shrink-0 group overflow-hidden", active === i ? "border" : "hover:bg-gray-50/60")}
-                style={active === i ? { background: `${e.col}08`, borderColor: `${e.col}30` } : {}}>
-                {active === i && <motion.div layoutId="editor-bg" className="absolute inset-0 rounded-2xl" style={{ background: `${e.col}06` }} />}
-                <div className="relative flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[9px] font-black shrink-0 transition-all"
-                    style={{ background: active === i ? e.col : "#e5e7eb", color: active === i ? "white" : "#9ca3af" }}>
-                    {e.initials}
-                  </div>
-                  <div><p className={cn("text-sm font-semibold transition-colors", active === i ? "text-gray-900" : "text-gray-400")}>{e.name}</p><p className="text-[10px] text-gray-400">{e.role}</p></div>
-                  {active === i && <motion.div layoutId="editor-dot" className="ml-auto w-1.5 h-1.5 rounded-full" style={{ background: e.col }} />}
-                </div>
-              </motion.button>
-            ))}
-          </div>
+                transition={{ delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="group relative rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+                style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
+              >
+                {/* Card header gradient */}
+                <div className="relative px-6 pt-6 pb-5 overflow-hidden"
+                  style={{ background: `linear-gradient(135deg, ${e.col}12 0%, ${e.col}04 100%)` }}>
+                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none" style={{ background: e.col }} />
 
-          {/* Feature card */}
-          <AnimatePresence mode="wait">
-            <motion.div key={active} initial={{ opacity: 0, y: 20, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.97 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
-              <TiltCard intensity={4}>
-                <div className="rounded-3xl overflow-hidden border shadow-[0_32px_80px_rgba(0,0,0,0.10)]"
-                  style={{ borderColor: `${ed.col}25`, boxShadow: `0 32px 80px ${ed.col}15` }}>
-                  {/* Header */}
-                  <div className="relative p-8 pb-6 overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${ed.col}18 0%, ${ed.col}05 100%)` }}>
-                    <div className="absolute inset-0 opacity-[0.1]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
-                    <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl opacity-25 pointer-events-none" style={{ background: ed.col }} />
-                    <div className="relative flex items-start gap-5">
-                      <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-xl border border-white/30"
-                        style={{ background: `${ed.col}cc` }}>{ed.initials}</div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between gap-3 mb-1">
-                          <h3 className="text-gray-900 font-black text-2xl">{ed.name}</h3>
-                          <span className={cn("text-[10px] border rounded-full px-3 py-1.5 font-bold shrink-0", ed.badgeCls)}>{ed.badge}</span>
-                        </div>
-                        <p className="text-gray-500 text-sm mb-0.5">{ed.role}</p>
-                        <div className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-[#0EA5E9]"/><p className="text-gray-400 text-xs">KYC Verified · {ed.loc}</p></div>
-                      </div>
+                  {/* Avatar + badge row */}
+                  <div className="relative flex items-start justify-between mb-4">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg"
+                      style={{ background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)` }}>
+                      {e.initials}
                     </div>
+                    {e.isFeatured
+                      ? <span className="text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2.5 py-1">Featured</span>
+                      : <span className="text-[9px] font-bold bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full px-2.5 py-1 flex items-center gap-1">
+                          <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
+                        </span>
+                    }
                   </div>
 
-                  {/* Portfolio thumbnails */}
-                  <div className="px-8 pt-6 bg-white">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Portfolio samples</p>
-                    <div className="grid grid-cols-3 gap-2.5 mb-6">
-                      {([
-                        { label: "Intro Cut",    dur: "0:32", prog: 35 },
-                        { label: "Main Edit",    dur: "2:14", prog: 60 },
-                        { label: "Color Grade",  dur: "1:05", prog: 80 },
-                      ] as { label: string; dur: string; prog: number }[]).map(({ label, dur, prog }, ti) => (
-                        <div key={ti} className="relative aspect-video rounded-xl overflow-hidden border group cursor-pointer transition-all hover:scale-[1.03]"
-                          style={{ borderColor: `${ed.col}30` }}>
-                          {/* gradient bg */}
-                          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${ed.col}28 0%, ${ed.col}10 100%)` }} />
-                          {/* dot pattern */}
-                          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.6) 1px, transparent 1px)", backgroundSize: "6px 6px" }} />
-                          {/* top label */}
-                          <div className="absolute top-1.5 left-2 right-2 flex items-center justify-between">
-                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${ed.col}30`, color: ed.col }}>{label}</span>
-                            <span className="text-[8px] font-bold text-white/60">{dur}</span>
-                          </div>
-                          {/* play button */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110"
-                              style={{ background: `${ed.col}50`, boxShadow: `0 4px 12px ${ed.col}40` }}>
-                              <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[9px] border-b-[5px] border-b-transparent ml-0.5"
-                                style={{ borderLeftColor: "white" }} />
-                            </div>
-                          </div>
-                          {/* timeline bar */}
-                          <div className="absolute bottom-1.5 left-2 right-2 h-1 rounded-full overflow-hidden" style={{ background: `${ed.col}20` }}>
-                            <div className="h-full rounded-full transition-all" style={{ width: `${prog}%`, background: ed.col }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Name + role */}
+                  <h3 className="font-black text-gray-900 text-lg leading-tight mb-0.5">{e.name}</h3>
+                  <p className="text-sm text-gray-500 mb-2">{e.role}</p>
 
-                  {/* Body */}
-                  <div className="px-8 pb-8 bg-white">
-                    <div className="grid grid-cols-3 gap-3 mb-7">
-                      {[{label:"Rating",val:`${ed.rating}★`,Icon:Star},{label:"Orders",val:`${ed.orders}+`,Icon:Package},{label:"Delivery",val:ed.time,Icon:Clock}].map(({label,val,Icon})=>(
-                        <div key={label} className="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-center">
-                          <Icon className="w-4 h-4 text-gray-300 mx-auto mb-2"/>
-                          <p className="text-gray-900 font-bold text-sm">{val}</p>
-                          <p className="text-gray-400 text-[10px] mt-0.5">{label}</p>
-                        </div>
-                      ))}
+                  {/* Rating + location */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      <span className="text-xs font-bold text-gray-700">{e.rating.toFixed(1)}</span>
+                      {e.reviews > 0 && <span className="text-xs text-gray-400">({e.reviews})</span>}
                     </div>
-                    <div className="flex flex-wrap gap-2 mb-7">
-                      {ed.skills.map(s=><span key={s} className="text-xs bg-gray-100 text-gray-600 rounded-xl px-3 py-1.5 font-medium">{s}</span>)}
-                    </div>
-                    <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-                      <div><p className="text-gray-400 text-xs mb-1">Starting from</p><p className="text-gray-900 font-black text-3xl">{ed.price}</p></div>
-                      <div className="flex gap-2">
-                        <Link href={editorHref} className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:border-gray-300 font-medium px-5 py-2.5 rounded-xl text-sm transition-all">Profile</Link>
-                        <MagBtn>
-                          <Link href={editorHref} className="inline-flex items-center gap-1.5 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all"
-                            style={{ background: ed.col, boxShadow: `0 8px 24px ${ed.col}50` }}>
-                            Book now <ArrowRight className="w-4 h-4"/>
-                          </Link>
-                        </MagBtn>
-                      </div>
-                    </div>
+                    <span className="text-gray-200">·</span>
+                    <span className="text-xs text-gray-400">{e.loc}</span>
                   </div>
                 </div>
-              </TiltCard>
-            </motion.div>
-          </AnimatePresence>
+
+                {/* Skills */}
+                <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-gray-50">
+                  {e.skills.length > 0
+                    ? e.skills.map(s => (
+                        <span key={s} className="text-[11px] font-medium bg-gray-50 text-gray-500 rounded-lg px-2.5 py-1">{s}</span>
+                      ))
+                    : <span className="text-[11px] text-gray-300">Skills not listed</span>
+                  }
+                </div>
+
+                {/* Stats row */}
+                <div className="px-6 py-4 flex items-center gap-4 border-b border-gray-50">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <Package className="w-3.5 h-3.5 text-gray-300" />
+                    {e.orders > 0 ? `${e.orders} orders` : <span className="text-gray-300">New</span>}
+                  </div>
+                  <span className="text-gray-200">·</span>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <Clock className="w-3.5 h-3.5 text-gray-300" />
+                    {e.time} delivery
+                  </div>
+                </div>
+
+                {/* Price + CTA */}
+                <div className="px-6 py-5 flex items-center justify-between mt-auto">
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-medium mb-0.5">Starting from</p>
+                    <p className="text-xl font-black text-gray-900">{e.price}</p>
+                  </div>
+                  <Link href={editorHref}
+                    className="inline-flex items-center gap-1.5 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all hover:opacity-90 hover:scale-[1.03]"
+                    style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}40` }}>
+                    Book now <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-        <div className="flex items-center justify-center gap-2 mt-8">
-          {displayEditors.map((_, i) => <button key={i} onClick={() => setActive(i)} className={cn("rounded-full transition-all", i === active ? "w-6 h-1.5 bg-[#0EA5E9]" : "w-1.5 h-1.5 bg-gray-200 hover:bg-gray-300")} />)}
-        </div>
-        <div className="mt-8 flex justify-center">
+
+        {/* View all */}
+        <div className="mt-10 flex justify-center">
           <Link href="/browse" className="inline-flex items-center gap-2 border border-[#0EA5E9]/30 text-[#0EA5E9] hover:bg-[#0EA5E9]/5 font-semibold px-6 py-3 rounded-xl text-sm transition-all">
             View all 100+ editors <ArrowRight className="w-4 h-4" />
           </Link>
