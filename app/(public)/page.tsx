@@ -1,5 +1,5 @@
+import { CinematicHero } from "@/components/home/cinematic-hero";
 import {
-  AnimatedHero,
   AnimatedFindEditorCTA,
   AnimatedStats,
   AnimatedActivity,
@@ -212,7 +212,7 @@ export default async function HomePage() {
       <div className="flex flex-col">
         <ScrollProgressBar />
         {/* 1. Hero */}
-        <AnimatedHero availableCount={availableCount} />
+        <CinematicHero editorCount={editorCount} completedOrders={completedOrders} availableCount={availableCount} />
         {/* 2. Editor cards — show who's on the platform immediately */}
         <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} />
         {/* 4. Visual proof of creative output */}
