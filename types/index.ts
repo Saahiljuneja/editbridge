@@ -7,7 +7,7 @@ export type UserRole =
   | "staff_dispute"
   | "staff_moderation";
 
-export type KYCStatus = "pending" | "approved" | "rejected";
+export type KYCStatus = "pending" | "approved" | "rejected" | "expired";
 
 export type OrderStatus =
   | "pending"
