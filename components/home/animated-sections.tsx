@@ -208,15 +208,6 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">KYC-Verified Editors</span>
               </span>
-              {availableCount > 0 && (
-                <span className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-2">
-                  <span className="relative flex h-1.5 w-1.5 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="text-[11px] font-semibold text-emerald-700">{availableCount} available now</span>
-                </span>
-              )}
             </motion.div>
 
             {/* Headline */}
