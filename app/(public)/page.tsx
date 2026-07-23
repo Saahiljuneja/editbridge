@@ -131,7 +131,14 @@ export default async function HomePage() {
   const showLeaderboard = leaderboardRows.some(e => e.totalOrders > 0);
   const editorCount = editorCountResult[0]?.value ?? 100;
   const completedOrders = completedOrdersResult[0]?.value ?? 0;
-  const showcaseItems = showcaseRows.map(r => ({ ...r, editorName: displayNameFromFull(r.editorName ?? "") }));
+  const showcaseItems = showcaseRows.map(r => ({
+    id: r.id,
+    title: r.title ?? "",
+    category: r.category ?? "",
+    editorName: displayNameFromFull(r.editorName ?? ""),
+    likesCount: r.likesCount,
+    viewsCount: r.viewsCount,
+  }));
   const leaderboardEditors = leaderboardRows.map(r => ({
     ...r,
     name: displayNameFromFull(r.name ?? ""),
