@@ -278,21 +278,6 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                   </a>
                 ))}
               </div>
-              {/* Budget + filter chips */}
-              <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider shrink-0">Filter:</span>
-                {[
-                  { label: "Under ₹2,000",    href: "/browse?maxPrice=2000"       },
-                  { label: "1–2 day delivery", href: "/browse?maxDelivery=2"       },
-                  { label: "Top Rated",        href: "/browse?sort=rating"         },
-                  { label: "Available now",    href: "/browse?available=true"      },
-                ].map(({ label, href }) => (
-                  <a key={label} href={href}
-                    className="text-[11px] text-gray-500 bg-white border border-gray-200 hover:border-[#0EA5E9] hover:text-[#0EA5E9] rounded-full px-3 py-1 transition-colors font-medium">
-                    {label}
-                  </a>
-                ))}
-              </div>
               <div className="mt-3 flex items-center gap-1.5">
                 <span className="text-xs text-gray-400">Not sure who to pick?</span>
                 <Link href="/find-editor"
