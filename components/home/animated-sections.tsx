@@ -1855,7 +1855,7 @@ const SHOWCASE_COLORS = ["#0EA5E9", "#7c3aed", "#0F6E56"];
 
 interface ShowcaseItem {
   id: string;
-  title: string;
+  title: string | null;
   category: string | null;
   editorName: string;
   likesCount: number;
