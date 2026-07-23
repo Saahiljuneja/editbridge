@@ -211,7 +211,6 @@ export default async function HomePage() {
       <BackToTopButton />
       <div className="flex flex-col">
         <ScrollProgressBar />
-        <StickyCtaBar />
         {/* 1. Hero */}
         <AnimatedHero availableCount={availableCount} />
         {/* 2. Niche + trust strip */}
