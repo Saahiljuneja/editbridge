@@ -59,9 +59,8 @@ export function CategoryBrowseSection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -6, scale: 1.025, boxShadow: `0 20px 48px ${cat.accentColor}30` }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -6, scale: 1.025, boxShadow: `0 20px 48px ${cat.accentColor}30` }}
               >
                 <Link
                   href={`/editors/${cat.slug}`}

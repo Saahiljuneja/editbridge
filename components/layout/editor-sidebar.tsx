@@ -12,7 +12,12 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const NAV_GROUPS = [
+type BadgeKey = "messages" | "notifications";
+type NavItem = { href: string; label: string; icon: React.ElementType; badgeKey?: BadgeKey; flag?: string };
+
+import React from "react";
+
+const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Work",
     items: [
@@ -158,7 +163,7 @@ export function EditorSidebar({
                   const active = href === "/editor/dashboard"
                     ? pathname === "/editor/dashboard"
                     : pathname.startsWith(href);
-                  const badgeCount = badgeKey ? counts[badgeKey] : 0;
+                  const badgeCount = badgeKey ? counts[badgeKey as BadgeKey] : 0;
 
                   return (
                     <Link key={href} href={href}
