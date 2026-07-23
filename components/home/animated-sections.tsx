@@ -1030,7 +1030,7 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
     ? realEditors.map((e, i) => ({
         name: e.displayName ?? e.name,
         initials: (e.displayName ?? e.name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
-        role: e.niche ?? e.title ?? "Video Editor",
+        role: (() => { const n = e.niche; if (!n) return e.title ?? "Video Editor"; try { const p = JSON.parse(n); return Array.isArray(p) ? p[0] : n; } catch { return n; } })(),
         loc: e.location ?? "India",
         rating: e.avgRating ?? 5.0,
         reviews: e.reviewCount,
@@ -1113,17 +1113,33 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
                   <div className="px-8 pt-6 bg-white">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Portfolio samples</p>
                     <div className="grid grid-cols-3 gap-2.5 mb-6">
-                      {[0.18, 0.12, 0.22].map((opacity, ti) => (
-                        <div key={ti} className="relative aspect-video rounded-xl overflow-hidden border border-gray-100 group cursor-pointer">
-                          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${ed.col}${Math.round(opacity * 255).toString(16).padStart(2,"0")} 0%, ${ed.col}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2,"0")} 100%)` }} />
-                          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.4) 1px, transparent 1px)", backgroundSize: "8px 8px" }} />
+                      {([
+                        { label: "Intro Cut",    dur: "0:32", prog: 35 },
+                        { label: "Main Edit",    dur: "2:14", prog: 60 },
+                        { label: "Color Grade",  dur: "1:05", prog: 80 },
+                      ] as { label: string; dur: string; prog: number }[]).map(({ label, dur, prog }, ti) => (
+                        <div key={ti} className="relative aspect-video rounded-xl overflow-hidden border group cursor-pointer transition-all hover:scale-[1.03]"
+                          style={{ borderColor: `${ed.col}30` }}>
+                          {/* gradient bg */}
+                          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${ed.col}28 0%, ${ed.col}10 100%)` }} />
+                          {/* dot pattern */}
+                          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.6) 1px, transparent 1px)", backgroundSize: "6px 6px" }} />
+                          {/* top label */}
+                          <div className="absolute top-1.5 left-2 right-2 flex items-center justify-between">
+                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${ed.col}30`, color: ed.col }}>{label}</span>
+                            <span className="text-[8px] font-bold text-white/60">{dur}</span>
+                          </div>
+                          {/* play button */}
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-all">
-                              <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-white/80 border-b-[5px] border-b-transparent ml-0.5" />
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110"
+                              style={{ background: `${ed.col}50`, boxShadow: `0 4px 12px ${ed.col}40` }}>
+                              <div className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[9px] border-b-[5px] border-b-transparent ml-0.5"
+                                style={{ borderLeftColor: "white" }} />
                             </div>
                           </div>
-                          <div className="absolute bottom-1.5 left-2 right-2 h-1 bg-white/15 rounded-full overflow-hidden">
-                            <div className="h-full bg-white/50 rounded-full" style={{ width: `${30 + ti * 25}%` }} />
+                          {/* timeline bar */}
+                          <div className="absolute bottom-1.5 left-2 right-2 h-1 rounded-full overflow-hidden" style={{ background: `${ed.col}20` }}>
+                            <div className="h-full rounded-full transition-all" style={{ width: `${prog}%`, background: ed.col }} />
                           </div>
                         </div>
                       ))}
