@@ -1024,30 +1024,51 @@ const EDITORS = [
   { name: "Vivek Das",    initials: "VD", role: "Podcast Editing",        loc: "Chennai",   rating: 4.9, reviews: 9,  price: "₹1,800", time: "2 days", col: "#db2777", badge: "KYC Verified",  badgeCls: "bg-rose-50 text-rose-700 border-rose-200",        skills: ["Audacity","Descript","Premiere Pro"],             orders: 11 },
 ];
 
+const EDITOR_FILTERS = [
+  { label: "All",        terms: [] as string[] },
+  { label: "YouTube",    terms: ["youtube", "long-form", "longform"] },
+  { label: "Reels",      terms: ["reels", "shorts", "short-form", "shortform"] },
+  { label: "Thumbnails", terms: ["thumbnail", "design", "branding"] },
+  { label: "Corporate",  terms: ["corporate", "brand", "commercial", "ads"] },
+  { label: "Podcast",    terms: ["podcast", "audio"] },
+];
+
 export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEditor[] }) {
-  const displayEditors = realEditors && realEditors.length > 0
-    ? realEditors.map((e, i) => ({
-        name: e.displayName ?? e.name,
-        initials: (e.displayName ?? e.name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
-        role: (() => { const n = e.niche; if (!n) return e.title ?? "Video Editor"; try { const p = JSON.parse(n); return Array.isArray(p) ? p[0] : n; } catch { return n; } })(),
-        loc: e.location ?? "India",
-        rating: e.avgRating ?? 5.0,
-        reviews: e.reviewCount,
-        price: e.minPrice ? `₹${Math.round(e.minPrice / 100).toLocaleString("en-IN")}` : "₹1,500",
-        time: e.minDeliveryDays ? `${e.minDeliveryDays} day${e.minDeliveryDays === 1 ? "" : "s"}` : "3 days",
-        col: (["#7c3aed","#059669","#ea580c","#2563eb","#db2777"] as string[])[i % 5],
-        isFeatured: e.isFeatured,
-        skills: (e.skills ?? []).slice(0, 3),
-        orders: e.totalOrders,
-        href: `/editor/${e.id}`,
-      }))
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const allEditors = realEditors && realEditors.length > 0
+    ? realEditors
+        .map((e, i) => ({
+          name: e.displayName ?? e.name,
+          initials: (e.displayName ?? e.name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
+          role: (() => { const n = e.niche; if (!n) return e.title ?? "Video Editor"; try { const p = JSON.parse(n); return Array.isArray(p) ? p[0] : n; } catch { return n; } })(),
+          loc: e.location ?? "India",
+          rating: e.avgRating ?? 5.0,
+          reviews: e.reviewCount,
+          price: e.minPrice ? `₹${Math.round(e.minPrice / 100).toLocaleString("en-IN")}` : "₹1,500",
+          time: e.minDeliveryDays ? `${e.minDeliveryDays} day${e.minDeliveryDays === 1 ? "" : "s"}` : "3 days",
+          col: (["#7c3aed","#059669","#ea580c","#2563eb","#db2777"] as string[])[i % 5],
+          isFeatured: e.isFeatured,
+          skills: (e.skills ?? []).slice(0, 3),
+          orders: e.totalOrders,
+          href: `/editor/${e.id}`,
+        }))
+        .filter(e => e.skills.length > 0) // hide incomplete/test accounts
     : EDITORS.map(e => ({ ...e, isFeatured: false }));
+
+  const filteredEditors = activeFilter === "All"
+    ? allEditors
+    : allEditors.filter(e => {
+        const text = `${e.role} ${e.skills.join(" ")}`.toLowerCase();
+        const terms = EDITOR_FILTERS.find(f => f.label === activeFilter)?.terms ?? [];
+        return terms.some(t => text.includes(t));
+      });
 
   return (
     <section className="bg-white py-28 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-end justify-between mb-14 flex-wrap gap-6">
+        <div className="flex items-end justify-between mb-10 flex-wrap gap-6">
           <Reveal>
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-[#0EA5E9]"/>
@@ -1062,92 +1083,124 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
           </Link>
         </div>
 
+        {/* Filter tabs */}
+        <div className="flex items-center gap-2 flex-wrap mb-8">
+          {EDITOR_FILTERS.map(({ label }) => (
+            <button key={label} onClick={() => setActiveFilter(label)}
+              className={cn(
+                "text-xs font-semibold px-4 py-2 rounded-full border transition-all",
+                activeFilter === label
+                  ? "bg-[#0EA5E9] text-white border-[#0EA5E9] shadow-sm"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9]"
+              )}>
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* 3-column grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayEditors.map((e, i) => {
-            const editorHref = (e as { href?: string }).href ?? "/browse";
-            return (
-              <motion.div key={e.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
-                style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
-              >
-                {/* Card header gradient */}
-                <div className="relative px-6 pt-6 pb-5 overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${e.col}12 0%, ${e.col}04 100%)` }}>
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none" style={{ background: e.col }} />
-
-                  {/* Avatar + badge row */}
-                  <div className="relative flex items-start justify-between mb-4">
-                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg"
-                      style={{ background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)` }}>
-                      {e.initials}
+          <AnimatePresence mode="popLayout">
+            {filteredEditors.map((e, i) => {
+              const editorHref = (e as { href?: string }).href ?? "/browse";
+              return (
+                <motion.div key={e.name}
+                  layout
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+                  style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
+                >
+                  {/* Card header gradient */}
+                  <div className="relative px-6 pt-6 pb-5 overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${e.col}12 0%, ${e.col}04 100%)` }}>
+                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none" style={{ background: e.col }} />
+                    {/* Avatar + badge row */}
+                    <div className="relative flex items-start justify-between mb-4">
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg"
+                        style={{ background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)` }}>
+                        {e.initials}
+                      </div>
+                      {e.isFeatured
+                        ? <span className="text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2.5 py-1">Featured</span>
+                        : <span className="text-[9px] font-bold bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full px-2.5 py-1 flex items-center gap-1">
+                            <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
+                          </span>
+                      }
                     </div>
-                    {e.isFeatured
-                      ? <span className="text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2.5 py-1">Featured</span>
-                      : <span className="text-[9px] font-bold bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full px-2.5 py-1 flex items-center gap-1">
-                          <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
-                        </span>
-                    }
+                    <h3 className="font-black text-gray-900 text-lg leading-tight mb-0.5">{e.name}</h3>
+                    <p className="text-sm text-gray-500 mb-2">{e.role}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        <span className="text-xs font-bold text-gray-700">{e.rating.toFixed(1)}</span>
+                        {e.reviews > 0 && <span className="text-xs text-gray-400">({e.reviews})</span>}
+                      </div>
+                      <span className="text-gray-200">·</span>
+                      <span className="text-xs text-gray-400">{e.loc}</span>
+                    </div>
                   </div>
 
-                  {/* Name + role */}
-                  <h3 className="font-black text-gray-900 text-lg leading-tight mb-0.5">{e.name}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{e.role}</p>
+                  {/* Skills */}
+                  <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-gray-50">
+                    {e.skills.map(s => (
+                      <span key={s} className="text-[11px] font-medium bg-gray-50 text-gray-500 rounded-lg px-2.5 py-1">{s}</span>
+                    ))}
+                  </div>
 
-                  {/* Rating + location */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                      <span className="text-xs font-bold text-gray-700">{e.rating.toFixed(1)}</span>
-                      {e.reviews > 0 && <span className="text-xs text-gray-400">({e.reviews})</span>}
+                  {/* Stats row */}
+                  <div className="px-6 py-4 flex items-center gap-4 border-b border-gray-50">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Package className="w-3.5 h-3.5 text-gray-300" />
+                      {e.orders > 0 ? `${e.orders} orders` : <span className="text-gray-300">New</span>}
                     </div>
                     <span className="text-gray-200">·</span>
-                    <span className="text-xs text-gray-400">{e.loc}</span>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Clock className="w-3.5 h-3.5 text-gray-300" />
+                      {e.time} delivery
+                    </div>
                   </div>
-                </div>
 
-                {/* Skills */}
-                <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-gray-50">
-                  {e.skills.length > 0
-                    ? e.skills.map(s => (
-                        <span key={s} className="text-[11px] font-medium bg-gray-50 text-gray-500 rounded-lg px-2.5 py-1">{s}</span>
-                      ))
-                    : <span className="text-[11px] text-gray-300">Skills not listed</span>
-                  }
-                </div>
+                  {/* Price + CTA */}
+                  <div className="px-6 py-5 flex items-center justify-between mt-auto">
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-medium mb-0.5">Starting from</p>
+                      <p className="text-xl font-black text-gray-900">{e.price}</p>
+                    </div>
+                    <Link href={editorHref}
+                      className="inline-flex items-center gap-1.5 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all hover:opacity-90 hover:scale-[1.03]"
+                      style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}40` }}>
+                      Book now <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            })}
 
-                {/* Stats row */}
-                <div className="px-6 py-4 flex items-center gap-4 border-b border-gray-50">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Package className="w-3.5 h-3.5 text-gray-300" />
-                    {e.orders > 0 ? `${e.orders} orders` : <span className="text-gray-300">New</span>}
-                  </div>
-                  <span className="text-gray-200">·</span>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Clock className="w-3.5 h-3.5 text-gray-300" />
-                    {e.time} delivery
-                  </div>
-                </div>
-
-                {/* Price + CTA */}
-                <div className="px-6 py-5 flex items-center justify-between mt-auto">
-                  <div>
-                    <p className="text-[10px] text-gray-400 font-medium mb-0.5">Starting from</p>
-                    <p className="text-xl font-black text-gray-900">{e.price}</p>
-                  </div>
-                  <Link href={editorHref}
-                    className="inline-flex items-center gap-1.5 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all hover:opacity-90 hover:scale-[1.03]"
-                    style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}40` }}>
-                    Book now <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </motion.div>
-            );
-          })}
+            {/* CTA card — always shown as the last card */}
+            <motion.div key="cta-card"
+              layout
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: filteredEditors.length * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="relative rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-[#0EA5E9]/40 hover:bg-[#0EA5E9]/3 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4 group-hover:bg-[#0EA5E9]/15 transition-colors">
+                <ArrowUpRight className="w-6 h-6 text-[#0EA5E9]" />
+              </div>
+              <h3 className="font-black text-gray-800 text-lg mb-2">Become a verified editor</h3>
+              <p className="text-sm text-gray-400 mb-6 leading-relaxed max-w-[200px]">
+                Join EditBridge, get KYC verified, and start earning from clients across India.
+              </p>
+              <Link href="/signup/editor"
+                className="inline-flex items-center gap-2 bg-[#0EA5E9] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all"
+                style={{ boxShadow: "0 6px 20px rgba(14,165,233,0.35)" }}>
+                Apply now <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* View all */}
