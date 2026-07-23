@@ -202,11 +202,11 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
               className="flex flex-wrap items-center gap-2 mb-10">
               <span className="inline-flex items-center gap-2 bg-[#0EA5E9]/8 border border-[#0EA5E9]/20 rounded-full px-4 py-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                <span className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.2em]">KYC-Verified Editors</span>
+                <span className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.2em]">India&apos;s #1 Video Editing Marketplace</span>
               </span>
               <span className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-4 py-2">
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">Pay after you approve</span>
+                <span className="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">KYC-Verified Editors</span>
               </span>
               {availableCount > 0 && (
                 <span className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-2">
