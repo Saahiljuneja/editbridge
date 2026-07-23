@@ -213,9 +213,7 @@ export default async function HomePage() {
         <ScrollProgressBar />
         {/* 1. Hero */}
         <AnimatedHero availableCount={availableCount} />
-        {/* 2. Niche + trust strip */}
-        <CombinedStrip />
-        {/* 3. Editor cards — show who's on the platform immediately */}
+        {/* 2. Editor cards — show who's on the platform immediately */}
         <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} />
         {/* 4. Visual proof of creative output */}
         <WorkGallerySection />
