@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ALTER COLUMN "package_id" DROP NOT NULL;

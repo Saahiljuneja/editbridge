@@ -1,0 +1,626 @@
+﻿export const dynamic = "force-dynamic";
+
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import {
+  editors, orders, reviews, messages, packages,
+  users, disputes, portfolioItems, preOrderQuestions,
+  userPoints, userCredits,
+} from "@/lib/db/schema";
+import { and, eq, sql, ne, desc, isNull, gte, lte } from "drizzle-orm";
+import { calcLevel, getLevelPerks, LEVELS } from "@/lib/rewards";
+import type { Level } from "@/lib/rewards";
+import { formatCurrency, displayNameFromFull, formatDate, formatDateTime } from "@/lib/utils";
+import {
+  ShoppingBag, AlertCircle, Clock, CheckCircle,
+  Star, ArrowRight, Zap, IndianRupee,
+  Package, MessageSquare, AlertTriangle, RefreshCw,
+  TrendingUp, ImageIcon, BadgeCheck, Share2, CircleDot,
+  HelpCircle, Film,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { AutoPauseBanner } from "./auto-pause-banner";
+import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
+import { AvailabilityToggle } from "@/components/editor/availability-toggle";
+
+const COLOR = "#0EA5E9";
+
+export default async function EditorDashboardPage() {
+  const session = await auth();
+  if (!session || session.user?.role !== "editor") redirect("/login");
+
+  const editorId = session.user.editorId;
+  const firstName = displayNameFromFull(session.user.name);
+
+  if (!editorId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-7 h-7 text-blue-600" />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Complete your setup</h2>
+          <p className="text-sm text-gray-500 mb-6">Your editor profile isn&apos;t set up yet. Complete KYC to start accepting orders.</p>
+          <Link href="/editor/kyc" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white" style={{ background: COLOR }}>
+            Complete setup <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const weekStart = new Date(now);
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
+  const creditExpirySoon = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+  const [
+    editorRow, activeOrders, recentReviews,
+    earningsRow, monthEarningsRow, unreadCountRow,
+    ratingRow, openDisputeCount, activePackages,
+    pendingPayoutRow, portfolioRows, unansweredQuestionCount,
+    xpRow, weekOrdersRow, expiringCredits,
+  ] = await Promise.all([
+    db.select({
+      bio: editors.bio, totalOrders: editors.totalOrders,
+      completionRate: editors.completionRate, avgResponseTime: editors.avgResponseTime,
+      createdAt: editors.createdAt, kycStatus: editors.kycStatus, kycApprovedAt: editors.kycApprovedAt,
+      isAvailable: editors.isAvailable, displayName: editors.displayName,
+    }).from(editors).where(eq(editors.id, editorId)).limit(1).then(r => r[0]),
+
+    db.select({
+      id: orders.id, status: orders.status,
+      totalAmount: orders.totalAmount, commissionAmount: orders.commissionAmount,
+      deadline: orders.deadline, createdAt: orders.createdAt,
+      packageTitle: packages.title, clientName: users.name,
+    }).from(orders)
+      .leftJoin(packages, eq(packages.id, orders.packageId))
+      .innerJoin(users, eq(users.id, orders.clientId))
+      .where(and(eq(orders.editorId, editorId), sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`))
+      .orderBy(sql`${orders.deadline} ASC NULLS LAST`).limit(8),
+
+    db.select({ id: reviews.id, rating: reviews.rating, text: reviews.text, createdAt: reviews.createdAt })
+      .from(reviews)
+      .where(and(eq(reviews.revieweeId, session.user.userId!), eq(reviews.role, "client")))
+      .orderBy(desc(reviews.createdAt)).limit(3),
+
+    db.select({ total: sql<number>`COALESCE(SUM(${orders.totalAmount} - ${orders.commissionAmount}),0)::int` })
+      .from(orders).where(and(eq(orders.editorId, editorId), eq(orders.status, "completed"))).then(r => r[0]),
+
+    db.select({ total: sql<number>`COALESCE(SUM(${orders.totalAmount} - ${orders.commissionAmount}),0)::int` })
+      .from(orders).where(and(eq(orders.editorId, editorId), eq(orders.status, "completed"), sql`${orders.updatedAt} >= ${monthStart}`)).then(r => r[0]),
+
+    db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(messages).innerJoin(orders, eq(messages.orderId, orders.id))
+      .where(and(eq(orders.editorId, editorId), ne(messages.senderId, session.user.userId!), sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`, eq(messages.isBlocked, false)))
+      .then(r => r[0]),
+
+    db.select({ avg: sql<number>`ROUND(AVG(${reviews.rating})::numeric, 1)`, count: sql<number>`COUNT(*)::int` })
+      .from(reviews).where(and(eq(reviews.revieweeId, session.user.userId!), eq(reviews.role, "client"))).then(r => r[0]),
+
+    db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(disputes).innerJoin(orders, eq(orders.id, disputes.orderId))
+      .where(and(eq(orders.editorId, editorId), eq(disputes.status, "open"))).then(r => r[0]),
+
+    db.select({ isActive: packages.isActive })
+      .from(packages).where(eq(packages.editorId, editorId)),
+
+    db.select({ total: sql<number>`COALESCE(SUM(${orders.totalAmount} - ${orders.commissionAmount}),0)::int` })
+      .from(orders).where(and(eq(orders.editorId, editorId), sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`)).then(r => r[0]),
+
+    db.select({ id: portfolioItems.id })
+      .from(portfolioItems).where(eq(portfolioItems.editorId, editorId)),
+
+    db.select({ count: sql<number>`COUNT(*)::int` })
+      .from(preOrderQuestions)
+      .where(and(
+        eq(preOrderQuestions.editorId, editorId),
+        isNull(preOrderQuestions.answer),
+        sql`${preOrderQuestions.askedAt} <= NOW() - INTERVAL '6 hours'`
+      )).then(r => r[0]),
+
+    db.select({ total: userPoints.total, level: userPoints.level })
+      .from(userPoints)
+      .where(eq(userPoints.userId, session.user.userId!))
+      .limit(1).then(r => r[0] ?? null),
+
+    db.select({ c: sql<number>`COUNT(*)::int` })
+      .from(orders)
+      .where(and(eq(orders.editorId, editorId), eq(orders.status, "completed"), gte(orders.updatedAt, weekStart)))
+      .then(r => r[0]),
+
+    db.select({ amount: userCredits.amount, expiresAt: userCredits.expiresAt })
+      .from(userCredits)
+      .where(and(
+        eq(userCredits.userId, session.user.userId!),
+        isNull(userCredits.usedAt),
+        gte(userCredits.expiresAt, now),
+        lte(userCredits.expiresAt, creditExpirySoon),
+      )),
+  ]);
+
+  const totalEarnings   = earningsRow?.total     ?? 0;
+  const monthEarnings   = monthEarningsRow?.total ?? 0;
+  const unreadMessages  = unreadCountRow?.count   ?? 0;
+  const avgRating       = ratingRow?.avg ? Number(ratingRow.avg) : null;
+  const totalReviews    = ratingRow?.count        ?? 0;
+  const openDisputes    = openDisputeCount?.count ?? 0;
+  const staleQuestions  = unansweredQuestionCount?.count ?? 0;
+  const isAvailable     = editorRow?.isAvailable  ?? true;
+  const pkgCount        = activePackages.filter(p => p.isActive).length;
+  const pendingPayout   = pendingPayoutRow?.total ?? 0;
+  const portCount       = portfolioRows.length;
+
+  const needsAction = activeOrders.filter(o => o.status === "revision_requested" || o.status === "pending");
+  const inProgress  = activeOrders.filter(o => o.status !== "revision_requested" && o.status !== "pending");
+
+  // XP / level
+  const xpTotal   = xpRow?.total ?? 0;
+  const xpLevel   = (xpRow?.level ?? "bronze") as Level;
+  const levelMeta = LEVELS.find(l => l.name === xpLevel)!;
+  const nextLevel = LEVELS.find(l => l.min > xpTotal);
+  const xpPct     = nextLevel
+    ? Math.min(100, ((xpTotal - levelMeta.min) / (nextLevel.min - levelMeta.min)) * 100)
+    : 100;
+  const weekOrders   = weekOrdersRow?.c ?? 0;
+  const expiringAmt  = expiringCredits.reduce((s, c) => s + c.amount, 0);
+  const earliestExp  = expiringCredits.length
+    ? expiringCredits.reduce((a, b) => (a.expiresAt! < b.expiresAt! ? a : b)).expiresAt
+    : null;
+
+  const LEVEL_COLORS: Record<Level, string> = {
+    bronze: "#D97706", silver: "#6B7280", gold: "#CA8A04", platinum: "#4F46E5",
+  };
+  const LEVEL_EMOJIS: Record<Level, string> = {
+    bronze: "🥉", silver: "🥈", gold: "🥇", platinum: "💎",
+  };
+  const xpColor = LEVEL_COLORS[xpLevel];
+  const RING_R = 28; const RING_C = +(2 * Math.PI * RING_R).toFixed(2);
+
+  const STATUS_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
+    pending:            { label: "Pending",         dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600"    },
+    in_progress:        { label: "In Progress",     dot: "bg-blue-500",   badge: "bg-blue-100 text-blue-700"    },
+    delivered:          { label: "Delivered",       dot: "bg-blue-500",   badge: "bg-blue-100 text-blue-700" },
+    revision_requested: { label: "Revision",        dot: "bg-amber-500",  badge: "bg-amber-100 text-amber-700"  },
+  };
+
+  const profileHref = `/editor/${editorId}`;
+  const kycApproved = editorRow?.kycStatus === "approved";
+
+  return (
+    <div className="min-h-screen bg-[#F0F9FF]">
+
+      {/* ── Top bar ──────────────────────────────────────────────────────── */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-8 py-6 ">
+          <div className="flex items-center justify-between gap-4">
+
+            {/* Left: avatar + greeting */}
+            <div className="flex items-center gap-4">
+              {session.user.image ? (
+                <Image src={session.user.image} alt="" width={44} height={44}
+                  className="rounded-xl object-cover shrink-0" style={{ outline: `2px solid ${COLOR}30` }} />
+              ) : (
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-lg" style={{ background: COLOR }}>
+                  {(session.user.name ?? "E")[0].toUpperCase()}
+                </div>
+              )}
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 leading-tight">Good {now.getHours() < 12 ? "morning" : now.getHours() < 17 ? "afternoon" : "evening"}, {firstName}</h1>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className={cn(
+                    "inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full",
+                    isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"
+                  )}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", isAvailable ? "bg-emerald-500" : "bg-gray-400")} />
+                    {isAvailable ? "Available" : "Paused"}
+                  </span>
+                  {kycApproved && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600">
+                      <BadgeCheck className="w-3.5 h-3.5" /> Verified
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right: month earnings + profile link */}
+            <div className="hidden sm:flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-xs text-gray-400">This month</p>
+                <p className="text-xl font-bold text-gray-900">{formatCurrency(monthEarnings)}</p>
+              </div>
+              <Link href={profileHref}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:border-blue-300 hover:text-blue-700 transition-colors">
+                <Share2 className="w-3.5 h-3.5" /> Public profile
+              </Link>
+            </div>
+          </div>
+
+          {/* Banners */}
+          {editorRow?.kycStatus === "pending" && (
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+              <Clock className="w-4 h-4 text-amber-500 shrink-0" />
+              <p className="text-sm text-amber-800 flex-1">Complete KYC verification to start receiving orders.</p>
+              <Link href="/editor/kyc" className="text-xs font-bold text-amber-700 hover:text-amber-900 whitespace-nowrap">Complete KYC →</Link>
+            </div>
+          )}
+          {editorRow?.kycStatus === "rejected" && (
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+              <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+              <p className="text-sm text-red-800 flex-1">Your KYC was rejected. Re-submit with a valid government ID.</p>
+              <Link href="/editor/kyc" className="text-xs font-bold text-red-700 whitespace-nowrap">Re-submit →</Link>
+            </div>
+          )}
+          {kycApproved && editorRow?.kycApprovedAt && (() => {
+            const approvedAt = new Date(editorRow.kycApprovedAt);
+            const expiryDate = new Date(approvedAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            const showExpiryWarning = daysUntilExpiry <= 60;
+            return showExpiryWarning ? (
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                <p className="text-sm text-amber-800 flex-1">
+                  Your KYC verification expires in <strong>{daysUntilExpiry} day{daysUntilExpiry !== 1 ? "s" : ""}</strong> ({formatDate(expiryDate)}). Stay active to avoid re-verification.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
+                <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
+                <p className="text-xs text-gray-500">
+                  KYC verified on {formatDate(approvedAt)} · valid until {formatDate(expiryDate)}
+                </p>
+              </div>
+            );
+          })()}
+          {kycApproved && activeOrders.length === 0 && totalEarnings === 0 && (
+            <div className="mt-4 flex items-center gap-3 rounded-xl border px-4 py-3" style={{ background: `${COLOR}08`, borderColor: `${COLOR}25` }}>
+              <CheckCircle className="w-4 h-4 shrink-0" style={{ color: COLOR }} />
+              <p className="text-sm text-gray-700 flex-1">Your profile is live! Share it to start receiving orders.</p>
+              <Link href={profileHref} className="text-xs font-bold whitespace-nowrap" style={{ color: COLOR }}>Share profile →</Link>
+            </div>
+          )}
+          {/* Credits expiry warning */}
+          {expiringAmt > 0 && earliestExp && (
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+              <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+              <p className="text-sm text-amber-800 flex-1">
+                <strong>₹{(expiringAmt / 100).toFixed(0)} in credits</strong> expire on{" "}
+                {new Date(earliestExp).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} — use them on your next order.
+              </p>
+              <Link href="/editor/rewards" className="text-xs font-bold text-amber-700 whitespace-nowrap">View →</Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="px-8 py-6 space-y-5">
+
+        {/* Auto-pause banner */}
+        {activeOrders.length >= 3 && kycApproved && isAvailable && (
+          <AutoPauseBanner activeCount={activeOrders.length} />
+        )}
+
+        {/* Disputes alert */}
+        {openDisputes > 0 && (
+          <Link href="/editor/disputes"
+            className="flex items-center gap-4 bg-red-50 border border-red-200 rounded-2xl px-5 py-4 hover:bg-red-100 transition-colors group">
+            <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-900">{openDisputes} open dispute{openDisputes !== 1 ? "s" : ""} need{openDisputes === 1 ? "s" : ""} your response</p>
+              <p className="text-xs text-red-600 mt-0.5">Respond promptly to help resolve these orders.</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-red-400 group-hover:text-red-600 shrink-0 transition-colors" />
+          </Link>
+        )}
+
+        {/* Unanswered pre-order questions alert */}
+        {staleQuestions > 0 && (
+          <Link href="/editor/questions"
+            className="flex items-center gap-4 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 hover:bg-amber-100 transition-colors group">
+            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <HelpCircle className="w-4 h-4 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900">{staleQuestions} unanswered question{staleQuestions !== 1 ? "s" : ""} from potential clients</p>
+              <p className="text-xs text-amber-600 mt-0.5">Asked over 6 hours ago — quick replies win more orders.</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-amber-400 group-hover:text-amber-600 shrink-0 transition-colors" />
+          </Link>
+        )}
+
+        {/* Needs attention */}
+        {needsAction.length > 0 && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 overflow-hidden">
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-amber-100">
+              <RefreshCw className="w-4 h-4 text-amber-600" />
+              <p className="text-sm font-semibold text-amber-900">Needs attention</p>
+              <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-800">{needsAction.length}</span>
+            </div>
+            <div className="divide-y divide-amber-100">
+              {needsAction.map(order => (
+                <Link key={order.id} href={`/editor/orders/${order.id}`}
+                  className="flex items-center justify-between px-5 py-3.5 hover:bg-amber-100/60 transition-colors group">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <CircleDot className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <p className="text-sm font-semibold text-gray-900 truncate">{order.packageTitle}</p>
+                    </div>
+                    <p className="text-xs text-amber-700 ml-5 mt-0.5">
+                      {order.status === "revision_requested" ? "Client requested revisions" : "Awaiting your start"}
+                      {order.deadline && <> · <DeadlineCountdown deadline={order.deadline.toISOString()} /></>}
+                    </p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:text-amber-700 shrink-0 ml-3 transition-colors" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── KPI row ─────────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "This Month",     value: formatCurrency(monthEarnings), sub: `${formatCurrency(totalEarnings)} lifetime`, icon: IndianRupee, color: COLOR },
+            { label: "Active Orders",  value: String(activeOrders.length),   sub: needsAction.length > 0 ? `${needsAction.length} need action` : "All on track", icon: ShoppingBag, color: "#0EA5E9" },
+            { label: "Pending Payout", value: formatCurrency(pendingPayout), sub: "From active orders",            icon: TrendingUp,  color: "#D97706" },
+            { label: "Avg Rating",     value: avgRating ? `${avgRating} ★` : "—", sub: `${totalReviews} review${totalReviews !== 1 ? "s" : ""}`, icon: Star, color: "#F59E0B" },
+          ].map(({ label, value, sub, icon: Icon, color }) => (
+            <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-medium text-gray-400">{label}</p>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}15` }}>
+                  <Icon className="w-4 h-4" style={{ color }} />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-gray-900 leading-none mb-1.5">{value}</p>
+              <p className="text-xs text-gray-400">{sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* ── XP + Streak widget ──────────────────────────────────────────── */}
+        <Link href="/editor/rewards" className="block bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-gray-200 transition-colors">
+          <div className="flex items-center gap-4">
+            {/* Mini ring */}
+            <div className="relative w-14 h-14 shrink-0">
+              <svg viewBox="0 0 64 64" className="w-full h-full" style={{ transform: "rotate(-90deg)" }}>
+                <circle cx="32" cy="32" r={RING_R} fill="none" stroke="currentColor"
+                  strokeWidth="5" className="text-gray-100" />
+                <circle cx="32" cy="32" r={RING_R} fill="none"
+                  stroke={xpColor} strokeWidth="5" strokeLinecap="round"
+                  strokeDasharray={RING_C}
+                  strokeDashoffset={RING_C * (1 - xpPct / 100)} />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-xl">
+                {LEVEL_EMOJIS[xpLevel]}
+              </div>
+            </div>
+
+            {/* XP info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-lg font-bold text-gray-900 tabular-nums">{xpTotal.toLocaleString()}</span>
+                <span className="text-xs text-gray-400">XP</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider ml-1 px-1.5 py-0.5 rounded-full text-white"
+                  style={{ background: xpColor }}>
+                  {xpLevel}
+                </span>
+              </div>
+              {nextLevel ? (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {(nextLevel.min - xpTotal).toLocaleString()} XP to {nextLevel.name.charAt(0).toUpperCase() + nextLevel.name.slice(1)}
+                </p>
+              ) : (
+                <p className="text-xs font-semibold mt-0.5" style={{ color: xpColor }}>Max level reached 🎉</p>
+              )}
+            </div>
+
+            {/* Streak */}
+            <div className="hidden sm:flex flex-col items-center gap-0.5 shrink-0 border-l border-gray-100 pl-4">
+              <span className="text-2xl">{weekOrders > 0 ? "🔥" : "💤"}</span>
+              <p className="text-sm font-bold text-gray-900 tabular-nums">{weekOrders}/5</p>
+              <p className="text-[10px] text-gray-400">this week</p>
+            </div>
+
+            <ArrowRight className="w-4 h-4 text-gray-300 shrink-0" />
+          </div>
+        </Link>
+
+        {/* ── Main grid ───────────────────────────────────────────────────── */}
+        <div className="grid lg:grid-cols-3 gap-5">
+
+          {/* Left: orders + reviews */}
+          <div className="lg:col-span-2 space-y-5">
+
+            {/* Active orders */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-semibold text-gray-900 text-sm">Active Orders</h2>
+                  {activeOrders.length > 0 && (
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: COLOR }}>
+                      {activeOrders.length}
+                    </span>
+                  )}
+                </div>
+                <Link href="/editor/orders" className="text-xs font-medium flex items-center gap-1 hover:underline" style={{ color: COLOR }}>
+                  View all <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+
+              {activeOrders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${COLOR}10` }}>
+                    <ShoppingBag className="w-5 h-5" style={{ color: COLOR }} />
+                  </div>
+                  <p className="font-medium text-gray-700 text-sm">No active orders</p>
+                  <p className="text-xs text-gray-400 mt-1 max-w-xs">
+                    {kycApproved ? "Share your profile link to start receiving orders." : "Complete KYC to start receiving orders."}
+                  </p>
+                  <Link href={kycApproved ? profileHref : "/editor/kyc"}
+                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white"
+                    style={{ background: COLOR }}>
+                    {kycApproved ? "View public profile" : "Complete KYC"} <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {[...needsAction, ...inProgress].slice(0, 6).map(order => {
+                    const s = STATUS_STYLES[order.status];
+                    return (
+                      <Link key={order.id} href={`/editor/orders/${order.id}`}
+                        className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors group">
+                        <span className={cn("w-2 h-2 rounded-full shrink-0", s.dot)} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate mb-0.5">{order.packageTitle}</p>
+                          <div className="flex items-center gap-2">
+                            <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-full", s.badge)}>{s.label}</span>
+                            <span className="text-xs text-gray-400">{displayNameFromFull(order.clientName ?? "Client")}</span>
+                            {order.deadline && (
+                              <>
+                                <span className="text-gray-200 text-xs">·</span>
+                                <DeadlineCountdown deadline={order.deadline.toISOString()} />
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-sm font-bold text-gray-900">{formatCurrency(order.totalAmount - order.commissionAmount)}</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Performance row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { icon: Clock,     label: "Avg Response", value: editorRow?.avgResponseTime ? editorRow.avgResponseTime < 60 ? `${editorRow.avgResponseTime}m` : `${Math.round(editorRow.avgResponseTime / 60)}h` : "—", color: "#0EA5E9" },
+                { icon: CheckCircle, label: "Completion",  value: editorRow?.completionRate != null ? `${editorRow.completionRate}%` : "—", color: COLOR },
+                { icon: ShoppingBag, label: "Completed",   value: String(editorRow?.totalOrders ?? 0), color: "#D97706" },
+                { icon: ImageIcon,   label: "Portfolio",   value: String(portCount), color: COLOR },
+              ].map(({ icon: Icon, label, value, color }) => (
+                <div key={label} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 shadow-sm">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}12` }}>
+                    <Icon className="w-4 h-4" style={{ color }} />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-gray-900 leading-none mb-0.5">{value}</p>
+                    <p className="text-[11px] text-gray-400">{label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Recent reviews */}
+            {recentReviews.length > 0 && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+                  <h2 className="font-semibold text-gray-900 text-sm">Recent Reviews</h2>
+                  {avgRating && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star key={i} className={cn("w-3 h-3", i < Math.round(avgRating) ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
+                        ))}
+                      </div>
+                      <span className="text-xs font-semibold text-gray-700">{avgRating}</span>
+                      <span className="text-xs text-gray-400">({totalReviews})</span>
+                    </div>
+                  )}
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {recentReviews.map(review => (
+                    <div key={review.id} className="px-5 py-4">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className={cn("w-3 h-3", i < review.rating ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-gray-400">{formatDate(review.createdAt)}</span>
+                      </div>
+                      {review.text && <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">{review.text}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Right sidebar ─────────────────────────────────────────────── */}
+          <div className="space-y-4">
+
+            {/* Availability */}
+            <AvailabilityToggle initial={isAvailable} kycApproved={kycApproved} />
+
+            {/* Earnings */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <p className="font-semibold text-gray-900 text-sm mb-4">Earnings</p>
+              <div className="space-y-3">
+                {[
+                  { dot: COLOR,     label: "This month", value: formatCurrency(monthEarnings), bold: false },
+                  { dot: "#D97706", label: "Pending",    value: formatCurrency(pendingPayout), bold: true, valueColor: "#D97706" },
+                  { dot: "#9CA3AF", label: "All-time",   value: formatCurrency(totalEarnings), bold: false },
+                ].map(({ dot, label, value, bold, valueColor }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dot }} />
+                      <span className="text-xs text-gray-500">{label}</span>
+                    </div>
+                    <span className={cn("text-sm font-bold", bold ? "" : "text-gray-900")} style={valueColor ? { color: valueColor } : {}}>
+                      {value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/editor/payouts" className="mt-4 flex items-center justify-between text-xs font-semibold hover:underline" style={{ color: COLOR }}>
+                View payouts <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            {/* Quick links */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-50">
+                <h2 className="font-semibold text-gray-900 text-sm">Quick Access</h2>
+              </div>
+              <div className="p-3 space-y-1">
+                {[
+                  { href: "/feed",             icon: Film,          label: "Editor Feed", sub: "Discover all work" },
+                  { href: "/editor/packages",  icon: Package,       label: "Packages",   sub: `${pkgCount} active` },
+                  { href: "/editor/messages",  icon: MessageSquare, label: "Messages",   sub: unreadMessages > 0 ? `${unreadMessages} unread` : "All read" },
+                  { href: "/editor/analytics", icon: TrendingUp,    label: "Analytics",  sub: "Earnings & stats" },
+                  { href: "/editor/rewards",   icon: Zap,           label: "Rewards",    sub: "XP & badges" },
+                ].map(({ href, icon: Icon, label, sub }) => (
+                  <Link key={href} href={href}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${COLOR}10` }}>
+                      <Icon className="w-4 h-4" style={{ color: COLOR }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800">{label}</p>
+                      <p className="text-xs text-gray-400">{sub}</p>
+                    </div>
+                    <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

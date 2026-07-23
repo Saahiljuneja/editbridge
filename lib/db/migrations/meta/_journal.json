@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1782764043700,
+      "tag": "0000_glamorous_outlaw_kid",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782772071770,
+      "tag": "0001_add_reward_discount_amount",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782832563887,
+      "tag": "0002_add_quote_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782832654402,
+      "tag": "0003_make_package_id_nullable",
+      "breakpoints": true
+    }
+  ]
+}

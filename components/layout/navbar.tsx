@@ -1,0 +1,331 @@
+﻿"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import {
+  Menu, X, ChevronDown, LayoutDashboard,
+  Settings, LogOut, ShieldCheck, HelpCircle,
+  BookOpen, Mail, Users, ArrowRight, Sparkles,
+  BarChart2, Trophy, Film,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { MobileNav } from "@/components/layout/mobile-nav";
+import { NotificationBell } from "@/components/layout/notification-bell";
+
+/* ── data ── */
+const NAV_LINKS = [
+  { href: "/feed",         label: "Feed" },
+  { href: "/browse",       label: "Browse Editors" },
+  { href: "/find-editor",  label: "Find an Editor", flag: "find_editor_quiz" as const },
+  { href: "/how-it-works", label: "How It Works"   },
+  { href: "/pricing",      label: "Pricing"         },
+];
+
+const RESOURCES = [
+  { href: "/about",       icon: Users,      label: "About us",         desc: "Our story and mission"            },
+  { href: "/blog",        icon: BookOpen,   label: "Blog",             desc: "Guides and creator tips"          },
+  { href: "/showcase",    icon: Film,       label: "Showcase",         desc: "Hand-picked editor work"          },
+  { href: "/leaderboard", icon: Trophy,     label: "Top 100 Editors",  desc: "Best-rated editors on EditBridge" },
+  { href: "/faq",         icon: HelpCircle, label: "FAQ",              desc: "Common questions answered"        },
+  { href: "/contact",     icon: Mail,       label: "Contact",          desc: "Support and enquiries"            },
+  { href: "/compare",     icon: BarChart2,  label: "Compare",          desc: "Side-by-side editor comparison"   },
+];
+
+const ROLE_LABELS: Record<string, string> = {
+  client:           "Client",
+  editor:           "Editor",
+  admin:            "Admin",
+  staff_kyc:        "Staff · KYC",
+  staff_support:    "Staff · Support",
+  staff_dispute:    "Staff · Disputes",
+  staff_moderation: "Staff · Moderation",
+};
+
+export function Navbar() {
+  const { data: session } = useSession();
+  const pathname = usePathname();
+
+  const [mobileOpen,  setMobileOpen]  = useState(false);
+  const [moreOpen,    setMoreOpen]    = useState(false);
+  const [userOpen,    setUserOpen]    = useState(false);
+
+  type AnnouncementBar = { id: string; title: string; body: string; type: string };
+  const [announcements, setAnnouncements] = useState<AnnouncementBar[]>([]);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [announcementIdx, setAnnouncementIdx] = useState(0);
+  const [flags, setFlags] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    function fetchAnnouncements() {
+      fetch("/api/announcements")
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data)) setAnnouncements(data); })
+        .catch(() => {});
+    }
+    fetchAnnouncements();
+    const id = setInterval(fetchAnnouncements, 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/feature-flags")
+      .then(r => r.json())
+      .then(d => setFlags(d.flags ?? {}))
+      .catch(() => {});
+  }, []);
+
+  // A link with a `flag` is hidden entirely while that flag is off — mirrors MobileNav's behaviour.
+  const navLinks = NAV_LINKS.filter((l) => !("flag" in l) || flags[(l as { flag: string }).flag] !== false);
+
+  const visibleAnnouncements = announcements.filter(a => !dismissedIds.has(a.id));
+  const currentAnnouncement = visibleAnnouncements[announcementIdx] ?? null;
+
+  function dismissAnnouncement(id: string) {
+    setDismissedIds(prev => new Set(prev).add(id));
+    setAnnouncementIdx(0);
+  }
+
+  /* close dropdowns on route change */
+  useEffect(() => {
+    setMoreOpen(false);
+    setUserOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const initials = session?.user?.name
+    ? session.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+    : "?";
+
+  const dashboardHref =
+    session?.user?.role === "editor"          ? "/editor/dashboard"
+    : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_")
+                                              ? "/admin/dashboard"
+    : "/dashboard";
+
+  const roleLabel = ROLE_LABELS[session?.user?.role ?? ""] ?? "Member";
+  const isActive  = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  return (
+    <>
+      {/* ── Announcement bar (DB-driven) ── */}
+      {currentAnnouncement && (
+        <div className={cn(
+          "relative px-4 py-2.5 text-center",
+          currentAnnouncement.type === "warning"     ? "bg-amber-500"
+          : currentAnnouncement.type === "maintenance" ? "bg-red-600"
+          : "bg-gradient-to-r from-[#0EA5E9] to-[#7c6ff7]"
+        )}>
+          <p className="text-xs sm:text-sm text-white font-medium pr-8">
+            {currentAnnouncement.type === "warning" && "⚠️ "}
+            {currentAnnouncement.type === "maintenance" && "🔧 "}
+            {currentAnnouncement.type === "info" && "📢 "}
+            <span className="font-bold">{currentAnnouncement.title}</span>
+            {currentAnnouncement.body && (
+              <span className="font-normal opacity-90"> — {currentAnnouncement.body}</span>
+            )}
+          </p>
+          {visibleAnnouncements.length > 1 && (
+            <button
+              onClick={() => setAnnouncementIdx(i => (i + 1) % visibleAnnouncements.length)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-xs font-bold transition-colors"
+            >
+              {announcementIdx + 1}/{visibleAnnouncements.length} ›
+            </button>
+          )}
+          <button
+            onClick={() => dismissAnnouncement(currentAnnouncement.id)}
+            aria-label="Dismiss"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* ── Main navbar ── */}
+      <nav className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between" style={{ height: 64 }}>
+
+            {/* ── Logo ── */}
+            <Link href="/" className="flex items-center gap-2.5 shrink-0 mr-8 group">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7c6ff7] to-[#0EA5E9] flex items-center justify-center shadow-[0_2px_8px_rgba(74,63,181,0.4)] group-hover:shadow-[0_4px_16px_rgba(74,63,181,0.5)] transition-all">
+                <span className="text-white font-black text-sm">E</span>
+              </div>
+              <span className="text-[1.15rem] font-black tracking-tight text-gray-900">
+                Edit<span className="text-[#0EA5E9]">Bridge</span>
+              </span>
+            </Link>
+
+            {/* ── Desktop nav ── */}
+            <div className="hidden md:flex items-center gap-0.5 flex-1">
+              {navLinks.map(({ href, label }) => (
+                <Link key={href} href={href}
+                  className={cn(
+                    "px-3.5 py-2 rounded-xl text-sm font-medium transition-all",
+                    isActive(href)
+                      ? "text-[#0EA5E9] bg-[#0EA5E9]/8"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  )}>
+                  {label}
+                </Link>
+              ))}
+
+              {/* Resources dropdown */}
+              <div className="relative">
+                <button onClick={() => setMoreOpen(o => !o)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all",
+                    moreOpen ? "text-[#0EA5E9] bg-[#0EA5E9]/8" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  )}>
+                  Resources
+                  <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
+                </button>
+
+                {moreOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
+                    <div className="absolute left-0 top-full mt-2 w-64 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden p-1.5">
+                      {RESOURCES.map(({ href, icon: Icon, label, desc }) => (
+                        <Link key={href} href={href}
+                          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                          <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-[#7c6ff7]/10 flex items-center justify-center shrink-0 transition-colors">
+                            <Icon className="w-4 h-4 text-gray-400 group-hover:text-[#7c6ff7] transition-colors" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-800">{label}</p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
+                          </div>
+                        </Link>
+                      ))}
+                      <div className="mx-3 my-1.5 border-t border-gray-100" />
+                      <Link href="/signup/editor"
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#7c6ff7]/5 transition-colors group">
+                        <div className="w-8 h-8 rounded-lg bg-[#7c6ff7]/10 flex items-center justify-center shrink-0">
+                          <Sparkles className="w-4 h-4 text-[#7c6ff7]" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-[#7c6ff7]">Become an editor</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">Apply and start earning</p>
+                        </div>
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* ── Right side ── */}
+            <div className="flex items-center gap-2">
+              {session ? (
+                <>
+                  <NotificationBell />
+
+                  <Link href={dashboardHref}
+                    className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+
+                  {/* User menu */}
+                  <div className="relative">
+                    <button onClick={() => setUserOpen(o => !o)}
+                      className="flex items-center gap-2 px-2 py-1.5 rounded-xl border transition-all border-gray-200 bg-gray-50 hover:bg-gray-100">
+                      <div className="w-7 h-7 rounded-lg bg-[#0EA5E9] flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
+                        {session.user?.image
+                          // eslint-disable-next-line @next/next/no-img-element
+                          ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
+                          : initials}
+                      </div>
+                      <div className="hidden sm:block text-left max-w-[90px]">
+                        <p className="text-xs font-semibold truncate leading-none text-gray-800">
+                          {session.user?.name?.split(" ")[0]}
+                        </p>
+                        <p className="text-[10px] leading-none mt-0.5 text-gray-400">
+                          {roleLabel}
+                        </p>
+                      </div>
+                      <ChevronDown className={cn("w-3.5 h-3.5 shrink-0 transition-all text-gray-400", userOpen && "rotate-180")} />
+                    </button>
+
+                    {userOpen && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setUserOpen(false)} />
+                        <div className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden">
+                          <div className="px-4 py-4 border-b border-gray-100">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-[#0EA5E9] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+                                {session.user?.image
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
+                                  : initials}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-gray-900 truncate">{session.user?.name}</p>
+                                <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
+                                <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#7c6ff7]/10 text-[#7c6ff7] text-[10px] font-black uppercase tracking-wide">
+                                  {roleLabel}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="p-1.5">
+                            <DropItem href={dashboardHref} icon={LayoutDashboard} label="Dashboard" />
+                            <DropItem href={session?.user?.role === "editor" ? "/editor/settings" : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_") ? "/admin/settings" : "/settings"} icon={Settings} label="Settings" />
+                            <DropItem href="/faq"          icon={HelpCircle}      label="Help & FAQ" />
+                          </div>
+                          <div className="border-t border-gray-100 p-1.5">
+                            <button
+                              onClick={() => { setUserOpen(false); signOut({ callbackUrl: "/" }); }}
+                              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-colors font-medium">
+                              <LogOut className="w-4 h-4 shrink-0" />
+                              Sign out
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link href="/login"
+                    className="hidden sm:block px-3.5 py-2 rounded-xl text-sm font-medium transition-all text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                    Sign in
+                  </Link>
+                  <Link href="/signup"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all bg-[#0EA5E9] hover:bg-[#0284C7] shadow-[0_2px_12px_rgba(14,165,233,0.4)] hover:shadow-[0_4px_20px_rgba(14,165,233,0.55)] hover:-translate-y-px">
+                    Get started
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </>
+              )}
+
+              {/* Mobile hamburger */}
+              <button
+                className="md:hidden p-2 rounded-xl transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                onClick={() => setMobileOpen(true)}
+                aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
+    </>
+  );
+}
+
+function DropItem({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
+  return (
+    <Link href={href}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors font-medium group">
+      <Icon className="w-4 h-4 text-gray-400 group-hover:text-gray-600 shrink-0 transition-colors" />
+      {label}
+    </Link>
+  );
+}
