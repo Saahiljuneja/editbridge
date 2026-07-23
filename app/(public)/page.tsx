@@ -233,7 +233,6 @@ export default async function HomePage() {
         {quizEnabled && <AnimatedFindEditorCTA />}
         {/* 11. Leaderboard only when editors have real completed orders */}
         {showLeaderboard && <LeaderboardTeaser editors={leaderboardEditors} />}
-        <BeforeAfterSection />
         <AnimatedWhySection />
         <ShowcasePreviewSection items={showcaseItems} />
         <ComparisonSection />
