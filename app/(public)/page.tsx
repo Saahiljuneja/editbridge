@@ -23,7 +23,6 @@ import {
   GuaranteeBar,
   BackToTopButton,
   EscrowFlowSection,
-  WorkGallerySection,
 } from "@/components/home/animated-sections";
 import { CategoryBrowseSection } from "@/components/home/category-browse-section";
 import { isFeatureEnabled } from "@/lib/feature-flags";
@@ -215,8 +214,6 @@ export default async function HomePage() {
         <AnimatedHero availableCount={availableCount} />
         {/* 2. Editor cards — show who's on the platform immediately */}
         <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} />
-        {/* 4. Visual proof of creative output */}
-        <WorkGallerySection />
         {/* 5. Price anchoring — removes cost uncertainty */}
         <PriceAnchorSection />
         {/* 6. Escrow flow — builds payment trust */}
