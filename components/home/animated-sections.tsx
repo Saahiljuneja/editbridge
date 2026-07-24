@@ -581,15 +581,21 @@ export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPai
    LIVE ACTIVITY FEED
 ════════════════════════════════════════════════════════════════════════════ */
 const ACTIVITY = [
-  { type: "order",    name: "Ankit V.",   action: "placed an order with Priya S.",    time: "2m ago",   col: "#0EA5E9", amount: "₹1,200" },
-  { type: "approved", name: "Rohan S.",   action: "approved delivery — ₹3,825 released", time: "5m ago", col: "#059669", amount: "₹3,825" },
-  { type: "order",    name: "Divya K.",   action: "booked Arjun M. for YouTube edit", time: "11m ago",  col: "#0EA5E9", amount: "₹4,500" },
-  { type: "approved", name: "Meera P.",   action: "left 5★ review — 'Delivered early!'", time: "18m ago", col: "#d97706", amount: null },
-  { type: "order",    name: "Karan D.",   action: "placed a thumbnail design order",   time: "24m ago",  col: "#0EA5E9", amount: "₹800" },
-  { type: "approved", name: "Sneha R.",   action: "approved Reels package delivery",   time: "31m ago",  col: "#059669", amount: "₹1,700" },
-  { type: "order",    name: "Vivek D.",   action: "booked podcast editing — 3 eps",    time: "45m ago",  col: "#0EA5E9", amount: "₹5,400" },
-  { type: "approved", name: "Priya M.",   action: "payment released after approval",   time: "1h ago",   col: "#059669", amount: "₹2,200" },
+  { type: "order",    name: "Ankit V.",  action: "placed an order with Priya S.",        time: "2m ago",   col: "#0EA5E9", amount: "₹1,200" },
+  { type: "approved", name: "Rohan S.",  action: "approved delivery — ₹3,825 released",  time: "5m ago",   col: "#059669", amount: "₹3,825" },
+  { type: "order",    name: "Divya K.",  action: "booked Arjun M. for YouTube edit",     time: "11m ago",  col: "#0EA5E9", amount: "₹4,500" },
+  { type: "review",   name: "Meera P.",  action: "left 5★ review — 'Delivered early!'",  time: "18m ago",  col: "#d97706", amount: null     },
+  { type: "order",    name: "Karan D.",  action: "placed a thumbnail design order",      time: "24m ago",  col: "#0EA5E9", amount: "₹800"  },
+  { type: "approved", name: "Sneha R.",  action: "approved Reels package delivery",      time: "31m ago",  col: "#059669", amount: "₹1,700" },
+  { type: "order",    name: "Vivek D.",  action: "booked podcast editing — 3 eps",       time: "45m ago",  col: "#0EA5E9", amount: "₹5,400" },
+  { type: "approved", name: "Priya M.",  action: "payment released after approval",      time: "1h ago",   col: "#059669", amount: "₹2,200" },
 ];
+
+const TAG_CFG: Record<string, { label: string }> = {
+  order:    { label: "ORDER"  },
+  approved: { label: "PAID"   },
+  review:   { label: "REVIEW" },
+};
 
 interface ActivityItem {
   type: string;
@@ -605,10 +611,12 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
   const base = hasRealData ? feedItems : ACTIVITY;
   const [items, setItems] = useState(base.slice(0, 6));
   const listRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef(null);
+  const sectionInView = useInView(sectionRef, { once: true, margin: "-60px" });
   const prefersReduced = useReducedMotion();
 
   useEffect(() => {
-    if (prefersReduced || !hasRealData) return; // never loop fake data
+    if (prefersReduced || !hasRealData) return;
     const t = setInterval(() => {
       setItems(prev => {
         const newItem = base[Math.floor(Math.random() * base.length)];
@@ -619,7 +627,7 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
   }, [prefersReduced, hasRealData, base]);
 
   return (
-    <section className="bg-white py-14 md:py-24 px-6 overflow-hidden">
+    <section ref={sectionRef} className="bg-white py-14 md:py-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left — text */}
@@ -632,20 +640,26 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
               Orders happening<br /><span className="text-gray-200">right now.</span>
             </h2>
             <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-8">
-              Creators across India are hiring verified editors at this very moment.
-              Every order runs through verified payment protection — zero risk, guaranteed security.
+              Creators across India are booking verified editors at this very moment.
+              Every rupee sits in escrow — your money moves only when you approve the work.
             </p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { v: "< 2hrs", l: "Avg. first response",  c: "#0EA5E9", Icon: Clock  },
-                { v: "5+",     l: "Content niches covered", c: "#0F6E56", Icon: Zap   },
-              ].map(({ v, l, c, Icon }) => (
-                <div key={l} className="rounded-2xl p-5 flex flex-col gap-3"
-                  style={{ background: `${c}08`, border: `1px solid ${c}22` }}>
+                { v: "< 2hrs", l: "Avg. first response",   c: "#0EA5E9", Icon: Clock, delay: 0.15 },
+                { v: "6",      l: "Content niches covered", c: "#0F6E56", Icon: Zap,   delay: 0.28 },
+              ].map(({ v, l, c, Icon, delay }) => (
+                <motion.div
+                  key={l}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={sectionInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+                  className="rounded-2xl p-5 flex flex-col gap-3"
+                  style={{ background: `${c}08`, border: `1px solid ${c}22` }}
+                >
                   <Icon className="w-4 h-4" style={{ color: c }} strokeWidth={1.5} />
                   <p className="text-3xl font-black leading-none" style={{ color: c }}>{v}</p>
                   <p className="text-xs font-semibold leading-snug" style={{ color: `${c}99` }}>{l}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </Reveal>
@@ -653,60 +667,99 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
           {/* Right — live feed */}
           <Reveal from="right" className="min-w-0">
             <div className="relative rounded-3xl overflow-hidden border border-gray-100 shadow-[0_32px_80px_rgba(0,0,0,0.08)]">
+
               {/* Header */}
               <div className="bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <motion.span animate={{ scale:[1,1.6,1], opacity:[1,0.5,1] }} transition={{ duration:1.6, repeat:Infinity }}
-                    className={`w-2 h-2 rounded-full inline-block ${hasRealData ? "bg-emerald-400" : "bg-amber-400"}`} />
-                  <span className="text-sm font-bold text-gray-900">{hasRealData ? "Live activity" : "Platform activity"}</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <motion.span
+                      className="absolute inline-flex h-full w-full rounded-full bg-emerald-400"
+                      animate={{ scale: [1, 2.4, 1], opacity: [0.7, 0, 0.7] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                    />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                  <span className="text-sm font-bold text-gray-900">Live activity</span>
                 </div>
-                {hasRealData ? (
-                  <span className="text-xs text-gray-400 font-medium">Last 24h</span>
-                ) : (
-                  <span className="text-[10px] text-amber-600 font-bold bg-amber-50 border border-amber-100 rounded-full px-2 py-0.5">Sample preview</span>
-                )}
+                <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2.5 py-0.5">
+                  {hasRealData ? "Last 24h" : "Updated live"}
+                </span>
               </div>
 
               {/* Feed */}
-              <div ref={listRef} className="bg-gray-50/50 divide-y divide-gray-100" style={{ maxHeight: 360, overflow: "hidden" }}>
+              <div ref={listRef} className="bg-gray-50/30 divide-y divide-gray-100/80" style={{ maxHeight: 372, overflow: "hidden" }}>
                 <AnimatePresence initial={false}>
-                  {items.slice(0, 6).map((item, i) => (
-                    <motion.div key={`${item.name}-${item.time}-${i}`}
-                      initial={{ opacity: 0, x: -20, height: 0 }}
-                      animate={{ opacity: 1, x: 0, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex items-center gap-3.5 px-5 py-3.5">
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                        style={{ background: item.col }}>
-                        {item.name.split(" ").map(w => w[0]).join("")}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-700 truncate">
-                          <span className="font-semibold text-gray-900">{item.name}</span> {item.action}
-                        </p>
-                        <p className="text-[10px] text-gray-400 mt-0.5">{item.time}</p>
-                      </div>
-                      {item.amount && (
-                        <motion.span
-                          className="text-xs font-bold shrink-0 rounded px-1.5 py-0.5"
-                          style={{ color: item.col }}
-                          initial={item.time === "just now" ? { scale: 1.18, backgroundColor: `${item.col}35` } : false}
-                          animate={{ scale: 1, backgroundColor: "rgba(0,0,0,0)" }}
-                          transition={{ duration: 0.8, ease: "easeOut" }}
+                  {items.slice(0, 6).map((item, i) => {
+                    const tag = TAG_CFG[item.type];
+                    const rightVal = item.amount ?? (item.type === "review" ? "★ 5.0" : null);
+                    const rightCol = item.amount ? item.col : "#d97706";
+                    const isNew = item.time === "just now";
+                    return (
+                      <motion.div
+                        key={`${item.name}-${item.time}-${i}`}
+                        initial={{ opacity: 0, x: isNew ? -20 : 0, height: isNew ? 0 : "auto" }}
+                        animate={{ opacity: 1, x: 0, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{
+                          duration: isNew ? 0.38 : 0.45,
+                          delay: isNew ? 0 : i * 0.065,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className={cn(
+                          "flex items-center gap-3.5 px-5 py-3.5 transition-colors duration-500",
+                          isNew && "bg-emerald-50/70"
+                        )}
+                      >
+                        {/* Avatar */}
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 ring-2 ring-white"
+                          style={{ background: item.col }}
                         >
-                          {item.amount}
-                        </motion.span>
-                      )}
-                    </motion.div>
-                  ))}
+                          {item.name.split(" ").map((w: string) => w[0]).join("")}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-600 truncate leading-snug">
+                            <span className="font-semibold text-gray-900">{item.name}</span>{" "}{item.action}
+                          </p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-[10px] text-gray-400">{item.time}</span>
+                            {tag && (
+                              <span
+                                className="text-[8px] font-black uppercase tracking-widest rounded px-1.5 py-0.5 leading-none"
+                                style={{ background: `${item.col}14`, color: item.col }}
+                              >
+                                {tag.label}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right badge */}
+                        {rightVal && (
+                          <motion.span
+                            className="text-xs font-bold shrink-0 rounded-md px-1.5 py-0.5 tabular-nums"
+                            style={{ color: rightCol }}
+                            initial={isNew ? { scale: 1.2, backgroundColor: `${rightCol}28` } : false}
+                            animate={{ scale: 1, backgroundColor: "rgba(0,0,0,0)" }}
+                            transition={{ duration: 0.9, ease: "easeOut" }}
+                          >
+                            {rightVal}
+                          </motion.span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </div>
 
               {/* Footer */}
               <div className="bg-white border-t border-gray-100 px-5 py-3 flex items-center justify-between">
-                <span className="text-[11px] text-gray-400">{hasRealData ? "Showing live order activity" : "Example — real orders shown as they happen"}</span>
-                <span className="text-[11px] text-[#0EA5E9] font-semibold">All payments verified & protected</span>
+                <span className="text-[11px] text-gray-400">
+                  {hasRealData ? "Showing live order activity" : "Every order is escrow-protected"}
+                </span>
+                <span className="text-[11px] text-[#0EA5E9] font-semibold">Payments verified & protected</span>
               </div>
             </div>
           </Reveal>
