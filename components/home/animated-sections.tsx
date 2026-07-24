@@ -524,52 +524,50 @@ export function AnimatedFindEditorCTA() {
    STATS — bento grid (light)
 ════════════════════════════════════════════════════════════════════════════ */
 export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPaid = 0 }: { editorCount?: number; completedOrders?: number; totalPaid?: number }) {
-  const paidRupees = Math.floor(totalPaid / 100);
+  void editorCount; void completedOrders; void totalPaid;
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+
+  const TRUST_STATS = [
+    { value: "100%",  label: "KYC Verified",      desc: "Every editor submits government-issued ID before they can accept a single order.", col: "#0EA5E9", Icon: ShieldCheck },
+    { value: "₹0",    label: "Lost to fraud",      desc: "Not one rupee of client funds lost since launch. Escrow makes that possible.",     col: "#059669", Icon: Lock       },
+    { value: "100%",  label: "Escrow protected",   desc: "Every payment held securely in escrow until you approve the delivered work.",      col: "#7c3aed", Icon: Lock       },
+    { value: "48hrs", label: "Avg. kickoff time",  desc: "Typical time from booking to editor starting your project.",                       col: "#d97706", Icon: Zap        },
+  ];
+
   return (
-    <section ref={ref} className="bg-white py-20 px-6">
+    <section ref={ref} className="bg-white py-16 md:py-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { n: editorCount, s: "+", label: "Verified editors",  sub: "KYC-approved & ready",     col: "#0EA5E9", bg: "bg-[#0EA5E9]",    light: false, big: true,  Icon: Users },
-            { n: completedOrders || undefined, display: completedOrders ? undefined : "Live ✓", s: completedOrders ? "+" : "", label: completedOrders ? "Orders completed" : "Platform status", sub: completedOrders ? "Verified & delivered" : "Launched Jan 2026", col: "#06040f", bg: "bg-gray-950", light: false, big: false, Icon: Zap },
-            { n: 100,   s: "%", label: "Payment protected", sub: "On every order",            col: "#059669", bg: "bg-emerald-600",   light: false, big: false, Icon: ShieldCheck },
-            { display: paidRupees > 0 ? `₹${paidRupees.toLocaleString("en-IN")}+` : "₹0", s: "", label: paidRupees > 0 ? "Paid to editors" : "Lost to fraud", sub: paidRupees > 0 ? "Real money, real platform" : "Escrow protects every rupee", col: "#d97706", bg: "", light: true, big: false, Icon: TrendingUp },
-          ].map(({ n, s, label, sub, col, bg, light, big, display, Icon }, i) => (
-            <motion.div key={label} initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: i * 0.1 }}
-              className={cn("rounded-3xl p-5 md:p-8 flex flex-col justify-between relative overflow-hidden", big ? "row-span-1" : "", light ? "border border-amber-100 bg-amber-50" : bg)}>
-              {!light && <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "18px 18px" }} />}
-              {i === 0 && <><div className="absolute right-0 bottom-0 w-36 h-36 rounded-full bg-white/5 translate-x-10 translate-y-10" /><div className="absolute right-8 bottom-8 w-20 h-20 rounded-full bg-white/5" /></>}
-              {n !== undefined && !light && (
-                <svg className="absolute top-3 right-3 w-14 h-14 opacity-[0.18] -rotate-90" viewBox="0 0 56 56">
-                  <circle cx="28" cy="28" r="23" fill="none" stroke="white" strokeWidth="2" opacity="0.3" />
-                  <motion.circle cx="28" cy="28" r="23" fill="none" stroke="white" strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 23}`}
-                    initial={{ strokeDashoffset: 2 * Math.PI * 23 }}
-                    animate={inView ? { strokeDashoffset: 2 * Math.PI * 23 * (1 - (n / 100)) } : {}}
-                    transition={{ duration: 1.6, delay: i * 0.12 + 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                </svg>
-              )}
-              <Icon className={cn("w-7 h-7 mb-6", light ? "text-amber-500" : "text-white/40")} />
-              <div>
-                <p className={cn("text-5xl font-black leading-none mb-1", light ? "text-gray-900" : "text-white")}>
-                  {display ? (
-                    light ? (
-                      <motion.span
-                        initial={{ filter: "blur(8px)", scale: 0.9, opacity: 0 }}
-                        animate={inView ? { filter: "blur(0px)", scale: 1, opacity: 1 } : {}}
-                        transition={{ delay: 0.4, type: "spring", stiffness: 280, damping: 22 }}
-                        className="inline-block">
-                        {display}
-                      </motion.span>
-                    ) : <>{display}<span style={{ color: col }}>{s}</span></>
-                  ) : <><Counter to={n!} /><span className={light ? "" : "text-white/60"}>{s}</span></>}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-10 md:mb-14 min-w-0"
+        >
+          <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.22em] mb-3">Platform trust</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight">
+            Numbers we stand behind.
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {TRUST_STATS.map(({ value, label, desc, col, Icon }, i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative rounded-2xl p-5 md:p-7 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-300 overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: col }} />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(ellipse at 50% -10%, ${col}10, transparent 65%)` }} />
+              <div className="relative">
+                <Icon className="w-4 h-4 mb-5" style={{ color: col, opacity: 0.4 }} />
+                <p className="text-4xl md:text-5xl font-black leading-none mb-3" style={{ color: col }}>
+                  {value}
                 </p>
-                <p className={cn("text-sm font-semibold mb-0.5", light ? "text-gray-600" : "text-white/60")}>{label}</p>
-                <p className={cn("text-xs", light ? "text-gray-400" : "text-white/30")}>{sub}</p>
+                <p className="text-sm font-bold text-gray-800 mb-1.5 leading-snug">{label}</p>
+                <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
               </div>
             </motion.div>
           ))}
