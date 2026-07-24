@@ -538,7 +538,7 @@ export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPai
             { display: paidRupees > 0 ? `₹${paidRupees.toLocaleString("en-IN")}+` : "₹0", s: "", label: paidRupees > 0 ? "Paid to editors" : "Lost to fraud", sub: paidRupees > 0 ? "Real money, real platform" : "Escrow protects every rupee", col: "#d97706", bg: "", light: true, big: false, Icon: TrendingUp },
           ].map(({ n, s, label, sub, col, bg, light, big, display, Icon }, i) => (
             <motion.div key={label} initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay: i * 0.1 }}
-              className={cn("rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden", big ? "row-span-1" : "", light ? "border border-amber-100 bg-amber-50" : bg)}>
+              className={cn("rounded-3xl p-5 md:p-8 flex flex-col justify-between relative overflow-hidden", big ? "row-span-1" : "", light ? "border border-amber-100 bg-amber-50" : bg)}>
               {!light && <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "18px 18px" }} />}
               {i === 0 && <><div className="absolute right-0 bottom-0 w-36 h-36 rounded-full bg-white/5 translate-x-10 translate-y-10" /><div className="absolute right-8 bottom-8 w-20 h-20 rounded-full bg-white/5" /></>}
               {n !== undefined && !light && (
@@ -2370,7 +2370,7 @@ export function ForEditorsSection() {
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border border-white/[0.06]">
         {/* Client side */}
         <Reveal from="left">
-          <div className="relative p-10 lg:p-14 h-full flex flex-col justify-between overflow-hidden" style={{ background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)" }}>
+          <div className="relative p-7 lg:p-14 h-full flex flex-col justify-between overflow-hidden" style={{ background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)" }}>
             <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20" style={{ background: "radial-gradient(ellipse, #ffffff, transparent 70%)" }} />
             <div className="relative">
@@ -2399,7 +2399,7 @@ export function ForEditorsSection() {
 
         {/* Editor side */}
         <Reveal from="right">
-          <div className="relative p-10 lg:p-14 h-full flex flex-col justify-between overflow-hidden border-t md:border-t-0 md:border-l border-white/[0.06]" style={{ background: "linear-gradient(135deg, #1a1030 0%, #0d0d1a 100%)" }}>
+          <div className="relative p-7 lg:p-14 h-full flex flex-col justify-between overflow-hidden border-t md:border-t-0 md:border-l border-white/[0.06]" style={{ background: "linear-gradient(135deg, #1a1030 0%, #0d0d1a 100%)" }}>
             <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "radial-gradient(rgba(124,58,237,0.8) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-15" style={{ background: "radial-gradient(ellipse, #7c3aed, transparent 70%)" }} />
             <div className="relative">
