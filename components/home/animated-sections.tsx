@@ -295,13 +295,13 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
             {/* Mobile-only editor cards — visual anchor for small screens */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}
-              className="mt-8 grid grid-cols-3 gap-2 lg:hidden">
+              className="mt-8 flex gap-2 overflow-x-auto pb-1 lg:hidden" style={{ scrollbarWidth: "none" }}>
               {[
                 { initials: "AM", name: "Arjun M.", niche: "YouTube", rating: "4.9★", col: "#7c3aed", avail: true },
                 { initials: "PS", name: "Priya S.", niche: "Reels",   rating: "5.0★", col: "#0EA5E9", avail: true  },
                 { initials: "DK", name: "Divya K.", niche: "Podcasts", rating: "4.8★", col: "#059669", avail: false },
               ].map(({ initials, name, niche, rating, col, avail }) => (
-                <div key={initials} className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm">
+                <div key={initials} className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm shrink-0 w-[calc(50%-4px)]">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[9px] font-black shrink-0" style={{ background: col }}>{initials}</div>
                     <div className="min-w-0">
@@ -621,7 +621,7 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
   }, [prefersReduced, hasRealData, base]);
 
   return (
-    <section className="bg-white py-0 px-6 pb-24">
+    <section className="bg-white py-14 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left — text */}
@@ -633,7 +633,7 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
             <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-[1.0] mb-6">
               Orders happening<br /><span className="text-gray-200">right now.</span>
             </h2>
-            <p className="text-gray-400 text-lg leading-relaxed mb-8">
+            <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-8">
               Creators across India are hiring verified editors at this very moment.
               Every order runs through verified payment protection — zero risk, guaranteed security.
             </p>
@@ -859,7 +859,7 @@ export function AnimatedHowItWorks() {
   useEffect(() => scrollYProgress.on("change", v => setActive(Math.min(STEPS.length - 1, Math.floor(v * STEPS.length)))), [scrollYProgress]);
 
   return (
-    <section ref={sectionRef} className="relative bg-[#06040f] py-28 px-6 overflow-hidden">
+    <section ref={sectionRef} className="relative bg-[#06040f] py-14 md:py-28 px-6 overflow-hidden">
       {/* Grid */}
       <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage:`linear-gradient(rgba(255,255,255,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.6) 1px,transparent 1px)`,backgroundSize:"48px 48px"}} />
       {/* Glow blobs */}
@@ -1065,7 +1065,7 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
       });
 
   return (
-    <section className="bg-white py-28 px-6">
+    <section className="bg-white py-14 md:py-28 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-end justify-between mb-10 flex-wrap gap-6">
@@ -1250,7 +1250,7 @@ export function BeforeAfterSection() {
   }
 
   return (
-    <section ref={sectionRef} className="bg-gray-950 py-28 px-6 overflow-hidden relative">
+    <section ref={sectionRef} className="bg-gray-950 py-14 md:py-28 px-6 overflow-hidden relative">
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
       <div className="relative max-w-6xl mx-auto">
         <Reveal className="text-center mb-10">
@@ -1519,7 +1519,7 @@ const WHY_FEATURES = [
 
 export function AnimatedWhySection() {
   return (
-    <section className="bg-white py-28 px-6 overflow-hidden relative">
+    <section className="bg-white py-14 md:py-28 px-6 overflow-hidden relative">
       <div className="relative max-w-6xl mx-auto">
         <Reveal className="text-center mb-14">
           <div className="flex items-center justify-center gap-3 mb-5"><div className="h-px w-10 bg-[#0EA5E9]"/><span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Why EditBridge</span><div className="h-px w-10 bg-[#0EA5E9]"/></div>
@@ -1606,7 +1606,7 @@ export function AnimatedAbout() {
     ABOUT_ORDER_ROWS.forEach((_, i) => setTimeout(() => setRevealedCount(i), 300 + i * 220));
   }, [cardInView]);
   return (
-    <section className="bg-[#06040f] py-28 px-6 overflow-hidden relative">
+    <section className="bg-[#06040f] py-14 md:py-28 px-6 overflow-hidden relative">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div animate={{ x:["0%","14%","0%"],y:["0%","8%","0%"] }} transition={{ duration:20,repeat:Infinity,ease:"easeInOut" }}
           className="absolute -top-1/3 -right-1/4 w-[700px] h-[600px] rounded-full opacity-25" style={{background:"radial-gradient(ellipse,#0EA5E9,transparent 65%)"}}/>
@@ -1732,7 +1732,7 @@ function ReviewCard({ quote, author, role, initials, col, rating }: typeof REVIE
 export function AnimatedScrollingReviews() {
   const prefersReduced = useReducedMotion();
   return (
-    <section className="bg-gray-50 py-20 overflow-hidden">
+    <section className="bg-gray-50 py-12 md:py-20 overflow-hidden">
       <Reveal className="text-center mb-12 px-6">
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="h-px w-10 bg-[#0EA5E9]" />
@@ -1789,7 +1789,7 @@ export function AnimatedTestimonials() {
   }, [go, prefersReduced]);
   const q = QUOTES[cur];
   return (
-    <section className="bg-white py-28 px-6">
+    <section className="bg-white py-14 md:py-28 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-4 mb-16"><div className="h-px w-10 bg-[#0EA5E9]"/><span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">What creators say</span></div>
         <div className="relative min-h-[240px]">
@@ -1885,7 +1885,7 @@ export function ShowcasePreviewSection({ items }: { items: ShowcaseItem[] }) {
   ];
 
   return (
-    <section className="bg-gray-950 py-24 px-6">
+    <section className="bg-gray-950 py-12 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
           <Reveal>
@@ -2040,7 +2040,7 @@ export function ComparisonSection() {
   ];
 
   return (
-    <section className="relative bg-[#060A14] py-28 px-6 overflow-hidden">
+    <section className="relative bg-[#060A14] py-14 md:py-28 px-6 overflow-hidden">
       {/* ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-sky-500/[0.04] rounded-full blur-3xl" />
@@ -2301,7 +2301,7 @@ const PRICING_TIERS = [
 
 export function PricingPreviewSection() {
   return (
-    <section className="bg-white py-24 px-6">
+    <section className="bg-white py-12 md:py-24 px-6">
       <div className="max-w-5xl mx-auto">
         <Reveal className="text-center mb-14">
           <div className="flex items-center justify-center gap-3 mb-4"><div className="h-px w-10 bg-gray-200"/><span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.28em]">Transparent pricing</span><div className="h-px w-10 bg-gray-200"/></div>
@@ -2366,7 +2366,7 @@ export function PricingPreviewSection() {
 ════════════════════════════════════════════════════════════════════════════ */
 export function ForEditorsSection() {
   return (
-    <section className="bg-gray-950 py-24 px-6 overflow-hidden">
+    <section className="bg-gray-950 py-12 md:py-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border border-white/[0.06]">
         {/* Client side */}
         <Reveal from="left">
@@ -2452,7 +2452,7 @@ export function EditorEarningsCalculator() {
   ];
 
   return (
-    <section className="bg-gray-950 py-24 px-6 overflow-hidden">
+    <section className="bg-gray-950 py-12 md:py-24 px-6 overflow-hidden">
       <div className="max-w-4xl mx-auto">
         <Reveal className="text-center mb-14">
           <div className="flex items-center justify-center gap-3 mb-5">
@@ -2566,7 +2566,7 @@ export function BlogPreviewSection({ posts }: { posts: BlogPost[] }) {
   };
 
   return (
-    <section className="bg-gray-50 py-24 px-6">
+    <section className="bg-gray-50 py-12 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
           <Reveal>
@@ -2634,7 +2634,7 @@ const FAQ_ITEMS = [
 export function AnimatedFAQ() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section className="bg-gray-50 py-24 px-6">
+    <section className="bg-gray-50 py-12 md:py-24 px-6">
       <div className="max-w-3xl mx-auto">
         <Reveal className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-5">
@@ -2747,7 +2747,7 @@ export function StickyCtaBar() {
 
 export function AnimatedCTA() {
   return (
-    <section className="relative overflow-hidden bg-[#0EA5E9] py-32 px-6">
+    <section className="relative overflow-hidden bg-[#0EA5E9] py-16 md:py-32 px-6">
       <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage:"radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)",backgroundSize:"28px 28px"}}/>
       <svg className="absolute inset-0 w-full h-full opacity-[0.06] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <filter id="cta-grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>

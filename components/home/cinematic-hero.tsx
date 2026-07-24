@@ -1,30 +1,27 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, Lock, Star, ArrowRight, Search } from "lucide-react";
-
-const SCROLL_DISTANCE = 5000;
 
 const STYLES = `
   .ch-film-grain {
     position: absolute; inset: 0;
-    pointer-events: none; z-index: 50; opacity: 0.04; mix-blend-mode: overlay;
+    pointer-events: none; z-index: 50; opacity: 0.025; mix-blend-mode: multiply;
     background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
   }
   .ch-grid {
-    background-size: 50px 50px;
+    background-size: 52px 52px;
     background-image:
-      linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+      linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
     mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
     -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
   }
-  .ch-silver {
-    background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.35) 100%);
+  .ch-brand-text {
+    background: linear-gradient(135deg, #0EA5E9 0%, #7c3aed 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text; transform: translateZ(0);
-    filter: drop-shadow(0 8px 20px rgba(255,255,255,0.12));
   }
   .ch-card-silver {
     background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
@@ -32,9 +29,14 @@ const STYLES = `
     background-clip: text; transform: translateZ(0);
     filter: drop-shadow(0 12px 24px rgba(0,0,0,0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
   }
+  .ch-cta-silver {
+    background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.5) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; transform: translateZ(0);
+  }
   .ch-main-card {
     background: linear-gradient(145deg, #0D1B3E 0%, #060B18 100%);
-    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9), 0 20px 40px -20px rgba(0,0,0,0.8),
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.5), 0 20px 40px -20px rgba(0,0,0,0.3),
       inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.8);
     border: 1px solid rgba(255,255,255,0.06);
   }
@@ -46,7 +48,7 @@ const STYLES = `
   .ch-glass {
     background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 20px 40px -10px rgba(0,0,0,0.7),
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 20px 40px -10px rgba(0,0,0,0.5),
       inset 0 1px 1px rgba(255,255,255,0.18);
   }
   .ch-btn-primary {
@@ -62,12 +64,6 @@ const STYLES = `
     backdrop-filter: blur(10px); transition: all 0.3s cubic-bezier(0.25,1,0.5,1); color: white;
   }
   .ch-btn-secondary:hover { transform: translateY(-2px); background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.1) 100%); }
-  .ch-skip {
-    background: rgba(255,255,255,0.07); backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.14);
-    transition: all 0.2s ease; color: rgba(255,255,255,0.65);
-  }
-  .ch-skip:hover { background: rgba(255,255,255,0.14); color: white; }
   .ch-editor-card {
     background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
     border: 1px solid rgba(255,255,255,0.07);
@@ -89,11 +85,12 @@ interface Props {
 }
 
 export function CinematicHero({ editorCount = 100, completedOrders = 0, availableCount = 0 }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const mainCardRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
+  const [gone, setGone] = useState(false);
 
-  // Mouse sheen effect
+  // Mouse sheen
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       cancelAnimationFrame(rafRef.current);
@@ -108,131 +105,98 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
     return () => { window.removeEventListener("mousemove", onMove); cancelAnimationFrame(rafRef.current); };
   }, []);
 
-  // Skip intro — jump past the pinned section instantly
-  const handleSkip = () => {
-    if (!containerRef.current) return;
-    const top = containerRef.current.getBoundingClientRect().top + window.scrollY + SCROLL_DISTANCE + 10;
-    window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
-  };
-
-  // GSAP scroll animation
+  // Auto-play animation
   useEffect(() => {
+    if (gone) return;
     let ctx: { revert: () => void } | null = null;
     let mounted = true;
 
-    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
-      ([{ gsap }, { ScrollTrigger }]) => {
-        if (!mounted || !containerRef.current) return;
-        gsap.registerPlugin(ScrollTrigger);
+    Promise.all([import("gsap")]).then(([{ gsap }]) => {
+      if (!mounted || !overlayRef.current) return;
 
-        ctx = gsap.context(() => {
-          // ── Initial states ──────────────────────────────────────
-          gsap.set(".ch-tag1", { autoAlpha: 0, y: 60, scale: 0.85, filter: "blur(20px)", rotationX: -20 });
-          gsap.set(".ch-tag2", { autoAlpha: 0, clipPath: "inset(0 100% 0 0)" });
-          gsap.set(".ch-tag3", { autoAlpha: 0, y: 20 });
-          gsap.set(".ch-card-el", { y: typeof window !== "undefined" ? window.innerHeight + 200 : 1000, autoAlpha: 1 });
-          gsap.set([".ch-left-col", ".ch-right-col", ".ch-mockup", ".ch-mock-card", ".ch-badge", ".ch-stat"], { autoAlpha: 0 });
-          gsap.set(".ch-cta", { autoAlpha: 0, scale: 0.85, filter: "blur(30px)" });
-          gsap.set(".ch-skip-btn", { autoAlpha: 0 });
+      ctx = gsap.context(() => {
+        // Initial states
+        gsap.set(".ch-tag1", { autoAlpha: 0, y: 60, scale: 0.85, filter: "blur(20px)", rotationX: -20 });
+        gsap.set(".ch-tag2", { autoAlpha: 0, clipPath: "inset(0 100% 0 0)" });
+        gsap.set(".ch-tag3", { autoAlpha: 0, y: 20 });
+        gsap.set(".ch-card-el", { y: window.innerHeight + 200, autoAlpha: 1 });
+        gsap.set([".ch-left-col", ".ch-right-col", ".ch-mockup", ".ch-mock-card", ".ch-badge", ".ch-stat"], { autoAlpha: 0 });
+        gsap.set(".ch-cta", { autoAlpha: 0, scale: 0.85, filter: "blur(30px)" });
 
-          // ── Intro (time-based) ──────────────────────────────────
-          gsap.timeline({ delay: 0.35 })
-            .to(".ch-tag1", { duration: 1.6, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
-            .to(".ch-tag2", { duration: 1.2, autoAlpha: 1, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=0.9")
-            .to(".ch-tag3", { duration: 0.8, autoAlpha: 1, y: 0, ease: "power3.out" }, "-=0.4")
-            .to(".ch-skip-btn", { duration: 0.5, autoAlpha: 1, ease: "power2.out" }, "-=0.2");
+        const tl = gsap.timeline({ delay: 0.3 });
 
-          // ── Scroll timeline ─────────────────────────────────────
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: containerRef.current,
-              start: "top top",
-              end: `+=${SCROLL_DISTANCE}`,
-              pin: true,
-              scrub: 1.2,
-              anticipatePin: 1,
-            },
+        // Phase 1: Taglines appear
+        tl.to(".ch-tag1", { duration: 1.2, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
+          .to(".ch-tag2", { duration: 0.9, autoAlpha: 1, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=0.7")
+          .to(".ch-tag3", { duration: 0.7, autoAlpha: 1, y: 0, ease: "power3.out" }, "-=0.3")
+          .to({}, { duration: 0.8 })
+
+          // Phase 2: Card rises
+          .to([".ch-tag-wrapper", ".ch-grid"], { scale: 1.08, filter: "blur(18px)", opacity: 0, duration: 1.5, ease: "power2.inOut" })
+          .to(".ch-card-el", { y: 0, duration: 1.5, ease: "power3.inOut" }, "-=1.5")
+
+          // Phase 3: Card expands to full screen
+          .to(".ch-card-el", { width: "100%", height: "100%", borderRadius: "0px", duration: 1.2, ease: "power3.inOut" })
+
+          // Phase 4: Content animates in
+          .fromTo(".ch-left-col",  { x: -60, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 1.2, ease: "power4.out" }, "-=0.4")
+          .fromTo(".ch-right-col", { x:  60, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 1.2, ease: "power4.out" }, "<")
+          .fromTo(".ch-mockup",    { y: 50, autoAlpha: 0, scale: 0.92 }, { y: 0, autoAlpha: 1, scale: 1, duration: 1.4, ease: "expo.out" }, "-=0.8")
+          .fromTo(".ch-mock-card", { y: 28, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.12, ease: "back.out(1.2)" }, "-=1")
+          .fromTo(".ch-badge",     { y: 36, autoAlpha: 0, scale: 0.8 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.5)" }, "-=0.7")
+          .fromTo(".ch-stat",      { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.09, ease: "power3.out" }, "-=0.5")
+
+          // Phase 5: Hold
+          .to({}, { duration: 2.2 })
+
+          // Phase 6: Transition to CTA
+          .to([".ch-mockup", ".ch-badge", ".ch-left-col", ".ch-right-col"], { scale: 0.92, y: -30, autoAlpha: 0, duration: 0.9, ease: "power2.in" })
+          .set(".ch-tag-wrapper", { autoAlpha: 0 })
+          .to(".ch-cta", { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: 1.2, ease: "expo.out" }, "-=0.3")
+
+          // Phase 7: Hold CTA
+          .to({}, { duration: 2.0 })
+
+          // Phase 8: Card shrinks & exits
+          .to(".ch-card-el", { width: "88vw", height: "88vh", borderRadius: "36px", duration: 1.4, ease: "expo.inOut" })
+          .to(".ch-card-el", { y: -(window.innerHeight + 300), duration: 1.2, ease: "power3.in" })
+
+          // Phase 9: Overlay fades out, then removes itself
+          .to(overlayRef.current, { autoAlpha: 0, duration: 0.5, ease: "power2.in",
+            onComplete: () => { if (mounted) setGone(true); }
           });
+      }, overlayRef);
+    });
 
-          tl
-            // Phase 1 (0–20%): text fades, card rises
-            .to([".ch-tag-wrapper", ".ch-grid"], { scale: 1.1, filter: "blur(22px)", opacity: 0, duration: 2, ease: "power2.inOut" }, 0)
-            .to(".ch-card-el", { y: 0, duration: 2, ease: "power3.inOut" }, 0)
+    return () => { mounted = false; ctx?.revert(); };
+  }, [gone]);
 
-            // Phase 2 (20–40%): card expands fullscreen
-            .to(".ch-card-el", { width: "100%", height: "100%", borderRadius: "0px", duration: 1.5, ease: "power3.inOut" })
-
-            // Phase 3 (40–70%): content animates in
-            .fromTo(".ch-left-col",  { x: -60, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 1.5, ease: "power4.out" }, "-=0.5")
-            .fromTo(".ch-right-col", { x:  60, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 1.5, ease: "power4.out" }, "<")
-            .fromTo(".ch-mockup",    { y: 50, autoAlpha: 0, scale: 0.92 }, { y: 0, autoAlpha: 1, scale: 1, duration: 1.8, ease: "expo.out" }, "-=1")
-            .fromTo(".ch-mock-card", { y: 28, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1, stagger: 0.14, ease: "back.out(1.2)" }, "-=1.2")
-            .fromTo(".ch-badge",     { y: 36, autoAlpha: 0, scale: 0.8 }, { y: 0, autoAlpha: 1, scale: 1, duration: 1, stagger: 0.18, ease: "back.out(1.5)" }, "-=0.8")
-            .fromTo(".ch-stat",      { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7, stagger: 0.1, ease: "power3.out" }, "-=0.6")
-
-            // Phase 4: hold
-            .to({}, { duration: 2.5 })
-
-            // Phase 5: transition to CTA
-            .set(".ch-tag-wrapper", { autoAlpha: 0 })
-            .set(".ch-cta", { autoAlpha: 1 })
-            .to([".ch-mockup", ".ch-badge", ".ch-left-col", ".ch-right-col"], { scale: 0.92, y: -30, autoAlpha: 0, duration: 1.2, ease: "power2.in" })
-            .to(".ch-cta", { scale: 1, filter: "blur(0px)", duration: 1.5, ease: "expo.out" }, "-=0.8")
-            .to(".ch-skip-btn", { autoAlpha: 0, duration: 0.4 }, "-=1.5")
-
-            // Phase 6: card pulls back
-            .to(".ch-card-el", { width: "88vw", height: "88vh", borderRadius: "36px", duration: 1.8, ease: "expo.inOut" }, "+=1")
-
-            // Phase 7: card exits upward
-            .to(".ch-card-el", { y: -(typeof window !== "undefined" ? window.innerHeight : 800) - 300, duration: 1.5, ease: "power3.in" });
-
-        }, containerRef);
-      }
-    );
-
-    return () => {
-      mounted = false;
-      ctx?.revert();
-    };
-  }, []);
+  if (gone) return null;
 
   const stats = [
-    { label: "Verified editors",   val: `${editorCount}+` },
-    { label: "Orders completed",   val: completedOrders > 0 ? `${completedOrders.toLocaleString()}+` : "Growing daily" },
-    { label: "Available now",      val: availableCount > 0 ? `${availableCount} online` : "Always available" },
-    { label: "Average rating",     val: "4.9 ★" },
+    { label: "Verified editors",  val: `${editorCount}+` },
+    { label: "Orders completed",  val: completedOrders > 0 ? `${completedOrders.toLocaleString()}+` : "Growing daily" },
+    { label: "Available now",     val: availableCount > 0 ? `${availableCount} online` : "Always open" },
+    { label: "Average rating",    val: "4.9 ★" },
   ];
 
   return (
     <div
-      ref={containerRef}
-      className="relative w-screen h-screen overflow-hidden flex items-center justify-center bg-[#06040f]"
+      ref={overlayRef}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F8FAFC] overflow-hidden"
       style={{ perspective: "1500px" }}
     >
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
+      <div className="ch-film-grain" aria-hidden />
+      <div className="ch-grid absolute inset-0 z-0 pointer-events-none" aria-hidden />
 
-      {/* Film grain */}
-      <div className="ch-film-grain absolute inset-0 pointer-events-none z-[50]" aria-hidden />
-
-      {/* Grid */}
-      <div className="ch-grid absolute inset-0 z-0 pointer-events-none opacity-60" aria-hidden />
-
-      {/* ── Skip button ────────────────────────────────────────── */}
-      <button
-        onClick={handleSkip}
-        className="ch-skip-btn fixed top-5 right-6 z-[200] ch-skip text-[11px] font-semibold px-4 py-2 rounded-full flex items-center gap-2"
-      >
-        Skip intro <ArrowRight className="w-3 h-3" />
-      </button>
-
-      {/* ── Background: taglines ───────────────────────────────── */}
+      {/* Background taglines */}
       <div className="ch-tag-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-full px-4 pointer-events-none">
         <p className="ch-tag1 text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.4em] mb-7">EditBridge</p>
-        <h1 className="ch-tag1 text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-3 text-white"
-          style={{ textShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+        <h1 className="ch-tag1 text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-3 text-gray-900">
           Find your perfect
         </h1>
-        <h1 className="ch-tag2 ch-silver text-5xl md:text-7xl lg:text-8xl font-black tracking-tight">
+        <h1 className="ch-tag2 ch-brand-text text-5xl md:text-7xl lg:text-8xl font-black tracking-tight">
           video editor.
         </h1>
         <p className="ch-tag3 text-gray-400 text-base mt-6 font-medium">
@@ -240,41 +204,37 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
         </p>
       </div>
 
-      {/* ── Background: final CTA ──────────────────────────────── */}
-      <div className="ch-cta absolute z-10 flex flex-col items-center justify-center text-center w-full px-6 pointer-events-auto">
-        <p className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.4em] mb-7">Ready to get started?</p>
-        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight text-white leading-tight">
-          Your next video.<br />
-          <span className="ch-silver">Professionally edited.</span>
-        </h2>
-        <p className="text-gray-400 text-base mb-10 max-w-lg mx-auto font-light leading-relaxed">
-          Browse {editorCount}+ KYC-verified editors. Pay only after you approve. Disputes handled by our team.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/browse"
-            className="ch-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-base">
-            Browse Editors <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link href="/signup/client"
-            className="ch-btn-secondary inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-base">
-            Post a Project <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-
-      {/* ── Foreground: dark card ──────────────────────────────── */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"
-        style={{ perspective: "1500px" }}>
+      {/* Dark card */}
+      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none" style={{ perspective: "1500px" }}>
         <div
           ref={mainCardRef}
           className="ch-card-el ch-main-card relative overflow-hidden flex items-center justify-center pointer-events-auto w-[90vw] md:w-[86vw] h-[88vh] rounded-[32px] md:rounded-[40px]"
         >
           <div className="ch-sheen" aria-hidden />
 
-          {/* 3-col inner layout */}
+          {/* CTA — inside card, above content, appears in phase 6 */}
+          <div className="ch-cta absolute inset-0 z-[60] flex flex-col items-center justify-center text-center px-6 pointer-events-auto">
+            <p className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.4em] mb-7">Ready to get started?</p>
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight text-white leading-tight">
+              Your next video.<br />
+              <span className="ch-cta-silver">Professionally edited.</span>
+            </h2>
+            <p className="text-gray-400 text-base mb-10 max-w-lg mx-auto leading-relaxed">
+              Browse {editorCount}+ KYC-verified editors. Pay only after you approve. Disputes handled by our team.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/browse" className="ch-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-base">
+                Browse Editors <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/signup/client" className="ch-btn-secondary inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-base">
+                Post a Project <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
           <div className="relative w-full h-full max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] items-center gap-8 z-10 py-10">
 
-            {/* LEFT — brand + stats */}
+            {/* LEFT */}
             <div className="ch-left-col hidden lg:flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-7">
                 <div className="w-6 h-6 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
@@ -301,7 +261,6 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
             {/* CENTER — browser mockup */}
             <div className="ch-mockup relative flex items-center justify-center">
               <div className="w-full rounded-2xl overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.8)] border border-white/[0.07]">
-                {/* Browser chrome */}
                 <div className="px-4 py-3 flex items-center gap-3"
                   style={{ background: "linear-gradient(180deg,#1E2A3A 0%,#162032 100%)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="flex gap-1.5">
@@ -314,10 +273,7 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                     <span className="text-[10px] text-gray-400 font-medium truncate">editbridge.com/browse</span>
                   </div>
                 </div>
-
-                {/* Browser content */}
                 <div className="bg-[#080F1E] p-4">
-                  {/* Search */}
                   <div className="flex gap-2 mb-3">
                     <div className="flex-1 bg-[#0D1B3E] rounded-xl px-3 py-2.5 flex items-center gap-2 border border-white/[0.06]">
                       <Search className="w-3.5 h-3.5 text-gray-500 shrink-0" />
@@ -325,8 +281,6 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                     </div>
                     <div className="bg-[#0EA5E9] rounded-xl px-4 py-2.5 text-xs font-bold text-white shrink-0">Search</div>
                   </div>
-
-                  {/* Filter chips */}
                   <div className="flex gap-2 mb-4">
                     {["All", "YouTube", "Reels", "Thumbnails"].map((f, i) => (
                       <span key={f}
@@ -336,8 +290,6 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                       </span>
                     ))}
                   </div>
-
-                  {/* Editor cards */}
                   <div className="space-y-2">
                     {MOCK_EDITORS.map((e, i) => (
                       <div key={i} className="ch-mock-card ch-editor-card rounded-xl p-3 flex items-center gap-3">
@@ -364,8 +316,6 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                   </div>
                 </div>
               </div>
-
-              {/* Floating badge — top left */}
               <div className="ch-badge ch-glass absolute -top-5 -left-5 lg:-left-10 rounded-xl p-3 flex items-center gap-3 z-30">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                   style={{ background: "rgba(14,165,233,0.18)", border: "1px solid rgba(14,165,233,0.3)" }}>
@@ -376,8 +326,6 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                   <p className="text-gray-400 text-[9px] leading-tight">Every editor ID-checked</p>
                 </div>
               </div>
-
-              {/* Floating badge — bottom right */}
               <div className="ch-badge ch-glass absolute -bottom-5 -right-5 lg:-right-10 rounded-xl p-3 flex items-center gap-3 z-30">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                   style={{ background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.3)" }}>
@@ -390,19 +338,13 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
               </div>
             </div>
 
-            {/* RIGHT — heading + checklist */}
+            {/* RIGHT */}
             <div className="ch-right-col hidden lg:flex flex-col justify-center items-end text-right">
               <h2 className="ch-card-silver text-6xl lg:text-7xl xl:text-[5.5rem] font-black uppercase tracking-tighter leading-none mb-8">
                 Find<br />Your<br />Editor.
               </h2>
               <div className="space-y-3">
-                {[
-                  "KYC-verified identity",
-                  "Escrow payment",
-                  "Dispute protection",
-                  "Revisions included",
-                  "Starting ₹299",
-                ].map(text => (
+                {["KYC-verified identity", "Escrow payment", "Dispute protection", "Revisions included", "Starting ₹299"].map(text => (
                   <p key={text} className="text-xs text-gray-400 font-medium flex items-center justify-end gap-2">
                     <span className="text-[#0EA5E9] font-black text-sm">✓</span> {text}
                   </p>
