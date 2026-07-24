@@ -621,11 +621,11 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
   }, [prefersReduced, hasRealData, base]);
 
   return (
-    <section className="bg-white py-14 md:py-24 px-6">
+    <section className="bg-white py-14 md:py-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left — text */}
-          <Reveal>
+          <Reveal className="min-w-0">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px w-10 bg-[#0EA5E9]" />
               <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Live platform</span>
@@ -653,7 +653,7 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
           </Reveal>
 
           {/* Right — live feed */}
-          <Reveal from="right">
+          <Reveal from="right" className="min-w-0">
             <div className="relative rounded-3xl overflow-hidden border border-gray-100 shadow-[0_32px_80px_rgba(0,0,0,0.08)]">
               {/* Header */}
               <div className="bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between">
