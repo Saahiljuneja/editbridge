@@ -9,7 +9,7 @@ import {
   Users, DollarSign, Shield,
   Mail, Server, TrendingUp,
   Film, Settings, ChevronDown, ChevronUp, ExternalLink,
-  HelpCircle, ChevronsUpDown, UserCircle, BookOpen, LogOut,
+  HelpCircle, ChevronsUpDown, UserCircle, BookOpen, LogOut, Menu, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
@@ -108,86 +108,68 @@ const ROLE_LABELS: Partial<Record<UserRole, string>> = {
 type Counts   = { pendingKyc: number; openDisputes: number; pendingPayouts: number };
 type BadgeKey = "pendingKyc" | "openDisputes" | "pendingPayouts";
 
-export function AdminSidebar() {
-  const pathname  = usePathname();
-  const { data: session } = useSession();
-  const role      = (session?.user?.role ?? "") as UserRole;
-  const userName  = session?.user?.name  ?? "";
-  const userEmail = session?.user?.email ?? "";
-  const userImage = session?.user?.image ?? null;
-  const [counts,   setCounts]    = useState<Counts>({ pendingKyc: 0, openDisputes: 0, pendingPayouts: 0 });
-  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
+function SidebarContent({
+  pathname,
+  role,
+  counts,
+  openGroups,
+  toggle,
+  userMenuOpen,
+  setUserMenuOpen,
+  userMenuRef,
+  userName,
+  userEmail,
+  userImage,
+  initials,
+  roleLabel,
+  onNavigate,
+}: {
+  pathname: string;
+  role: UserRole;
+  counts: Counts;
+  openGroups: Set<string>;
+  toggle: (label: string) => void;
+  userMenuOpen: boolean;
+  setUserMenuOpen: (v: boolean | ((p: boolean) => boolean)) => void;
+  userMenuRef: React.RefObject<HTMLDivElement>;
+  userName: string;
+  userEmail: string;
+  userImage: string | null;
+  initials: string;
+  roleLabel: string;
+  onNavigate?: () => void;
+}) {
   const router = useRouter();
-
-  const initials  = userName.split(" ").filter(Boolean).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "A";
-  const roleLabel = ROLE_LABELS[role] ?? "Staff";
-
-  const activeGroupLabel = NAV_GROUPS.find(g =>
-    g.items.some(item =>
-      item.href === "/admin/dashboard"
-        ? pathname === "/admin/dashboard"
-        : pathname.startsWith(item.href)
-    )
-  )?.label;
-
-  useEffect(() => {
-    if (activeGroupLabel) {
-      setOpenGroups(prev => new Set([...prev, activeGroupLabel]));
-    }
-  }, [activeGroupLabel]);
-
-  useEffect(() => {
-    fetch("/api/admin/counts")
-      .then(r => r.json())
-      .then(d => setCounts(d))
-      .catch(() => {});
-  }, [pathname]);
-
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setUserMenuOpen(false);
-      }
-    }
-    if (userMenuOpen) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [userMenuOpen]);
-
-  function toggle(label: string) {
-    setOpenGroups(prev => {
-      const next = new Set(prev);
-      next.has(label) ? next.delete(label) : next.add(label);
-      return next;
-    });
-  }
 
   function groupBadge(items: { badgeKey: string | null }[]): number {
     return items.reduce((s, it) => s + (it.badgeKey ? (counts[it.badgeKey as BadgeKey] ?? 0) : 0), 0);
   }
 
-  return (
-    <aside className="w-[240px] flex-shrink-0 hidden md:flex flex-col h-screen sticky top-0 bg-gray-950 border-r border-white/[0.06]">
+  function go(href: string) {
+    router.push(href);
+    onNavigate?.();
+  }
 
-      {/* ── Brand ── */}
-      <div className="flex items-center justify-between px-4 pt-5 pb-3">
+  return (
+    <div className="flex flex-col h-full bg-gray-950">
+      {/* Brand */}
+      <div className="flex items-center justify-between px-4 pt-5 pb-3 shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-[30px] h-[30px] rounded-lg bg-rose-500 flex items-center justify-center shrink-0">
-            <Film className="w-4 h-4 text-white"/>
+            <Film className="w-4 h-4 text-white" />
           </div>
           <span className="text-[14.5px] font-bold text-white tracking-tight">EditBridge</span>
         </div>
         <AdminThemeToggle />
       </div>
 
-      {/* ── Search ── */}
-      <div className="px-3 pb-3">
+      {/* Search */}
+      <div className="px-3 pb-3 shrink-0">
         <AdminGlobalSearch />
       </div>
 
-      {/* ── Nav ── */}
-      <nav className="flex-1 overflow-y-auto px-2 pb-2 scrollbar-none">
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-2 pb-2 scrollbar-none min-h-0">
         <div className="space-y-0.5">
           {NAV_GROUPS.map(group => {
             const visible = group.items.filter(it => it.roles.includes(role));
@@ -216,7 +198,7 @@ export function AdminSidebar() {
                   <Icon className={cn(
                     "w-[15px] h-[15px] shrink-0",
                     anyActive ? "text-rose-400" : "text-gray-600"
-                  )}/>
+                  )} />
                   <span className="flex-1 truncate">{group.label}</span>
                   {!isOpen && total > 0 && (
                     <span className="text-[10.5px] font-bold bg-rose-500 text-white rounded-full px-1.5 py-0.5 leading-none">
@@ -224,8 +206,8 @@ export function AdminSidebar() {
                     </span>
                   )}
                   {isOpen
-                    ? <ChevronUp   className="w-3.5 h-3.5 text-gray-600 shrink-0"/>
-                    : <ChevronDown className="w-3.5 h-3.5 text-gray-600 shrink-0"/>
+                    ? <ChevronUp   className="w-3.5 h-3.5 text-gray-600 shrink-0" />
+                    : <ChevronDown className="w-3.5 h-3.5 text-gray-600 shrink-0" />
                   }
                 </button>
 
@@ -238,7 +220,7 @@ export function AdminSidebar() {
                       const count  = badgeKey ? counts[badgeKey as BadgeKey] : 0;
 
                       return (
-                        <Link key={href} href={href}
+                        <Link key={href} href={href} onClick={onNavigate}
                           className={cn(
                             "flex items-center justify-between px-3 py-[7px] rounded-lg text-[12.5px] font-medium transition-colors",
                             active
@@ -250,9 +232,7 @@ export function AdminSidebar() {
                           {count > 0 && (
                             <span className={cn(
                               "text-[10.5px] font-bold rounded-full px-1.5 py-0.5 leading-none ml-1.5",
-                              active
-                                ? "bg-rose-500 text-white"
-                                : "bg-gray-800 text-gray-400"
+                              active ? "bg-rose-500 text-white" : "bg-gray-800 text-gray-400"
                             )}>
                               {count > 99 ? "99+" : count}
                             </span>
@@ -268,72 +248,68 @@ export function AdminSidebar() {
         </div>
       </nav>
 
-      {/* ── Footer links ── */}
-      <div className="px-2 pt-1 border-t border-white/[0.06]">
-        <Link href="/admin/settings"
+      {/* Footer links */}
+      <div className="px-2 pt-1 border-t border-white/[0.06] shrink-0">
+        <Link href="/admin/settings" onClick={onNavigate}
           className={cn(
             "flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-colors",
             pathname.startsWith("/admin/settings")
               ? "text-white bg-white/10"
               : "text-gray-500 hover:bg-white/[0.05] hover:text-gray-300"
           )}>
-          <Settings className="w-[15px] h-[15px] shrink-0"/>
+          <Settings className="w-[15px] h-[15px] shrink-0" />
           Settings
         </Link>
 
         <div className="flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px] font-medium text-gray-600">
-          <HelpCircle className="w-[15px] h-[15px] shrink-0"/>
+          <HelpCircle className="w-[15px] h-[15px] shrink-0" />
           <span className="flex-1">Support</span>
           <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-900/40 rounded-full px-2 py-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"/>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
             Online
           </span>
         </div>
 
         <Link href="/" target="_blank"
           className="flex items-center gap-2.5 px-3 py-[9px] rounded-lg text-[13px] font-medium text-gray-500 hover:bg-white/[0.05] hover:text-gray-300 transition-colors">
-          <ExternalLink className="w-[15px] h-[15px] shrink-0"/>
+          <ExternalLink className="w-[15px] h-[15px] shrink-0" />
           <span className="flex-1">Open website</span>
-          <ExternalLink className="w-3 h-3 text-gray-700"/>
+          <ExternalLink className="w-3 h-3 text-gray-700" />
         </Link>
       </div>
 
-      {/* ── User card ── */}
-      <div className="p-3 border-t border-white/[0.06] relative" ref={userMenuRef}>
+      {/* User card */}
+      <div className="p-3 border-t border-white/[0.06] relative shrink-0" ref={userMenuRef}>
         {userMenuOpen && (
           <div className="absolute bottom-[calc(100%-8px)] left-3 right-3 bg-gray-900 rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden z-50">
             <div className="p-1">
               <button
-                onClick={() => { setUserMenuOpen(false); router.push("/admin/settings"); }}
+                onClick={() => { setUserMenuOpen(false); go("/admin/settings"); }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors text-left"
               >
-                <UserCircle className="w-4 h-4 text-gray-500 shrink-0"/>
+                <UserCircle className="w-4 h-4 text-gray-500 shrink-0" />
                 <span className="flex-1">View profile</span>
               </button>
               <button
-                onClick={() => { setUserMenuOpen(false); router.push("/admin/settings"); }}
+                onClick={() => { setUserMenuOpen(false); go("/admin/settings"); }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors text-left"
               >
-                <Settings className="w-4 h-4 text-gray-500 shrink-0"/>
+                <Settings className="w-4 h-4 text-gray-500 shrink-0" />
                 <span className="flex-1">Account settings</span>
               </button>
-              <Link
-                href="/"
-                target="_blank"
-                onClick={() => setUserMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors"
-              >
-                <BookOpen className="w-4 h-4 text-gray-500 shrink-0"/>
+              <Link href="/" target="_blank" onClick={() => setUserMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] text-gray-300 hover:bg-white/[0.06] transition-colors">
+                <BookOpen className="w-4 h-4 text-gray-500 shrink-0" />
                 <span className="flex-1">Documentation</span>
               </Link>
             </div>
-            <div className="h-px bg-white/[0.06] mx-1"/>
+            <div className="h-px bg-white/[0.06] mx-1" />
             <div className="p-1">
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] text-red-400 hover:bg-red-900/30 transition-colors text-left"
               >
-                <LogOut className="w-4 h-4 shrink-0"/>
+                <LogOut className="w-4 h-4 shrink-0" />
                 <span className="flex-1">Sign out</span>
               </button>
             </div>
@@ -347,10 +323,10 @@ export function AdminSidebar() {
           <div className="relative shrink-0">
             <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-rose-500 to-orange-400 flex items-center justify-center text-white text-[11px] font-bold select-none">
               {userImage
-                ? <img src={userImage} alt={userName} className="w-full h-full object-cover"/>
+                ? <img src={userImage} alt={userName} className="w-full h-full object-cover" />
                 : initials}
             </div>
-            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border-[1.5px] border-gray-950"/>
+            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border-[1.5px] border-gray-950" />
           </div>
           <div className="flex-1 min-w-0 text-left">
             <p className="text-[12.5px] font-semibold text-gray-200 leading-tight truncate">
@@ -360,10 +336,143 @@ export function AdminSidebar() {
               {roleLabel}
             </p>
           </div>
-          <ChevronsUpDown className="w-3.5 h-3.5 text-gray-600 shrink-0"/>
+          <ChevronsUpDown className="w-3.5 h-3.5 text-gray-600 shrink-0" />
         </button>
       </div>
+    </div>
+  );
+}
 
-    </aside>
+export function AdminSidebar() {
+  const pathname  = usePathname();
+  const { data: session } = useSession();
+  const role      = (session?.user?.role ?? "") as UserRole;
+  const userName  = session?.user?.name  ?? "";
+  const userEmail = session?.user?.email ?? "";
+  const userImage = session?.user?.image ?? null;
+  const [counts,       setCounts]      = useState<Counts>({ pendingKyc: 0, openDisputes: 0, pendingPayouts: 0 });
+  const [openGroups,   setOpenGroups]  = useState<Set<string>>(new Set());
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileOpen,   setMobileOpen]  = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const initials  = userName.split(" ").filter(Boolean).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "A";
+  const roleLabel = ROLE_LABELS[role] ?? "Staff";
+
+  const activeGroupLabel = NAV_GROUPS.find(g =>
+    g.items.some(item =>
+      item.href === "/admin/dashboard"
+        ? pathname === "/admin/dashboard"
+        : pathname.startsWith(item.href)
+    )
+  )?.label;
+
+  useEffect(() => {
+    if (activeGroupLabel) {
+      setOpenGroups(prev => new Set([...prev, activeGroupLabel]));
+    }
+  }, [activeGroupLabel]);
+
+  useEffect(() => {
+    fetch("/api/admin/counts")
+      .then(r => r.json())
+      .then(d => setCounts(d))
+      .catch(() => {});
+  }, [pathname]);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    if (userMenuOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [userMenuOpen]);
+
+  // Close mobile drawer on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
+
+  // Prevent body scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  function toggle(label: string) {
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      next.has(label) ? next.delete(label) : next.add(label);
+      return next;
+    });
+  }
+
+  const sharedProps = {
+    pathname,
+    role,
+    counts,
+    openGroups,
+    toggle,
+    userMenuOpen,
+    setUserMenuOpen,
+    userMenuRef,
+    userName,
+    userEmail,
+    userImage,
+    initials,
+    roleLabel,
+  };
+
+  return (
+    <>
+      {/* ── Mobile top bar ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center gap-3 px-4 bg-gray-950 border-b border-white/[0.06]">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+          aria-label="Open menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-rose-500 flex items-center justify-center shrink-0">
+            <Film className="w-3.5 h-3.5 text-white" />
+          </div>
+          <span className="text-[14px] font-bold text-white tracking-tight">EditBridge</span>
+        </div>
+      </div>
+
+      {/* ── Mobile drawer overlay ── */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Drawer */}
+          <div className="relative w-[240px] h-full shadow-2xl flex flex-col">
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="absolute top-4 right-3 z-10 p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-white/[0.05] transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <SidebarContent
+              {...sharedProps}
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Desktop sidebar ── */}
+      <aside className="w-[240px] flex-shrink-0 hidden md:flex flex-col h-screen sticky top-0 border-r border-white/[0.06] overflow-hidden">
+        <SidebarContent {...sharedProps} />
+      </aside>
+    </>
   );
 }
