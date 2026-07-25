@@ -36,50 +36,65 @@ function last30Days() {
 // ── sub-components ───────────────────────────────────────────────────────────
 
 function StatCard({
-  label, value, sub, icon: Icon, iconBg, iconColor, href, trend,
+  label, value, sub, icon: Icon, accent, href, trend,
 }: {
   label: string; value: string | number; sub?: string;
-  icon: React.ElementType; iconBg: string; iconColor: string;
+  icon: React.ElementType; accent: string;
   href?: string; trend?: { diff: number; up: boolean } | null;
 }) {
   const inner = (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm h-full hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
-          <Icon className={`w-5 h-5 ${iconColor}`} />
-        </div>
+    <div className={`rounded-2xl border bg-white p-5 shadow-sm h-full hover:shadow-md transition-all duration-200 group border-l-4 ${accent}`}>
+      <div className="flex items-start justify-between mb-3">
+        <Icon className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={1.8} />
         {trend && (
-          <span className={`flex items-center gap-0.5 text-xs font-semibold ${trend.up ? "text-emerald-600" : "text-red-500"}`}>
-            {trend.up ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+          <span className={`flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
+            trend.up ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"
+          }`}>
+            {trend.up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {trend.diff}%
           </span>
         )}
       </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      <p className="text-sm text-gray-500 mt-1">{label}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <p className="text-3xl font-black text-gray-900 tabular-nums tracking-tight">{value}</p>
+      <p className="text-sm font-medium text-gray-700 mt-1">{label}</p>
+      {sub && <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>}
     </div>
   );
-  return href ? <Link href={href} className="block">{inner}</Link> : inner;
+  return href ? <Link href={href} className="block h-full">{inner}</Link> : inner;
 }
 
+type AccentKey = "amber" | "red" | "violet";
+
+const ACCENT_STYLES: Record<AccentKey, { border: string; iconBg: string; iconColor: string; badge: string }> = {
+  amber: { border: "border-amber-500", iconBg: "bg-amber-50", iconColor: "text-amber-600", badge: "bg-amber-500" },
+  red:   { border: "border-red-600",   iconBg: "bg-red-50",   iconColor: "text-red-600",   badge: "bg-red-500"   },
+  violet:{ border: "border-violet-600",iconBg: "bg-violet-50",iconColor: "text-violet-600",badge: "bg-violet-500"},
+};
+
 function ActionCard({
-  label, sub, icon: Icon, iconBg, iconColor, href, count: cnt,
+  label, sub, icon: Icon, accentKey, href, count: cnt,
 }: {
   label: string; sub: string; icon: React.ElementType;
-  iconBg: string; iconColor: string; href: string; count: number;
+  accentKey: AccentKey; href: string; count: number;
 }) {
+  const hasAlert = cnt > 0;
+  const a = ACCENT_STYLES[accentKey];
   return (
-    <Link href={href} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-sm hover:shadow-md transition-shadow group">
-      <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
-        <Icon className={`w-5 h-5 ${iconColor}`} />
+    <Link
+      href={href}
+      className={`flex items-center gap-4 rounded-2xl px-5 py-4 bg-white shadow-sm hover:shadow-md transition-all duration-200 group border ${
+        hasAlert ? `border-l-4 ${a.border} border-gray-100` : "border-gray-100"
+      }`}
+    >
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${hasAlert ? a.iconBg : "bg-gray-50"}`}>
+        <Icon className={`w-5 h-5 ${hasAlert ? a.iconColor : "text-gray-400"}`} strokeWidth={1.8} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm text-gray-900">{label}</p>
         <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
       </div>
-      {cnt > 0 && (
-        <span className="bg-red-500 text-white text-xs font-bold rounded-full min-w-[22px] h-[22px] flex items-center justify-center px-1">
+      {hasAlert && (
+        <span className={`text-white text-xs font-bold rounded-full min-w-[24px] h-[24px] flex items-center justify-center px-1.5 ${a.badge}`}>
           {cnt > 99 ? "99+" : cnt}
         </span>
       )}
@@ -435,75 +450,101 @@ export default async function AdminDashboardPage() {
     "payout.status_change": "Updated payout",
   };
 
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
   return (
-    <div className="px-8 py-6 space-y-8">
+    <div className="min-h-screen bg-gray-50">
 
       {/* ── Header ── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-red-600 bg-red-50 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            Admin Panel
-          </span>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">Platform Overview</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Live stats across users, orders, revenue, and disputes.</p>
+      <div className="bg-gray-950 px-8 py-7">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-1">Admin Panel</p>
+            <h1 className="text-2xl font-black text-white tracking-tight">{greeting}, {actorName}.</h1>
+            <p className="text-sm text-gray-400 mt-1">Platform overview — live stats across users, orders, revenue, and disputes.</p>
+          </div>
+          <div className="text-right shrink-0 ml-8">
+            <p className="text-sm font-semibold text-white">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{new Date().toLocaleDateString("en-IN", { weekday: "long" })}</p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-xs text-gray-400">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</p>
+
+        {/* ── Live stats (polls every 30s) ── */}
+        <div className="mt-6">
+          <LiveStats initial={{ activeOrders, todaySignups, pendingKyc, openDisputes }} />
         </div>
       </div>
 
-      {/* ── Live stats (polls every 30s) ── */}
-      <LiveStats initial={{ activeOrders, todaySignups, pendingKyc, openDisputes }} />
+      <div className="px-8 py-7 space-y-7">
 
-      {/* ── 10. New users today / this week ── */}
+      {/* ── Pending action cards ── */}
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400 mb-3">Needs Attention</p>
+        <div className="grid sm:grid-cols-3 gap-3">
+          <ActionCard label="KYC Queue" sub="Pending applications" icon={FileCheck} accentKey="amber" href="/admin/kyc" count={pendingKyc} />
+          <ActionCard label="Open Disputes" sub="Needs resolution" icon={AlertTriangle} accentKey="red" href="/admin/disputes" count={openDisputes} />
+          <ActionCard label="Pending Payouts" sub="Awaiting processing" icon={Wallet} accentKey="violet" href="/admin/revenue" count={pendingPayouts} />
+        </div>
+      </div>
+
+      {/* ── Core stat grid with MoM comparison ── */}
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400 mb-3">Platform Metrics</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <StatCard label="Total Users" value={totalUsers} icon={Users} accent="border-blue-500" href="/admin/users" />
+          <StatCard label="Total Editors" value={totalEditors} sub="Registered on platform" icon={FileCheck} accent="border-violet-500" href="/admin/users?role=editor" />
+          <StatCard label="Total Orders" value={totalOrders} sub="All time" icon={ShoppingBag} accent="border-emerald-500" href="/admin/orders" />
+          <StatCard label="This Month Orders" value={thisMonthOrders} sub={lastMonthOrders > 0 ? `${lastMonthOrders} last month` : undefined} icon={ShoppingBag} accent="border-indigo-500" href="/admin/orders" trend={orderTrend} />
+          <StatCard label="This Month Revenue" value={formatCurrency(thisMonthRevenue)} sub={lastMonthRevenue > 0 ? `${formatCurrency(lastMonthRevenue)} last month` : undefined} icon={DollarSign} accent="border-emerald-500" href="/admin/revenue" trend={revenueTrend} />
+          <StatCard label="Platform Revenue" value={formatCurrency(totalRevenue)} sub="Commission all time" icon={TrendingUp} accent="border-teal-500" href="/admin/revenue" />
+        </div>
+      </div>
+
+      {/* ── Quick signups overview ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "New today", value: todaySignups, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "New this week", value: weekSignups, color: "text-violet-600", bg: "bg-violet-50" },
-          { label: "This month signups", value: thisMonthSignups, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Pending payouts", value: pendingPayouts, color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "New today", value: todaySignups, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
+          { label: "New this week", value: weekSignups, color: "text-violet-600", bg: "bg-violet-50", border: "border-violet-100" },
+          { label: "Month signups", value: thisMonthSignups, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
+          { label: "Pending payouts", value: pendingPayouts, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
         ].map(item => (
-          <div key={item.label} className={`rounded-2xl ${item.bg} px-4 py-3.5`}>
-            <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{item.label}</p>
+          <div key={item.label} className={`rounded-2xl border ${item.border} ${item.bg} px-4 py-4`}>
+            <p className={`text-2xl font-black tabular-nums ${item.color}`}>{item.value}</p>
+            <p className="text-xs text-gray-500 mt-1 font-medium">{item.label}</p>
           </div>
         ))}
       </div>
 
-      {/* ── 4. Pending action cards ── */}
-      <div className="grid sm:grid-cols-3 gap-3">
-        <ActionCard label="KYC Queue" sub="Pending applications" icon={FileCheck} iconBg="bg-amber-50" iconColor="text-amber-600" href="/admin/kyc" count={pendingKyc} />
-        <ActionCard label="Open Disputes" sub="Needs resolution" icon={AlertTriangle} iconBg="bg-red-50" iconColor="text-red-600" href="/admin/disputes" count={openDisputes} />
-        <ActionCard label="Pending Payouts" sub="Awaiting processing" icon={Wallet} iconBg="bg-violet-50" iconColor="text-violet-600" href="/admin/revenue" count={pendingPayouts} />
-      </div>
-
-      {/* ── 1. Core stat grid with 6. MoM comparison ── */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <StatCard label="Total Users" value={totalUsers} icon={Users} iconBg="bg-blue-50" iconColor="text-blue-600" href="/admin/users" />
-        <StatCard label="Total Editors" value={totalEditors} sub="Registered on platform" icon={FileCheck} iconBg="bg-violet-50" iconColor="text-violet-600" href="/admin/users?role=editor" />
-        <StatCard label="Total Orders" value={totalOrders} sub="All time" icon={ShoppingBag} iconBg="bg-emerald-50" iconColor="text-emerald-600" href="/admin/orders" />
-        <StatCard label="This Month Orders" value={thisMonthOrders} sub={lastMonthOrders > 0 ? `${lastMonthOrders} last month` : undefined} icon={ShoppingBag} iconBg="bg-indigo-50" iconColor="text-indigo-600" href="/admin/orders" trend={orderTrend} />
-        <StatCard label="This Month Revenue" value={formatCurrency(thisMonthRevenue)} sub={lastMonthRevenue > 0 ? `${formatCurrency(lastMonthRevenue)} last month` : undefined} icon={DollarSign} iconBg="bg-emerald-50" iconColor="text-emerald-600" href="/admin/revenue" trend={revenueTrend} />
-        <StatCard label="Platform Revenue" value={formatCurrency(totalRevenue)} sub="Commission all time" icon={TrendingUp} iconBg="bg-teal-50" iconColor="text-teal-600" href="/admin/revenue" />
-      </div>
-
-      {/* ── 2. Charts ── */}
-      <div className="grid lg:grid-cols-2 gap-5">
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <p className="font-semibold text-gray-900 mb-1">Orders — last 30 days</p>
-          <p className="text-xs text-gray-400 mb-4">Daily order count</p>
-          <OrdersLineChart data={ordersChartData} />
-        </div>
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <p className="font-semibold text-gray-900 mb-1">Signups — last 30 days</p>
-          <p className="text-xs text-gray-400 mb-4">New user registrations per day</p>
-          <SignupsBarChart data={signupsChartData} />
+      {/* ── Charts ── */}
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-gray-400 mb-3">30-Day Trends</p>
+        <div className="grid lg:grid-cols-2 gap-4">
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="font-bold text-gray-900">Orders</p>
+                <p className="text-xs text-gray-400 mt-0.5">Daily count — last 30 days</p>
+              </div>
+              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{thisMonthOrders} this month</span>
+            </div>
+            <OrdersLineChart data={ordersChartData} />
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="font-bold text-gray-900">Signups</p>
+                <p className="text-xs text-gray-400 mt-0.5">New registrations — last 30 days</p>
+              </div>
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">{thisMonthSignups} this month</span>
+            </div>
+            <SignupsBarChart data={signupsChartData} />
+          </div>
         </div>
       </div>
 
-      {/* ── 5. User breakdown + 7. Conversion funnel ── */}
-      <div className="grid lg:grid-cols-2 gap-5">
+      {/* ── User breakdown + Conversion funnel ── */}
+      <div className="grid lg:grid-cols-2 gap-4">
         {/* 5. User breakdown */}
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <p className="font-semibold text-gray-900 mb-1">User breakdown</p>
@@ -543,109 +584,128 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── 3. Top editors leaderboard ── */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p className="font-semibold text-gray-900">Top Editors</p>
-            <p className="text-xs text-gray-400 mt-0.5">By total orders completed</p>
+      {/* ── Top editors + Recent activity (side by side on large screens) ── */}
+      <div className="grid lg:grid-cols-2 gap-4">
+
+        {/* Top Editors */}
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="font-bold text-gray-900">Top Editors</p>
+              <p className="text-xs text-gray-400 mt-0.5">By total orders completed</p>
+            </div>
+            <Link href="/admin/users?role=editor" className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">View all →</Link>
           </div>
-          <Link href="/admin/users?role=editor" className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">View all →</Link>
+          {topEditors.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">No completed orders yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {topEditors.map((editor, i) => (
+                <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                    i === 0 ? "bg-amber-100 text-amber-700" : i === 1 ? "bg-gray-100 text-gray-600" : i === 2 ? "bg-orange-100 text-orange-700" : "bg-gray-50 text-gray-400"
+                  }`}>{i + 1}</span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shrink-0">
+                    <span className="text-xs font-bold text-gray-600">{(editor.name ?? "?")[0].toUpperCase()}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{editor.name ?? "Unknown"}</p>
+                    <p className="text-xs text-gray-400 truncate">{editor.email}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0 bg-gray-50 px-2.5 py-1 rounded-lg">
+                    <ShoppingBag className="w-3 h-3 text-gray-400" />
+                    <span className="text-sm font-bold text-gray-700 tabular-nums">{editor.totalOrders}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        {topEditors.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">No completed orders yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {topEditors.map((editor, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
-                  i === 0 ? "bg-amber-100 text-amber-700" : i === 1 ? "bg-gray-100 text-gray-600" : i === 2 ? "bg-orange-100 text-orange-700" : "bg-gray-50 text-gray-400"
-                }`}>{i + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{editor.name ?? "Unknown"}</p>
-                  <p className="text-xs text-gray-400 truncate">{editor.email}</p>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <ShoppingBag className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-900">{editor.totalOrders}</span>
-                </div>
-              </div>
-            ))}
+
+        {/* Recent Activity */}
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="font-bold text-gray-900">Recent Activity</p>
+              <p className="text-xs text-gray-400 mt-0.5">Latest admin actions on the platform</p>
+            </div>
+            <Link href="/admin/audit" className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">Full log →</Link>
           </div>
-        )}
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">No activity yet.</p>
+          ) : (
+            <div className="space-y-1">
+              {recentActivity.map((item) => {
+                const iconCfg: Record<string, { bg: string; color: string; Icon: React.ElementType }> = {
+                  "kyc.approve": { bg: "bg-emerald-100", color: "text-emerald-600", Icon: UserCheck },
+                  "kyc.reject": { bg: "bg-red-100", color: "text-red-600", Icon: UserCheck },
+                  "dispute.resolve": { bg: "bg-amber-100", color: "text-amber-600", Icon: AlertTriangle },
+                  "user.role_change": { bg: "bg-blue-100", color: "text-blue-600", Icon: Users },
+                  "user.suspend": { bg: "bg-red-100", color: "text-red-600", Icon: Users },
+                  "payout.status_change": { bg: "bg-violet-100", color: "text-violet-600", Icon: Wallet },
+                };
+                const cfg = iconCfg[item.action] ?? { bg: "bg-gray-100", color: "text-gray-500", Icon: Activity };
+                return (
+                  <div key={item.id} className="flex items-start gap-3 px-2 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div className={`w-7 h-7 rounded-lg ${cfg.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <cfg.Icon className={`w-3.5 h-3.5 ${cfg.color}`} strokeWidth={1.8} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 leading-snug">
+                        <span className="font-semibold">{item.actorName ?? "Admin"}</span>
+                        {" "}<span className="text-gray-500">{ACTION_LABEL[item.action] ?? item.action}</span>
+                      </p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(item.createdAt)} · {item.actorRole}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* ── 1. Recent activity feed ── */}
+      {/* ── Quick Actions ── */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p className="font-semibold text-gray-900">Recent Activity</p>
-            <p className="text-xs text-gray-400 mt-0.5">Latest admin actions on the platform</p>
-          </div>
-          <Link href="/admin/audit" className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">Full log →</Link>
-        </div>
-        {recentActivity.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">No activity yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {recentActivity.map((item) => (
-              <div key={item.id} className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <Activity className="w-3.5 h-3.5 text-gray-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">{item.actorName ?? "Admin"}</span>
-                    {" "}<span className="text-gray-500">{ACTION_LABEL[item.action] ?? item.action}</span>
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">{formatDate(item.createdAt)} · {item.actorRole}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── 8. Quick action buttons ── */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <p className="font-semibold text-gray-900 mb-4">Quick Actions</p>
-        <div className="flex flex-wrap gap-3">
+        <p className="font-bold text-gray-900 mb-4">Quick Actions</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            { label: "Review KYC", href: "/admin/kyc", icon: FileCheck, color: "bg-amber-50 text-amber-700 hover:bg-amber-100" },
-            { label: "Resolve Disputes", href: "/admin/disputes", icon: AlertTriangle, color: "bg-red-50 text-red-700 hover:bg-red-100" },
-            { label: "Pending Payouts", href: "/admin/revenue", icon: Wallet, color: "bg-violet-50 text-violet-700 hover:bg-violet-100" },
-            { label: "Manage Users", href: "/admin/users", icon: Users, color: "bg-blue-50 text-blue-700 hover:bg-blue-100" },
-            { label: "All Orders", href: "/admin/orders", icon: ShoppingBag, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
-            { label: "Add Staff", href: "/admin/staff", icon: UserPlus, color: "bg-gray-100 text-gray-700 hover:bg-gray-200" },
-            { label: "Announcements", href: "/admin/announcements", icon: Zap, color: "bg-indigo-50 text-indigo-700 hover:bg-indigo-100" },
-            { label: "Audit Log", href: "/admin/audit", icon: Activity, color: "bg-gray-100 text-gray-700 hover:bg-gray-200" },
+            { label: "Review KYC", href: "/admin/kyc", icon: FileCheck, color: "bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-100" },
+            { label: "Resolve Disputes", href: "/admin/disputes", icon: AlertTriangle, color: "bg-red-50 text-red-700 hover:bg-red-100 border border-red-100" },
+            { label: "Pending Payouts", href: "/admin/revenue", icon: Wallet, color: "bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-100" },
+            { label: "Manage Users", href: "/admin/users", icon: Users, color: "bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-100" },
+            { label: "All Orders", href: "/admin/orders", icon: ShoppingBag, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-100" },
+            { label: "Add Staff", href: "/admin/staff", icon: UserPlus, color: "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200" },
+            { label: "Announcements", href: "/admin/announcements", icon: Zap, color: "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100" },
+            { label: "Audit Log", href: "/admin/audit", icon: Activity, color: "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200" },
           ].map(({ label, href, icon: Icon, color }) => (
-            <Link key={href} href={href} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${color}`}>
-              <Icon className="w-4 h-4" />
+            <Link key={href} href={href} className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${color}`}>
+              <Icon className="w-4 h-4 shrink-0" />
               {label}
             </Link>
           ))}
         </div>
       </div>
 
-      {/* ── 9. System health ── */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      {/* ── System health ── */}
+      <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-green-600" />
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">System healthy</p>
-              <p className="text-xs text-gray-400">No active maintenance mode · All services operational</p>
+              <p className="text-sm font-semibold text-emerald-900">All systems operational</p>
+              <p className="text-xs text-emerald-600/70">No active maintenance mode · Payments, orders, and KYC running normally</p>
             </div>
           </div>
-          <Link href="/admin/announcements" className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2 shrink-0">
+          <Link href="/admin/announcements" className="text-xs font-semibold text-emerald-700 hover:underline underline-offset-2 shrink-0">
             Post notice →
           </Link>
         </div>
       </div>
 
+      </div>
     </div>
   );
 }
