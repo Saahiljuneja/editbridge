@@ -523,17 +523,81 @@ export function AnimatedFindEditorCTA() {
 /* ════════════════════════════════════════════════════════════════════════════
    STATS — bento grid (light)
 ════════════════════════════════════════════════════════════════════════════ */
+const TRUST_STATS_DATA = [
+  {
+    value: "100%",
+    label: "KYC Verified",
+    sub: "Since day one",
+    desc: "Every editor submits govt-issued ID before accepting a single order.",
+    bg: "bg-zinc-950",
+    Icon: ShieldCheck,
+    svg: (
+      <svg className="absolute right-0 top-0 h-full w-2/3 pointer-events-none opacity-100" viewBox="0 0 300 200" fill="none">
+        <circle cx="220" cy="100" r="90" fill="#fff" fillOpacity="0.05" />
+        <circle cx="260" cy="60"  r="60" fill="#fff" fillOpacity="0.07" />
+        <circle cx="200" cy="160" r="50" fill="#fff" fillOpacity="0.04" />
+        <circle cx="270" cy="150" r="30" fill="#fff" fillOpacity="0.09" />
+      </svg>
+    ),
+  },
+  {
+    value: "₹0",
+    label: "Lost to fraud",
+    sub: "Since launch",
+    desc: "Not one rupee of client funds lost. Escrow protects every payment.",
+    bg: "bg-emerald-600",
+    Icon: Lock,
+    svg: (
+      <svg className="absolute right-0 top-0 w-48 h-48 pointer-events-none" viewBox="0 0 200 200" fill="none">
+        <defs><filter id="st-blur2"><feGaussianBlur stdDeviation="10" /></filter></defs>
+        <ellipse cx="170" cy="60" rx="40" ry="18" fill="#fff" fillOpacity="0.13" filter="url(#st-blur2)" />
+        <rect x="120" y="20" width="60" height="20" rx="8" fill="#fff" fillOpacity="0.09" />
+        <polygon points="150,0 200,0 200,50" fill="#fff" fillOpacity="0.07" />
+        <circle cx="180" cy="100" r="14" fill="#fff" fillOpacity="0.14" />
+      </svg>
+    ),
+  },
+  {
+    value: "100%",
+    label: "Escrow protected",
+    sub: "Every order",
+    desc: "Your payment held securely until you approve the delivered work.",
+    bg: "bg-violet-600",
+    Icon: Lock,
+    svg: (
+      <svg className="absolute right-0 top-0 w-48 h-48 pointer-events-none" viewBox="0 0 200 200" fill="none">
+        <defs><filter id="st-blur3"><feGaussianBlur stdDeviation="12" /></filter></defs>
+        <rect x="120" y="0" width="70" height="70" rx="35" fill="#fff" fillOpacity="0.08" filter="url(#st-blur3)" />
+        <ellipse cx="170" cy="80" rx="28" ry="12" fill="#fff" fillOpacity="0.11" />
+        <polygon points="200,0 200,60 140,0" fill="#fff" fillOpacity="0.06" />
+        <circle cx="150" cy="30" r="10" fill="#fff" fillOpacity="0.14" />
+      </svg>
+    ),
+  },
+  {
+    value: "48hrs",
+    label: "Avg. kickoff time",
+    sub: "Platform average",
+    desc: "From booking to editor starting your project.",
+    bg: "bg-[#0F6E56]",
+    Icon: Zap,
+    svg: (
+      <svg className="absolute right-0 top-0 w-48 h-48 pointer-events-none" viewBox="0 0 200 200" fill="none">
+        <defs><filter id="st-blur4"><feGaussianBlur stdDeviation="16" /></filter></defs>
+        <polygon points="200,0 200,100 100,0" fill="#fff" fillOpacity="0.07" />
+        <ellipse cx="170" cy="40" rx="30" ry="18" fill="#fff" fillOpacity="0.11" filter="url(#st-blur4)" />
+        <rect x="140" y="60" width="40" height="18" rx="8" fill="#fff" fillOpacity="0.09" />
+        <circle cx="150" cy="30" r="14" fill="#fff" fillOpacity="0.15" />
+        <line x1="120" y1="0" x2="200" y2="80" stroke="#fff" strokeOpacity="0.06" strokeWidth="6" />
+      </svg>
+    ),
+  },
+];
+
 export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPaid = 0 }: { editorCount?: number; completedOrders?: number; totalPaid?: number }) {
   void editorCount; void completedOrders; void totalPaid;
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  const TRUST_STATS = [
-    { value: "100%",  label: "KYC Verified",      desc: "Every editor submits government-issued ID before they can accept a single order.", col: "#0EA5E9", Icon: ShieldCheck },
-    { value: "₹0",    label: "Lost to fraud",      desc: "Not one rupee of client funds lost since launch. Escrow makes that possible.",     col: "#059669", Icon: Lock       },
-    { value: "100%",  label: "Escrow protected",   desc: "Every payment held securely in escrow until you approve the delivered work.",      col: "#7c3aed", Icon: Lock       },
-    { value: "48hrs", label: "Avg. kickoff time",  desc: "Typical time from booking to editor starting your project.",                       col: "#d97706", Icon: Zap        },
-  ];
 
   return (
     <section ref={ref} className="bg-white py-16 md:py-24 px-6 overflow-hidden">
@@ -551,23 +615,26 @@ export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPai
         </motion.div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {TRUST_STATS.map(({ value, label, desc, col, Icon }, i) => (
+          {TRUST_STATS_DATA.map(({ value, label, sub, desc, bg, Icon, svg }, i) => (
             <motion.div
               key={label}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="group relative rounded-2xl p-5 md:p-7 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-300 overflow-hidden"
+              transition={{ duration: 0.65, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className={cn("relative overflow-hidden rounded-2xl p-5 md:p-6 flex flex-col justify-between min-h-[180px] md:min-h-[200px]", bg)}
             >
-              <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: col }} />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(ellipse at 50% -10%, ${col}10, transparent 65%)` }} />
-              <div className="relative">
-                <Icon className="w-4 h-4 mb-5" style={{ color: col, opacity: 0.4 }} />
-                <p className="text-4xl md:text-5xl font-black leading-none mb-3" style={{ color: col }}>
-                  {value}
-                </p>
-                <p className="text-sm font-bold text-gray-800 mb-1.5 leading-snug">{label}</p>
-                <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
+              {/* Decorative SVG */}
+              {svg}
+
+              <div className="relative z-10">
+                <Icon className="w-4 h-4 text-white/50 mb-4 md:mb-5" strokeWidth={1.8} />
+                <p className="text-3xl md:text-4xl font-black text-white leading-none tracking-tight">{value}</p>
+              </div>
+
+              <div className="relative z-10 mt-4 border-t border-white/15 pt-3">
+                <p className="text-sm font-bold text-white/90 leading-snug">{label}</p>
+                <p className="text-[11px] text-white/50 mt-0.5 mb-2">{sub}</p>
+                <p className="text-[11px] text-white/40 leading-relaxed hidden md:block">{desc}</p>
               </div>
             </motion.div>
           ))}
