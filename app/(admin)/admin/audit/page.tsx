@@ -67,9 +67,9 @@ export default async function AuditLogPage({
         subtitle={`${totalCount} entries — all admin and staff actions recorded for compliance.`}
       />
 
-      <div className="mt-6 bg-white border border-gray-100 rounded-xl overflow-hidden">
+      <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
             <tr>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">Action</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">Actor</th>
@@ -78,7 +78,7 @@ export default async function AuditLogPage({
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">When</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
             {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
@@ -87,7 +87,7 @@ export default async function AuditLogPage({
               </tr>
             )}
             {rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50/50">
+              <tr key={row.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${
@@ -127,14 +127,14 @@ export default async function AuditLogPage({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-4 text-sm">
-          <p className="text-gray-400">
+          <p className="text-gray-400 dark:text-gray-500">
             Page {page} of {totalPages} · showing {offset + 1}–{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
           </p>
           <div className="flex gap-2">
             {page > 1 && (
               <Link
                 href={`/admin/audit?page=${page - 1}`}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
               >
                 ← Prev
               </Link>
@@ -142,7 +142,7 @@ export default async function AuditLogPage({
             {page < totalPages && (
               <Link
                 href={`/admin/audit?page=${page + 1}`}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
               >
                 Next →
               </Link>

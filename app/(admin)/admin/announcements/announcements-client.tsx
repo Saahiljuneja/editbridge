@@ -119,8 +119,8 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
     <div className="px-8 py-6 ">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Announcements</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Platform-wide notices shown to all users.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Announcements</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Platform-wide notices shown to all users.</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -132,36 +132,36 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 mb-6 space-y-4">
-          <p className="font-semibold text-gray-900">New announcement</p>
+        <form onSubmit={handleCreate} className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 mb-6 space-y-4">
+          <p className="font-semibold text-gray-900 dark:text-white">New announcement</p>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Scheduled maintenance on Sunday"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Message</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Message</label>
               <textarea
                 required
                 rows={3}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Describe the notice in detail…"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               >
                 <option value="info">Info</option>
                 <option value="warning">Warning</option>
@@ -169,22 +169,22 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Schedule for (optional)</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Schedule for (optional)</label>
               <input
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               />
-              <p className="text-[10px] text-gray-400 mt-1">Leave blank to publish immediately</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Leave blank to publish immediately</p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Expires at (optional)</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Expires at (optional)</label>
               <input
                 type="datetime-local"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               />
             </div>
           </div>
@@ -199,7 +199,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
             >
               Cancel
             </button>
@@ -208,10 +208,10 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
       )}
 
       {initialRows.length === 0 && !showForm ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-12 text-center shadow-sm">
           <Megaphone className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-500">No announcements yet</p>
-          <p className="text-xs text-gray-400 mt-1">Create one to notify all users on the platform.</p>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No announcements yet</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Create one to notify all users on the platform.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -246,7 +246,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                         <Check className="w-3.5 h-3.5" /> {saving ? "Saving…" : "Save"}
                       </button>
                       <button onClick={() => setEditId(null)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 bg-white/60 text-xs font-medium text-gray-600">
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/60 text-xs font-medium text-gray-600 dark:text-gray-300">
                         <X className="w-3.5 h-3.5" /> Cancel
                       </button>
                     </div>
@@ -262,11 +262,11 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                           ? <span className="text-xs text-indigo-600 font-medium">Scheduled for {formatDate(row.scheduledAt)}</span>
                           : !row.isActive && <span className="text-xs text-gray-400 font-medium">Inactive</span>
                         }
-                        {row.expiresAt && <span className="text-xs text-gray-400">Expires {formatDate(row.expiresAt)}</span>}
+                        {row.expiresAt && <span className="text-xs text-gray-400 dark:text-gray-500">Expires {formatDate(row.expiresAt)}</span>}
                       </div>
                       <p className={cn("font-semibold text-sm", cfg.text)}>{row.title}</p>
-                      <p className="text-xs text-gray-600 mt-0.5">{row.body}</p>
-                      <p className="text-xs text-gray-400 mt-1">{formatDate(row.createdAt)}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">{row.body}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{formatDate(row.createdAt)}</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => startEdit(row)} title="Edit"

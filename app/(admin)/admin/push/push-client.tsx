@@ -57,66 +57,66 @@ export function PushClient({ subscriberCount }: { subscriberCount: number }) {
       </div>
 
       {/* Form */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-5">
+      <div className="a-card p-6 space-y-5">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Title</label>
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Title</label>
           <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
             placeholder="e.g. New feature available!"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10" />
-          <p className="text-xs text-gray-400 mt-1 text-right">{title.length}/80</p>
+            className="w-full a-input rounded-xl px-3 py-2.5" />
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-right">{title.length}/80</p>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Body</label>
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Body</label>
           <textarea value={body} onChange={e => setBody(e.target.value)} maxLength={200} rows={3}
             placeholder="e.g. Check out the new timeline view on your orders…"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 resize-none" />
-          <p className="text-xs text-gray-400 mt-1 text-right">{body.length}/200</p>
+            className="w-full a-input rounded-xl px-3 py-2.5 resize-none" />
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-right">{body.length}/200</p>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
             <span className="flex items-center gap-1"><LinkIcon className="w-3 h-3" /> Click-through URL</span>
           </label>
           <input value={url} onChange={e => setUrl(e.target.value)}
             placeholder="/dashboard"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10" />
+            className="w-full a-input rounded-xl px-3 py-2.5" />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
             <span className="flex items-center gap-1"><Users className="w-3 h-3" /> Audience</span>
           </label>
           <select value={audience} onChange={e => setAudience(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 bg-white">
+            className="w-full a-input rounded-xl px-3 py-2.5">
             {AUDIENCE_OPTIONS.map(o => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             {audience === "all" ? `Up to ${subscriberCount.toLocaleString()} devices` : "Count depends on segment"}
           </p>
         </div>
 
         <button onClick={send} disabled={sending || !title || !body}
-          className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white text-sm font-semibold py-3 rounded-xl hover:bg-gray-700 transition-colors disabled:opacity-40">
+          className="w-full flex items-center justify-center gap-2 bg-gray-900 dark:bg-gray-700 text-white text-sm font-semibold py-3 rounded-xl hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:opacity-40">
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           {sending ? "Sending…" : "Send Push Notification"}
         </button>
       </div>
 
       {sent && (
-        <div className="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-sm text-emerald-700 font-medium">
+        <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 p-4 text-sm text-emerald-700 dark:text-emerald-400 font-medium">
           Push notification sent successfully!
         </div>
       )}
 
-      <div className="rounded-2xl bg-amber-50 border border-amber-100 p-4">
-        <p className="text-xs font-semibold text-amber-800 mb-1">Setup required</p>
-        <p className="text-xs text-amber-700">
-          Push notifications require VAPID keys configured in <code className="bg-amber-100 px-1 rounded">NEXT_PUBLIC_VAPID_PUBLIC_KEY</code>{" "}
-          and a service worker at <code className="bg-amber-100 px-1 rounded">/sw.js</code>.
-          The API endpoint <code className="bg-amber-100 px-1 rounded">/api/admin/push</code> handles delivery via web-push.
+      <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/40 p-4">
+        <p className="text-xs font-semibold text-amber-800 dark:text-amber-300 mb-1">Setup required</p>
+        <p className="text-xs text-amber-700 dark:text-amber-400">
+          Push notifications require VAPID keys configured in <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">NEXT_PUBLIC_VAPID_PUBLIC_KEY</code>{" "}
+          and a service worker at <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">/sw.js</code>.
+          The API endpoint <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">/api/admin/push</code> handles delivery via web-push.
         </p>
       </div>
     </div>

@@ -76,8 +76,8 @@ export default async function AdminKycQueuePage({
   return (
     <div className="px-8 py-6 ">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">KYC Queue</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{totalCount} application{totalCount !== 1 ? "s" : ""}</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">KYC Queue</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{totalCount} application{totalCount !== 1 ? "s" : ""}</p>
       </div>
 
       {/* Search + filter bar */}
@@ -86,14 +86,14 @@ export default async function AdminKycQueuePage({
           name="q"
           defaultValue={q}
           placeholder="Search by name or email…"
-          className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+          className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
         />
         <input type="hidden" name="status" value={status} />
         <button type="submit" className="px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-medium hover:bg-sky-600 transition-colors">
           Search
         </button>
         {q && (
-          <Link href={`/admin/kyc?status=${status}`} className="px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
+          <Link href={`/admin/kyc?status=${status}`} className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
             Clear
           </Link>
         )}
@@ -109,7 +109,7 @@ export default async function AdminKycQueuePage({
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
               status === tab.value
                 ? "bg-[#0EA5E9] text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             )}
           >
             {tab.label}
@@ -118,10 +118,10 @@ export default async function AdminKycQueuePage({
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
-          <FileCheck className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-500">No {status} applications</p>
-          <p className="text-xs text-gray-400 mt-1">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-12 text-center shadow-sm">
+          <FileCheck className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No {status} applications</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             {status === "pending" ? "All KYC applications have been reviewed." : `No ${status} applications found.`}
           </p>
         </div>
@@ -132,14 +132,14 @@ export default async function AdminKycQueuePage({
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-1 py-2 text-sm">
-              <p className="text-gray-400">
+              <p className="text-gray-400 dark:text-gray-500">
                 Page {page} of {totalPages} · {offset + 1}–{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
               </p>
               <div className="flex gap-2">
                 {page > 1 && (
                   <Link
                     href={`/admin/kyc?${new URLSearchParams({ status, ...(q ? { q } : {}), page: String(page - 1) }).toString()}`}
-                    className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                   >
                     ← Prev
                   </Link>
@@ -147,7 +147,7 @@ export default async function AdminKycQueuePage({
                 {page < totalPages && (
                   <Link
                     href={`/admin/kyc?${new URLSearchParams({ status, ...(q ? { q } : {}), page: String(page + 1) }).toString()}`}
-                    className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                   >
                     Next →
                   </Link>

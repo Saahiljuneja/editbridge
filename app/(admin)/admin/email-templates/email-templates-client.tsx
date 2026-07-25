@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useMemo, useEffect } from "react";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ import {
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
-function Skel({w,h="h-3"}:{w:string;h?:string}){return <div className={`animate-pulse bg-gray-100 rounded ${h} ${w}`}/>;}
+function Skel({w,h="h-3"}:{w:string;h?:string}){return <div className={`animate-pulse bg-gray-100 dark:bg-gray-800 rounded ${h} ${w}`}/>;}
 function SkeletonRow(){return <div className="flex items-center gap-4 px-4 py-3 border-b border-gray-50 last:border-0"><Skel w="w-16" h="h-4"/><Skel w="flex-1"/><Skel w="w-24"/><Skel w="w-20"/></div>;}
 
 const RECIPIENT_BADGE: Record<string, string> = {
@@ -78,7 +78,7 @@ function lineDiff(oldText: string, newText: string) {
 }
 
 // Shared input class — base without w-full so callers can override width
-const ic = "border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20";
+const ic = "border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900/20 dark:focus:ring-gray-100/20";
 
 // Opens a template preview in a new browser tab as a self-contained HTML blob
 function openInTab(label: string, subject: string, body: string, isHtml: boolean) {
@@ -142,13 +142,13 @@ export function EmailTemplatesClient(props: Props) {
   return (
     <div className="px-8 py-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Email Templates</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage every email sent by the platform.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email Templates</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage every email sent by the platform.</p>
       </div>
       <div className="overflow-x-auto pb-0.5 -mx-1 px-1">
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-max">
+        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-max">
           {TABS.map(({id,label,icon:Icon})=>(
-            <button key={id} onClick={()=>setTab(id)} className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${tab===id?"bg-white text-gray-900 shadow-sm":"text-gray-500 hover:text-gray-700"}`}>
+            <button key={id} onClick={()=>setTab(id)} className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${tab===id?"bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm":"text-gray-500 dark:text-gray-400 hover:text-gray-700"}`}>
               <Icon className="w-3.5 h-3.5"/>{label}
               {id==="templates"&&unsavedCount>0&&<span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unsavedCount}</span>}
             </button>
@@ -158,7 +158,7 @@ export function EmailTemplatesClient(props: Props) {
       {tab==="overview"  && <OverviewTab totalTemplates={Object.keys(props.templates).length/2} activeTemplates={Object.values(props.enabled).filter(Boolean).length} suppressedCount={props.suppressionList.length} broadcasts={props.broadcasts} onNavigate={setTab}/>}
       {tab==="templates" && <TemplatesTab {...props} broadcasts={props.broadcasts} onModifiedChange={setUnsavedCount} injectHtml={builderHtml} onInjectConsumed={()=>setBuilderHtml(null)} onEditInBuilder={(label,body)=>{setBuilderLoad({label,body});setTab("builder");}}/>}
       {tab==="builder"   && (
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5" style={{minHeight:640}}>
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5" style={{minHeight:640}}>
           <EmailBuilder
             templates={props.templates}
             loadTemplate={builderLoad}
@@ -198,7 +198,7 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
     { icon: Users,       color: "bg-emerald-50 text-emerald-600",title: "Broadcasts", body: "Send a template to a whole segment — All Clients, All Editors, or Inactive Clients (no order in 90+ days). Before sending you see a recipient preview showing the first 5 eligible addresses and the total count. Broadcasts respect the suppression list, the send-window restriction, and the per-send throttle. You can also schedule a broadcast for a future time." },
     { icon: Shield,      color: "bg-red-50 text-red-600",        title: "Suppression & compliance", body: `Emails on the suppression list are silently skipped by every broadcast. Addresses are added automatically when Resend reports a hard bounce or spam complaint via webhook (POST /api/webhooks/resend). You can also add or remove addresses manually in Settings → Suppression List. Currently ${suppressedCount} address${suppressedCount!==1?"es are":"is"} suppressed.` },
     { icon: BarChart2,   color: "bg-sky-50 text-sky-600",        title: "Delivery tracking", body: "The Delivery tab shows up to 100 recent emails from Resend with their latest event status (sent, delivered, opened, clicked, bounced, failed). A 14-day sparkline shows volume trends. Bounced emails have a one-click Suppress button. Resend automatically fires the webhook on hard bounces and spam complaints to keep the suppression list current." },
-    { icon: Globe,       color: "bg-gray-50 text-gray-600",       title: "Global settings", body: "Settings → Global Settings controls the default sender name, the unsubscribe footer appended to marketing emails, the broadcast throttle (ms between sends), and the send window (allowed IST hours for broadcasts). The Pause all emails kill switch immediately halts all outgoing email until toggled off. These settings take effect on the next send." },
+    { icon: Globe,       color: "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300",       title: "Global settings", body: "Settings → Global Settings controls the default sender name, the unsubscribe footer appended to marketing emails, the broadcast throttle (ms between sends), and the send window (allowed IST hours for broadcasts). The Pause all emails kill switch immediately halts all outgoing email until toggled off. These settings take effect on the next send." },
   ];
 
   const FEATURES = [
@@ -254,33 +254,33 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
       {/* Live stats strip */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          {label:"Active Templates", value:activeTemplates.toLocaleString(),    sub:`of ${totalTemplates} total`,          color:"text-gray-900",   onClick:()=>onNavigate("templates")},
+          {label:"Active Templates", value:activeTemplates.toLocaleString(),    sub:`of ${totalTemplates} total`,          color:"text-gray-900 dark:text-white",   onClick:()=>onNavigate("templates")},
           {label:"Emails This Month",value:quota!=null?quota.sentThisMonth.toLocaleString():"—", sub:"via Resend",         color:"text-indigo-600", onClick:()=>onNavigate("delivery")},
           {label:"Open Rate",        value:openRate!=null?`${openRate}%`:"—",    sub:"last 100 emails",                    color:"text-blue-600",   onClick:()=>onNavigate("analytics")},
           {label:"Broadcasts Sent",  value:broadcasts.length.toLocaleString(),  sub:"total campaigns",                     color:"text-violet-600", onClick:()=>onNavigate("broadcast")},
-          {label:"Last Broadcast",   value:lastBroadcastDays===null?"—":lastBroadcastDays===0?"Today":lastBroadcastDays===1?"Yesterday":`${lastBroadcastDays}d ago`, sub:lastBroadcast?.templateLabel??"no broadcasts", color:"text-gray-700", onClick:()=>onNavigate("broadcast")},
-          {label:"Suppressed",       value:suppressedCount.toLocaleString(),    sub:"emails excluded",                     color:suppressedCount>0?"text-red-500":"text-gray-500", onClick:()=>onNavigate("settings")},
+          {label:"Last Broadcast",   value:lastBroadcastDays===null?"—":lastBroadcastDays===0?"Today":lastBroadcastDays===1?"Yesterday":`${lastBroadcastDays}d ago`, sub:lastBroadcast?.templateLabel??"no broadcasts", color:"text-gray-700 dark:text-gray-200", onClick:()=>onNavigate("broadcast")},
+          {label:"Suppressed",       value:suppressedCount.toLocaleString(),    sub:"emails excluded",                     color:suppressedCount>0?"text-red-500":"text-gray-500 dark:text-gray-400", onClick:()=>onNavigate("settings")},
         ].map(({label,value,sub,color,onClick})=>(
-          <button key={label} onClick={onClick} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-left hover:border-gray-300 transition-colors">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">{label}</p>
+          <button key={label} onClick={onClick} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 text-left hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+            <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">{label}</p>
             <p className={`text-xl font-bold tabular-nums leading-none ${color}`}>{value}</p>
-            <p className="text-[10px] text-gray-400 mt-1 truncate">{sub}</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 truncate">{sub}</p>
           </button>
         ))}
       </div>
 
       {/* Quick-start */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
-        <h3 className="text-sm font-bold text-gray-900 mb-5">Quick start</h3>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5">Quick start</h3>
         <div className="relative">
-          <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-100"/>
+          <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-100 dark:bg-gray-800"/>
           <div className="space-y-5">
             {QUICKSTART.map(({step,title,desc})=>(
               <div key={step} className="flex gap-4 relative">
                 <div className="w-8 h-8 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center shrink-0 relative z-10">{step}</div>
                 <div className="pt-1 pb-1">
-                  <p className="text-sm font-semibold text-gray-900">{title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -290,16 +290,16 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
 
       {/* How it works sections */}
       <div>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">How it works</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">How it works</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {SECTIONS_DATA.map(({icon:Icon,color,title,body})=>(
-            <div key={title} className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5 flex gap-4">
+            <div key={title} className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5 flex gap-4">
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
                 <Icon className="w-4.5 h-4.5 w-[18px] h-[18px]"/>
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-900 mb-1">{title}</p>
-                <p className="text-xs text-gray-500 leading-relaxed">{body}</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">{title}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{body}</p>
               </div>
             </div>
           ))}
@@ -307,8 +307,8 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
       </div>
 
       {/* Tabs reference */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
-        <h3 className="text-sm font-bold text-gray-900 mb-4">What each tab does</h3>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">What each tab does</h3>
         <div className="space-y-3">
           {([
             {icon:Mail,        tab:"templates" as TabId, label:"Templates",  desc:"Edit the subject, body, sender, CC, BCC, reply-to, preheader, and attachment for every email. Manage A/B variants, Hindi translations, version history, locking, and approval status."},
@@ -318,15 +318,15 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
             {icon:ClipboardList,tab:"audit"    as TabId, label:"Audit",      desc:"Every admin action — save, enable/disable, lock, approval change — is logged here with timestamp and admin email. Searchable and clearable."},
             {icon:Settings,    tab:"settings"  as TabId, label:"Settings",   desc:"Configure global sender name, unsubscribe footer, broadcast throttle, IST send window, and the emergency pause kill switch. Manage custom variables and the suppression list."},
           ]).map(({icon:Icon,tab,label,desc})=>(
-            <div key={label} className="flex items-start gap-4 p-3.5 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors group">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 group-hover:bg-gray-200 transition-colors">
-                <Icon className="w-4 h-4 text-gray-500"/>
+            <div key={label} className="flex items-start gap-4 p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group">
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 group-hover:bg-gray-200 dark:group-hover:bg-gray-700 dark:hover:bg-gray-700 transition-colors">
+                <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400"/>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900">{label}</p>
-                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{label}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
               </div>
-              <button onClick={()=>onNavigate(tab)} className="shrink-0 flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-gray-700 transition-colors mt-1">
+              <button onClick={()=>onNavigate(tab)} className="shrink-0 flex items-center gap-1 text-xs font-semibold text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mt-1">
                 Go<ArrowRight className="w-3 h-3"/>
               </button>
             </div>
@@ -336,12 +336,12 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
 
       {/* Feature list + variables reference side by side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">All features</h3>
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">All features</h3>
           <div className="space-y-1.5">
             {FEATURES.map(({label,tab})=>(
               <button key={label} onClick={()=>onNavigate(tab)}
-                className="w-full flex items-center gap-2.5 text-left text-xs text-gray-600 hover:text-gray-900 group py-0.5">
+                className="w-full flex items-center gap-2.5 text-left text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white group py-0.5">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0"/>
                 <span className="flex-1 group-hover:underline underline-offset-2">{label}</span>
               </button>
@@ -349,18 +349,18 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">Built-in variables</h3>
-          <p className="text-xs text-gray-400 mb-3">Use these in any template subject or body. They are replaced at send time with real data.</p>
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Built-in variables</h3>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">Use these in any template subject or body. They are replaced at send time with real data.</p>
           <div className="space-y-2">
             {VARS_REFERENCE.map(([key,desc])=>(
               <div key={key} className="flex items-baseline gap-3">
                 <code className="text-[11px] font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded shrink-0 min-w-0">{key}</code>
-                <span className="text-xs text-gray-500 truncate">{desc}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{desc}</span>
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-gray-400 mt-4 border-t border-gray-100 pt-3">Define additional variables in Settings → Custom Variables.</p>
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-4 border-t border-gray-100 dark:border-gray-800 pt-3">Define additional variables in Settings → Custom Variables.</p>
         </div>
       </div>
 
@@ -636,23 +636,23 @@ function TemplatesTab({ templates:init, enabled:initEnabled, fromNames:initFN, c
       {/* toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"/>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none"/>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search templates…"
-            className="w-full pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white"/>
-          {search&&<button onClick={()=>setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X className="w-3.5 h-3.5"/></button>}
+            className="w-full pl-9 pr-8 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white dark:bg-gray-900"/>
+          {search&&<button onClick={()=>setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600"><X className="w-3.5 h-3.5"/></button>}
         </div>
-        <button onClick={()=>setVarDrawer(v=>!v)} className={`flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border transition-colors ${varDrawer?"bg-blue-50 border-blue-200 text-blue-700":"border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+        <button onClick={()=>setVarDrawer(v=>!v)} className={`flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border transition-colors ${varDrawer?"bg-blue-50 border-blue-200 text-blue-700":"border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50"}`}>
           <Globe className="w-4 h-4"/>Variables
         </button>
         <button onClick={()=>{if(allOpen){setOpen(new Set());setAllOpen(false);}else{setOpen(new Set(SECTIONS.flatMap(s=>s.groups).map(g=>g.label)));setAllOpen(true);}}}
-          className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+          className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
           {allOpen?<ChevronUp className="w-4 h-4"/>:<ChevronDown className="w-4 h-4"/>}{allOpen?"Collapse all":"Expand all"}
         </button>
-        <button onClick={()=>fileInputRef.current?.click()} className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+        <button onClick={()=>fileInputRef.current?.click()} className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
           <Upload className="w-4 h-4"/>Import
         </button>
         <input ref={fileInputRef} type="file" accept=".json" onChange={importFile} className="hidden"/>
-        <button onClick={exportAll} className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+        <button onClick={exportAll} className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
           <Download className="w-4 h-4"/>Export
         </button>
         <button onClick={convertAllToBuilderFormat} className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
@@ -664,7 +664,7 @@ function TemplatesTab({ templates:init, enabled:initEnabled, fromNames:initFN, c
         </button>
       </div>
 
-      <div className="flex items-center gap-3 text-xs text-gray-400 px-1">
+      <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500 px-1">
         <span>{allGroups.length} templates · {enabledCount} enabled · {allGroups.length-enabledCount} disabled</span>
         <span className="text-[10px]">· Cmd+S saves open template</span>
       </div>
@@ -676,7 +676,7 @@ function TemplatesTab({ templates:init, enabled:initEnabled, fromNames:initFN, c
             {allVars.map(({key,label,sample})=>(
               <div key={key} className="flex items-baseline gap-2 text-xs">
                 <button onClick={()=>insertVar(key)} className="font-mono text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors shrink-0">{key}</button>
-                <span className="text-gray-500 truncate">{label!==key?`${label} — `:""}{sample}</span>
+                <span className="text-gray-500 dark:text-gray-400 truncate">{label!==key?`${label} — `:""}{sample}</span>
               </div>
             ))}
           </div>
@@ -708,9 +708,9 @@ function TemplatesTab({ templates:init, enabled:initEnabled, fromNames:initFN, c
           return (
             <div key={section.section}>
               <div className="flex items-center gap-2 mb-3 px-1">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 flex-1">{section.section}</p>
-                <button onClick={bulkReset} className="text-[10px] font-bold px-2.5 py-1 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition-colors">Reset all</button>
-                <button onClick={bulkToggle} className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition-colors ${allOn?"bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-red-50 hover:border-red-200 hover:text-red-500":"bg-gray-50 border-gray-200 text-gray-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600"}`}>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 flex-1">{section.section}</p>
+                <button onClick={bulkReset} className="text-[10px] font-bold px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">Reset all</button>
+                <button onClick={bulkToggle} className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition-colors ${allOn?"bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-red-50 hover:border-red-200 hover:text-red-500":"bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600"}`}>
                   {allOn?"Disable all":"Enable all"}
                 </button>
               </div>
@@ -752,7 +752,7 @@ function TemplatesTab({ templates:init, enabled:initEnabled, fromNames:initFN, c
           );
         })}
         {filteredSections.length===0&&(
-          <div className="text-center py-14 text-gray-400">
+          <div className="text-center py-14 text-gray-400 dark:text-gray-500">
             <Search className="w-7 h-7 mx-auto mb-3 opacity-40"/>
             <p className="text-sm font-medium">No templates match &ldquo;{search}&rdquo;</p>
             <button onClick={()=>setSearch("")} className="mt-2 text-xs underline underline-offset-2 hover:text-gray-600">Clear</button>
@@ -791,9 +791,9 @@ function ChipInput({value,onChange,placeholder}:{value:string;onChange:(v:string
   function commit(){if(!inp.trim())return;const all=[...chips,...inp.split(",").map(e=>e.trim()).filter(Boolean)];onChange(all.join(", "));setInp("");}
   function remove(i:number){const next=chips.filter((_,j)=>j!==i);onChange(next.join(", "));}
   return(
-    <div className="flex flex-wrap items-center gap-1 border border-gray-200 rounded-xl px-2.5 py-1.5 min-h-[38px] focus-within:ring-2 focus-within:ring-gray-900/20 bg-white cursor-text">
+    <div className="flex flex-wrap items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-xl px-2.5 py-1.5 min-h-[38px] focus-within:ring-2 focus-within:ring-gray-900/20 bg-white dark:bg-gray-900 cursor-text">
       {chips.map((c,i)=>(
-        <span key={i} className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
+        <span key={i} className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded-full">
           {c}<button type="button" onClick={()=>remove(i)} className="hover:text-red-500 ml-0.5"><X className="w-2.5 h-2.5"/></button>
         </span>
       ))}
@@ -895,20 +895,20 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
   function openPreviewTab(){ openInTab(group.label, subjectVal, bodyVal, isHtml); }
 
   return (
-    <div className={`rounded-2xl border bg-white shadow-sm overflow-hidden ${isEnabled?"border-gray-100":"border-gray-100 opacity-55"} ${isLocked?"ring-1 ring-amber-200":""}`}>
+    <div className={`rounded-2xl border bg-white dark:bg-gray-900 shadow-sm overflow-hidden ${isEnabled?"border-gray-100 dark:border-gray-800":"border-gray-100 dark:border-gray-800 opacity-55"} ${isLocked?"ring-1 ring-amber-200":""}`}>
       {/* header */}
       <div className="flex items-center gap-2 px-5 py-3.5">
         <button onClick={onOpen} className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-75 transition-opacity">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isLocked?"bg-amber-50":isEnabled?"bg-blue-50":"bg-gray-100"}`}>
-            {isLocked?<Lock className="w-4 h-4 text-amber-400"/>:<Mail className={`w-4 h-4 ${isEnabled?"text-blue-500":"text-gray-400"}`}/>}
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isLocked?"bg-amber-50":isEnabled?"bg-blue-50":"bg-gray-100 dark:bg-gray-800"}`}>
+            {isLocked?<Lock className="w-4 h-4 text-amber-400"/>:<Mail className={`w-4 h-4 ${isEnabled?"text-blue-500":"text-gray-400 dark:text-gray-500"}`}/>}
           </div>
           <div className="flex items-center gap-2 flex-wrap min-w-0">
-            <span className="text-sm font-semibold text-gray-900 truncate">{group.label}</span>
-            {group.recipient&&<span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${RECIPIENT_BADGE[group.recipient]??"bg-gray-100 text-gray-500"}`}>{group.recipient}</span>}
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${isApproved?"bg-emerald-50 text-emerald-600":"bg-gray-100 text-gray-500"}`}>{isApproved?"Approved":"Draft"}</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">{group.label}</span>
+            {group.recipient&&<span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${RECIPIENT_BADGE[group.recipient]??"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>{group.recipient}</span>}
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${isApproved?"bg-emerald-50 text-emerald-600":"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>{isApproved?"Approved":"Draft"}</span>
             {isLocked&&<span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 shrink-0">Locked</span>}
-            {usageCount>0&&<span className="text-[10px] font-semibold text-gray-400 shrink-0 tabular-nums">{usageCount}× · {daysAgo===0?"today":daysAgo===1?"yesterday":daysAgo!==null?`${daysAgo}d ago`:""}</span>}
-            {lastSentDays!==null&&<span className="text-[10px] font-semibold text-gray-300 shrink-0">{lastSentDays===0?"broadcast today":lastSentDays===1?"broadcast yesterday":`broadcast ${lastSentDays}d ago`}</span>}
+            {usageCount>0&&<span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 shrink-0 tabular-nums">{usageCount}× · {daysAgo===0?"today":daysAgo===1?"yesterday":daysAgo!==null?`${daysAgo}d ago`:""}</span>}
+            {lastSentDays!==null&&<span className="text-[10px] font-semibold text-gray-300 dark:text-gray-600 shrink-0">{lastSentDays===0?"broadcast today":lastSentDays===1?"broadcast yesterday":`broadcast ${lastSentDays}d ago`}</span>}
             {isDirty&&<span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"/>}
             {isDupSubject&&<span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" title="Duplicate subject"/>}
             {missingVars.length>0&&<span title={`Unknown: ${missingVars.join(", ")}`}><AlertCircle className="w-3.5 h-3.5 text-orange-400 shrink-0"/></span>}
@@ -916,20 +916,20 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
           </div>
         </button>
         <div className="flex items-center gap-0.5 shrink-0">
-          <button onClick={onToggleLock} title={isLocked?"Unlock":"Lock"} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-            {isLocked?<Unlock className="w-4 h-4 text-amber-400"/>:<Lock className="w-4 h-4 text-gray-300 hover:text-gray-500"/>}
+          <button onClick={onToggleLock} title={isLocked?"Unlock":"Lock"} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            {isLocked?<Unlock className="w-4 h-4 text-amber-400"/>:<Lock className="w-4 h-4 text-gray-300 dark:text-gray-600 hover:text-gray-500"/>}
           </button>
-          <button onClick={onToggleApproval} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-            <CheckCircle className={`w-4 h-4 ${isApproved?"text-emerald-500":"text-gray-300"}`}/>
+          <button onClick={onToggleApproval} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <CheckCircle className={`w-4 h-4 ${isApproved?"text-emerald-500":"text-gray-300 dark:text-gray-600"}`}/>
           </button>
-          <button onClick={onToggleEnabled} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-            {isEnabled?<ToggleRight className="w-4 h-4 text-emerald-500"/>:<ToggleLeft className="w-4 h-4 text-gray-400"/>}
+          <button onClick={onToggleEnabled} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            {isEnabled?<ToggleRight className="w-4 h-4 text-emerald-500"/>:<ToggleLeft className="w-4 h-4 text-gray-400 dark:text-gray-500"/>}
           </button>
-          <button onClick={onPreview} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-            <Eye className="w-4 h-4 text-gray-400"/>
+          <button onClick={onPreview} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <Eye className="w-4 h-4 text-gray-400 dark:text-gray-500"/>
           </button>
-          <button onClick={onOpen} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-            {isOpen?<ChevronUp className="w-4 h-4 text-gray-400"/>:<ChevronDown className="w-4 h-4 text-gray-400"/>}
+          <button onClick={onOpen} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            {isOpen?<ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-500"/>:<ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500"/>}
           </button>
         </div>
       </div>
@@ -943,22 +943,22 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
       )}
 
       {isOpen&&!isLocked&&(
-        <div className="border-t border-gray-100 grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-gray-100">
+        <div className="border-t border-gray-100 dark:border-gray-800 grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-gray-100 dark:divide-gray-800">
 
           {/* ── LEFT: editor ── */}
           <div className="px-6 pb-6 space-y-4 pt-5">
           {/* language */}
-          <div className="flex gap-1 bg-gray-100 p-0.5 rounded-lg w-fit">
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg w-fit">
             {([["en","English"],["hi","हिंदी"]] as [Lang,string][]).map(([l,label])=>(
-              <button key={l} onClick={()=>setLang(l)} className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1 ${lang===l?"bg-white text-gray-900 shadow-sm":"text-gray-500 hover:text-gray-700"}`}><Languages className="w-3 h-3"/>{label}</button>
+              <button key={l} onClick={()=>setLang(l)} className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1 ${lang===l?"bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm":"text-gray-500 dark:text-gray-400 hover:text-gray-700"}`}><Languages className="w-3 h-3"/>{label}</button>
             ))}
           </div>
 
           {/* var chips */}
           <div>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Variables — click to insert</p>
+            <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Variables — click to insert</p>
             <div className="flex flex-wrap gap-1.5">
-              {group.vars.map(v=><button key={v} onClick={()=>onInsertVar(v)} className="text-[11px] bg-gray-100 hover:bg-blue-50 hover:text-blue-700 text-gray-600 px-2 py-0.5 rounded transition-colors font-mono">{v}</button>)}
+              {group.vars.map(v=><button key={v} onClick={()=>onInsertVar(v)} className="text-[11px] bg-gray-100 dark:bg-gray-800 hover:bg-blue-50 hover:text-blue-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded transition-colors font-mono">{v}</button>)}
             </div>
           </div>
 
@@ -975,21 +975,21 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
           {/* fields: sender, reply-to, CC (chip), BCC (chip), preheader, attachment */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Sender name</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Sender name</label>
               <input value={fnVal} onChange={e=>onSetFN(e.target.value)} onFocus={e=>{activeFieldRef.current={key:fnK,el:e.target};}} placeholder="EditBridge"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Reply-to</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Reply-to</label>
               <input value={rtVal} onChange={e=>onSetRT(e.target.value)} onFocus={e=>{activeFieldRef.current={key:rtK,el:e.target};}} placeholder="hello@editbridge.com"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">CC <span className="text-[9px] font-normal normal-case text-gray-400">comma-separated</span></label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">CC <span className="text-[9px] font-normal normal-case text-gray-400 dark:text-gray-500">comma-separated</span></label>
               <ChipInput value={ccVal} onChange={onSetCC} placeholder="support@editbridge.com"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">BCC <span className="text-[9px] font-normal normal-case text-gray-400">comma-separated</span></label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">BCC <span className="text-[9px] font-normal normal-case text-gray-400 dark:text-gray-500">comma-separated</span></label>
               <ChipInput value={bccVal} onChange={onSetBCC} placeholder="admin@editbridge.com"/>
             </div>
           </div>
@@ -997,49 +997,49 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
           {/* subject */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Subject line</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subject line</label>
               <div className="flex items-center gap-2">
-                <span className={`text-[10px] tabular-nums ${subjectTooLong?"text-red-400 font-bold":"text-gray-400"}`}>{subjectLen}/60</span>
-                <button onClick={()=>copy(subjectVal,"Subject")} className="text-gray-400 hover:text-gray-600"><Copy className="w-3 h-3"/></button>
+                <span className={`text-[10px] tabular-nums ${subjectTooLong?"text-red-400 font-bold":"text-gray-400 dark:text-gray-500"}`}>{subjectLen}/60</span>
+                <button onClick={()=>copy(subjectVal,"Subject")} className="text-gray-400 dark:text-gray-500 hover:text-gray-600"><Copy className="w-3 h-3"/></button>
               </div>
             </div>
             <input value={subjectVal} onChange={e=>setSubject(e.target.value)} onFocus={e=>{activeFieldRef.current={key:subjectKey,el:e.target};}} spellCheck
-              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 ${subjectTooLong?"border-red-200 bg-red-50":"border-gray-200"}`}/>
+              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 ${subjectTooLong?"border-red-200 bg-red-50":"border-gray-200 dark:border-gray-700"}`}/>
           </div>
 
           {/* preheader */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Preheader <span className="text-[9px] font-normal normal-case">Preview text shown after subject in inbox</span></label>
-              <span className={`text-[10px] tabular-nums ${phVal.length>90?"text-red-400 font-bold":"text-gray-400"}`}>{phVal.length}/90</span>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Preheader <span className="text-[9px] font-normal normal-case">Preview text shown after subject in inbox</span></label>
+              <span className={`text-[10px] tabular-nums ${phVal.length>90?"text-red-400 font-bold":"text-gray-400 dark:text-gray-500"}`}>{phVal.length}/90</span>
             </div>
             <input value={phVal} onChange={e=>onSetPH(e.target.value)} onFocus={e=>{activeFieldRef.current={key:phK,el:e.target};}} maxLength={95} placeholder="Short preview text shown in inbox after subject…"
-              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 ${phVal.length>90?"border-amber-200":"border-gray-200"}`}/>
+              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 ${phVal.length>90?"border-amber-200":"border-gray-200 dark:border-gray-700"}`}/>
           </div>
 
           {/* body */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Body</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Body</label>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-400 tabular-nums">{bodyVal.length.toLocaleString()} chars</span>
-                <button onClick={()=>copy(bodyVal,"Body")} className="text-gray-400 hover:text-gray-600"><Copy className="w-3 h-3"/></button>
-                <button onClick={onToggleHtml} className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border transition-colors ${isHtml?"bg-violet-50 border-violet-200 text-violet-600":"bg-gray-50 border-gray-200 text-gray-500"}`}>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums">{bodyVal.length.toLocaleString()} chars</span>
+                <button onClick={()=>copy(bodyVal,"Body")} className="text-gray-400 dark:text-gray-500 hover:text-gray-600"><Copy className="w-3 h-3"/></button>
+                <button onClick={onToggleHtml} className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border transition-colors ${isHtml?"bg-violet-50 border-violet-200 text-violet-600":"bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400"}`}>
                   {isHtml?<Code className="w-2.5 h-2.5"/>:<AlignLeft className="w-2.5 h-2.5"/>}{isHtml?"HTML":"Plain"}
                 </button>
               </div>
             </div>
             {isHtml&&(
-              <div className="flex items-center gap-1 mb-2 p-1.5 bg-gray-50 rounded-xl border border-gray-200 flex-wrap">
+              <div className="flex items-center gap-1 mb-2 p-1.5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 flex-wrap">
                 {[{icon:Bold,fn:()=>htmlWrap("<strong>","</strong>"),title:"Bold"},{icon:Italic,fn:()=>htmlWrap("<em>","</em>"),title:"Italic"},{icon:Underline,fn:()=>htmlWrap("<u>","</u>"),title:"Underline"},{icon:List,fn:()=>htmlWrap("<ul><li>","</li></ul>"),title:"List"},{icon:Minus,fn:()=>setBody(bodyVal+"\n<hr>"),title:"Divider"}].map(({icon:Icon,fn,title})=>(
-                  <button key={title} onClick={fn} title={title} className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-gray-800"><Icon className="w-3.5 h-3.5"/></button>
+                  <button key={title} onClick={fn} title={title} className="p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 dark:text-gray-400 hover:text-gray-800"><Icon className="w-3.5 h-3.5"/></button>
                 ))}
                 <div className="relative">
-                  <button onClick={()=>setLinkInput(linkInput===null?"":null)} className={`p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-gray-800 ${linkInput!==null?"bg-white shadow-sm":""}`}><Link className="w-3.5 h-3.5"/></button>
+                  <button onClick={()=>setLinkInput(linkInput===null?"":null)} className={`p-1.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 dark:text-gray-400 hover:text-gray-800 ${linkInput!==null?"bg-white dark:bg-gray-900 shadow-sm":""}`}><Link className="w-3.5 h-3.5"/></button>
                   {linkInput!==null&&(
-                    <div className="absolute top-full left-0 mt-1 z-20 flex gap-1 bg-white border border-gray-200 rounded-xl shadow-lg p-2">
+                    <div className="absolute top-full left-0 mt-1 z-20 flex gap-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-2">
                       <input autoFocus value={linkInput} onChange={e=>setLinkInput(e.target.value)} placeholder="https://" onKeyDown={e=>e.key==="Enter"&&insertLink()}
-                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 w-48 focus:outline-none focus:ring-1 focus:ring-gray-900/20"/>
+                        className="text-xs border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 w-48 focus:outline-none focus:ring-1 focus:ring-gray-900/20"/>
                       <button onClick={insertLink} className="text-xs font-semibold bg-gray-900 text-white px-2.5 py-1.5 rounded-lg hover:bg-gray-700">Insert</button>
                     </div>
                   )}
@@ -1047,32 +1047,32 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
               </div>
             )}
             <textarea ref={bodyElRef} rows={12} value={bodyVal} onChange={e=>setBody(e.target.value)} onFocus={e=>{activeFieldRef.current={key:bodyKey,el:e.target};}} spellCheck
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 resize-y font-mono leading-relaxed"/>
+              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 resize-y font-mono leading-relaxed"/>
           </div>
 
           {/* attachment */}
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Attachment URL <span className="text-[9px] font-normal normal-case text-gray-400">optional</span></label>
+            <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Attachment URL <span className="text-[9px] font-normal normal-case text-gray-400 dark:text-gray-500">optional</span></label>
             <input value={attVal} onChange={e=>onSetATT(e.target.value)} onFocus={e=>{activeFieldRef.current={key:attK,el:e.target};}} placeholder="https://editbridge.com/files/invoice.pdf"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
           </div>
 
           {/* actions */}
           <div className="flex items-center gap-2 pt-1 flex-wrap">
             <button onClick={onSaveOne} disabled={savingOne===group.label} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50"><Save className="w-3.5 h-3.5"/>{savingOne===group.label?"Saving…":"Save"}</button>
-            <button onClick={()=>setTestOpen(o=>!o)} className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${testOpen?"bg-blue-50 border-blue-200 text-blue-700":"border-gray-200 text-gray-600 hover:bg-gray-50"}`}><Send className="w-3.5 h-3.5"/>Test</button>
+            <button onClick={()=>setTestOpen(o=>!o)} className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${testOpen?"bg-blue-50 border-blue-200 text-blue-700":"border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50"}`}><Send className="w-3.5 h-3.5"/>Test</button>
             <button onClick={()=>onEditInBuilder?.(group.label, bodyVal)} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors"><LayoutTemplate className="w-3.5 h-3.5"/>Edit in Builder</button>
-            <button onClick={openPreviewTab} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600"><Monitor className="w-3.5 h-3.5"/>Open in tab</button>
-            <button onClick={()=>setHistOpen(h=>!h)} className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${histOpen?"bg-indigo-50 border-indigo-200 text-indigo-600":"border-gray-200 text-gray-600 hover:bg-gray-50"}`}><History className="w-3.5 h-3.5"/>History{enrichedHistory.length>0&&` (${enrichedHistory.length})`}</button>
+            <button onClick={openPreviewTab} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40 text-gray-600 dark:text-gray-300"><Monitor className="w-3.5 h-3.5"/>Open in tab</button>
+            <button onClick={()=>setHistOpen(h=>!h)} className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${histOpen?"bg-indigo-50 border-indigo-200 text-indigo-600":"border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50"}`}><History className="w-3.5 h-3.5"/>History{enrichedHistory.length>0&&` (${enrichedHistory.length})`}</button>
             <div className="relative">
-              <button onClick={()=>setDupOpen(d=>!d)} className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${dupOpen?"bg-amber-50 border-amber-200 text-amber-700":"border-gray-200 text-gray-600 hover:bg-gray-50"}`}><Copy className="w-3.5 h-3.5"/>Dup to…</button>
-              {dupOpen&&<div className="absolute top-full left-0 mt-1 z-30 bg-white border border-gray-100 rounded-xl shadow-lg py-1 w-56 max-h-56 overflow-y-auto">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 py-1.5">Copy to…</p>
-                {allGroups.filter(g=>g.label!==group.label).map(g=><button key={g.label} onClick={()=>{onSetField(g.subject,subjectVal);onSetField(g.body,bodyVal);setDupOpen(false);toast.success(`Copied to "${g.label}"`);}} className="w-full text-left text-xs px-3 py-2 hover:bg-gray-50 text-gray-700 truncate">{g.label}</button>)}
+              <button onClick={()=>setDupOpen(d=>!d)} className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${dupOpen?"bg-amber-50 border-amber-200 text-amber-700":"border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50"}`}><Copy className="w-3.5 h-3.5"/>Dup to…</button>
+              {dupOpen&&<div className="absolute top-full left-0 mt-1 z-30 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg py-1 w-56 max-h-56 overflow-y-auto">
+                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 py-1.5">Copy to…</p>
+                {allGroups.filter(g=>g.label!==group.label).map(g=><button key={g.label} onClick={()=>{onSetField(g.subject,subjectVal);onSetField(g.body,bodyVal);setDupOpen(false);toast.success(`Copied to "${g.label}"`);}} className="w-full text-left text-xs px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800/40 text-gray-700 dark:text-gray-200 truncate">{g.label}</button>)}
               </div>}
             </div>
             <div className="flex-1"/>
-            <button onClick={onReset} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-gray-500"><RotateCcw className="w-3.5 h-3.5"/>Reset</button>
+            <button onClick={onReset} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-gray-500 dark:text-gray-400"><RotateCcw className="w-3.5 h-3.5"/>Reset</button>
           </div>
 
           {testOpen&&(
@@ -1080,7 +1080,7 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
               <p className="text-xs font-bold text-blue-600">Send test email</p>
               <div className="flex gap-2">
                 <input value={testTo} onChange={e=>setTestTo(e.target.value)} placeholder="Blank = your inbox · comma-separate for multiple"
-                  className="flex-1 text-sm border border-blue-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/30"/>
+                  className="flex-1 text-sm border border-blue-200 rounded-xl px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400/30"/>
                 <button onClick={sendTest} disabled={testSending} className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50">
                   <Send className="w-3.5 h-3.5"/>{testSending?"Sending…":"Send"}
                 </button>
@@ -1108,7 +1108,7 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
               <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Version history — last {enrichedHistory.length} save{enrichedHistory.length!==1?"s":""}</p>
               {enrichedHistory.length===0&&<p className="text-xs text-indigo-300">No versions yet.</p>}
               {enrichedHistory.map((entry,i)=>(
-                <div key={i} className="rounded-lg bg-white border border-indigo-100 px-3 py-2.5 space-y-2">
+                <div key={i} className="rounded-lg bg-white dark:bg-gray-900 border border-indigo-100 px-3 py-2.5 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-indigo-400 font-mono">{fmtDate(entry.savedAt)}</span>
@@ -1119,12 +1119,12 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
                       <button onClick={()=>{onSetField(group.subject,entry.subject);onSetField(group.body,entry.body);setHistOpen(false);setDiffEntry(null);toast.success("Restored — save to apply");}} className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800">Restore</button>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-700 font-semibold truncate">{entry.subject||"(no subject)"}</p>
+                  <p className="text-xs text-gray-700 dark:text-gray-200 font-semibold truncate">{entry.subject||"(no subject)"}</p>
                   {diffEntry?.savedAt===entry.savedAt&&(
-                    <div className="rounded-lg bg-gray-50 border border-gray-100 p-2 max-h-48 overflow-y-auto">
-                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Body diff vs current</p>
+                    <div className="rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 p-2 max-h-48 overflow-y-auto">
+                      <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Body diff vs current</p>
                       {lineDiff(entry.body,templates[group.body]??"").map((op,j)=>(
-                        <div key={j} className={`text-[10px] font-mono leading-tight px-1 ${op.type==="add"?"bg-emerald-50 text-emerald-700":op.type==="remove"?"bg-red-50 text-red-600":"text-gray-400"}`}>
+                        <div key={j} className={`text-[10px] font-mono leading-tight px-1 ${op.type==="add"?"bg-emerald-50 text-emerald-700":op.type==="remove"?"bg-red-50 text-red-600":"text-gray-400 dark:text-gray-500"}`}>
                           {op.type==="add"?"+ ":op.type==="remove"?"- ":"  "}{op.text||" "}
                         </div>
                       ))}
@@ -1137,24 +1137,24 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
           </div>
 
           {/* ── RIGHT: live preview ── */}
-          <div className="flex flex-col bg-gray-50">
+          <div className="flex flex-col bg-gray-50 dark:bg-gray-800/50">
             {/* preview toolbar */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-white">
-              <Eye className="w-3.5 h-3.5 text-gray-400 shrink-0"/>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Live Preview</span>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+              <Eye className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0"/>
+              <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Live Preview</span>
               <span className="ml-auto flex items-center gap-2">
-                <button onClick={()=>setDarkPreview(d=>!d)} title="Toggle dark mode preview" className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${darkPreview?"bg-gray-800 text-gray-200":"bg-gray-100 text-gray-400 hover:text-gray-600"}`}>
+                <button onClick={()=>setDarkPreview(d=>!d)} title="Toggle dark mode preview" className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${darkPreview?"bg-gray-800 text-gray-200":"bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-gray-600"}`}>
                   <Moon className="w-2.5 h-2.5"/>{darkPreview?"Dark":"Light"}
                 </button>
-                <span className="text-[10px] text-gray-300">Sample data applied</span>
+                <span className="text-[10px] text-gray-300 dark:text-gray-600">Sample data applied</span>
               </span>
             </div>
             {/* email header meta */}
-            <div className="bg-white px-4 py-2.5 border-b border-gray-100 space-y-1">
-              <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 w-14 shrink-0">From:</span><span className="text-gray-600 truncate">{fnVal||"EditBridge"} &lt;noreply@editbridge.com&gt;</span></div>
-              <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 w-14 shrink-0">To:</span><span className="text-gray-600">{group.recipient||"Recipient"} &lt;user@example.com&gt;</span></div>
-              <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 w-14 shrink-0">Subject:</span><span className="text-gray-900 font-semibold font-sans truncate">{fillVars(subjectVal)||"(no subject)"}</span></div>
-              {phVal&&<div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 w-14 shrink-0">Preview:</span><span className="text-gray-400 italic truncate">{fillVars(phVal)}</span></div>}
+            <div className="bg-white dark:bg-gray-900 px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 space-y-1">
+              <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 dark:text-gray-500 w-14 shrink-0">From:</span><span className="text-gray-600 dark:text-gray-300 truncate">{fnVal||"EditBridge"} &lt;noreply@editbridge.com&gt;</span></div>
+              <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 dark:text-gray-500 w-14 shrink-0">To:</span><span className="text-gray-600 dark:text-gray-300">{group.recipient||"Recipient"} &lt;user@example.com&gt;</span></div>
+              <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 dark:text-gray-500 w-14 shrink-0">Subject:</span><span className="text-gray-900 dark:text-white font-semibold font-sans truncate">{fillVars(subjectVal)||"(no subject)"}</span></div>
+              {phVal&&<div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 dark:text-gray-500 w-14 shrink-0">Preview:</span><span className="text-gray-400 dark:text-gray-500 italic truncate">{fillVars(phVal)}</span></div>}
             </div>
             {/* body render */}
             {(isHtml||isHtmlContent(bodyVal)) ? (
@@ -1166,8 +1166,8 @@ function TemplateCard({ group,templates,enabled,fromNames,ccs,htmlModes,historie
                 sandbox="allow-same-origin"
               />
             ) : (
-              <div className={`p-6 flex-1 overflow-y-auto ${darkPreview?"bg-gray-900":"bg-white"}`}>
-                <pre className={`text-sm whitespace-pre-wrap font-sans leading-relaxed ${darkPreview?"text-gray-200":"text-gray-700"}`}>{fillVars(bodyVal)||"(no content yet)"}</pre>
+              <div className={`p-6 flex-1 overflow-y-auto ${darkPreview?"bg-gray-900":"bg-white dark:bg-gray-900"}`}>
+                <pre className={`text-sm whitespace-pre-wrap font-sans leading-relaxed ${darkPreview?"text-gray-200":"text-gray-700 dark:text-gray-200"}`}>{fillVars(bodyVal)||"(no content yet)"}</pre>
               </div>
             )}
           </div>
@@ -1198,33 +1198,33 @@ function PreviewModal({preview,footerOn,footerText,onClose}:{
   function openTab(){ openInTab(preview.label, preview.subject, fullBody, preview.isHtml); }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col" onClick={e=>e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div><p className="text-sm font-bold text-gray-900">{preview.label}</p><p className="text-xs text-gray-400 mt-0.5">Preview with sample data</p></div>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col" onClick={e=>e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div><p className="text-sm font-bold text-gray-900 dark:text-white">{preview.label}</p><p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Preview with sample data</p></div>
           <div className="flex items-center gap-2">
-            <button onClick={openTab} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600"><Eye className="w-3.5 h-3.5"/>Open in tab</button>
-            <div className="flex gap-0.5 bg-gray-100 p-0.5 rounded-lg">
-              {MODES.map(({id,icon:Icon,label})=><button key={id} onClick={()=>setMode(id)} title={label} className={`p-1.5 rounded-md transition-all ${mode===id?"bg-white shadow-sm text-gray-900":"text-gray-400 hover:text-gray-600"}`}><Icon className="w-3.5 h-3.5"/></button>)}
+            <button onClick={openTab} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40 text-gray-600 dark:text-gray-300"><Eye className="w-3.5 h-3.5"/>Open in tab</button>
+            <div className="flex gap-0.5 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg">
+              {MODES.map(({id,icon:Icon,label})=><button key={id} onClick={()=>setMode(id)} title={label} className={`p-1.5 rounded-md transition-all ${mode===id?"bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white":"text-gray-400 dark:text-gray-500 hover:text-gray-600"}`}><Icon className="w-3.5 h-3.5"/></button>)}
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4 text-gray-500"/></button>
+            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"><X className="w-4 h-4 text-gray-500 dark:text-gray-400"/></button>
           </div>
         </div>
-        <div className={`overflow-y-auto flex-1 p-6 ${isDark?"bg-gray-900":"bg-gray-50"}`}>
+        <div className={`overflow-y-auto flex-1 p-6 ${isDark?"bg-gray-900":"bg-gray-50 dark:bg-gray-800/50"}`}>
           <div className={`mx-auto transition-all ${isMobile?"max-w-[375px]":"max-w-full"}`}>
-            <div className={`rounded-xl border overflow-hidden ${isDark?"border-gray-700 bg-gray-800":"border-gray-200 bg-white"}`}>
-              <div className={`px-5 py-3 border-b text-xs font-mono space-y-1 ${isDark?"border-gray-700 bg-gray-900":"border-gray-100 bg-gray-50"}`}>
+            <div className={`rounded-xl border overflow-hidden ${isDark?"border-gray-700 bg-gray-800":"border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"}`}>
+              <div className={`px-5 py-3 border-b text-xs font-mono space-y-1 ${isDark?"border-gray-700 bg-gray-900":"border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"}`}>
                 {[["From","EditBridge <hello@editbridge.com>"],["To",`${preview.recipient??"User"} <recipient@example.com>`],["Subject",fillVars(preview.subject)]].map(([l,v])=>(
                   <div key={l} className="flex gap-2">
-                    <span className={`${isDark?"text-gray-500":"text-gray-400"} w-14 shrink-0`}>{l}:</span>
-                    <span className={`${isDark?"text-gray-200":"text-gray-700"} ${l==="Subject"?"font-semibold":""}`}>{v}</span>
+                    <span className={`${isDark?"text-gray-500 dark:text-gray-400":"text-gray-400 dark:text-gray-500"} w-14 shrink-0`}>{l}:</span>
+                    <span className={`${isDark?"text-gray-200":"text-gray-700 dark:text-gray-200"} ${l==="Subject"?"font-semibold":""}`}>{v}</span>
                   </div>
                 ))}
               </div>
-              <div className={`px-5 py-4 ${isDark?"text-gray-200":"text-gray-700"}`}>
+              <div className={`px-5 py-4 ${isDark?"text-gray-200":"text-gray-700 dark:text-gray-200"}`}>
                 {preview.isHtml?<div className="text-sm leading-relaxed" dangerouslySetInnerHTML={{__html:fillVars(fullBody)}}/>:<pre className="text-sm whitespace-pre-wrap font-sans leading-relaxed">{fillVars(fullBody)}</pre>}
               </div>
             </div>
-            <p className={`text-[10px] text-center mt-3 ${isDark?"text-gray-600":"text-gray-400"}`}>Variables replaced with sample data</p>
+            <p className={`text-[10px] text-center mt-3 ${isDark?"text-gray-600 dark:text-gray-300":"text-gray-400 dark:text-gray-500"}`}>Variables replaced with sample data</p>
           </div>
         </div>
       </div>
@@ -1239,24 +1239,24 @@ function BroadcastHistoryCard({broadcasts,segments}:{broadcasts:BroadcastRecord[
   const [expanded,setExpanded]=useState<string|null>(null);
   const filtered=broadcasts.filter(b=>!search||(b.templateLabel.toLowerCase().includes(search.toLowerCase())||b.segment.includes(search.toLowerCase())));
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5 space-y-3">
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5 space-y-3">
       <div className="flex items-center gap-3">
-        <h2 className="text-sm font-bold text-gray-900 flex-1">Broadcast History</h2>
+        <h2 className="text-sm font-bold text-gray-900 dark:text-white flex-1">Broadcast History</h2>
         {broadcasts.length>3&&(
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none"/>
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500 pointer-events-none"/>
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search…"
-              className="pl-7 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900/20 w-36"/>
+              className="pl-7 pr-3 py-1.5 text-xs border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900/20 w-36"/>
           </div>
         )}
       </div>
-      {broadcasts.length===0&&<p className="text-xs text-gray-400">No broadcasts sent yet.</p>}
-      {filtered.length===0&&broadcasts.length>0&&<p className="text-xs text-gray-400">No matches for &ldquo;{search}&rdquo;</p>}
+      {broadcasts.length===0&&<p className="text-xs text-gray-400 dark:text-gray-500">No broadcasts sent yet.</p>}
+      {filtered.length===0&&broadcasts.length>0&&<p className="text-xs text-gray-400 dark:text-gray-500">No matches for &ldquo;{search}&rdquo;</p>}
       <div className="space-y-2 max-h-[360px] overflow-y-auto">
         {filtered.map(b=>(
-          <div key={b.id} className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 space-y-1">
+          <div key={b.id} className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-4 py-3 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-800">{b.templateLabel}</span>
+              <span className="text-xs font-semibold text-gray-800 dark:text-gray-100">{b.templateLabel}</span>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{b.sentCount.toLocaleString()} sent</span>
                 {(b.failed??0)>0&&(
@@ -1266,7 +1266,7 @@ function BroadcastHistoryCard({broadcasts,segments}:{broadcasts:BroadcastRecord[
                 )}
               </div>
             </div>
-            <p className="text-[10px] text-gray-400">{segments.find(s=>s.id===b.segment)?.label??b.segment} · {fmtDate(b.timestamp)} · {b.adminEmail}</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">{segments.find(s=>s.id===b.segment)?.label??b.segment} · {fmtDate(b.timestamp)} · {b.adminEmail}</p>
             {expanded===b.id&&b.failedEmails&&b.failedEmails.length>0&&(
               <div className="mt-2 rounded-lg bg-red-50 border border-red-100 px-3 py-2 space-y-1">
                 <p className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Failed addresses (up to 20 shown)</p>
@@ -1374,14 +1374,14 @@ function CustomMailCard() {
   }
 
   return (
-    <div className="rounded-2xl border border-indigo-100 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-indigo-100 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
       <div className="flex items-center gap-3 px-6 py-4 bg-indigo-50 border-b border-indigo-100">
         <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
           <Mail className="w-4 h-4 text-white"/>
         </div>
         <div>
-          <h2 className="text-sm font-bold text-gray-900">Custom Email</h2>
-          <p className="text-xs text-gray-500">Compose and send a one-off email outside of any template</p>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white">Custom Email</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Compose and send a one-off email outside of any template</p>
         </div>
       </div>
       <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1389,19 +1389,19 @@ function CustomMailCard() {
         <div className="space-y-4">
           {/* recipient mode */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Send to</label>
-            <div className="flex gap-1 bg-gray-100 p-0.5 rounded-lg w-fit mb-3">
+            <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">Send to</label>
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg w-fit mb-3">
               {([["email","Specific Email"],["segment","Segment"],["csv","CSV Upload"]] as [CustomRecipientMode,string][]).map(([id,label])=>(
-                <button key={id} onClick={()=>setMode(id)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${mode===id?"bg-white text-gray-900 shadow-sm":"text-gray-500 hover:text-gray-700"}`}>{label}</button>
+                <button key={id} onClick={()=>setMode(id)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${mode===id?"bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm":"text-gray-500 dark:text-gray-400 hover:text-gray-700"}`}>{label}</button>
               ))}
             </div>
             {mode === "email" ? (
               <input type="email" placeholder="recipient@example.com" value={toEmail} onChange={e=>setToEmail(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"/>
             ) : mode === "csv" ? (
               <div className="space-y-3">
                 <input ref={csvInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={e=>{const f=e.target.files?.[0];if(f)handleCsvFile(f);e.target.value="";}}/>
-                <button onClick={()=>csvInputRef.current?.click()} className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-xl py-4 text-sm font-semibold text-gray-500 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
+                <button onClick={()=>csvInputRef.current?.click()} className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl py-4 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:border-indigo-300 hover:text-indigo-600 transition-colors">
                   <Upload className="w-4 h-4"/>{csvFileName||"Click to upload CSV"}
                 </button>
                 {csvEmails.length>0&&(
@@ -1413,14 +1413,14 @@ function CustomMailCard() {
                     <button onClick={()=>{setCsvEmails([]);setCsvFileName("");}} className="text-indigo-300 hover:text-indigo-600"><X className="w-4 h-4"/></button>
                   </div>
                 )}
-                <p className="text-[10px] text-gray-400">CSV should have one email per row, or a column with email addresses. Headers are ignored.</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500">CSV should have one email per row, or a column with email addresses. Headers are ignored.</p>
               </div>
             ) : (
               <div className="space-y-1.5">
                 {SEGMENTS.map(seg=>(
-                  <label key={seg.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${segment===seg.id?"border-indigo-500 bg-indigo-50":"border-gray-200 hover:border-gray-300"}`}>
+                  <label key={seg.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${segment===seg.id?"border-indigo-500 bg-indigo-50":"border-gray-200 dark:border-gray-700 hover:border-gray-300"}`}>
                     <input type="radio" name="cm_segment" value={seg.id} checked={segment===seg.id} onChange={()=>setSegment(seg.id)} className="mt-0.5 accent-indigo-600"/>
-                    <div className="flex-1"><p className="text-sm font-semibold text-gray-900">{seg.label}</p><p className="text-xs text-gray-400">{seg.desc}</p></div>
+                    <div className="flex-1"><p className="text-sm font-semibold text-gray-900 dark:text-white">{seg.label}</p><p className="text-xs text-gray-400 dark:text-gray-500">{seg.desc}</p></div>
                     {segment===seg.id&&segCount!==null&&<span className="text-sm font-bold text-indigo-600 tabular-nums">{segCount.toLocaleString()}</span>}
                   </label>
                 ))}
@@ -1429,21 +1429,21 @@ function CustomMailCard() {
           </div>
           {/* subject */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Subject</label>
+            <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">Subject</label>
             <input type="text" placeholder="Email subject…" value={subject} onChange={e=>setSubject(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"/>
+              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"/>
           </div>
           {/* body */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Body</label>
-              <button onClick={()=>setHtmlMode(h=>!h)} className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${htmlMode?"bg-indigo-100 text-indigo-700":"bg-gray-100 text-gray-500 hover:text-gray-700"}`}>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Body</label>
+              <button onClick={()=>setHtmlMode(h=>!h)} className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors ${htmlMode?"bg-indigo-100 text-indigo-700":"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700"}`}>
                 <Code className="w-3 h-3"/>{htmlMode?"HTML":"Plain"}
               </button>
             </div>
             <textarea value={body} onChange={e=>setBody(e.target.value)} rows={8}
               placeholder={htmlMode?"<p>Your message here…</p>":"Your message here…"}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"/>
+              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"/>
           </div>
           {/* send */}
           {!confirm ? (
@@ -1462,21 +1462,21 @@ function CustomMailCard() {
                 <button onClick={send} disabled={sending} className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
                   {sending?<RefreshCw className="w-3.5 h-3.5 animate-spin"/>:<Send className="w-3.5 h-3.5"/>}{sending?"Sending…":"Yes, send"}
                 </button>
-                <button onClick={()=>setConfirm(false)} className="text-xs font-semibold px-4 py-2 border border-gray-200 rounded-lg hover:bg-white">Cancel</button>
+                <button onClick={()=>setConfirm(false)} className="text-xs font-semibold px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-white">Cancel</button>
               </div>
             </div>
           )}
         </div>
         {/* ── right: preview — always shows branded wrapper ── */}
-        <div className="rounded-xl border border-gray-100 overflow-hidden flex flex-col">
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
-            <Eye className="w-3.5 h-3.5 text-gray-400"/>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Live Preview</span>
-            <span className="ml-auto text-[10px] text-gray-300">Header &amp; footer applied</span>
+        <div className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+            <Eye className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"/>
+            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Live Preview</span>
+            <span className="ml-auto text-[10px] text-gray-300 dark:text-gray-600">Header &amp; footer applied</span>
           </div>
-          <div className="bg-white px-4 py-2.5 border-b border-gray-100 space-y-1">
-            <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 w-14 shrink-0">To:</span><span className="text-gray-600 truncate">{mode==="email"?(toEmail||"recipient@example.com"):`${SEGMENTS.find(s=>s.id===segment)?.label??segment} (${segCount??"…"})`}</span></div>
-            <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 w-14 shrink-0">Subject:</span><span className="text-gray-900 font-semibold font-sans">{fillVars(subject)||"(no subject)"}</span></div>
+          <div className="bg-white dark:bg-gray-900 px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 space-y-1">
+            <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 dark:text-gray-500 w-14 shrink-0">To:</span><span className="text-gray-600 dark:text-gray-300 truncate">{mode==="email"?(toEmail||"recipient@example.com"):`${SEGMENTS.find(s=>s.id===segment)?.label??segment} (${segCount??"…"})`}</span></div>
+            <div className="flex gap-2 text-xs font-mono"><span className="text-gray-400 dark:text-gray-500 w-14 shrink-0">Subject:</span><span className="text-gray-900 dark:text-white font-semibold font-sans">{fillVars(subject)||"(no subject)"}</span></div>
           </div>
           <iframe
             srcDoc={wrapEmailHtml(htmlBody||"<p style='color:#94a3b8;font-size:14px;padding:32px 0;text-align:center'>Start typing to preview…</p>")}
@@ -1553,71 +1553,71 @@ function BroadcastTab({broadcasts:initBroadcasts,pendingBroadcasts:initPending,g
   return (
     <div className="space-y-6">
       {quota&&(
-        <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3">
-          <TrendingUp className="w-4 h-4 text-gray-400 shrink-0"/>
-          <p className="text-xs text-gray-600"><span className="font-bold text-gray-900">{quota.sentThisMonth.toLocaleString()}</span> emails sent this month (from Resend)</p>
-          {suppressionList.length>0&&<><span className="text-gray-300">·</span><Ban className="w-3.5 h-3.5 text-red-400 shrink-0"/><span className="text-xs text-gray-500">{suppressionList.length} suppressed</span></>}
+        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-2xl px-5 py-3">
+          <TrendingUp className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0"/>
+          <p className="text-xs text-gray-600 dark:text-gray-300"><span className="font-bold text-gray-900 dark:text-white">{quota.sentThisMonth.toLocaleString()}</span> emails sent this month (from Resend)</p>
+          {suppressionList.length>0&&<><span className="text-gray-300 dark:text-gray-600">·</span><Ban className="w-3.5 h-3.5 text-red-400 shrink-0"/><span className="text-xs text-gray-500 dark:text-gray-400">{suppressionList.length} suppressed</span></>}
         </div>
       )}
       <CustomMailCard/>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-5">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-gray-900">Send Broadcast</h2>
-            <div className="flex gap-1 bg-gray-100 p-0.5 rounded-lg">
+            <h2 className="text-sm font-bold text-gray-900 dark:text-white">Send Broadcast</h2>
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg">
               {[{id:false,icon:Send,label:"Now"},{id:true,icon:Clock,label:"Schedule"}].map(({id,icon:Icon,label})=>(
-                <button key={String(id)} onClick={()=>setSchedMode(id)} className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${schedMode===id?"bg-white text-gray-900 shadow-sm":"text-gray-500 hover:text-gray-700"}`}><Icon className="w-3 h-3"/>{label}</button>
+                <button key={String(id)} onClick={()=>setSchedMode(id)} className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${schedMode===id?"bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm":"text-gray-500 dark:text-gray-400 hover:text-gray-700"}`}><Icon className="w-3 h-3"/>{label}</button>
               ))}
             </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Segment</label>
+            <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">Segment</label>
             <div className="space-y-1.5">
               {SEGMENTS.map(seg=>(
-                <label key={seg.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${segment===seg.id?"border-gray-900 bg-gray-50":"border-gray-200 hover:border-gray-300"}`}>
+                <label key={seg.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${segment===seg.id?"border-gray-900 bg-gray-50 dark:bg-gray-800/50":"border-gray-200 dark:border-gray-700 hover:border-gray-300"}`}>
                   <input type="radio" name="segment" value={seg.id} checked={segment===seg.id} onChange={()=>setSegment(seg.id)} className="mt-0.5 accent-gray-900"/>
-                  <div><p className="text-sm font-semibold text-gray-900">{seg.label}</p><p className="text-xs text-gray-400">{seg.desc}</p></div>
-                  {segment===seg.id&&count!==null&&<span className="ml-auto text-sm font-bold text-gray-700 tabular-nums">{count.toLocaleString()}</span>}
+                  <div><p className="text-sm font-semibold text-gray-900 dark:text-white">{seg.label}</p><p className="text-xs text-gray-400 dark:text-gray-500">{seg.desc}</p></div>
+                  {segment===seg.id&&count!==null&&<span className="ml-auto text-sm font-bold text-gray-700 dark:text-gray-200 tabular-nums">{count.toLocaleString()}</span>}
                 </label>
               ))}
             </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Template</label>
+            <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">Template</label>
             <select value={selGroup?.label??""} onChange={e=>setSelGroup(allGroups.find(g=>g.label===e.target.value)??null)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white">
+              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white dark:bg-gray-900">
               <option value="">Select a template…</option>
               {SECTIONS.map(s=><optgroup key={s.section} label={s.section}>{s.groups.map(g=><option key={g.label} value={g.label}>{g.label}</option>)}</optgroup>)}
             </select>
           </div>
           {schedMode&&(
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Schedule time</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">Schedule time</label>
               <input type="datetime-local" value={schedAt} onChange={e=>setSchedAt(e.target.value)} min={new Date().toISOString().slice(0,16)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
           )}
-          {selGroup&&<div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-xs text-gray-600 space-y-1"><p className="font-semibold truncate">{templates[selGroup.subject]??""}</p><p className="text-gray-400 line-clamp-2">{templates[selGroup.body]??""}</p></div>}
-          <button onClick={simulate} disabled={simLoading} className="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-gray-500 border border-dashed border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50">
+          {selGroup&&<div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-4 py-3 text-xs text-gray-600 dark:text-gray-300 space-y-1"><p className="font-semibold truncate">{templates[selGroup.subject]??""}</p><p className="text-gray-400 dark:text-gray-500 line-clamp-2">{templates[selGroup.body]??""}</p></div>}
+          <button onClick={simulate} disabled={simLoading} className="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-dashed border-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/40 disabled:opacity-50">
             {simLoading?<RefreshCw className="w-3.5 h-3.5 animate-spin"/>:<FlaskConical className="w-3.5 h-3.5"/>}{simLoading?"Simulating…":"Dry run — simulate without sending"}
           </button>
           {simResult&&(
-            <div className="rounded-xl border border-gray-200 bg-white p-3 space-y-1.5 text-xs">
-              <p className="font-bold text-gray-700 flex items-center gap-1.5"><FlaskConical className="w-3.5 h-3.5 text-gray-400"/>Simulation result</p>
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 space-y-1.5 text-xs">
+              <p className="font-bold text-gray-700 dark:text-gray-200 flex items-center gap-1.5"><FlaskConical className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500"/>Simulation result</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  {label:"Total in segment",value:simResult.total,color:"text-gray-700"},
+                  {label:"Total in segment",value:simResult.total,color:"text-gray-700 dark:text-gray-200"},
                   {label:"Would receive",   value:simResult.wouldSend,color:"text-emerald-600"},
-                  {label:"Suppressed",      value:simResult.suppressed,color:simResult.suppressed>0?"text-red-500":"text-gray-400"},
-                  {label:"Freq-capped",     value:simResult.freqCapped,color:simResult.freqCapped>0?"text-amber-500":"text-gray-400"},
+                  {label:"Suppressed",      value:simResult.suppressed,color:simResult.suppressed>0?"text-red-500":"text-gray-400 dark:text-gray-500"},
+                  {label:"Freq-capped",     value:simResult.freqCapped,color:simResult.freqCapped>0?"text-amber-500":"text-gray-400 dark:text-gray-500"},
                 ].map(({label,value,color})=>(
-                  <div key={label} className="rounded-lg bg-gray-50 px-3 py-2">
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wide">{label}</p>
+                  <div key={label} className="rounded-lg bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wide">{label}</p>
                     <p className={`text-lg font-bold tabular-nums ${color}`}>{value.toLocaleString()}</p>
                   </div>
                 ))}
               </div>
-              <button onClick={()=>setSimResult(null)} className="text-[10px] text-gray-400 hover:text-gray-600">Dismiss</button>
+              <button onClick={()=>setSimResult(null)} className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-gray-600">Dismiss</button>
             </div>
           )}
           {winStart!==null&&winEnd!==null&&(
@@ -1637,24 +1637,24 @@ function BroadcastTab({broadcasts:initBroadcasts,pendingBroadcasts:initPending,g
             <div className="rounded-xl border border-red-100 bg-red-50 p-4 space-y-3">
               <p className="text-sm font-bold text-red-700">Confirm broadcast</p>
               {recipientPreview&&(
-                <div className="rounded-lg border border-red-100 bg-white p-2.5 space-y-1.5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                <div className="rounded-lg border border-red-100 bg-white dark:bg-gray-900 p-2.5 space-y-1.5">
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                     {recipientPreview.total.toLocaleString()} will receive · {recipientPreview.suppressed} suppressed{recipientPreview.freqCapped>0?` · ${recipientPreview.freqCapped} freq-capped`:""}
                   </p>
                   {recipientPreview.preview.map(u=>(
-                    <p key={u.email} className="text-xs text-gray-700">{u.name||u.email} <span className="text-gray-400">{u.name?`· ${u.email}`:""}</span></p>
+                    <p key={u.email} className="text-xs text-gray-700 dark:text-gray-200">{u.name||u.email} <span className="text-gray-400 dark:text-gray-500">{u.name?`· ${u.email}`:""}</span></p>
                   ))}
-                  {recipientPreview.total>5&&<p className="text-[10px] text-gray-400">+ {recipientPreview.total-5} more</p>}
+                  {recipientPreview.total>5&&<p className="text-[10px] text-gray-400 dark:text-gray-500">+ {recipientPreview.total-5} more</p>}
                 </div>
               )}
               {selGroup&&(
                 <div>
-                  <button onClick={()=>setShowEmailPreview(p=>!p)} className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 hover:text-gray-800 mb-2">
+                  <button onClick={()=>setShowEmailPreview(p=>!p)} className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 mb-2">
                     <Eye className="w-3 h-3"/>{showEmailPreview?"Hide email preview":"Preview email"}
                   </button>
                   {showEmailPreview&&(
-                    <div className="rounded-lg overflow-hidden border border-gray-200 bg-white">
-                      <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 text-[10px] text-gray-400 font-mono">Subject: {templates[selGroup.subject]}</div>
+                    <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                      <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 text-[10px] text-gray-400 dark:text-gray-500 font-mono">Subject: {templates[selGroup.subject]}</div>
                       <iframe
                         srcDoc={wrapEmailHtml(fillVars(templates[selGroup.body]??""))}
                         className="w-full border-0 block"
@@ -1671,18 +1671,18 @@ function BroadcastTab({broadcasts:initBroadcasts,pendingBroadcasts:initPending,g
                 <button onClick={sendNow} disabled={sending} className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
                   {sending?<RefreshCw className="w-3.5 h-3.5 animate-spin"/>:<Send className="w-3.5 h-3.5"/>}{sending?"Sending…":"Yes, send now"}
                 </button>
-                <button onClick={()=>{setConfirm(false);setRecipientPreview(null);setShowEmailPreview(false);}} className="text-xs font-semibold px-4 py-2 border border-gray-200 rounded-lg hover:bg-white">Cancel</button>
+                <button onClick={()=>{setConfirm(false);setRecipientPreview(null);setShowEmailPreview(false);}} className="text-xs font-semibold px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-white">Cancel</button>
               </div>
             </div>
           )}
         </div>
         <div className="space-y-4">
           {pending.filter(b=>b.status==="pending").length>0&&(
-            <div className="rounded-2xl border border-amber-100 bg-white shadow-sm p-5 space-y-3">
-              <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2"><Clock className="w-4 h-4 text-amber-400"/>Scheduled</h2>
+            <div className="rounded-2xl border border-amber-100 bg-white dark:bg-gray-900 shadow-sm p-5 space-y-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2"><Clock className="w-4 h-4 text-amber-400"/>Scheduled</h2>
               {pending.filter(b=>b.status==="pending").map(b=>(
                 <div key={b.id} className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 flex items-start justify-between gap-2">
-                  <div><p className="text-xs font-semibold text-gray-800">{b.templateLabel}</p><p className="text-[10px] text-amber-600 mt-0.5">{SEGMENTS.find(s=>s.id===b.segment)?.label??b.segment} · {fmtDate(b.scheduledAt)}</p></div>
+                  <div><p className="text-xs font-semibold text-gray-800 dark:text-gray-100">{b.templateLabel}</p><p className="text-[10px] text-amber-600 mt-0.5">{SEGMENTS.find(s=>s.id===b.segment)?.label??b.segment} · {fmtDate(b.scheduledAt)}</p></div>
                   <button onClick={()=>cancelPending(b.id)} className="text-red-400 hover:text-red-600 shrink-0 p-1"><X className="w-3.5 h-3.5"/></button>
                 </div>
               ))}
@@ -1747,38 +1747,38 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
           {label:"Broadcasts Run",       value:totalRuns.toLocaleString(),   sub:"manual send campaigns",  color:"text-violet-600"},
           {label:"Avg Recipients",       value:avgPerRun.toLocaleString(),   sub:"per broadcast",          color:"text-blue-600"},
           {label:"Failed Deliveries",    value:totalFailed.toLocaleString(), sub:`${failRate}% failure rate`, color:totalFailed>0?"text-red-500":"text-emerald-600"},
-          {label:"Suppressed Addresses", value:suppressionList.length.toLocaleString(), sub:"on suppression list", color:"text-gray-700"},
+          {label:"Suppressed Addresses", value:suppressionList.length.toLocaleString(), sub:"on suppression list", color:"text-gray-700 dark:text-gray-200"},
         ].map(({label,value,sub,color})=>(
-          <div key={label} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">{label}</p>
+          <div key={label} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm">
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">{label}</p>
             <p className={`text-2xl font-bold tabular-nums ${color}`}>{value}</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>
           </div>
         ))}
       </div>
 
       {/* Resend performance */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900">Resend Email Performance</h3>
-          <span className="text-[10px] text-gray-400">{resend?.total??0} most recent emails sampled</span>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Resend Email Performance</h3>
+          <span className="text-[10px] text-gray-400 dark:text-gray-500">{resend?.total??0} most recent emails sampled</span>
         </div>
         {resendLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{[...Array(4)].map((_,i)=><div key={i} className="rounded-lg bg-gray-50 p-3 space-y-2"><Skel w="w-20"/><Skel w="w-12" h="h-6"/><Skel w="w-24"/></div>)}</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{[...Array(4)].map((_,i)=><div key={i} className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-3 space-y-2"><Skel w="w-20"/><Skel w="w-12" h="h-6"/><Skel w="w-24"/></div>)}</div>
         ) : !resend ? (
-          <p className="text-sm text-gray-400">Could not fetch Resend stats.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Could not fetch Resend stats.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               {label:"Delivery rate", value:resend.deliveryRate!=null?`${resend.deliveryRate}%`:"—", sub:`${(resend.delivered+resend.opened+resend.clicked).toLocaleString()} delivered`, color:"text-emerald-600"},
               {label:"Open rate",     value:resend.openRate!=null?`${resend.openRate}%`:"—",     sub:`${(resend.opened+resend.clicked).toLocaleString()} opened`,    color:"text-blue-600"},
               {label:"Click-through", value:resend.ctr!=null?`${resend.ctr}%`:"—",               sub:`${resend.clicked.toLocaleString()} clicked`,                   color:"text-indigo-600"},
-              {label:"Bounce rate",   value:resend.bounceRate!=null?`${resend.bounceRate}%`:"—", sub:`${resend.bounced.toLocaleString()} bounced`,                   color:resend.bounced>0?"text-red-500":"text-gray-500"},
+              {label:"Bounce rate",   value:resend.bounceRate!=null?`${resend.bounceRate}%`:"—", sub:`${resend.bounced.toLocaleString()} bounced`,                   color:resend.bounced>0?"text-red-500":"text-gray-500 dark:text-gray-400"},
             ].map(({label,value,sub,color})=>(
-              <div key={label} className="rounded-lg bg-gray-50 p-3">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">{label}</p>
+              <div key={label} className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-3">
+                <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">{label}</p>
                 <p className={`text-xl font-bold tabular-nums ${color}`}>{value}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5">{sub}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>
               </div>
             ))}
           </div>
@@ -1787,12 +1787,12 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
 
       {/* 7-day daily delivery chart from Resend */}
       {!resendLoading&&resend&&resend.dailyBreakdown&&resend.dailyBreakdown.some(d=>d.sent>0)&&(
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-gray-900">7-Day Delivery Activity</h3>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white">7-Day Delivery Activity</h3>
             <div className="flex items-center gap-3 text-[10px] font-semibold">
               {[{label:"Sent",color:"bg-blue-400"},{label:"Opened",color:"bg-emerald-400"},{label:"Bounced",color:"bg-red-400"}].map(({label,color})=>(
-                <div key={label} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${color}`}/><span className="text-gray-500">{label}</span></div>
+                <div key={label} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${color}`}/><span className="text-gray-500 dark:text-gray-400">{label}</span></div>
               ))}
             </div>
           </div>
@@ -1809,7 +1809,7 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
                     <div className="w-2.5 rounded-t-sm bg-emerald-200 group-hover:bg-emerald-400 transition-colors" style={{height:openH}} title={`Opened: ${d.opened}`}/>
                     {d.bounced>0&&<div className="w-2.5 rounded-t-sm bg-red-200 group-hover:bg-red-400 transition-colors" style={{height:bounceH}} title={`Bounced: ${d.bounced}`}/>}
                   </div>
-                  <span className="text-[9px] text-gray-300 group-hover:text-gray-500 transition-colors">{d.date.slice(5)}</span>
+                  <span className="text-[9px] text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors">{d.date.slice(5)}</span>
                 </div>
               );
             })}
@@ -1819,19 +1819,19 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weekly volume chart */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">Weekly Email Volume</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Weekly Email Volume</h3>
           {totalSent===0 ? (
-            <div className="flex items-center justify-center h-40 text-sm text-gray-400">No broadcasts yet</div>
+            <div className="flex items-center justify-center h-40 text-sm text-gray-400 dark:text-gray-500">No broadcasts yet</div>
           ) : (
             <div className="space-y-2">
               {weeks.map(w=>(
                 <div key={w.label} className="flex items-center gap-3">
-                  <span className="text-[11px] text-gray-400 w-16 shrink-0 text-right">{w.label}</span>
-                  <div className="flex-1 h-5 bg-gray-50 rounded overflow-hidden">
+                  <span className="text-[11px] text-gray-400 dark:text-gray-500 w-16 shrink-0 text-right">{w.label}</span>
+                  <div className="flex-1 h-5 bg-gray-50 dark:bg-gray-800/50 rounded overflow-hidden">
                     <div className="h-full bg-indigo-500 rounded transition-all" style={{width:`${(w.count/maxWeek)*100}%`,minWidth:w.count>0?"4px":"0"}}/>
                   </div>
-                  <span className="text-[11px] font-semibold text-gray-600 tabular-nums w-10 text-right">{w.count>0?w.count.toLocaleString():"—"}</span>
+                  <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 tabular-nums w-10 text-right">{w.count>0?w.count.toLocaleString():"—"}</span>
                 </div>
               ))}
             </div>
@@ -1839,19 +1839,19 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
         </div>
 
         {/* Segment breakdown */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">Emails by Segment</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Emails by Segment</h3>
           {segments.length===0 ? (
-            <div className="flex items-center justify-center h-40 text-sm text-gray-400">No broadcasts yet</div>
+            <div className="flex items-center justify-center h-40 text-sm text-gray-400 dark:text-gray-500">No broadcasts yet</div>
           ) : (
             <div className="space-y-3">
               {segments.map(([seg,count])=>(
                 <div key={seg} className="space-y-1">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold text-gray-700">{SEG_LABELS[seg]??seg}</span>
-                    <span className="text-xs font-bold text-gray-500 tabular-nums">{count.toLocaleString()}</span>
+                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">{SEG_LABELS[seg]??seg}</span>
+                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 tabular-nums">{count.toLocaleString()}</span>
                   </div>
-                  <div className="h-2.5 bg-gray-50 rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-gray-50 dark:bg-gray-800/50 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${SEG_COLORS[seg]??"bg-gray-400"}`} style={{width:`${(count/maxSeg)*100}%`}}/>
                   </div>
                 </div>
@@ -1860,7 +1860,7 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
                 {segments.map(([seg])=>(
                   <div key={seg} className="flex items-center gap-1.5">
                     <div className={`w-2 h-2 rounded-full ${SEG_COLORS[seg]??"bg-gray-400"}`}/>
-                    <span className="text-[11px] text-gray-500">{SEG_LABELS[seg]??seg}</span>
+                    <span className="text-[11px] text-gray-500 dark:text-gray-400">{SEG_LABELS[seg]??seg}</span>
                   </div>
                 ))}
               </div>
@@ -1871,16 +1871,16 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top templates */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-gray-900 mb-4">Most Broadcast Templates</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Most Broadcast Templates</h3>
           {topTpls.length===0 ? (
-            <div className="flex items-center justify-center h-28 text-sm text-gray-400">No broadcasts yet</div>
+            <div className="flex items-center justify-center h-28 text-sm text-gray-400 dark:text-gray-500">No broadcasts yet</div>
           ) : (
             <div className="space-y-2">
               {topTpls.map(([label,count],i)=>(
                 <div key={label} className="flex items-center gap-3">
-                  <span className="text-[11px] font-bold text-gray-300 w-4 tabular-nums">{i+1}</span>
-                  <span className="flex-1 text-sm text-gray-700 truncate">{label}</span>
+                  <span className="text-[11px] font-bold text-gray-300 dark:text-gray-600 w-4 tabular-nums">{i+1}</span>
+                  <span className="flex-1 text-sm text-gray-700 dark:text-gray-200 truncate">{label}</span>
                   <span className="text-xs font-bold text-indigo-600 tabular-nums">{count}×</span>
                 </div>
               ))}
@@ -1889,13 +1889,13 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
         </div>
 
         {/* Recent broadcasts */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-gray-900">Recent Broadcasts</h3>
-            <button onClick={()=>onNavigate("broadcast")} className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-gray-700 transition-colors"><ArrowRight className="w-3 h-3"/>View all</button>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white">Recent Broadcasts</h3>
+            <button onClick={()=>onNavigate("broadcast")} className="flex items-center gap-1 text-xs font-semibold text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"><ArrowRight className="w-3 h-3"/>View all</button>
           </div>
           {broadcasts.length===0 ? (
-            <div className="flex items-center justify-center h-28 text-sm text-gray-400">No broadcasts yet</div>
+            <div className="flex items-center justify-center h-28 text-sm text-gray-400 dark:text-gray-500">No broadcasts yet</div>
           ) : (
             <div className="divide-y divide-gray-50">
               {broadcasts.slice(0,6).map(b=>{
@@ -1905,11 +1905,11 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
                 return (
                   <div key={b.id} className="py-2.5 flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 truncate">{b.templateLabel}</p>
-                      <p className="text-[11px] text-gray-400">{SEG_LABELS[b.segment]??b.segment} · {when}</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{b.templateLabel}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{SEG_LABELS[b.segment]??b.segment} · {when}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-bold text-gray-700 tabular-nums">{b.sentCount.toLocaleString()}</p>
+                      <p className="text-sm font-bold text-gray-700 dark:text-gray-200 tabular-nums">{b.sentCount.toLocaleString()}</p>
                       {(b.failed??0)>0&&<p className="text-[10px] text-red-400 tabular-nums">{b.failed} failed</p>}
                     </div>
                   </div>
@@ -1926,7 +1926,7 @@ function AnalyticsTab({broadcasts,suppressionList,onNavigate}:{broadcasts:Broadc
 // ─── Delivery tab ─────────────────────────────────────────────────────────────
 
 type DeliveryEmail={id:string;from:string;to:string[];subject:string;created_at:string;last_event?:string};
-const EVENT_BADGE:Record<string,string>={delivered:"bg-emerald-100 text-emerald-700",opened:"bg-blue-100 text-blue-700",clicked:"bg-indigo-100 text-indigo-700",bounced:"bg-red-100 text-red-700",failed:"bg-red-100 text-red-700",sent:"bg-gray-100 text-gray-600"};
+const EVENT_BADGE:Record<string,string>={delivered:"bg-emerald-100 text-emerald-700",opened:"bg-blue-100 text-blue-700",clicked:"bg-indigo-100 text-indigo-700",bounced:"bg-red-100 text-red-700",failed:"bg-red-100 text-red-700",sent:"bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"};
 
 function DeliveryTab(){
   const [emails,setEmails]=useState<DeliveryEmail[]>([]);
@@ -1975,13 +1975,13 @@ function DeliveryTab(){
   return (
     <div className="space-y-5">
       {!loading&&trendData.some(d=>d.count>0)&&(
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Emails sent — last 14 days</p>
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-5">
+          <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Emails sent — last 14 days</p>
           <div className="flex items-end gap-1 h-16">
             {trendData.map(({date,count})=>(
               <div key={date} className="flex-1 flex flex-col items-center gap-1 group">
                 <div className="w-full bg-blue-100 rounded-sm transition-all group-hover:bg-blue-400" style={{height:`${Math.max((count/maxCount)*100,4)}%`}} title={`${date}: ${count}`}/>
-                <span className="text-[8px] text-gray-300 group-hover:text-gray-500 transition-colors hidden sm:block">{date.slice(5)}</span>
+                <span className="text-[8px] text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors hidden sm:block">{date.slice(5)}</span>
               </div>
             ))}
           </div>
@@ -1989,39 +1989,39 @@ function DeliveryTab(){
       )}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"/>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none"/>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by subject or recipient…"
-            className="w-full pl-9 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white"/>
+            className="w-full pl-9 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white dark:bg-gray-900"/>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} title="From date"
-            className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white"/>
-          <span className="text-xs text-gray-400">–</span>
+            className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white dark:bg-gray-900"/>
+          <span className="text-xs text-gray-400 dark:text-gray-500">–</span>
           <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} title="To date"
-            className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white"/>
-          {(dateFrom||dateTo)&&<button onClick={()=>{setDateFrom("");setDateTo("");}} className="text-xs text-gray-400 hover:text-gray-700 px-2 py-1 rounded-lg hover:bg-gray-100"><X className="w-3.5 h-3.5"/></button>}
+            className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white dark:bg-gray-900"/>
+          {(dateFrom||dateTo)&&<button onClick={()=>{setDateFrom("");setDateTo("");}} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 px-2 py-1 rounded-lg hover:bg-gray-100"><X className="w-3.5 h-3.5"/></button>}
         </div>
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl flex-wrap">
-          {events.map(ev=><button key={ev} onClick={()=>setFilter(ev)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${filter===ev?"bg-white text-gray-900 shadow-sm":"text-gray-500 hover:text-gray-700"}`}>{ev}</button>)}
+        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex-wrap">
+          {events.map(ev=><button key={ev} onClick={()=>setFilter(ev)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${filter===ev?"bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm":"text-gray-500 dark:text-gray-400 hover:text-gray-700"}`}>{ev}</button>)}
         </div>
-        <button onClick={exportDeliveryCsv} disabled={filtered.length===0} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 shrink-0">
+        <button onClick={exportDeliveryCsv} disabled={filtered.length===0} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/40 disabled:opacity-40 shrink-0">
           <Download className="w-3.5 h-3.5"/>CSV
         </button>
       </div>
-      {loading&&<div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">{[...Array(6)].map((_,i)=><SkeletonRow key={i}/>)}</div>}
-      {!loading&&filtered.length===0&&<div className="text-center py-12 text-gray-400"><Inbox className="w-8 h-8 mx-auto mb-3 opacity-40"/><p className="text-sm">No emails match</p></div>}
+      {loading&&<div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">{[...Array(6)].map((_,i)=><SkeletonRow key={i}/>)}</div>}
+      {!loading&&filtered.length===0&&<div className="text-center py-12 text-gray-400 dark:text-gray-500"><Inbox className="w-8 h-8 mx-auto mb-3 opacity-40"/><p className="text-sm">No emails match</p></div>}
       {!loading&&filtered.length>0&&(
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="border-b border-gray-100 bg-gray-50">{["Status","Subject","To","Sent",""].map(h=><th key={h} className="text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 px-4 py-3">{h}</th>)}</tr></thead>
+              <thead><tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">{["Status","Subject","To","Sent",""].map(h=><th key={h} className="text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-4 py-3">{h}</th>)}</tr></thead>
               <tbody>
                 {filtered.map(email=>{const ev=email.last_event??"sent";const isBounced=ev==="bounced";return(
                   <tr key={email.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                    <td className="px-4 py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${EVENT_BADGE[ev]??"bg-gray-100 text-gray-500"}`}>{ev}</span></td>
-                    <td className="px-4 py-3 text-gray-700 max-w-[260px] truncate">{email.subject}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs truncate max-w-[180px]">{email.to[0]}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{fmtDate(email.created_at)}</td>
+                    <td className="px-4 py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${EVENT_BADGE[ev]??"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>{ev}</span></td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-200 max-w-[260px] truncate">{email.subject}</td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs truncate max-w-[180px]">{email.to[0]}</td>
+                    <td className="px-4 py-3 text-gray-400 dark:text-gray-500 text-xs whitespace-nowrap">{fmtDate(email.created_at)}</td>
                     <td className="px-4 py-3">{isBounced&&email.to[0]&&<button onClick={()=>suppressEmail(email.to[0])} disabled={suppressing===email.to[0]} className="flex items-center gap-1 text-[10px] font-bold text-red-500 hover:text-red-700 disabled:opacity-40 whitespace-nowrap"><Ban className="w-3 h-3"/>{suppressing===email.to[0]?"…":"Suppress"}</button>}</td>
                   </tr>
                 );})}
@@ -2030,8 +2030,8 @@ function DeliveryTab(){
           </div>
         </div>
       )}
-      {cursor&&<button onClick={loadMore} disabled={loadingMore} className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50">{loadingMore?<RefreshCw className="w-3.5 h-3.5 animate-spin"/>:<Download className="w-3.5 h-3.5"/>}{loadingMore?"Loading…":"Load next 100"}</button>}
-      <p className="text-[10px] text-gray-400 text-center">{emails.length} emails loaded from Resend{cursor?" · more available":""}</p>
+      {cursor&&<button onClick={loadMore} disabled={loadingMore} className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/40 disabled:opacity-50">{loadingMore?<RefreshCw className="w-3.5 h-3.5 animate-spin"/>:<Download className="w-3.5 h-3.5"/>}{loadingMore?"Loading…":"Load next 100"}</button>}
+      <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center">{emails.length} emails loaded from Resend{cursor?" · more available":""}</p>
     </div>
   );
 }
@@ -2051,35 +2051,35 @@ function AuditTab({initialLog}:{initialLog:AuditEntry[]}){
     const a=document.createElement("a");a.href=url;a.download=`audit-log-${new Date().toISOString().slice(0,10)}.csv`;a.click();
     setTimeout(()=>URL.revokeObjectURL(url),5000);
   }
-  const ACTION_STYLE:Record<string,string>={save:"bg-blue-100 text-blue-700",enable:"bg-emerald-100 text-emerald-700",disable:"bg-gray-100 text-gray-500",approved:"bg-emerald-100 text-emerald-700",draft:"bg-amber-100 text-amber-700",lock:"bg-amber-100 text-amber-600",unlock:"bg-gray-100 text-gray-500"};
+  const ACTION_STYLE:Record<string,string>={save:"bg-blue-100 text-blue-700",enable:"bg-emerald-100 text-emerald-700",disable:"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400",approved:"bg-emerald-100 text-emerald-700",draft:"bg-amber-100 text-amber-700",lock:"bg-amber-100 text-amber-600",unlock:"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"};
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"/>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Filter by template or action…" className="w-full pl-9 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white"/>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none"/>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Filter by template or action…" className="w-full pl-9 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white dark:bg-gray-900"/>
         </div>
-        <button onClick={exportCsv} disabled={filtered.length===0} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40">
+        <button onClick={exportCsv} disabled={filtered.length===0} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/40 disabled:opacity-40">
           <Download className="w-3.5 h-3.5"/>Export CSV
         </button>
-        <button onClick={clearLog} disabled={clearing||log.length===0} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 disabled:opacity-40">
+        <button onClick={clearLog} disabled={clearing||log.length===0} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 disabled:opacity-40">
           <Trash2 className="w-3.5 h-3.5"/>{clearing?"Clearing…":"Clear log"}
         </button>
       </div>
-      {filtered.length===0&&<div className="text-center py-14 text-gray-400"><ClipboardList className="w-8 h-8 mx-auto mb-3 opacity-40"/><p className="text-sm">{log.length===0?"No audit entries yet.":"No entries match."}</p></div>}
+      {filtered.length===0&&<div className="text-center py-14 text-gray-400 dark:text-gray-500"><ClipboardList className="w-8 h-8 mx-auto mb-3 opacity-40"/><p className="text-sm">{log.length===0?"No audit entries yet.":"No entries match."}</p></div>}
       {filtered.length>0&&(
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="border-b border-gray-100 bg-gray-50">{["When","Admin","Template","Action","Note"].map(h=><th key={h} className="text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 px-4 py-3">{h}</th>)}</tr></thead>
+              <thead><tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">{["When","Admin","Template","Action","Note"].map(h=><th key={h} className="text-left text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-4 py-3">{h}</th>)}</tr></thead>
               <tbody>
                 {filtered.map(entry=>(
                   <tr key={entry.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                    <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{fmtDate(entry.timestamp)}</td>
-                    <td className="px-4 py-3 text-xs text-gray-600 truncate max-w-[140px]">{entry.adminEmail}</td>
-                    <td className="px-4 py-3 text-xs font-semibold text-gray-800 truncate max-w-[180px]">{entry.templateLabel}</td>
-                    <td className="px-4 py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${ACTION_STYLE[entry.action]??"bg-gray-100 text-gray-500"}`}>{entry.action}</span></td>
-                    <td className="px-4 py-3 text-xs text-gray-400 max-w-[200px] truncate">{entry.note??"—"}</td>
+                    <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">{fmtDate(entry.timestamp)}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 truncate max-w-[140px]">{entry.adminEmail}</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-gray-800 dark:text-gray-100 truncate max-w-[180px]">{entry.templateLabel}</td>
+                    <td className="px-4 py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${ACTION_STYLE[entry.action]??"bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>{entry.action}</span></td>
+                    <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-500 max-w-[200px] truncate">{entry.note??"—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2087,7 +2087,7 @@ function AuditTab({initialLog}:{initialLog:AuditEntry[]}){
           </div>
         </div>
       )}
-      <p className="text-[10px] text-gray-400 text-center">{filtered.length} of {log.length} entries (max 100)</p>
+      <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center">{filtered.length} of {log.length} entries (max 100)</p>
     </div>
   );
 }
@@ -2206,63 +2206,63 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
   return (
     <div className="max-w-2xl space-y-6">
       {/* Kill switch */}
-      <div className={`rounded-2xl border shadow-sm p-5 flex items-center justify-between gap-4 ${emailPaused?"border-red-200 bg-red-50":"border-gray-100 bg-white"}`}>
+      <div className={`rounded-2xl border shadow-sm p-5 flex items-center justify-between gap-4 ${emailPaused?"border-red-200 bg-red-50":"border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900"}`}>
         <div>
-          <p className={`text-sm font-bold ${emailPaused?"text-red-700":"text-gray-900"}`}>Pause all emails</p>
-          <p className="text-xs text-gray-400 mt-0.5">{emailPaused?"No emails are being sent. Toggle to resume.":"All email sending is active."}</p>
+          <p className={`text-sm font-bold ${emailPaused?"text-red-700":"text-gray-900 dark:text-white"}`}>Pause all emails</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{emailPaused?"No emails are being sent. Toggle to resume.":"All email sending is active."}</p>
         </div>
-        <button onClick={togglePause} className={`shrink-0 transition-colors ${emailPaused?"text-red-500 hover:text-red-700":"text-gray-300 hover:text-gray-500"}`}>
+        <button onClick={togglePause} className={`shrink-0 transition-colors ${emailPaused?"text-red-500 hover:text-red-700":"text-gray-300 dark:text-gray-600 hover:text-gray-500"}`}>
           {emailPaused?<ToggleRight className="w-8 h-8 text-red-500"/>:<ToggleLeft className="w-8 h-8"/>}
         </button>
       </div>
 
       {/* Global */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-4">
-        <h2 className="text-sm font-bold text-gray-900">Global Settings</h2>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-4">
+        <h2 className="text-sm font-bold text-gray-900 dark:text-white">Global Settings</h2>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Default sender name</label>
-          <input value={fromName} onChange={e=>setFromName(e.target.value)} placeholder="EditBridge" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
-          <p className="text-[10px] text-gray-400 mt-1">Shown as "From: {fromName||"EditBridge"} &lt;hello@editbridge.com&gt;"</p>
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Default sender name</label>
+          <input value={fromName} onChange={e=>setFromName(e.target.value)} placeholder="EditBridge" className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Shown as "From: {fromName||"EditBridge"} &lt;hello@editbridge.com&gt;"</p>
         </div>
         <div className="flex items-start justify-between">
-          <div><p className="text-sm font-semibold text-gray-800">Unsubscribe footer</p><p className="text-xs text-gray-400">Appended to marketing emails and shown in preview.</p></div>
-          <button onClick={()=>setFooterOn(v=>!v)} className="p-1.5 rounded-lg hover:bg-gray-100 shrink-0">{footerOn?<ToggleRight className="w-5 h-5 text-emerald-500"/>:<ToggleLeft className="w-5 h-5 text-gray-400"/>}</button>
+          <div><p className="text-sm font-semibold text-gray-800 dark:text-gray-100">Unsubscribe footer</p><p className="text-xs text-gray-400 dark:text-gray-500">Appended to marketing emails and shown in preview.</p></div>
+          <button onClick={()=>setFooterOn(v=>!v)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0">{footerOn?<ToggleRight className="w-5 h-5 text-emerald-500"/>:<ToggleLeft className="w-5 h-5 text-gray-400 dark:text-gray-500"/>}</button>
         </div>
         {footerOn&&<textarea rows={3} value={footerTxt} onChange={e=>setFooterTxt(e.target.value)} placeholder={"You're receiving this because you signed up on EditBridge.\nEditBridge · Mumbai, India\nUnsubscribe: https://editbridge.com/unsubscribe"}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 resize-y font-mono leading-relaxed"/>}
+          className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 resize-y font-mono leading-relaxed"/>}
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Broadcast throttle (ms between sends)</label>
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Broadcast throttle (ms between sends)</label>
           <div className="flex items-center gap-3">
-            <input type="number" value={throttleMs} onChange={e=>setThrottleMs(e.target.value)} min="0" max="5000" step="100" className="w-32 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
-            <span className="text-xs text-gray-400">0 = no delay · 100 = 10/sec · 1000 = 1/sec</span>
+            <input type="number" value={throttleMs} onChange={e=>setThrottleMs(e.target.value)} min="0" max="5000" step="100" className="w-32 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+            <span className="text-xs text-gray-400 dark:text-gray-500">0 = no delay · 100 = 10/sec · 1000 = 1/sec</span>
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Frequency cap (min hours between emails to same user)</label>
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Frequency cap (min hours between emails to same user)</label>
           <div className="flex items-center gap-3">
-            <input type="number" value={freqCapHoursVal} onChange={e=>setFreqCapHoursVal(e.target.value)} min="0" max="720" step="1" className="w-32 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
-            <span className="text-xs text-gray-400">0 = no cap · 24 = max 1 email/day · 168 = max 1/week</span>
+            <input type="number" value={freqCapHoursVal} onChange={e=>setFreqCapHoursVal(e.target.value)} min="0" max="720" step="1" className="w-32 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+            <span className="text-xs text-gray-400 dark:text-gray-500">0 = no cap · 24 = max 1 email/day · 168 = max 1/week</span>
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Broadcast send window (IST hours, 0–23) <span className="text-[9px] font-normal normal-case text-gray-400">leave blank to allow all hours</span></label>
+          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Broadcast send window (IST hours, 0–23) <span className="text-[9px] font-normal normal-case text-gray-400 dark:text-gray-500">leave blank to allow all hours</span></label>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <input type="number" value={winStart} onChange={e=>setWinStart(e.target.value)} min="0" max="23" placeholder="9" className="w-20 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
-              <span className="text-xs text-gray-400">to</span>
-              <input type="number" value={winEnd} onChange={e=>setWinEnd(e.target.value)} min="0" max="23" placeholder="18" className="w-20 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+              <input type="number" value={winStart} onChange={e=>setWinStart(e.target.value)} min="0" max="23" placeholder="9" className="w-20 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+              <span className="text-xs text-gray-400 dark:text-gray-500">to</span>
+              <input type="number" value={winEnd} onChange={e=>setWinEnd(e.target.value)} min="0" max="23" placeholder="18" className="w-20 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
-            <span className="text-xs text-gray-400">e.g. 9–18 = 9am–6pm IST</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">e.g. 9–18 = 9am–6pm IST</span>
           </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <button onClick={saveGlobals} disabled={saving} className="flex items-center gap-2 bg-gray-900 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-700 disabled:opacity-50">
             <Save className="w-4 h-4"/>{saving?"Saving…":"Save settings"}
           </button>
-          <button onClick={exportGlobalsJson} className="flex items-center gap-2 border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+          <button onClick={exportGlobalsJson} className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
             <Download className="w-4 h-4"/>Export JSON
           </button>
-          <button onClick={()=>importJsonRef.current?.click()} disabled={importingJson} className="flex items-center gap-2 border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50">
+          <button onClick={()=>importJsonRef.current?.click()} disabled={importingJson} className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors disabled:opacity-50">
             <Upload className="w-4 h-4"/>{importingJson?"Importing…":"Import JSON"}
           </button>
           <input ref={importJsonRef} type="file" accept=".json" className="hidden" onChange={importGlobalsJson}/>
@@ -2270,47 +2270,47 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
       </div>
 
       {/* Webhook health */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-4">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-4">
         <div>
-          <h2 className="text-sm font-bold text-gray-900">Resend Webhook</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Resend fires this URL on hard bounces and spam complaints to auto-suppress addresses.</p>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white">Resend Webhook</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Resend fires this URL on hard bounces and spam complaints to auto-suppress addresses.</p>
         </div>
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-          <code className="flex-1 text-xs font-mono text-gray-700 break-all">{typeof window!=="undefined"?window.location.origin:""}/api/webhooks/resend</code>
-          <button onClick={()=>{navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/resend`);toast.success("Copied");}} className="shrink-0 text-gray-400 hover:text-gray-700 transition-colors"><Copy className="w-4 h-4"/></button>
+        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3">
+          <code className="flex-1 text-xs font-mono text-gray-700 dark:text-gray-200 break-all">{typeof window!=="undefined"?window.location.origin:""}/api/webhooks/resend</code>
+          <button onClick={()=>{navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/resend`);toast.success("Copied");}} className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"><Copy className="w-4 h-4"/></button>
         </div>
-        <div className="flex items-start gap-2.5 text-xs text-gray-500 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
+        <div className="flex items-start gap-2.5 text-xs text-gray-500 dark:text-gray-400 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
           <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/>
           <span>Add this URL in your <strong>Resend Dashboard → Webhooks</strong> and select the <em>email.bounced</em> and <em>email.complained</em> events. Without it, hard bounces won't be auto-suppressed.</span>
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-400">{suppList.length} address{suppList.length!==1?"es":"" } currently suppressed</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">{suppList.length} address{suppList.length!==1?"es":"" } currently suppressed</p>
         </div>
       </div>
 
       {/* Test layout */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-4">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-4">
         <div>
-          <h2 className="text-sm font-bold text-gray-900">Test Email Layout</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Send a sample email to your inbox to verify the current header/footer layout renders correctly.</p>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white">Test Email Layout</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Send a sample email to your inbox to verify the current header/footer layout renders correctly.</p>
         </div>
         <button onClick={sendTestLayout} disabled={testLayoutSending} className="flex items-center gap-2 bg-indigo-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors">
           <Send className="w-4 h-4"/>{testLayoutSending?"Sending…":"Send layout test to my inbox"}
         </button>
-        <p className="text-xs text-gray-400">Sends to your admin account email. Save layout settings first before testing.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">Sends to your admin account email. Save layout settings first before testing.</p>
       </div>
 
       {/* Email Layout */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-5">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-5">
         <div>
-          <h2 className="text-sm font-bold text-gray-900">Email Layout</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Customise the header and footer that wrap every email sent by the platform.</p>
+          <h2 className="text-sm font-bold text-gray-900 dark:text-white">Email Layout</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Customise the header and footer that wrap every email sent by the platform.</p>
         </div>
 
         {/* live mini-preview */}
-        <div className="rounded-xl overflow-hidden border border-gray-100">
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border-b border-gray-100">
-            <Eye className="w-3 h-3 text-gray-400"/><span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preview</span>
+        <div className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+            <Eye className="w-3 h-3 text-gray-400 dark:text-gray-500"/><span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Preview</span>
           </div>
           {/* header preview */}
           <div className="flex items-center justify-center px-5 py-3.5" style={{background:headerBg}}>
@@ -2328,119 +2328,119 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
             )}
           </div>
           {/* body stub */}
-          <div className="px-5 py-4 bg-white border-x border-gray-200">
-            <div className="h-2 w-40 rounded bg-gray-100 mb-2"/>
-            <div className="h-2 w-56 rounded bg-gray-100 mb-2"/>
-            <div className="h-2 w-32 rounded bg-gray-100"/>
+          <div className="px-5 py-4 bg-white dark:bg-gray-900 border-x border-gray-200 dark:border-gray-700">
+            <div className="h-2 w-40 rounded bg-gray-100 dark:bg-gray-800 mb-2"/>
+            <div className="h-2 w-56 rounded bg-gray-100 dark:bg-gray-800 mb-2"/>
+            <div className="h-2 w-32 rounded bg-gray-100 dark:bg-gray-800"/>
           </div>
           {/* footer preview */}
-          <div className="bg-gray-50 border border-gray-200 border-t-0 px-5 py-3 text-center space-y-1">
-            <p className="text-[11px] text-gray-500">Questions? <span className="underline text-gray-600">{supportEmail||"support@editbridge.com"}</span></p>
-            <p className="text-[10px] text-gray-400">{(websiteUrl||"editbridge.com").replace(/^https?:\/\//,"")} · Help Center · Unsubscribe</p>
-            <p className="text-[10px] text-gray-300">{copyright}</p>
+          <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 border-t-0 px-5 py-3 text-center space-y-1">
+            <p className="text-[11px] text-gray-500 dark:text-gray-400">Questions? <span className="underline text-gray-600 dark:text-gray-300">{supportEmail||"support@editbridge.com"}</span></p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500">{(websiteUrl||"editbridge.com").replace(/^https?:\/\//,"")} · Help Center · Unsubscribe</p>
+            <p className="text-[10px] text-gray-300 dark:text-gray-600">{copyright}</p>
           </div>
         </div>
 
         {/* Header fields */}
         <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Header</p>
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Header</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Logo image URL <span className="text-[10px] font-normal normal-case text-gray-400">— paste your logo link here; leave blank to use text logo below</span></label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Logo image URL <span className="text-[10px] font-normal normal-case text-gray-400 dark:text-gray-500">— paste your logo link here; leave blank to use text logo below</span></label>
               <div className="flex items-center gap-2">
                 <input value={logoImageUrl} onChange={e=>setLogoImageUrl(e.target.value)} placeholder="https://yourdomain.com/logo.png"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <label className="text-xs text-gray-400 whitespace-nowrap">Height px</label>
+                  <label className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">Height px</label>
                   <input type="number" value={logoImageHeight} onChange={e=>setLogoImageHeight(e.target.value)} min="20" max="120" step="1"
-                    className="w-16 border border-gray-200 rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                    className="w-16 border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
                 </div>
-                {logoImageUrl&&<button onClick={()=>setLogoImageUrl("")} className="text-gray-300 hover:text-gray-600 shrink-0"><X className="w-4 h-4"/></button>}
+                {logoImageUrl&&<button onClick={()=>setLogoImageUrl("")} className="text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"><X className="w-4 h-4"/></button>}
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Text logo / brand name <span className="text-[10px] font-normal normal-case text-gray-400">fallback when no image set</span></label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Text logo / brand name <span className="text-[10px] font-normal normal-case text-gray-400 dark:text-gray-500">fallback when no image set</span></label>
               <input value={logoText} onChange={e=>setLogoText(e.target.value)} placeholder="EditBridge"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tagline <span className="text-[10px] font-normal normal-case text-gray-400">shown below logo image</span></label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Tagline <span className="text-[10px] font-normal normal-case text-gray-400 dark:text-gray-500">shown below logo image</span></label>
               <input value={headerTagline} onChange={e=>setHeaderTagline(e.target.value)} placeholder="India's Editing Marketplace"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Header background color</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Header background color</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={headerBg} onChange={e=>setHeaderBg(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"/>
+                <input type="color" value={headerBg} onChange={e=>setHeaderBg(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"/>
                 <input value={headerBg} onChange={e=>setHeaderBg(e.target.value)} placeholder="#0f172a"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Logo text color</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Logo text color</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={headerTextColor} onChange={e=>setHeaderTextColor(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"/>
+                <input type="color" value={headerTextColor} onChange={e=>setHeaderTextColor(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"/>
                 <input value={headerTextColor} onChange={e=>setHeaderTextColor(e.target.value)} placeholder="#ffffff"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tagline color</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Tagline color</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={headerTaglineColor} onChange={e=>setHeaderTaglineColor(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"/>
+                <input type="color" value={headerTaglineColor} onChange={e=>setHeaderTaglineColor(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"/>
                 <input value={headerTaglineColor} onChange={e=>setHeaderTaglineColor(e.target.value)} placeholder="#475569"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Accent / button color</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Accent / button color</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={accentColor} onChange={e=>setAccentColor(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"/>
+                <input type="color" value={accentColor} onChange={e=>setAccentColor(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"/>
                 <input value={accentColor} onChange={e=>setAccentColor(e.target.value)} placeholder="#4f46e5"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
               </div>
-              <p className="text-[10px] text-gray-400 mt-1">Used for CTA buttons in email templates</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Used for CTA buttons in email templates</p>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Email background color</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Email background color</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={bodyBg} onChange={e=>setBodyBg(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5"/>
+                <input type="color" value={bodyBg} onChange={e=>setBodyBg(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"/>
                 <input value={bodyBg} onChange={e=>setBodyBg(e.target.value)} placeholder="#f1f5f9"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
               </div>
-              <p className="text-[10px] text-gray-400 mt-1">Outer background color visible around the email card</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Outer background color visible around the email card</p>
             </div>
           </div>
         </div>
 
         {/* Footer fields */}
         <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Footer</p>
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Footer</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Support email</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Support email</label>
               <input value={supportEmail} onChange={e=>setSupportEmail(e.target.value)} placeholder="support@editbridge.com"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Website URL</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Website URL</label>
               <input value={websiteUrl} onChange={e=>setWebsiteUrl(e.target.value)} placeholder="https://editbridge.com"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Help center URL</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Help center URL</label>
               <input value={helpUrl} onChange={e=>setHelpUrl(e.target.value)} placeholder="https://editbridge.com/help"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Unsubscribe URL</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Unsubscribe URL</label>
               <input value={unsubscribeUrl} onChange={e=>setUnsubscribeUrl(e.target.value)} placeholder="https://editbridge.com/unsubscribe"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Copyright line</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Copyright line</label>
               <input value={copyright} onChange={e=>setCopyright(e.target.value)} placeholder="© 2026 EditBridge Technologies Pvt. Ltd."
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
           </div>
         </div>
@@ -2451,12 +2451,12 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
       </div>
 
       {/* Custom variables */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-4">
-        <div><h2 className="text-sm font-bold text-gray-900">Custom Variables</h2><p className="text-xs text-gray-400 mt-0.5">Define your own {"{{variables}}"} for use in any template.</p></div>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-4">
+        <div><h2 className="text-sm font-bold text-gray-900 dark:text-white">Custom Variables</h2><p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Define your own {"{{variables}}"} for use in any template.</p></div>
         <div className="grid grid-cols-3 gap-2">
-          <input value={newVarKey} onChange={e=>setNewVarKey(e.target.value)} placeholder="{{my_var}}" className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 font-mono"/>
-          <input value={newVarLabel} onChange={e=>setNewVarLabel(e.target.value)} placeholder="Label" className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
-          <input value={newVarSample} onChange={e=>setNewVarSample(e.target.value)} placeholder="Sample value" className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+          <input value={newVarKey} onChange={e=>setNewVarKey(e.target.value)} placeholder="{{my_var}}" className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 font-mono"/>
+          <input value={newVarLabel} onChange={e=>setNewVarLabel(e.target.value)} placeholder="Label" className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+          <input value={newVarSample} onChange={e=>setNewVarSample(e.target.value)} placeholder="Sample value" className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
         </div>
         <button onClick={addCustomVar} disabled={savingVars||!newVarKey} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-40">
           <PlusCircle className="w-3.5 h-3.5"/>{savingVars?"Saving…":"Add variable"}
@@ -2464,24 +2464,24 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
         {customVars.length>0&&(
           <div className="space-y-1.5">
             {customVars.map(v=>(
-              <div key={v.key} className="flex items-center gap-3 text-xs rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
+              <div key={v.key} className="flex items-center gap-3 text-xs rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-3 py-2">
                 <code className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">{v.key}</code>
-                <span className="text-gray-500">{v.label}</span>
-                <span className="text-gray-400">→ {v.sample}</span>
+                <span className="text-gray-500 dark:text-gray-400">{v.label}</span>
+                <span className="text-gray-400 dark:text-gray-500">→ {v.sample}</span>
                 <button onClick={()=>removeCustomVar(v.key)} className="ml-auto text-red-400 hover:text-red-600"><Trash2 className="w-3 h-3"/></button>
               </div>
             ))}
           </div>
         )}
-        {customVars.length===0&&<p className="text-xs text-gray-400">No custom variables yet.</p>}
+        {customVars.length===0&&<p className="text-xs text-gray-400 dark:text-gray-500">No custom variables yet.</p>}
       </div>
 
       {/* Suppression list */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 space-y-4">
-        <div><h2 className="text-sm font-bold text-gray-900">Suppression List</h2><p className="text-xs text-gray-400 mt-0.5">These emails are excluded from all broadcasts.</p></div>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6 space-y-4">
+        <div><h2 className="text-sm font-bold text-gray-900 dark:text-white">Suppression List</h2><p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">These emails are excluded from all broadcasts.</p></div>
         <div className="grid grid-cols-2 gap-2">
-          <input value={newEmail} onChange={e=>setNewEmail(e.target.value)} placeholder="email@example.com" className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
-          <input value={newReason} onChange={e=>setNewReason(e.target.value)} placeholder="Reason (optional)" className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+          <input value={newEmail} onChange={e=>setNewEmail(e.target.value)} placeholder="email@example.com" className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+          <input value={newReason} onChange={e=>setNewReason(e.target.value)} placeholder="Reason (optional)" className="border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
         </div>
         <button onClick={addSuppression} disabled={addingSupp||!newEmail} className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-40">
           <Ban className="w-3.5 h-3.5"/>{addingSupp?"Adding…":"Suppress email"}
@@ -2489,9 +2489,9 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
         {suppList.length>0&&(
           <div className="space-y-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"/>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500 pointer-events-none"/>
               <input value={suppSearch} onChange={e=>setSuppSearch(e.target.value)} placeholder="Search suppressed emails…"
-                className="w-full pl-9 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
+                className="w-full pl-9 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"/>
             </div>
           </div>
         )}
@@ -2500,18 +2500,19 @@ function SettingsTab({globals,customVars:initVars,suppressionList:initSupp}:{glo
             {suppList.filter(e=>!suppSearch||e.email.toLowerCase().includes(suppSearch.toLowerCase())||(e.reason??"").toLowerCase().includes(suppSearch.toLowerCase())).map(e=>(
               <div key={e.email} className="flex items-center gap-3 text-xs rounded-xl border border-red-50 bg-red-50 px-3 py-2">
                 <Ban className="w-3 h-3 text-red-300 shrink-0"/>
-                <span className="font-medium text-gray-800">{e.email}</span>
-                {e.reason&&<span className="text-gray-400 truncate">{e.reason}</span>}
-                <span className="text-gray-300 ml-auto shrink-0">{fmtDate(e.addedAt)}</span>
+                <span className="font-medium text-gray-800 dark:text-gray-100">{e.email}</span>
+                {e.reason&&<span className="text-gray-400 dark:text-gray-500 truncate">{e.reason}</span>}
+                <span className="text-gray-300 dark:text-gray-600 ml-auto shrink-0">{fmtDate(e.addedAt)}</span>
                 <button onClick={()=>removeSuppression(e.email)} className="text-red-400 hover:text-red-600 shrink-0"><X className="w-3 h-3"/></button>
               </div>
             ))}
           </div>
         )}
-        {suppList.length===0&&<p className="text-xs text-gray-400">No suppressed emails.</p>}
-        {suppList.length>0&&<p className="text-[10px] text-gray-400">{suppList.filter(e=>!suppSearch||e.email.toLowerCase().includes(suppSearch.toLowerCase())||(e.reason??"").toLowerCase().includes(suppSearch.toLowerCase())).length} of {suppList.length} entries</p>}
+        {suppList.length===0&&<p className="text-xs text-gray-400 dark:text-gray-500">No suppressed emails.</p>}
+        {suppList.length>0&&<p className="text-[10px] text-gray-400 dark:text-gray-500">{suppList.filter(e=>!suppSearch||e.email.toLowerCase().includes(suppSearch.toLowerCase())||(e.reason??"").toLowerCase().includes(suppSearch.toLowerCase())).length} of {suppList.length} entries</p>}
       </div>
 
     </div>
   );
 }
+

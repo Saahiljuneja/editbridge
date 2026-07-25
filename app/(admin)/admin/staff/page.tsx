@@ -41,29 +41,29 @@ export default async function AdminStaffPage() {
     <div className="px-8 py-6 ">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Staff</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{staffRows.length} member{staffRows.length !== 1 ? "s" : ""}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{staffRows.length} member{staffRows.length !== 1 ? "s" : ""}</p>
         </div>
         <AddStaffForm />
       </div>
 
-      <div className="rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-900 shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Member</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-500">Role</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-500">Status</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">Joined</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500">Action</th>
+            <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+              <th className="text-left px-5 py-3 font-medium text-gray-500 dark:text-gray-400">Member</th>
+              <th className="text-center px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Role</th>
+              <th className="text-center px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Joined</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Action</th>
             </tr>
           </thead>
           <tbody>
             {staffRows.map((row) => (
-              <tr key={row.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+              <tr key={row.id} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                 <td className="px-5 py-3.5">
-                  <p className="font-medium text-gray-900">{row.name ?? "No name"}</p>
-                  <p className="text-xs text-gray-400">{row.email}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{row.name ?? "No name"}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{row.email}</p>
                 </td>
                 <td className="px-4 py-3.5 text-center">
                   <Badge className={cn("text-xs border-0", ROLE_COLORS[row.role] ?? "bg-gray-100")}>
@@ -76,7 +76,7 @@ export default async function AdminStaffPage() {
                     {row.isActive ? "Active" : "Suspended"}
                   </span>
                 </td>
-                <td className="px-4 py-3.5 text-gray-400 text-xs">{formatDate(row.createdAt)}</td>
+                <td className="px-4 py-3.5 text-gray-400 dark:text-gray-500 text-xs">{formatDate(row.createdAt)}</td>
                 <td className="px-4 py-3.5 text-right">
                   <Link href={`/admin/users/${row.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
                     Edit →
@@ -86,7 +86,7 @@ export default async function AdminStaffPage() {
             ))}
             {staffRows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-gray-400 text-sm">No staff members yet. Add one above.</td>
+                <td colSpan={5} className="px-5 py-10 text-center text-gray-400 dark:text-gray-600 text-sm">No staff members yet. Add one above.</td>
               </tr>
             )}
           </tbody>

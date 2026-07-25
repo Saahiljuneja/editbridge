@@ -46,34 +46,34 @@ export function FeatureFlagsClient({ initial }: { initial: Flag[] }) {
   return (
     <div className="px-8 py-6 ">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Feature Flags</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Feature Flags</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
           Kill switches for features shipped after this page â€” turning one off takes effect immediately, platform-wide.
         </p>
       </div>
 
       {flags.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-400">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 text-center text-sm text-gray-400 dark:text-gray-500">
           No flagged features yet.
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm divide-y divide-gray-50 dark:divide-gray-800">
           {flags.map((flag) => (
             <div key={flag.key} className="flex items-start justify-between gap-6 px-6 py-5">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-semibold text-gray-900 text-sm">{flag.label}</p>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500">
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">{flag.label}</p>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                     {PORTAL_LABELS[flag.portal] ?? flag.portal}
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">{flag.description}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{flag.description}</p>
               </div>
               <label className="flex items-center gap-3 cursor-pointer shrink-0">
                 <div
                   onClick={() => pending === null && toggle(flag.key, !flag.enabled)}
                   className={`relative w-11 h-6 rounded-full transition-colors ${
-                    flag.enabled ? "bg-green-500" : "bg-gray-200"
+                    flag.enabled ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"
                   } ${pending === flag.key ? "opacity-50" : ""}`}
                 >
                   <span
@@ -82,7 +82,7 @@ export function FeatureFlagsClient({ initial }: { initial: Flag[] }) {
                     }`}
                   />
                 </div>
-                <span className={`text-xs font-semibold w-6 ${flag.enabled ? "text-green-600" : "text-gray-400"}`}>
+                <span className={`text-xs font-semibold w-6 ${flag.enabled ? "text-green-600" : "text-gray-400 dark:text-gray-500"}`}>
                   {flag.enabled ? "ON" : "OFF"}
                 </span>
               </label>
@@ -91,7 +91,7 @@ export function FeatureFlagsClient({ initial }: { initial: Flag[] }) {
         </div>
       )}
 
-      <div className="flex items-start gap-2.5 mt-6 text-xs text-gray-400">
+      <div className="flex items-start gap-2.5 mt-6 text-xs text-gray-400 dark:text-gray-500">
         <ToggleLeft className="w-4 h-4 shrink-0 mt-0.5" />
         <p>
           New flags appear here automatically as they&apos;re registered in code â€” no migration needed to add one.

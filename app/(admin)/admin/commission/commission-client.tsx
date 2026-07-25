@@ -58,8 +58,8 @@ export function CommissionClient({ settings: initial }: { settings: Record<strin
     <div className="px-8 py-6 space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Commission & Fee Settings</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Commission & Fee Settings</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Adjust platform fee percentages, payout rules, and credit amounts. Changes apply to new orders only.
           </p>
         </div>
@@ -77,13 +77,13 @@ export function CommissionClient({ settings: initial }: { settings: Record<strin
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="divide-y divide-gray-100">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {FIELDS.map(f => (
             <div key={f.key} className="flex items-center gap-6 px-6 py-5">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">{f.label}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{f.sub}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{f.label}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{f.sub}</p>
                 <p className="text-xs text-emerald-600 font-semibold mt-1">Currently: {display(f)}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -93,18 +93,18 @@ export function CommissionClient({ settings: initial }: { settings: Record<strin
                   onChange={e => set(f.key, e.target.value)}
                   min={0}
                   step={f.type === "pct" ? 1 : 100}
-                  className="w-28 border border-gray-200 rounded-xl px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+                  className="w-28 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-gray-900/10 dark:bg-gray-800 dark:text-white"
                 />
-                <span className="text-xs text-gray-400 w-10">{f.unit}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 w-10">{f.unit}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
-        <p className="font-semibold text-gray-900 text-sm mb-2">Per-editor overrides</p>
-        <p className="text-sm text-gray-400">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
+        <p className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Per-editor overrides</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">
           Custom commission rates for individual editors can be set on the editor&apos;s profile page under{" "}
           <a href="/admin/users?role=editor" className="text-[#0EA5E9] hover:underline font-medium">Users â†’ Editors</a>.
           The override there takes precedence over this global rate.

@@ -60,8 +60,8 @@ export default async function AdminAbusePage() {
   return (
     <div className="px-8 py-6 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Abuse Detection</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Abuse Detection</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Flag suspicious multi-account patterns and review suspended users. IP-based detection requires storing IP at signup.
         </p>
       </div>
@@ -75,7 +75,7 @@ export default async function AdminAbusePage() {
           <div key={s.label} className={`rounded-2xl ${s.bg} px-5 py-5`}>
             <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-sm text-gray-500 mt-0.5">{s.label}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -94,21 +94,21 @@ export default async function AdminAbusePage() {
 
       {/* Suspicious email domains */}
       {domainRows.length > 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-            <p className="font-semibold text-gray-900 text-sm">Business/custom domains with 3+ accounts</p>
-            <p className="text-xs text-gray-400 mt-0.5">Could indicate a company or coordinated signup. Review if the domain is unfamiliar.</p>
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+            <p className="font-semibold text-gray-900 dark:text-white text-sm">Business/custom domains with 3+ accounts</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Could indicate a company or coordinated signup. Review if the domain is unfamiliar.</p>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {domainRows.map(row => (
               <div key={row.domain} className="flex items-center gap-4 px-6 py-3.5">
                 <Users className="w-4 h-4 text-gray-400 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">@{row.domain}</p>
-                  <p className="text-xs text-gray-400 truncate">{row.names}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">@{row.domain}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{row.names}</p>
                 </div>
                 <span className="text-sm font-bold text-amber-600 shrink-0">{row.account_count} accounts</span>
-                <p className="text-xs text-gray-400 shrink-0">First: {formatDate(new Date(row.first_seen))}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">First: {formatDate(new Date(row.first_seen))}</p>
                 <Link href={`/admin/users?search=${encodeURIComponent("@" + row.domain)}`}
                   className="text-xs font-semibold text-[#0EA5E9] hover:underline shrink-0">
                   View â†’
@@ -120,27 +120,27 @@ export default async function AdminAbusePage() {
       )}
 
       {/* Recent suspensions */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-          <p className="font-semibold text-gray-900 text-sm">Recent Suspensions</p>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
+          <p className="font-semibold text-gray-900 dark:text-white text-sm">Recent Suspensions</p>
           <Link href="/admin/users?suspended=true" className="text-xs font-semibold text-[#0EA5E9] hover:underline">
             View all suspended â†’
           </Link>
         </div>
         {suspRows.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-10">No recent suspensions.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-10">No recent suspensions.</p>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {suspRows.map(row => (
               <div key={row.id} className="flex items-center gap-4 px-6 py-3.5">
                 <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
                   <Ban className="w-4 h-4 text-red-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">{row.target_name ?? "Unknown"}</p>
-                  <p className="text-xs text-gray-400">{row.target_email} Â· Suspended by {row.actor_name}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{row.target_name ?? "Unknown"}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{row.target_email} Â· Suspended by {row.actor_name}</p>
                 </div>
-                <p className="text-xs text-gray-400 shrink-0">{formatDate(new Date(row.created_at))}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{formatDate(new Date(row.created_at))}</p>
                 {row.target_id && (
                   <Link href={`/admin/users/${row.target_id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline shrink-0">
                     Profile â†’

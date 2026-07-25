@@ -77,12 +77,12 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm">
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-900 shadow-sm">
       {/* Bulk action bar */}
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+      <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
         <input type="checkbox" checked={selected.size === rows.length && rows.length > 0}
           onChange={toggleAll} className="rounded border-gray-300" />
-        <span className="text-xs text-gray-400">{selected.size > 0 ? `${selected.size} selected` : "Select all"}</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">{selected.size > 0 ? `${selected.size} selected` : "Select all"}</span>
         {selected.size > 0 && status === "pending" && (
           <>
             <button onClick={() => bulkAction("approve")} disabled={bulkLoading}
@@ -98,7 +98,7 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
         )}
         <div className="ml-auto">
           <button onClick={exportCSV}
-            className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 transition-colors">
+            className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg hover:border-gray-300 transition-colors">
             <Download className="w-3.5 h-3.5" /> Export CSV
           </button>
         </div>
@@ -106,28 +106,28 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
 
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50">
+          <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
             <th className="w-8 px-5 py-3" />
-            <th className="text-left px-5 py-3 font-medium text-gray-500">Editor</th>
-            <th className="text-left px-4 py-3 font-medium text-gray-500">Document</th>
-            <th className="text-left px-4 py-3 font-medium text-gray-500">Submitted</th>
-            <th className="text-left px-4 py-3 font-medium text-gray-500">Waiting</th>
-            <th className="text-center px-4 py-3 font-medium text-gray-500">Status</th>
-            <th className="text-right px-4 py-3 font-medium text-gray-500">Action</th>
+            <th className="text-left px-5 py-3 font-medium text-gray-500 dark:text-gray-400">Editor</th>
+            <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Document</th>
+            <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Submitted</th>
+            <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Waiting</th>
+            <th className="text-center px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
+            <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Action</th>
           </tr>
         </thead>
         <tbody>
           {rows.map(row => (
-            <tr key={row.id} className={cn("border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors", selected.has(row.id) && "bg-sky-50/50")}>
+            <tr key={row.id} className={cn("border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors", selected.has(row.id) && "bg-sky-50/50")}>
               <td className="px-5 py-3.5">
                 <input type="checkbox" checked={selected.has(row.id)} onChange={() => toggle(row.id)} className="rounded border-gray-300" />
               </td>
               <td className="px-5 py-3.5">
-                <p className="font-medium text-gray-900">{row.userName ?? "Unknown"}</p>
-                <p className="text-xs text-gray-400">{row.userEmail}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{row.userName ?? "Unknown"}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{row.userEmail}</p>
               </td>
-              <td className="px-4 py-3.5 capitalize text-gray-600">{row.documentType}</td>
-              <td className="px-4 py-3.5 text-gray-400 text-xs">{formatDate(row.createdAt)}</td>
+              <td className="px-4 py-3.5 capitalize text-gray-600 dark:text-gray-300">{row.documentType}</td>
+              <td className="px-4 py-3.5 text-gray-400 dark:text-gray-500 text-xs">{formatDate(row.createdAt)}</td>
               <td className="px-4 py-3.5">
                 {(() => {
                   const days = Math.floor((Date.now() - new Date(row.createdAt).getTime()) / 86400000);
@@ -136,7 +136,7 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
                       {days}d waiting
                     </span>
                   ) : (
-                    <span className="text-xs text-gray-400">{formatRelativeTime(row.createdAt)}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">{formatRelativeTime(row.createdAt)}</span>
                   );
                 })()}
               </td>

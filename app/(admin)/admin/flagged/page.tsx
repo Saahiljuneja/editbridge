@@ -37,26 +37,26 @@ export default async function AdminFlaggedPage() {
   return (
     <div className="px-8 py-6 ">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Flagged Users</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{suspendedUsers.length} suspended account{suspendedUsers.length !== 1 ? "s" : ""}</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Flagged Users</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{suspendedUsers.length} suspended account{suspendedUsers.length !== 1 ? "s" : ""}</p>
       </div>
 
       {suspendedUsers.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-12 text-center shadow-sm">
           <Ban className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-500">No suspended accounts</p>
-          <p className="text-xs text-gray-400 mt-1">All users are currently active.</p>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No suspended accounts</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">All users are currently active.</p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm">
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-900 shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-5 py-3 font-medium text-gray-500">User</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">Reason</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">Actioned by</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">Date</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-500">Action</th>
+              <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                <th className="text-left px-5 py-3 font-medium text-gray-500 dark:text-gray-400">User</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Reason</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Actioned by</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Date</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -64,19 +64,19 @@ export default async function AdminFlaggedPage() {
                 const log = logMap.get(user.id);
                 const reason = (log?.metadata as Record<string, unknown>)?.reason as string | null;
                 return (
-                  <tr key={user.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                  <tr key={user.id} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                     <td className="px-5 py-3.5">
-                      <p className="font-medium text-gray-900">{user.name ?? "No name"}</p>
-                      <p className="text-xs text-gray-400">{user.email}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user.name ?? "No name"}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{user.email}</p>
                       <Badge className="mt-1 text-xs border-0 bg-red-100 text-red-700">Suspended</Badge>
                     </td>
-                    <td className="px-4 py-3.5 text-gray-600 text-xs max-w-[200px]">
-                      {reason ?? <span className="text-gray-400 italic">No reason given</span>}
+                    <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300 text-xs max-w-[200px]">
+                      {reason ?? <span className="text-gray-400 dark:text-gray-500 italic">No reason given</span>}
                     </td>
-                    <td className="px-4 py-3.5 text-gray-500 text-xs">
-                      {log ? <><p>{log.actorName}</p><p className="text-gray-400">{log.actorRole}</p></> : "—"}
+                    <td className="px-4 py-3.5 text-gray-500 dark:text-gray-400 text-xs">
+                      {log ? <><p>{log.actorName}</p><p className="text-gray-400 dark:text-gray-500">{log.actorRole}</p></> : "—"}
                     </td>
-                    <td className="px-4 py-3.5 text-gray-400 text-xs">{formatDate(user.updatedAt)}</td>
+                    <td className="px-4 py-3.5 text-gray-400 dark:text-gray-500 text-xs">{formatDate(user.updatedAt)}</td>
                     <td className="px-4 py-3.5 text-right">
                       <Link href={`/admin/users/${user.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
                         Manage →

@@ -63,14 +63,14 @@ export default async function AdminRevenuePage() {
     <div className="px-8 py-6 ">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Revenue</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Platform financials and payout history.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Revenue</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Platform financials and payout history.</p>
         </div>
         <div className="flex items-center gap-3">
           <GstExportButton />
           <a
             href="/api/admin/export/revenue"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
           >
             â†“ Export CSV
           </a>
@@ -85,18 +85,18 @@ export default async function AdminRevenuePage() {
           { label: "TDS Collected", value: formatCurrency(totalTdsCollected), sub: "Sec. 194J â€” deposit with IT dept", icon: Landmark, color: "text-orange-600", bg: "bg-orange-50" },
           { label: "Featured Revenue", value: formatCurrency(featuredRevenue), sub: "Paid featured listings", icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
         ].map((card) => (
-          <div key={card.label} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div key={card.label} className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4", card.bg)}>
               <card.icon className={cn("w-5 h-5", card.color)} />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{card.value}</p>
-            <p className="text-sm text-gray-500 mt-1">{card.label}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{card.sub}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{card.label}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{card.sub}</p>
           </div>
         ))}
       </div>
 
-      <h2 className="font-semibold text-gray-900 mb-4">Payout history</h2>
+      <h2 className="font-semibold text-gray-900 dark:text-white mb-4">Payout history</h2>
       <RevenueClient payouts={recentPayouts} />
     </div>
   );

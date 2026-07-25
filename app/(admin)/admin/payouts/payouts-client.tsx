@@ -80,12 +80,12 @@ export function PayoutsClient({ rows: initial }: { rows: PayoutRow[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-3">
           <input type="checkbox" checked={selected.size === rows.length && rows.length > 0}
             onChange={toggleAll} className="rounded border-gray-300" />
-          <span className="text-sm text-gray-500">{rows.length} pending</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{rows.length} pending</span>
           {selected.size > 0 && (
             <button onClick={bulkApprove}
               className="text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors">
@@ -94,14 +94,14 @@ export function PayoutsClient({ rows: initial }: { rows: PayoutRow[] }) {
           )}
         </div>
         <button onClick={exportCSV}
-          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-800 border border-gray-200 px-3 py-1.5 rounded-lg transition-colors">
+          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg transition-colors">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
 
-      <div className="divide-y divide-gray-50">
+      <div className="divide-y divide-gray-50 dark:divide-gray-800">
         {rows.map(row => (
-          <div key={row.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+          <div key={row.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
             <input type="checkbox" checked={selected.has(row.id)}
               onChange={() => setSelected(s => {
                 const n = new Set(s);
@@ -111,17 +111,17 @@ export function PayoutsClient({ rows: initial }: { rows: PayoutRow[] }) {
               className="rounded border-gray-300 shrink-0" />
 
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900">{row.editorName ?? "Unknown"}</p>
-              <p className="text-xs text-gray-400">{row.editorEmail} · {row.packageTitle ?? "Order"}</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{row.editorName ?? "Unknown"}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{row.editorEmail} · {row.packageTitle ?? "Order"}</p>
             </div>
 
             <div className="text-right shrink-0">
-              <p className="text-sm font-bold text-gray-900">{formatCurrency(row.netAmount)}</p>
-              <p className="text-xs text-gray-400">Gross {formatCurrency(row.grossAmount)} · Commission {formatCurrency(row.commissionAmount)}</p>
+              <p className="text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(row.netAmount)}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Gross {formatCurrency(row.grossAmount)} · Commission {formatCurrency(row.commissionAmount)}</p>
               {row.tdsAmount > 0 && <p className="text-xs text-amber-600">TDS {formatCurrency(row.tdsAmount)}</p>}
             </div>
 
-            <p className="text-xs text-gray-400 shrink-0 w-20 text-right">{formatDate(new Date(row.createdAt))}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0 w-20 text-right">{formatDate(new Date(row.createdAt))}</p>
 
             <div className="flex items-center gap-2 shrink-0">
               <button onClick={() => approvePayout(row.id)} disabled={!!loading[row.id]}

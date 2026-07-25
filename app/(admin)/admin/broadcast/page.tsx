@@ -143,44 +143,44 @@ export default function AdminBroadcastPage() {
   return (
     <div className="px-8 py-6 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Broadcast & Reports</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Send in-app notifications to users and export monthly reports.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Broadcast & Reports</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Send in-app notifications to users and export monthly reports.</p>
       </div>
 
       {/* Compose */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center gap-2">
           <Megaphone className="w-4 h-4 text-[#0EA5E9]" />
           <div>
-            <p className="font-semibold text-gray-900 text-sm">Send notification</p>
-            <p className="text-xs text-gray-400 mt-0.5">Delivered as an in-app notification to all matched users.</p>
+            <p className="font-semibold text-gray-900 dark:text-white text-sm">Send notification</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Delivered as an in-app notification to all matched users.</p>
           </div>
         </div>
         <form onSubmit={handleSend} className="p-6 space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input required value={title} onChange={e => setTitle(e.target.value)}
                 placeholder="e.g. Platform update available"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Message</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Message</label>
               <textarea required rows={3} value={body} onChange={e => setBody(e.target.value)}
                 placeholder="Your message to users…"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none" />
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Target audience</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Target audience</label>
               <select value={targetRole} onChange={e => setTargetRole(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30">
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30">
                 {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Link (optional)</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Link (optional)</label>
               <input value={link} onChange={e => setLink(e.target.value)} placeholder="/editor/dashboard"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
             </div>
           </div>
           <button type="submit" disabled={sending}
@@ -192,21 +192,21 @@ export default function AdminBroadcastPage() {
       </div>
 
       {/* History */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <p className="font-semibold text-gray-900 text-sm">Broadcast history</p>
-          <p className="text-xs text-gray-400 mt-0.5">Edit or delete a broadcast — changes apply to all recipients instantly.</p>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+          <p className="font-semibold text-gray-900 dark:text-white text-sm">Broadcast history</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Edit or delete a broadcast — changes apply to all recipients instantly.</p>
         </div>
 
         {loadingHistory ? (
-          <div className="p-8 text-center text-sm text-gray-400">Loading…</div>
+          <div className="p-8 text-center text-sm text-gray-400 dark:text-gray-500">Loading…</div>
         ) : history.length === 0 ? (
           <div className="p-10 flex flex-col items-center text-center">
             <Megaphone className="w-8 h-8 text-gray-200 mb-2" />
-            <p className="text-sm text-gray-400">No broadcasts sent yet.</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">No broadcasts sent yet.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {history.map(b => (
               <div key={b.id} className="px-6 py-4">
                 {editId === b.id ? (
@@ -217,14 +217,14 @@ export default function AdminBroadcastPage() {
                     <textarea rows={3} value={editBody} onChange={e => setEditBody(e.target.value)}
                       className="w-full rounded-xl border border-[#0EA5E9]/30 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20" />
                     <input value={editLink} onChange={e => setEditLink(e.target.value)} placeholder="Link (optional)"
-                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20" />
+                      className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20" />
                     <div className="flex gap-2">
                       <button onClick={handleEdit} disabled={saving}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0EA5E9] text-white text-xs font-semibold disabled:opacity-50">
                         <Check className="w-3.5 h-3.5" /> {saving ? "Saving…" : "Save changes"}
                       </button>
                       <button onClick={() => setEditId(null)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50">
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40">
                         <X className="w-3.5 h-3.5" /> Cancel
                       </button>
                     </div>
@@ -233,13 +233,13 @@ export default function AdminBroadcastPage() {
                   <div className="flex items-start gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="font-semibold text-gray-900 text-sm truncate">{b.title}</p>
-                        <span className="shrink-0 flex items-center gap-1 text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                        <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">{b.title}</p>
+                        <span className="shrink-0 flex items-center gap-1 text-[10px] font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
                           <Users className="w-2.5 h-2.5" /> {roleLabel(b.targetRole)}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{b.body}</p>
-                      <div className="flex items-center gap-3 text-[10px] text-gray-400">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">{b.body}</p>
+                      <div className="flex items-center gap-3 text-[10px] text-gray-400 dark:text-gray-500">
                         <span>{formatDateTime(new Date(b.createdAt))}</span>
                         <span>·</span>
                         <span>{b.sentCount} recipient{b.sentCount !== 1 ? "s" : ""}</span>
@@ -251,7 +251,7 @@ export default function AdminBroadcastPage() {
 
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => startEdit(b)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:border-[#0EA5E9]/30 hover:text-[#0EA5E9] transition-colors">
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:border-[#0EA5E9]/30 hover:text-[#0EA5E9] transition-colors">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       {deleteId === b.id ? (
@@ -279,29 +279,29 @@ export default function AdminBroadcastPage() {
       </div>
 
       {/* Monthly report */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <p className="font-semibold text-gray-900 text-sm">Monthly report</p>
-          <p className="text-xs text-gray-400 mt-0.5">Download a CSV summary of orders, revenue and users for any month.</p>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+          <p className="font-semibold text-gray-900 dark:text-white text-sm">Monthly report</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Download a CSV summary of orders, revenue and users for any month.</p>
         </div>
         <div className="p-6 flex items-end gap-4 flex-wrap">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Month</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Month</label>
             <select value={reportMonth} onChange={e => setReportMonth(Number(e.target.value))}
-              className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30">
+              className="rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30">
               {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Year</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Year</label>
             <input type="number" value={reportYear} onChange={e => setReportYear(Number(e.target.value))}
               min={2024} max={now.getFullYear()}
-              className="w-24 rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
+              className="w-24 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
           </div>
           <a href={`/api/admin/export/report?year=${reportYear}&month=${reportMonth}`}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600",
-              "hover:bg-gray-50 transition-colors"
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300",
+              "hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
             )}>
             <Download className="w-4 h-4" />
             Download CSV

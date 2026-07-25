@@ -154,17 +154,17 @@ export default async function AdminAnalyticsPage() {
   ];
 
   return (
-    <div className="px-8 py-6 ">
+    <div className="px-8 py-6">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Platform-wide performance metrics.</p>
+          <h1 className="a-h1">Analytics</h1>
+          <p className="a-muted mt-0.5">Platform-wide performance metrics.</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/admin/revenue" className="px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+          <Link href="/admin/revenue" className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
             Revenue →
           </Link>
-          <Link href="/admin/payments" className="px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+          <Link href="/admin/payments" className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
             Payments →
           </Link>
         </div>
@@ -173,30 +173,30 @@ export default async function AdminAnalyticsPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {kpiCards.map(({ label, value, sub, icon: Icon, color }) => (
-          <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5">
+          <div key={label} className="a-card p-5">
             <div className="flex items-start justify-between mb-3">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}18` }}>
                 <Icon className="w-4.5 h-4.5" style={{ color }} />
               </div>
               {sub && (
-                <span className={cn("inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full", sub.up ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600")}>
+                <span className={cn("inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full", sub.up ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400" : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400")}>
                   {sub.up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                   {sub.diff}%
                 </span>
               )}
             </div>
-            <p className="text-2xl font-extrabold text-gray-900 mb-1">{value}</p>
-            <p className="text-xs text-gray-400">{label}</p>
+            <p className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">{value}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
           </div>
         ))}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6 mb-6">
         {/* Daily orders chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="text-sm font-bold text-gray-700 mb-5">Orders — last 30 days</h2>
+        <div className="lg:col-span-2 a-card p-6">
+          <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-5">Orders — last 30 days</h2>
           {dailyRows.length === 0 ? (
-            <div className="h-40 flex items-center justify-center text-sm text-gray-300">No data</div>
+            <div className="h-40 flex items-center justify-center text-sm text-gray-300 dark:text-gray-600">No data</div>
           ) : (
             <div className="flex items-end gap-1 h-40">
               {dailyRows.map((row) => (
@@ -210,15 +210,15 @@ export default async function AdminAnalyticsPage() {
               ))}
             </div>
           )}
-          <div className="flex justify-between mt-2 text-xs text-gray-300">
+          <div className="flex justify-between mt-2 text-xs text-gray-300 dark:text-gray-600">
             <span>{dailyRows[0]?.day ?? ""}</span>
             <span>{dailyRows[dailyRows.length - 1]?.day ?? ""}</span>
           </div>
         </div>
 
         {/* Order status breakdown */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="text-sm font-bold text-gray-700 mb-5">Orders by status</h2>
+        <div className="a-card p-6">
+          <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-5">Orders by status</h2>
           <div className="space-y-2.5">
             {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
               const count = orderMap[key] ?? 0;
@@ -226,10 +226,10 @@ export default async function AdminAnalyticsPage() {
               return (
                 <div key={key}>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-gray-600 font-medium">{cfg.label}</span>
-                    <span className="text-gray-400">{count} ({pct}%)</span>
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">{cfg.label}</span>
+                    <span className="text-gray-400 dark:text-gray-500">{count} ({pct}%)</span>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                     <div className={cn("h-full rounded-full", cfg.color)} style={{ width: `${pct}%` }} />
                   </div>
                 </div>
@@ -241,8 +241,8 @@ export default async function AdminAnalyticsPage() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Platform totals */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="text-sm font-bold text-gray-700 mb-5">Platform totals</h2>
+        <div className="a-card p-6">
+          <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-5">Platform totals</h2>
           <div className="space-y-3">
             {[
               { label: "Total registered users", value: totalUsers.toLocaleString() },
@@ -252,40 +252,40 @@ export default async function AdminAnalyticsPage() {
               { label: "Order completion rate", value: totalOrders > 0 ? `${Math.round((completedOrders / totalOrders) * 100)}%` : "—" },
               { label: "Clients who reordered", value: `${repeatClientCount} (${retentionRate}%)` },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-                <span className="text-sm text-gray-500">{label}</span>
-                <span className="text-sm font-semibold text-gray-900">{value}</span>
+              <div key={label} className="flex items-center justify-between py-1.5 border-b border-gray-50 dark:border-gray-800/50 last:border-0">
+                <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">{value}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Top editors */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="a-card p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-bold text-gray-700">Top editors by orders</h2>
+            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200">Top editors by orders</h2>
             <Link href="/admin/editors" className="text-xs text-[#0EA5E9] hover:underline">View all</Link>
           </div>
           <div className="space-y-3">
             {topEditors.map((editor, idx) => (
               <div key={editor.id} className="flex items-center gap-3">
-                <span className="w-5 text-xs text-gray-300 font-bold text-right shrink-0">{idx + 1}</span>
+                <span className="w-5 text-xs text-gray-300 dark:text-gray-600 font-bold text-right shrink-0">{idx + 1}</span>
                 <div className="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
                   <span className="text-[#0EA5E9] text-xs font-bold">
                     {(editor.name ?? "?").slice(0, 1)}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{editor.name ?? "—"}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{editor.name ?? "—"}</p>
                   {editor.completionRate != null && (
-                    <p className="text-xs text-gray-400">{editor.completionRate}% completion</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{editor.completionRate}% completion</p>
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Award className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-sm font-semibold text-gray-700">{editor.totalOrders}</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{editor.totalOrders}</span>
                 </div>
-                <Link href={`/admin/users/${editor.id}`} className="text-xs text-gray-300 hover:text-[#0EA5E9] transition-colors shrink-0">→</Link>
+                <Link href={`/admin/users/${editor.id}`} className="text-xs text-gray-300 dark:text-gray-600 hover:text-[#0EA5E9] transition-colors shrink-0">→</Link>
               </div>
             ))}
           </div>

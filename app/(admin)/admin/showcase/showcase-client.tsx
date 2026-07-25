@@ -161,51 +161,51 @@ export function ShowcaseClient() {
   return (
     <div className="space-y-6">
       {/* Add clip */}
-      <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+      <div className="a-card overflow-hidden">
         <button
           onClick={() => setShowForm((s) => !s)}
-          className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+          className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
         >
           <span className="flex items-center gap-2">
             <Plus className="w-4 h-4 text-[#7C3AED]" /> Add clip to showcase
           </span>
-          <X className={cn("w-4 h-4 text-gray-400 transition-transform", !showForm && "rotate-45")} />
+          <X className={cn("w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform", !showForm && "rotate-45")} />
         </button>
 
         {showForm && (
-          <div className="border-t border-gray-100 p-5 space-y-4">
+          <div className="border-t border-gray-100 dark:border-gray-800 p-5 space-y-4">
             {/* Editor picker */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Editor</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Editor</label>
               {selectedEditor ? (
-                <div className="mt-1.5 flex items-center justify-between rounded-xl border border-[#7C3AED]/30 bg-[#7C3AED]/5 px-3 py-2">
-                  <span className="text-sm font-medium text-gray-800">
+                <div className="mt-1.5 flex items-center justify-between rounded-xl border border-[#7C3AED]/30 bg-[#7C3AED]/5 dark:bg-[#7C3AED]/10 px-3 py-2">
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
                     {selectedEditor.displayName || displayNameFromFull(selectedEditor.name)}
-                    {selectedEditor.title && <span className="text-gray-400 font-normal"> · {selectedEditor.title}</span>}
+                    {selectedEditor.title && <span className="text-gray-400 dark:text-gray-500 font-normal"> · {selectedEditor.title}</span>}
                   </span>
-                  <button onClick={() => { setSelectedEditor(null); setEditorQuery(""); }} className="text-gray-400 hover:text-red-500">
+                  <button onClick={() => { setSelectedEditor(null); setEditorQuery(""); }} className="text-gray-400 dark:text-gray-500 hover:text-red-500">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <div className="relative mt-1.5">
-                  <Search className="w-4 h-4 text-gray-300 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-gray-300 dark:text-gray-600 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     value={editorQuery}
                     onChange={(e) => setEditorQuery(e.target.value)}
                     placeholder="Search editor by name…"
-                    className="w-full text-sm pl-9 pr-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                    className="w-full text-sm pl-9 pr-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
                   />
                   {editorResults.length > 0 && (
-                    <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
+                    <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg overflow-hidden">
                       {editorResults.map((e) => (
                         <button
                           key={e.id}
                           onClick={() => { setSelectedEditor(e); setEditorResults([]); }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors"
+                          className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                         >
-                          <span className="font-medium text-gray-800">{e.displayName || displayNameFromFull(e.name)}</span>
-                          {e.title && <span className="text-xs text-gray-400">· {e.title}</span>}
+                          <span className="font-medium text-gray-800 dark:text-gray-100">{e.displayName || displayNameFromFull(e.name)}</span>
+                          {e.title && <span className="text-xs text-gray-400 dark:text-gray-500">· {e.title}</span>}
                         </button>
                       ))}
                     </div>
@@ -216,12 +216,12 @@ export function ShowcaseClient() {
 
             {/* Video URL */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Video URL (YouTube or Vimeo)</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Video URL (YouTube or Vimeo)</label>
               <input
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="https://youtube.com/watch?v=…"
-                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
               />
               {videoUrl.trim() && !preview?.ok && (
                 <p className="text-xs text-red-500 mt-1">Only YouTube and Vimeo links are supported.</p>
@@ -235,26 +235,26 @@ export function ShowcaseClient() {
 
             {/* Title */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Title</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Title</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. YouTube highlight reel — TechChannel"
                 maxLength={120}
-                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description (optional)</label>
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Description (optional)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 maxLength={300}
                 placeholder="Short context about the project…"
-                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10 resize-none"
+                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10 resize-none"
               />
             </div>
 
@@ -270,47 +270,47 @@ export function ShowcaseClient() {
       </div>
 
       {/* Curated list */}
-      <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
-          <p className="text-sm font-semibold text-gray-800">Showcased clips ({items.length})</p>
+      <div className="a-card overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">Showcased clips ({items.length})</p>
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-400 px-5 py-8 text-center">Loading…</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 px-5 py-8 text-center">Loading…</p>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center px-5">
-            <Film className="w-8 h-8 text-gray-200 mb-2" />
-            <p className="text-sm text-gray-400">No clips showcased yet. Add one above.</p>
+            <Film className="w-8 h-8 text-gray-200 dark:text-gray-700 mb-2" />
+            <p className="text-sm text-gray-400 dark:text-gray-500">No clips showcased yet. Add one above.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {items.map((item, index) => {
               const name = item.editorDisplayName || displayNameFromFull(item.editorName);
               return (
-                <div key={item.id} className="flex items-center gap-3 px-5 py-3">
+                <div key={item.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                   <div className="flex flex-col gap-0.5 shrink-0">
                     <button
                       onClick={() => handleMove(index, -1)}
                       disabled={index === 0}
-                      className="p-1 rounded text-gray-400 hover:text-gray-700 disabled:opacity-20 disabled:cursor-not-allowed"
+                      className="p-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-20 disabled:cursor-not-allowed"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleMove(index, 1)}
                       disabled={index === items.length - 1}
-                      className="p-1 rounded text-gray-400 hover:text-gray-700 disabled:opacity-20 disabled:cursor-not-allowed"
+                      className="p-1 rounded text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-20 disabled:cursor-not-allowed"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{item.title}</p>
-                    <p className="text-xs text-gray-400 truncate">{name}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{item.title}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{name}</p>
                   </div>
                   <button
                     onClick={() => handleRemove(item.id)}
-                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                    className="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shrink-0"
                     title="Remove from showcase"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

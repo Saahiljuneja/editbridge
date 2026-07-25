@@ -49,8 +49,8 @@ export default async function AdminSystemPage() {
   return (
     <div className="px-8 py-6 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">System Health</h1>
-        <p className="text-sm text-gray-500 mt-1">Live process stats, service status, and queue depths.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Health</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Live process stats, service status, and queue depths.</p>
       </div>
 
       {/* Overall status banner */}
@@ -73,14 +73,14 @@ export default async function AdminSystemPage() {
           <div key={m.label} className={`rounded-2xl ${m.bg} px-4 py-4`}>
             <m.icon className={`w-4 h-4 ${m.color} mb-2`} />
             <p className={`text-lg font-bold ${m.color}`}>{m.value}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{m.label}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{m.label}</p>
           </div>
         ))}
       </div>
 
       {/* Queue depths */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
-        <p className="font-semibold text-gray-900 mb-5">Queue Depths</p>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm p-6">
+        <p className="font-semibold text-gray-900 dark:text-white mb-5">Queue Depths</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
           {[
             { label: "Active orders", value: activeOrders, color: "text-blue-600" },
@@ -90,26 +90,26 @@ export default async function AdminSystemPage() {
           ].map(q => (
             <div key={q.label} className="text-center">
               <p className={`text-3xl font-bold ${q.color}`}>{q.value}</p>
-              <p className="text-xs text-gray-400 mt-1">{q.label}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{q.label}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Service status */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <p className="font-semibold text-gray-900 text-sm">Service Status</p>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+          <p className="font-semibold text-gray-900 dark:text-white text-sm">Service Status</p>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-50 dark:divide-gray-800">
           {services.map(svc => (
             <div key={svc.name} className="flex items-center justify-between px-6 py-3.5">
               <div className="flex items-center gap-3">
                 <span className={`w-2 h-2 rounded-full ${svc.status === "operational" ? "bg-emerald-400" : "bg-amber-400"}`} />
-                <span className="text-sm font-medium text-gray-900">{svc.name}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{svc.name}</span>
               </div>
               <div className="flex items-center gap-6">
-                <span className="text-xs text-gray-400 font-mono">{svc.latency}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{svc.latency}</span>
                 <span className={`text-xs font-semibold ${svc.status === "operational" ? "text-emerald-600" : "text-amber-600"}`}>
                   {svc.status === "operational" ? "Operational" : "Degraded"}
                 </span>

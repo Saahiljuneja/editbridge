@@ -45,8 +45,8 @@ export default async function AdminReferralsPage() {
   return (
     <div className="px-8 py-6 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Referral Analytics</h1>
-        <p className="text-sm text-gray-500 mt-1">Track who referred whom and how many referrals converted to orders.</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Referral Analytics</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Track who referred whom and how many referrals converted to orders.</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -59,7 +59,7 @@ export default async function AdminReferralsPage() {
           <div key={s.label} className={`rounded-2xl ${s.bg} px-5 py-5`}>
             <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-sm text-gray-500 mt-0.5">{s.label}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>

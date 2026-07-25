@@ -122,15 +122,15 @@ export function UsersBulkTable({
       {/* Export button */}
       <div className="flex justify-end mb-2">
         <button onClick={exportCSV}
-          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 transition-colors">
+          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg hover:border-gray-300 transition-colors">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
 
       {/* Bulk action bar */}
       {canBulkAction && someSelected && (
-        <div className="sticky top-4 z-10 mb-3 flex items-center gap-3 rounded-xl border border-border bg-white px-4 py-3 shadow-md">
-          <span className="text-sm font-medium text-gray-700">
+        <div className="sticky top-4 z-10 mb-3 flex items-center gap-3 rounded-xl border border-border bg-white dark:bg-gray-900 dark:border-gray-800 px-4 py-3 shadow-md">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
             {selected.size} user{selected.size !== 1 ? "s" : ""} selected
           </span>
           <div className="ml-auto flex items-center gap-2">
@@ -150,7 +150,7 @@ export function UsersBulkTable({
                 </button>
                 <button
                   onClick={() => setSelected(new Set())}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 text-sm hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                 >
                   Deselect all
                 </button>
@@ -163,7 +163,7 @@ export function UsersBulkTable({
                   onChange={(e) => setReason(e.target.value)}
                   placeholder={`Reason for ${pendingAction} (optional)`}
                   maxLength={300}
-                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 w-64"
+                  className="rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 w-64"
                 />
                 <button
                   onClick={confirmAction}
@@ -177,7 +177,7 @@ export function UsersBulkTable({
                 >
                   {isPending ? "Working…" : `Confirm ${pendingAction}`}
                 </button>
-                <button onClick={cancelAction} className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-500 hover:bg-gray-50">
+                <button onClick={cancelAction} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40">
                   Cancel
                 </button>
               </div>
@@ -186,7 +186,7 @@ export function UsersBulkTable({
         </div>
       )}
 
-      <div className="rounded-xl border border-border overflow-hidden bg-white">
+      <div className="rounded-xl border border-border overflow-hidden bg-white dark:bg-gray-900">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/30">

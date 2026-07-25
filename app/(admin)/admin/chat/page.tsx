@@ -54,8 +54,8 @@ export default async function AdminChatPage() {
       {/* â”€â”€ All Conversations â”€â”€ */}
       <section>
         <div className="mb-4">
-          <h2 className="text-base font-bold text-gray-900">All Conversations</h2>
-          <p className="text-sm text-gray-400">Every order chat â€” click to read the full thread.</p>
+          <h2 className=”text-base font-bold text-gray-900 dark:text-white”>All Conversations</h2>
+          <p className=”text-sm text-gray-400 dark:text-gray-500”>Every order chat â€” click to read the full thread.</p>
         </div>
 
         <ConversationsTable orderId={undefined} />
@@ -64,8 +64,8 @@ export default async function AdminChatPage() {
       {/* â”€â”€ Flagged Messages â”€â”€ */}
       <section>
         <div className="mb-4">
-          <h2 className="text-base font-bold text-gray-900">Flagged Messages</h2>
-          <p className="text-sm text-gray-400">{warnings} warning{warnings !== 1 ? "s" : ""} Â· {blocked} blocked</p>
+          <h2 className="text-base font-bold text-gray-900 dark:text-white">Flagged Messages</h2>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{warnings} warning{warnings !== 1 ? "s" : ""} Â· {blocked} blocked</p>
         </div>
 
         <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
@@ -80,7 +80,7 @@ export default async function AdminChatPage() {
             description="The content filter has not flagged any messages yet."
           />
         ) : (
-          <div className="rounded-xl border border-border overflow-hidden bg-white">
+          <div className="rounded-xl border border-border overflow-hidden bg-white dark:bg-gray-900">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
@@ -179,7 +179,7 @@ async function ConversationsTable(_: { orderId: undefined }) {
   }
 
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-white">
+    <div className="rounded-xl border border-border overflow-hidden bg-white dark:bg-gray-900">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/30">
@@ -196,18 +196,18 @@ async function ConversationsTable(_: { orderId: undefined }) {
           {conversations.map((row, i) => (
             <tr key={row.orderId} className={cn("border-b border-border last:border-0 hover:bg-muted/20 transition-colors", i % 2 === 1 && "bg-muted/10")}>
               <td className="px-4 py-3">
-                <p className="font-medium text-gray-900 truncate max-w-[160px]">{row.packageTitle ?? "Custom order"}</p>
+                <p className="font-medium text-gray-900 dark:text-white truncate max-w-[160px]">{row.packageTitle ?? "Custom order"}</p>
                 {row.hasFlag && (
                   <span className="text-[10px] font-semibold text-amber-600">âš  flagged activity</span>
                 )}
               </td>
-              <td className="px-4 py-3 text-gray-600">{row.clientName}</td>
-              <td className="px-4 py-3 text-gray-600">{row.editorName}</td>
+              <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{row.clientName}</td>
+              <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{row.editorName}</td>
               <td className="px-4 py-3">
-                <span className="text-xs font-medium text-gray-500 capitalize">{row.orderStatus.replace(/_/g, " ")}</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">{row.orderStatus.replace(/_/g, " ")}</span>
               </td>
-              <td className="px-4 py-3 text-center text-gray-700 font-semibold">{row.messageCount}</td>
-              <td className="px-4 py-3 text-right text-gray-400 text-xs whitespace-nowrap">{formatDateTime(row.lastMessageAt)}</td>
+              <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-200 font-semibold">{row.messageCount}</td>
+              <td className="px-4 py-3 text-right text-gray-400 dark:text-gray-500 text-xs whitespace-nowrap">{formatDateTime(row.lastMessageAt)}</td>
               <td className="px-4 py-3 text-right">
                 <Link href={`/admin/chat/${row.orderId}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2 whitespace-nowrap">
                   View chat â†’

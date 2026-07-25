@@ -87,13 +87,13 @@ export function RevenueClient({ payouts }: { payouts: Payout[] }) {
     <div>
       <div className="flex justify-end mb-2">
         <button onClick={exportCSV}
-          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:border-gray-300 transition-colors">
+          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
       {pending.length > 0 && (
         <div className="flex items-center gap-3 mb-3">
-          <button onClick={toggleAll} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700">
+          <button onClick={toggleAll} className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
             {selected.size === pending.length && pending.length > 0
               ? <CheckSquare className="w-4 h-4 text-[#0EA5E9]" />
               : <Square className="w-4 h-4" />}
@@ -109,52 +109,52 @@ export function RevenueClient({ payouts }: { payouts: Payout[] }) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm">
+      <div className="a-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
+            <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
               <th className="w-8 px-4 py-3" />
-              <th className="text-left px-5 py-3 font-medium text-gray-500">Order</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500">Gross</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500">Commission</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500">Net payout</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-500">Status</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500">Date</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500">Action</th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500 dark:text-gray-400">Order</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Gross</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Commission</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Net payout</th>
+              <th className="text-center px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Date</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Action</th>
             </tr>
           </thead>
           <tbody>
             {payouts.map((row) => (
-              <tr key={row.id} className={cn("border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors", selected.has(row.id) && "bg-emerald-50/40")}>
+              <tr key={row.id} className={cn("border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors", selected.has(row.id) && "bg-emerald-50/40 dark:bg-emerald-900/10")}>
                 <td className="px-4 py-3.5">
                   {row.status === "pending" && (
                     <button onClick={() => toggle(row.id)} className="flex items-center justify-center">
                       {selected.has(row.id)
                         ? <CheckSquare className="w-4 h-4 text-[#0EA5E9]" />
-                        : <Square className="w-4 h-4 text-gray-300" />}
+                        : <Square className="w-4 h-4 text-gray-300 dark:text-gray-600" />}
                     </button>
                   )}
                 </td>
                 <td className="px-5 py-3.5">
-                  <p className="font-medium text-gray-900 truncate max-w-[140px]">{row.packageTitle ?? "Custom order"}</p>
-                  {row.editorName && <p className="text-xs text-gray-400">{row.editorName}</p>}
+                  <p className="font-medium text-gray-900 dark:text-white truncate max-w-[140px]">{row.packageTitle ?? "Custom order"}</p>
+                  {row.editorName && <p className="text-xs text-gray-400 dark:text-gray-500">{row.editorName}</p>}
                 </td>
-                <td className="px-4 py-3.5 text-right tabular-nums">{formatCurrency(row.grossAmount)}</td>
-                <td className="px-4 py-3.5 text-right tabular-nums text-emerald-600">+{formatCurrency(row.commissionAmount)}</td>
-                <td className="px-4 py-3.5 text-right tabular-nums font-medium">{formatCurrency(row.netAmount)}</td>
+                <td className="px-4 py-3.5 text-right tabular-nums text-gray-700 dark:text-gray-200">{formatCurrency(row.grossAmount)}</td>
+                <td className="px-4 py-3.5 text-right tabular-nums text-emerald-600 dark:text-emerald-400">+{formatCurrency(row.commissionAmount)}</td>
+                <td className="px-4 py-3.5 text-right tabular-nums font-medium text-gray-900 dark:text-white">{formatCurrency(row.netAmount)}</td>
                 <td className="px-4 py-3.5 text-center">
-                  <Badge className={cn("text-xs border-0", STATUS_COLORS[row.status] ?? "bg-gray-100")}>
+                  <Badge className={cn("text-xs border-0", STATUS_COLORS[row.status] ?? "bg-gray-100 dark:bg-gray-800")}>
                     {row.status}
                   </Badge>
                 </td>
-                <td className="px-4 py-3.5 text-right text-gray-400 text-xs">{formatDate(row.createdAt)}</td>
+                <td className="px-4 py-3.5 text-right text-gray-400 dark:text-gray-500 text-xs">{formatDate(row.createdAt)}</td>
                 <td className="px-4 py-3.5 text-right">
                   {row.status !== "completed" && <MarkPaidButton payoutId={row.id} />}
                 </td>
               </tr>
             ))}
             {payouts.length === 0 && (
-              <tr><td colSpan={8} className="px-5 py-10 text-center text-gray-400 text-sm">No payouts yet.</td></tr>
+              <tr><td colSpan={8} className="a-empty">No payouts yet.</td></tr>
             )}
           </tbody>
         </table>

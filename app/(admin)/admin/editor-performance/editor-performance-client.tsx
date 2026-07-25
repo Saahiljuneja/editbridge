@@ -79,17 +79,17 @@ export function EditorPerformanceClient({ rows }: { rows: EditorRow[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-gray-800">
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by name or email…"
-          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+          className="flex-1 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10"
         />
-        <span className="text-sm text-gray-400">{filtered.length} editors</span>
+        <span className="text-sm text-gray-400 dark:text-gray-500">{filtered.length} editors</span>
         <button onClick={exportCSV}
-          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 border border-gray-200 px-3 py-2 rounded-xl hover:border-gray-300 transition-colors shrink-0">
+          className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-2 rounded-xl hover:border-gray-300 transition-colors shrink-0">
           <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
@@ -97,7 +97,7 @@ export function EditorPerformanceClient({ rows }: { rows: EditorRow[] }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
               <th className="text-left px-6 py-3">Editor</th>
               <th className="px-4 py-3"><ThBtn label="Total Orders" k="totalOrders" /></th>
               <th className="px-4 py-3"><ThBtn label="Completed" k="completedOrders" /></th>
@@ -106,35 +106,35 @@ export function EditorPerformanceClient({ rows }: { rows: EditorRow[] }) {
               <th className="px-4 py-3"><ThBtn label="Avg Rating" k="avgRating" /></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
             {filtered.map((r, i) => {
               const cr = completionRate(r);
               return (
-                <tr key={r.editorId} className="hover:bg-gray-50 transition-colors">
+                <tr key={r.editorId} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded bg-gray-100 text-[10px] font-bold text-gray-400 flex items-center justify-center shrink-0">{i + 1}</span>
+                      <span className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0">{i + 1}</span>
                       <div>
-                        <Link href={`/admin/editors/${r.editorId}`} className="font-semibold text-gray-900 hover:underline">{r.name ?? "—"}</Link>
-                        <p className="text-xs text-gray-400">{r.email}</p>
+                        <Link href={`/admin/editors/${r.editorId}`} className="font-semibold text-gray-900 dark:text-white hover:underline">{r.name ?? "—"}</Link>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{r.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3.5 text-center font-semibold text-gray-900">{r.totalOrders}</td>
+                  <td className="px-4 py-3.5 text-center font-semibold text-gray-900 dark:text-white">{r.totalOrders}</td>
                   <td className="px-4 py-3.5 text-center">
-                    <span className="text-gray-900 font-semibold">{r.completedOrders}</span>
-                    {cr !== null && <span className="text-gray-400 text-xs ml-1">({cr}%)</span>}
+                    <span className="text-gray-900 dark:text-white font-semibold">{r.completedOrders}</span>
+                    {cr !== null && <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">({cr}%)</span>}
                   </td>
-                  <td className="px-4 py-3.5 text-center text-gray-700">{r.activeOrders}</td>
-                  <td className="px-4 py-3.5 text-right font-semibold text-gray-900">{formatCurrency(r.totalRevenue)}</td>
+                  <td className="px-4 py-3.5 text-center text-gray-700 dark:text-gray-200">{r.activeOrders}</td>
+                  <td className="px-4 py-3.5 text-right font-semibold text-gray-900 dark:text-white">{formatCurrency(r.totalRevenue)}</td>
                   <td className="px-4 py-3.5">
                     {r.avgRating ? (
                       <div className="flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                        <span className="font-semibold text-gray-900">{r.avgRating.toFixed(1)}</span>
-                        <span className="text-gray-400 text-xs">({r.reviewCount})</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{r.avgRating.toFixed(1)}</span>
+                        <span className="text-gray-400 dark:text-gray-500 text-xs">({r.reviewCount})</span>
                       </div>
-                    ) : <span className="text-gray-300 text-xs">No reviews</span>}
+                    ) : <span className="text-gray-300 dark:text-gray-600 text-xs">No reviews</span>}
                   </td>
                 </tr>
               );
@@ -143,7 +143,7 @@ export function EditorPerformanceClient({ rows }: { rows: EditorRow[] }) {
         </table>
 
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-400 text-sm">No editors found.</div>
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">No editors found.</div>
         )}
       </div>
     </div>

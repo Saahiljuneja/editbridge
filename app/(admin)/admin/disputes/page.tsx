@@ -114,7 +114,7 @@ export default async function AdminDisputesPage({
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
               tab === t.value
                 ? "bg-[#0EA5E9] text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             )}
           >
             {t.label}
@@ -135,14 +135,14 @@ export default async function AdminDisputesPage({
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 text-sm">
-              <p className="text-gray-400">
-                Page {page} of {totalPages} Â· {offset + 1}â€“{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
+              <p className=”text-gray-400 dark:text-gray-500”>
+                Page {page} of {totalPages} Â· {offset + 1}â€”{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
               </p>
               <div className="flex gap-2">
                 {page > 1 && (
                   <Link
                     href={`/admin/disputes?tab=${tab}&page=${page - 1}`}
-                    className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                   >
                     â† Prev
                   </Link>
@@ -150,7 +150,7 @@ export default async function AdminDisputesPage({
                 {page < totalPages && (
                   <Link
                     href={`/admin/disputes?tab=${tab}&page=${page + 1}`}
-                    className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                   >
                     Next â†’
                   </Link>
