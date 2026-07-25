@@ -24,11 +24,9 @@ export default async function AdminLayout({
 
   return (
     <AdminThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-200">
-        <div className="flex min-h-screen">
-          <AdminSidebar />
-          <main className="flex-1 min-w-0 pt-14 md:pt-0">{children}</main>
-        </div>
+      <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-950 transition-colors duration-200 flex">
+        <AdminSidebar />
+        <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">{children}</main>
       </div>
     </AdminThemeProvider>
   );

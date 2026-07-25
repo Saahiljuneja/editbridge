@@ -470,7 +470,7 @@ export function AdminSidebar() {
       )}
 
       {/* ── Desktop sidebar ── */}
-      <aside className="w-[240px] flex-shrink-0 hidden md:flex flex-col h-screen sticky top-0 border-r border-white/[0.06] overflow-hidden">
+      <aside className="w-[240px] flex-shrink-0 hidden md:flex flex-col h-full border-r border-white/[0.06] overflow-hidden">
         <SidebarContent {...sharedProps} />
       </aside>
     </>
