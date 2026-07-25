@@ -1,39 +1,20 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 
-type Theme = "dark" | "light";
-
-const AdminThemeContext = createContext<{
-  theme: Theme;
-  toggle: () => void;
-}>({ theme: "dark", toggle: () => {} });
+const AdminThemeContext = createContext<{ theme: "light"; toggle: () => void }>({
+  theme: "light",
+  toggle: () => {},
+});
 
 export function useAdminTheme() {
   return useContext(AdminThemeContext);
 }
 
 export function AdminThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("admin-theme") as Theme | null;
-    if (stored === "light" || stored === "dark") setTheme(stored);
-  }, []);
-
-  function toggle() {
-    setTheme(prev => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("admin-theme", next);
-      return next;
-    });
-  }
-
   return (
-    <AdminThemeContext.Provider value={{ theme, toggle }}>
-      <div className={theme === "dark" ? "dark" : ""}>
-        {children}
-      </div>
+    <AdminThemeContext.Provider value={{ theme: "light", toggle: () => {} }}>
+      <div>{children}</div>
     </AdminThemeContext.Provider>
   );
 }

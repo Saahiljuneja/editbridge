@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Save, AlertTriangle } from "lucide-react";
-import { AdminThemeToggle } from "@/components/admin/admin-theme-toggle";
-import { useAdminTheme } from "@/components/admin/admin-theme-provider";
 
 type Settings = Record<string, string>;
 
@@ -32,30 +30,6 @@ function Field({ label, sub, children }: { label: string; sub?: string; children
   );
 }
 
-function AppearanceSection() {
-  const { theme } = useAdminTheme();
-  return (
-    <div className="a-card overflow-hidden">
-      <div className="a-card-header bg-gray-50 dark:bg-gray-800/50">
-        <p className="font-semibold text-gray-900 dark:text-white text-sm">Appearance</p>
-      </div>
-      <div className="p-6">
-        <div className="flex items-start justify-between gap-6">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">Admin theme</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              Switch between dark and light mode for the admin portal. Preference is saved in your browser.
-            </p>
-          </div>
-          <div className="shrink-0 flex items-center gap-3">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">{theme}</span>
-            <AdminThemeToggle className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function SettingsClient({ initial }: { initial: Settings }) {
   const router = useRouter();
@@ -118,8 +92,6 @@ export function SettingsClient({ initial }: { initial: Settings }) {
           </div>
         </div>
       )}
-
-      <AppearanceSection />
 
       <Section title="Platform">
         <Field label="Platform name" sub="Shown in emails and pages">

@@ -14,7 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
 import { AdminGlobalSearch } from "./admin-global-search";
-import { AdminThemeToggle } from "@/components/admin/admin-theme-toggle";
 
 const NAV_GROUPS = [
   {
@@ -153,14 +152,11 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full bg-gray-950">
       {/* Brand */}
-      <div className="flex items-center justify-between px-4 pt-5 pb-3 shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-[30px] h-[30px] rounded-lg bg-rose-500 flex items-center justify-center shrink-0">
-            <Film className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-[14.5px] font-bold text-white tracking-tight">EditBridge</span>
+      <div className="flex items-center gap-2.5 px-4 pt-5 pb-3 shrink-0">
+        <div className="w-[30px] h-[30px] rounded-lg bg-rose-500 flex items-center justify-center shrink-0">
+          <Film className="w-4 h-4 text-white" />
         </div>
-        <AdminThemeToggle />
+        <span className="text-[14.5px] font-bold text-white tracking-tight">EditBridge</span>
       </div>
 
       {/* Search */}
