@@ -61,55 +61,55 @@ export function AdminGlobalSearch() {
       {/* Trigger button */}
       <button
         onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus(), 50); }}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-400 transition-colors w-full"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.05] hover:bg-white/10 text-gray-500 transition-colors w-full"
       >
         <Search className="w-3.5 h-3.5 shrink-0" />
         <span className="flex-1 text-left text-[12.5px]">Search</span>
-        <kbd className="text-[10px] font-medium bg-white border border-gray-200 rounded px-1.5 py-0.5 text-gray-400">⌘K</kbd>
+        <kbd className="text-[10px] font-medium bg-white/10 border border-white/10 rounded px-1.5 py-0.5 text-gray-600">⌘K</kbd>
       </button>
 
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
-          <div className="absolute inset-0 bg-black/20" onClick={() => setOpen(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-lg overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-              <Search className="w-4 h-4 text-gray-400 shrink-0" />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div className="relative bg-gray-900 rounded-2xl shadow-2xl border border-white/10 w-full max-w-lg overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06]">
+              <Search className="w-4 h-4 text-gray-500 shrink-0" />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Search users, orders, disputes…"
-                className="flex-1 text-sm outline-none text-gray-900 placeholder:text-gray-400"
+                className="flex-1 text-sm outline-none bg-transparent text-gray-100 placeholder:text-gray-600"
               />
               {query && (
-                <button onClick={() => { setQuery(""); setResults(null); }} className="text-gray-400 hover:text-gray-600">
+                <button onClick={() => { setQuery(""); setResults(null); }} className="text-gray-600 hover:text-gray-400">
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
             <div className="max-h-96 overflow-y-auto">
-              {loading && <p className="text-xs text-gray-400 text-center py-6">Searching…</p>}
+              {loading && <p className="text-xs text-gray-500 text-center py-6">Searching…</p>}
               {!loading && query.length >= 2 && !hasResults && (
-                <p className="text-xs text-gray-400 text-center py-6">No results for "{query}"</p>
+                <p className="text-xs text-gray-500 text-center py-6">No results for "{query}"</p>
               )}
               {!loading && query.length < 2 && (
-                <p className="text-xs text-gray-400 text-center py-6">Type at least 2 characters…</p>
+                <p className="text-xs text-gray-600 text-center py-6">Type at least 2 characters…</p>
               )}
 
               {results?.users && results.users.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 pt-3 pb-1">Users</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600 px-4 pt-3 pb-1">Users</p>
                   {results.users.map(u => (
                     <button key={u.id} onClick={() => go(`/admin/users/${u.id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left">
-                      <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                        <Users className="w-3.5 h-3.5 text-blue-600" />
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.05] transition-colors text-left">
+                      <div className="w-7 h-7 rounded-lg bg-blue-900/40 flex items-center justify-center shrink-0">
+                        <Users className="w-3.5 h-3.5 text-blue-400" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{u.name ?? u.email}</p>
-                        <p className="text-xs text-gray-400 truncate">{u.email} · {u.role}</p>
+                        <p className="text-sm font-medium text-gray-200 truncate">{u.name ?? u.email}</p>
+                        <p className="text-xs text-gray-500 truncate">{u.email} · {u.role}</p>
                       </div>
                     </button>
                   ))}
@@ -118,16 +118,16 @@ export function AdminGlobalSearch() {
 
               {results?.orders && results.orders.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 pt-3 pb-1">Orders</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600 px-4 pt-3 pb-1">Orders</p>
                   {results.orders.map(o => (
                     <button key={o.id} onClick={() => go(`/admin/orders/${o.id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left">
-                      <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                        <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.05] transition-colors text-left">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-900/40 flex items-center justify-center shrink-0">
+                        <ShoppingBag className="w-3.5 h-3.5 text-emerald-400" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{o.packageTitle}</p>
-                        <p className="text-xs text-gray-400 truncate">{o.clientName} · {o.status}</p>
+                        <p className="text-sm font-medium text-gray-200 truncate">{o.packageTitle}</p>
+                        <p className="text-xs text-gray-500 truncate">{o.clientName} · {o.status}</p>
                       </div>
                     </button>
                   ))}
@@ -136,16 +136,16 @@ export function AdminGlobalSearch() {
 
               {results?.disputes && results.disputes.length > 0 && (
                 <div className="pb-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 pt-3 pb-1">Disputes</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-600 px-4 pt-3 pb-1">Disputes</p>
                   {results.disputes.map(d => (
                     <button key={d.id} onClick={() => go(`/admin/disputes/${d.id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left">
-                      <div className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
-                        <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.05] transition-colors text-left">
+                      <div className="w-7 h-7 rounded-lg bg-red-900/40 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{d.reason}</p>
-                        <p className="text-xs text-gray-400">{d.status}</p>
+                        <p className="text-sm font-medium text-gray-200 truncate">{d.reason}</p>
+                        <p className="text-xs text-gray-500">{d.status}</p>
                       </div>
                     </button>
                   ))}

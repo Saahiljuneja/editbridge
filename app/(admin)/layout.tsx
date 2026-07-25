@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
+import { AdminThemeProvider } from "@/components/admin/admin-theme-provider";
 import type { UserRole } from "@/types";
 
 const ADMIN_ROLES: UserRole[] = [
@@ -22,11 +23,13 @@ export default async function AdminLayout({
   if (!ADMIN_ROLES.includes(session.user.role as UserRole)) redirect("/dashboard");
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        <AdminSidebar />
-        <main className="flex-1 min-w-0">{children}</main>
+    <AdminThemeProvider>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-200">
+        <div className="flex">
+          <AdminSidebar />
+          <main className="flex-1 min-w-0">{children}</main>
+        </div>
       </div>
-    </div>
+    </AdminThemeProvider>
   );
 }

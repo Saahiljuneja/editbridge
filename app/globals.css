@@ -141,6 +141,42 @@ html, body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ── Admin portal design tokens ─────────────────────────────────────────── */
+@layer utilities {
+  /* Page shell */
+  .a-page  { @apply px-8 py-7 space-y-7; }
+  /* Cards */
+  .a-card  { @apply rounded-2xl border border-gray-100 bg-white shadow-sm dark:bg-gray-900 dark:border-gray-800; }
+  .a-card-header { @apply px-6 py-4 border-b border-gray-100 dark:border-gray-800; }
+  /* Typography */
+  .a-eyebrow { @apply text-xs font-bold uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500; }
+  .a-h1   { @apply text-2xl font-black text-gray-900 dark:text-white tracking-tight; }
+  .a-h2   { @apply text-lg font-bold text-gray-900 dark:text-white; }
+  .a-h3   { @apply text-sm font-bold text-gray-900 dark:text-white; }
+  .a-muted{ @apply text-sm text-gray-500 dark:text-gray-400; }
+  .a-subtle{@apply text-xs text-gray-400 dark:text-gray-500; }
+  /* Table rows */
+  .a-row  { @apply border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors; }
+  /* Inputs */
+  .a-input { @apply bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600; }
+  /* Dividers */
+  .a-divider { @apply border-gray-100 dark:border-gray-800; }
+  /* Badges */
+  .a-badge { @apply text-xs font-semibold px-2 py-0.5 rounded-full; }
+  .a-badge-gray { @apply bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300; }
+  .a-badge-green { @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400; }
+  .a-badge-red   { @apply bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400; }
+  .a-badge-amber { @apply bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400; }
+  .a-badge-blue  { @apply bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400; }
+  /* Section label */
+  .a-section-label { @apply text-xs font-bold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-600 mb-3; }
+  /* Buttons */
+  .a-btn-ghost { @apply text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg px-3 py-1.5 transition-colors; }
+  .a-link { @apply text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2; }
+  /* Empty state */
+  .a-empty { @apply text-sm text-gray-400 dark:text-gray-600 text-center py-10; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
