@@ -72,7 +72,7 @@ export default async function AdminRevenuePage() {
             href="/api/admin/export/revenue"
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
           >
-            â†" Export CSV
+            &darr; Export CSV
           </a>
         </div>
       </div>
