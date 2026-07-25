@@ -72,7 +72,7 @@ export default async function AdminRevenuePage() {
             href="/api/admin/export/revenue"
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
           >
-            â†“ Export CSV
+            â†" Export CSV
           </a>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default async function AdminRevenuePage() {
           { label: "Platform Revenue", value: formatCurrency(totalRevenue), sub: "Commission collected (15%)", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
           { label: "Gross GMV", value: formatCurrency(totalGmv), sub: "Total completed order value", icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-50" },
           { label: "Editor Payouts", value: formatCurrency(totalPayouts), sub: "Total paid to editors", icon: Wallet, color: "text-purple-600", bg: "bg-purple-50" },
-          { label: "TDS Collected", value: formatCurrency(totalTdsCollected), sub: "Sec. 194J â€” deposit with IT dept", icon: Landmark, color: "text-orange-600", bg: "bg-orange-50" },
+          { label: "TDS Collected", value: formatCurrency(totalTdsCollected), sub: "Sec. 194J â€" deposit with IT dept", icon: Landmark, color: "text-orange-600", bg: "bg-orange-50" },
           { label: "Featured Revenue", value: formatCurrency(featuredRevenue), sub: "Paid featured listings", icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
         ].map((card) => (
           <div key={card.label} className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">

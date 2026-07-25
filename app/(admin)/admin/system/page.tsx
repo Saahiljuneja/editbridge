@@ -39,11 +39,11 @@ export default async function AdminSystemPage() {
 
   const services = [
     { name: "Database (PostgreSQL)", status: dbLatency < 500 ? "operational" : "degraded", latency: `${dbLatency}ms` },
-    { name: "Auth (NextAuth)", status: "operational", latency: "â€”" },
-    { name: "File Storage", status: "operational", latency: "â€”" },
-    { name: "Email (Resend)", status: "operational", latency: "â€”" },
-    { name: "Payment Gateway (Razorpay)", status: "operational", latency: "â€”" },
-    { name: "Push Notifications", status: "operational", latency: "â€”" },
+    { name: "Auth (NextAuth)", status: "operational", latency: "â€"" },
+    { name: "File Storage", status: "operational", latency: "â€"" },
+    { name: "Email (Resend)", status: "operational", latency: "â€"" },
+    { name: "Payment Gateway (Razorpay)", status: "operational", latency: "â€"" },
+    { name: "Push Notifications", status: "operational", latency: "â€"" },
   ];
 
   return (
@@ -58,7 +58,7 @@ export default async function AdminSystemPage() {
         <CheckCircle className="w-6 h-6 text-emerald-500 shrink-0" />
         <div>
           <p className="font-semibold text-emerald-900">All systems operational</p>
-          <p className="text-sm text-emerald-700 mt-0.5">No incidents reported Â· Last checked just now</p>
+          <p className="text-sm text-emerald-700 mt-0.5">No incidents reported &middot; Last checked just now</p>
         </div>
       </div>
 

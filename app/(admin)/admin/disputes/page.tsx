@@ -102,7 +102,7 @@ export default async function AdminDisputesPage({
 
   return (
     <div className="px-8 py-6 ">
-      <PageHeader title="Disputes" subtitle={`${openCount} open Â· ${resolvedCount} resolved`} />
+      <PageHeader title="Disputes" subtitle={`${openCount} open &middot; ${resolvedCount} resolved`} />
 
       {/* Tabs */}
       <div className="flex gap-1.5 mt-4 mb-5">
@@ -135,8 +135,8 @@ export default async function AdminDisputesPage({
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 text-sm">
-              <p className=”text-gray-400 dark:text-gray-500”>
-                Page {page} of {totalPages} Â· {offset + 1}â€”{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
+              <p className="text-gray-400 dark:text-gray-500">
+                Page {page} of {totalPages} &middot; {offset + 1}&ndash;{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
               </p>
               <div className="flex gap-2">
                 {page > 1 && (
@@ -144,7 +144,7 @@ export default async function AdminDisputesPage({
                     href={`/admin/disputes?tab=${tab}&page=${page - 1}`}
                     className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                   >
-                    â† Prev
+                    &larr; Prev
                   </Link>
                 )}
                 {page < totalPages && (
@@ -152,7 +152,7 @@ export default async function AdminDisputesPage({
                     href={`/admin/disputes?tab=${tab}&page=${page + 1}`}
                     className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                   >
-                    Next â†’
+                    Next &rarr;
                   </Link>
                 )}
               </div>

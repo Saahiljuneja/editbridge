@@ -70,12 +70,12 @@ export default async function AdminChargebacksPage() {
       </div>
 
       {/* Table */}
-      <div className=”rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden”>
-        <div className=”px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between”>
-          <p className=”text-sm font-semibold text-gray-900 dark:text-white”>Chargeback Cases</p>
-          <span className=”text-xs text-gray-400 dark:text-gray-500 italic”>Sample data â€” connect webhook to populate</span>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">Chargeback Cases</p>
+          <span className="text-xs text-gray-400 dark:text-gray-500 italic">Sample data â€" connect webhook to populate</span>
         </div>
-        <div className=”divide-y divide-gray-50 dark:divide-gray-800”>
+        <div className="divide-y divide-gray-50 dark:divide-gray-800">
           {MOCK_CHARGEBACKS.map(cb => (
             <div key={cb.id} className="flex items-center gap-4 px-6 py-4">
               <div className="flex-1 min-w-0">

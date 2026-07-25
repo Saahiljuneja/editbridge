@@ -51,26 +51,26 @@ export default async function AdminChatPage() {
         subtitle="Monitor all conversations and flagged messages"
       />
 
-      {/* â”€â”€ All Conversations â”€â”€ */}
+      {/* â"€â"€ All Conversations â"€â"€ */}
       <section>
         <div className="mb-4">
-          <h2 className=”text-base font-bold text-gray-900 dark:text-white”>All Conversations</h2>
-          <p className=”text-sm text-gray-400 dark:text-gray-500”>Every order chat â€” click to read the full thread.</p>
+          <h2 className="text-base font-bold text-gray-900 dark:text-white">All Conversations</h2>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Every order chat â€" click to read the full thread.</p>
         </div>
 
         <ConversationsTable orderId={undefined} />
       </section>
 
-      {/* â”€â”€ Flagged Messages â”€â”€ */}
+      {/* â"€â"€ Flagged Messages â"€â"€ */}
       <section>
         <div className="mb-4">
           <h2 className="text-base font-bold text-gray-900 dark:text-white">Flagged Messages</h2>
-          <p className="text-sm text-gray-400 dark:text-gray-500">{warnings} warning{warnings !== 1 ? "s" : ""} Â· {blocked} blocked</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{warnings} warning{warnings !== 1 ? "s" : ""} &middot; {blocked} blocked</p>
         </div>
 
         <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
           Users get <strong>3 warnings</strong> before messages are hard-blocked and hashed.
-          Blocked content is stored as a SHA-256 hash â€” unreadable to everyone.
+          Blocked content is stored as a SHA-256 hash â€" unreadable to everyone.
         </div>
 
         {flaggedMessages.length === 0 ? (
@@ -116,7 +116,7 @@ export default async function AdminChatPage() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate">
                       {row.isBlocked ? (
-                        <span className="text-gray-400 italic">[content hashed â€” unreadable]</span>
+                        <span className="text-gray-400 italic">[content hashed â€" unreadable]</span>
                       ) : (
                         row.content
                       )}
@@ -210,7 +210,7 @@ async function ConversationsTable(_: { orderId: undefined }) {
               <td className="px-4 py-3 text-right text-gray-400 dark:text-gray-500 text-xs whitespace-nowrap">{formatDateTime(row.lastMessageAt)}</td>
               <td className="px-4 py-3 text-right">
                 <Link href={`/admin/chat/${row.orderId}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2 whitespace-nowrap">
-                  View chat â†’
+                  View chat &rarr;
                 </Link>
               </td>
             </tr>

@@ -220,19 +220,19 @@ export default async function AdminOrdersPage({
         return (
           <div className="flex items-center justify-between mt-4 text-sm">
             <p className="text-gray-400 dark:text-gray-500">
-              Page {page} of {totalPages} Â· showing {offset + 1}â€“{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
+              Page {page} of {totalPages} &middot; showing {offset + 1}â€"{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
             </p>
             <div className="flex gap-2">
               {page > 1 && (
                 <Link href={`/admin/orders?${new URLSearchParams({ ...base, page: String(page - 1) }).toString()}`}
                   className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  â† Prev
+                  &larr; Prev
                 </Link>
               )}
               {page < totalPages && (
                 <Link href={`/admin/orders?${new URLSearchParams({ ...base, page: String(page + 1) }).toString()}`}
                   className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  Next â†’
+                  Next &rarr;
                 </Link>
               )}
             </div>
