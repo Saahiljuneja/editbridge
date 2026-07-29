@@ -138,7 +138,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
   }, [prefersReduced]);
 
   return (
-    <section ref={heroRef} className="relative h-[100dvh] min-h-[640px] bg-[#080E1A] overflow-hidden flex flex-col">
+    <section ref={heroRef} className="relative min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden bg-[#080E1A] overflow-x-hidden flex flex-col">
 
       {/* Film-cut flash on page load */}
       <motion.div className="absolute inset-0 bg-black z-50 pointer-events-none"
@@ -193,20 +193,20 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
       </motion.div>
 
       {/* Main content — centered */}
-      <div className="relative z-10 flex-1 flex items-center px-8 lg:px-16">
-        <div className="max-w-5xl mx-auto w-full pt-8 pb-14 text-center">
+      <div className="relative z-10 flex-1 flex items-center px-5 sm:px-8 lg:px-16">
+        <div className="max-w-5xl mx-auto w-full pt-6 pb-10 lg:pt-8 lg:pb-14 text-center">
 
           {/* Live badge */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/50 font-medium">
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-[11px] text-white/50 font-medium max-w-[90vw]">
             <motion.span animate={{ scale: [1, 1.8, 1] }} transition={{ duration: 1.8, repeat: Infinity }}
               className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
-            {availableCount > 0 ? `${availableCount} editors available now` : "Editors online now"} · KYC-verified · ₹0 fraud, ever
+            <span className="truncate">{availableCount > 0 ? `${availableCount} editors live` : "Editors online"} · KYC-verified · ₹0 fraud, ever</span>
           </motion.div>
 
           {/* Headline */}
-          <motion.div style={{ y: headY }} className="mb-6">
-            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white" style={{ fontSize: "clamp(3rem, 8vw, 7rem)" }}>
+          <motion.div style={{ y: headY }} className="mb-5">
+            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white" style={{ fontSize: "clamp(2.1rem, 8vw, 7rem)" }}>
               Hire the perfect<br />
               video editor for<br />
               <div className="overflow-hidden mt-1" style={{ height: "1.05em" }}>
@@ -226,13 +226,13 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
           {/* Description */}
           <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.7 }}
-            className="text-white/45 text-lg leading-relaxed font-medium mb-10 max-w-xl mx-auto">
+            className="text-white/45 text-sm sm:text-base md:text-lg leading-relaxed font-medium mb-6 max-w-xl mx-auto">
             Browse portfolios, compare packages, and hire KYC-verified editors — every payment held safely in escrow until you approve.
           </motion.p>
 
           {/* Search bar */}
           <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.75 }}
-            className="mb-6">
+            className="mb-4">
             <form action="/browse" method="get"
               className="flex items-center gap-2 bg-white rounded-2xl p-1.5 shadow-2xl shadow-black/50 max-w-2xl mx-auto">
               <Search className="w-5 h-5 text-gray-400 ml-3 shrink-0" />
@@ -251,8 +251,8 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
           {/* Niche quick-search chips */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.6 }}
-            className="mb-10">
-            <p className="text-xs text-white/25 font-bold mb-2.5 uppercase tracking-widest">Popular searches</p>
+            className="mb-6">
+            <p className="text-[10px] text-white/25 font-bold mb-2 uppercase tracking-widest">Popular searches</p>
             <div className="flex flex-wrap items-center justify-center gap-2">
             {[
               { label: "YouTube Videos", emoji: "▶️", q: "youtube" },
