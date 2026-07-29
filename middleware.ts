@@ -3,15 +3,12 @@ import { auth } from "@/lib/auth";
 
 export default auth(async (req) => {
   const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
   const user = req.auth?.user;
   const path = nextUrl.pathname;
 
-  // 1. Skip middleware for static assets, public API routes, NextAuth paths, and the maintenance page itself
+  // 1. Skip middleware for static assets and the maintenance page itself
   if (
     path.startsWith("/_next") ||
-    path.startsWith("/api/auth") ||
-    path.startsWith("/api/maintenance-check") ||
     path === "/favicon.ico" ||
     path === "/maintenance"
   ) {
@@ -57,6 +54,13 @@ export default auth(async (req) => {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    /*
+     * Match all request paths except:
+     * - api (NextAuth APIs, upload API routes, etc.)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
