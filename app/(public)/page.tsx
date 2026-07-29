@@ -1,6 +1,5 @@
 import {
   AnimatedHero,
-  AnimatedFindEditorCTA,
   AnimatedStats,
   AnimatedActivity,
   AnimatedHowItWorks,
@@ -9,7 +8,6 @@ import {
   AnimatedWhySection,
   AnimatedAbout,
   AnimatedScrollingReviews,
-  AnimatedCTA,
   ScrollProgressBar,
   AnimatedFAQ,
   StickyCtaBar,
@@ -19,7 +17,6 @@ import {
   LeaderboardTeaser,
   BlogPreviewSection,
   CombinedStrip,
-  PriceAnchorSection,
   GuaranteeBar,
   BackToTopButton,
   EscrowFlowSection,
@@ -264,8 +261,6 @@ export default async function HomePage() {
         <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} />
         {/* 3. Categories — browse by type right away */}
         <CategoryBrowseSection />
-        {/* Price anchoring — removes cost uncertainty */}
-        <PriceAnchorSection />
         {/* Escrow flow — builds payment trust */}
         <EscrowFlowSection />
         {/* Stats */}
@@ -275,7 +270,6 @@ export default async function HomePage() {
         <AnimatedActivity feedItems={activityFeed.length > 0 ? activityFeed : undefined} />
         {/* 10. How it works */}
         <AnimatedHowItWorks />
-        {quizEnabled && <AnimatedFindEditorCTA />}
         {/* 11. Leaderboard only when editors have real completed orders */}
         {showLeaderboard && <LeaderboardTeaser editors={leaderboardEditors} />}
         <AnimatedWhySection />
@@ -286,7 +280,6 @@ export default async function HomePage() {
         <BlogPreviewSection posts={blogPosts} />
         <AnimatedAbout />
         <AnimatedFAQ />
-        <AnimatedCTA />
       </div>
     </>
   );
