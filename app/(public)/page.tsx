@@ -12,7 +12,6 @@ import {
   AnimatedFAQ,
   StickyCtaBar,
   ForEditorsSection,
-  ShowcasePreviewSection,
   ComparisonSection,
   LeaderboardTeaser,
   BlogPreviewSection,
@@ -24,7 +23,7 @@ import {
 import { CategoryBrowseSection } from "@/components/home/category-browse-section";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { db } from "@/lib/db";
-import { editors, orders, portfolioItems, users, blogPosts } from "@/lib/db/schema";
+import { editors, orders, users, blogPosts } from "@/lib/db/schema";
 import { count, eq, desc, and, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { displayNameFromFull } from "@/lib/utils";
@@ -35,23 +34,10 @@ const getHomepageData = unstable_cache(
     const clientUsers = alias(users, "client_users");
     const editorUsers = alias(users, "editor_users");
 
-    const [quizEnabled, editorCountResult, completedOrdersResult, showcaseRows, leaderboardRows, activityRows, blogRows, editorRows, availableCountResult, totalPaidResult] = await Promise.all([
+    const [quizEnabled, editorCountResult, completedOrdersResult, leaderboardRows, activityRows, blogRows, editorRows, availableCountResult, totalPaidResult] = await Promise.all([
       isFeatureEnabled("find_editor_quiz"),
       db.select({ value: count() }).from(editors).where(eq(editors.kycStatus, "approved")),
       db.select({ value: count() }).from(orders).where(eq(orders.status, "completed")),
-      db.select({
-        id: portfolioItems.id,
-        title: portfolioItems.title,
-        category: portfolioItems.category,
-        editorName: users.name,
-        likesCount: portfolioItems.likesCount,
-        viewsCount: portfolioItems.viewsCount,
-      })
-      .from(portfolioItems)
-      .innerJoin(editors, and(eq(editors.id, portfolioItems.editorId), eq(editors.kycStatus, "approved")))
-      .innerJoin(users, eq(users.id, editors.userId))
-      .orderBy(desc(portfolioItems.likesCount))
-      .limit(3),
       db.select({
         id: editors.id,
         name: users.name,
@@ -132,14 +118,6 @@ const getHomepageData = unstable_cache(
     const showLeaderboard = leaderboardRows.some(e => e.totalOrders > 0);
     const editorCount = editorCountResult[0]?.value ?? 100;
     const completedOrders = completedOrdersResult[0]?.value ?? 0;
-    const showcaseItems = showcaseRows.map(r => ({
-      id: r.id,
-      title: r.title ?? "",
-      category: r.category ?? "",
-      editorName: displayNameFromFull(r.editorName ?? ""),
-      likesCount: r.likesCount,
-      viewsCount: r.viewsCount,
-    }));
     const leaderboardEditors = leaderboardRows.map(r => ({
       ...r,
       name: displayNameFromFull(r.name ?? ""),
@@ -183,7 +161,6 @@ const getHomepageData = unstable_cache(
       showLeaderboard,
       editorCount,
       completedOrders,
-      showcaseItems,
       leaderboardEditors,
       activityFeed,
       blogRows: serializedBlogRows,
@@ -202,7 +179,6 @@ export default async function HomePage() {
     showLeaderboard,
     editorCount,
     completedOrders,
-    showcaseItems,
     leaderboardEditors,
     activityFeed,
     blogRows,
@@ -273,7 +249,7 @@ export default async function HomePage() {
         {/* 11. Leaderboard only when editors have real completed orders */}
         {showLeaderboard && <LeaderboardTeaser editors={leaderboardEditors} />}
         <AnimatedWhySection />
-        <ShowcasePreviewSection items={showcaseItems} />
+
         <ComparisonSection />
         <AnimatedScrollingReviews />
         <ForEditorsSection />
