@@ -160,6 +160,11 @@ async function EditorGrid({ searchParams }: { searchParams: BrowseSearchParams }
 
   return (
     <div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm font-medium text-gray-700">
+          <span className="text-gray-900 font-bold">{data.total.toLocaleString("en-IN")}</span> editor{data.total !== 1 ? "s" : ""} found
+        </p>
+      </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {data.editors.map((editor) => (
           <EditorCard key={editor.id} {...editor} />
@@ -218,10 +223,12 @@ export default async function BrowsePage({
             {/* Active filters + result count bar */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-500">
-                  {hasFilters ? "Showing filtered results" : "All editors"}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                  <span className="text-sm text-gray-500 font-medium">
+                    {hasFilters ? "Filtered results" : "KYC-verified editors"}
+                  </span>
+                </div>
                 {hasFilters && (
                   <Link href="/browse" className="text-xs text-[var(--brand-client)] font-medium hover:underline">
                     Clear filters

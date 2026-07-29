@@ -262,17 +262,17 @@ export default async function HomePage() {
         <AnimatedHero availableCount={availableCount} />
         {/* 2. Editor cards — show who's on the platform immediately */}
         <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} />
-        {/* 5. Price anchoring — removes cost uncertainty */}
+        {/* 3. Categories — browse by type right away */}
+        <CategoryBrowseSection />
+        {/* Price anchoring — removes cost uncertainty */}
         <PriceAnchorSection />
-        {/* 6. Escrow flow — builds payment trust */}
+        {/* Escrow flow — builds payment trust */}
         <EscrowFlowSection />
-        {/* 7. Stats */}
+        {/* Stats */}
         <AnimatedStats editorCount={editorCount} completedOrders={completedOrders} totalPaid={totalPaid} />
         <GuaranteeBar />
-        {/* 8. Live activity */}
+        {/* Live activity */}
         <AnimatedActivity feedItems={activityFeed.length > 0 ? activityFeed : undefined} />
-        {/* 9. Category browse */}
-        <CategoryBrowseSection />
         {/* 10. How it works */}
         <AnimatedHowItWorks />
         {quizEnabled && <AnimatedFindEditorCTA />}

@@ -290,6 +290,21 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
               </div>
             </motion.div>
 
+            {/* Live marketplace stats strip */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.05, duration: 0.6 }}
+              className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-4">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                <span className="text-xs text-gray-500 font-semibold">{availableCount > 0 ? `${availableCount} available now` : "Editors online"}</span>
+              </div>
+              <span className="text-gray-300 text-xs select-none">·</span>
+              <span className="text-xs text-gray-500 font-semibold">4.9★ avg rating</span>
+              <span className="text-gray-300 text-xs select-none">·</span>
+              <span className="text-xs text-gray-500 font-semibold">Packages from ₹299</span>
+              <span className="text-gray-300 text-xs select-none">·</span>
+              <span className="text-xs text-gray-500 font-semibold">₹0 fraud</span>
+            </motion.div>
+
             {/* Mobile-only editor cards — visual anchor for small screens */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}
               className="mt-8 flex gap-2 overflow-x-auto pb-1 lg:hidden" style={{ scrollbarWidth: "none" }}>
@@ -333,126 +348,55 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 </div>
                 <div className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 mx-2">
                   <Lock className="w-3 h-3 text-gray-300" />
-                  <span className="text-[11px] text-gray-400 font-mono">editbridge.in/dashboard</span>
+                  <span className="text-[11px] text-gray-400 font-mono">editbridge.in/browse</span>
                 </div>
               </div>
 
-              {/* App shell */}
-              <div className="bg-white flex" style={{ height: 420 }}>
-
-                {/* Sidebar */}
-                <div className="w-48 bg-gray-50 border-r border-gray-100 flex flex-col shrink-0">
-                  <div className="p-4 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
-                        <span className="text-white text-[8px] font-black">E</span>
-                      </div>
-                      <span className="text-xs font-bold text-gray-900">EditBridge</span>
-                    </div>
-                  </div>
-                  <nav className="p-2 flex-1">
-                    {[
-                      { label: "Dashboard", active: false },
-                      { label: "My Orders",  active: true  },
-                      { label: "Messages",   active: false },
-                      { label: "Payments",   active: false },
-                      { label: "Settings",   active: false },
-                    ].map(({ label, active }) => (
-                      <div key={label} className={cn("px-3 py-2 rounded-lg text-[11px] font-medium mb-0.5 flex items-center gap-2", active ? "bg-[var(--brand-client)] text-white" : "text-gray-500 hover:bg-gray-100")}>
-                        <div className={cn("w-1.5 h-1.5 rounded-full", active ? "bg-white/60" : "bg-gray-300")} />
-                        {label}
-                      </div>
-                    ))}
-                  </nav>
-                  <div className="p-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-violet-500 flex items-center justify-center text-white text-[8px] font-black">RK</div>
-                      <div><p className="text-[10px] font-semibold text-gray-700">Rohan K.</p><p className="text-[9px] text-gray-400">Creator</p></div>
-                    </div>
+              {/* App shell — editor browse listing */}
+              <div className="bg-gray-50 flex flex-col overflow-hidden" style={{ height: 420 }}>
+                {/* Search bar */}
+                <div className="bg-white border-b border-gray-100 px-4 py-3">
+                  <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
+                    <Search className="w-3 h-3 text-gray-400 shrink-0" />
+                    <span className="text-[10px] text-gray-400 flex-1">Search by skill or niche…</span>
+                    <div className="bg-[var(--brand-client)] text-white text-[9px] font-bold px-2 py-0.5 rounded-lg shrink-0">Search</div>
                   </div>
                 </div>
-
-                {/* Main area */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-
-                  {/* Top bar */}
-                  <div className="border-b border-gray-100 px-5 py-3 flex items-center justify-between shrink-0">
-                    <div>
-                      <p className="text-xs font-bold text-gray-900">My Orders</p>
-                      <p className="text-[10px] text-gray-400">2 active · 1 delivered</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-[var(--brand-client)] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg">
-                      + New order
-                    </div>
-                  </div>
-
-                  {/* Order list + detail split */}
-                  <div className="flex flex-1 overflow-hidden">
-
-                    {/* Order list */}
-                    <div className="w-44 border-r border-gray-100 overflow-hidden shrink-0">
-                      {[
-                        { init: "AM", col: "var(--brand-editor)", name: "Arjun M.", tag: "In progress", tagCol: "var(--brand-client)", tagBg: "#f5f3ff" },
-                        { init: "PS", col: "#059669", name: "Priya S.",  tag: "Delivered",   tagCol: "#059669", tagBg: "#f0fdf4" },
-                        { init: "RK", col: "#ea580c", name: "Rahul K.", tag: "In progress", tagCol: "var(--brand-client)", tagBg: "#f5f3ff" },
-                      ].map(({ init, col, name, tag, tagCol, tagBg }, i) => (
-                        <div key={name} className={cn("px-3 py-3 border-b border-gray-50 flex items-center gap-2.5", i === 0 && "bg-[var(--brand-client)]/[0.04] border-l-2 border-l-[var(--brand-client)]")}>
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[9px] font-black shrink-0" style={{ background: col }}>{init}</div>
-                          <div className="min-w-0">
-                            <p className="text-[11px] font-semibold text-gray-800 truncate">{name}</p>
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ color: tagCol, background: tagBg }}>{tag}</span>
-                          </div>
+                {/* Category pills */}
+                <div className="px-4 py-2 bg-white border-b border-gray-100 flex gap-1.5 overflow-hidden shrink-0">
+                  {[{ l: "All", a: true }, { l: "YouTube", a: false }, { l: "Reels", a: false }, { l: "Wedding", a: false }, { l: "Shorts", a: false }].map(({ l, a }) => (
+                    <span key={l} className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0 ${a ? "bg-[var(--brand-client)] text-white" : "bg-gray-100 text-gray-500"}`}>{l}</span>
+                  ))}
+                </div>
+                {/* Editor cards */}
+                <div className="flex-1 overflow-hidden p-3 space-y-2">
+                  {[
+                    { i: "AM", c: "#7C3AED", n: "Arjun M.", s: "YouTube Long-form", r: "4.9", rv: 42, p: "₹3,500", av: true },
+                    { i: "PS", c: "#0EA5E9", n: "Priya S.", s: "Reels & Shorts",    r: "5.0", rv: 28, p: "₹1,200", av: true },
+                    { i: "DK", c: "#059669", n: "Divya K.", s: "Wedding Films",     r: "4.8", rv: 19, p: "₹6,000", av: false },
+                  ].map((e, editorIdx) => (
+                    <motion.div key={editorIdx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + editorIdx * 0.12 }}
+                      className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-[10px] font-black shrink-0" style={{ background: e.c }}>{e.i}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <p className="text-[11px] font-bold text-gray-900 truncate">{e.n}</p>
+                          <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${e.av ? "bg-emerald-50 text-emerald-600" : "bg-gray-50 text-gray-400"}`}>{e.av ? "Online" : "Busy"}</span>
                         </div>
-                      ))}
-                    </div>
-
-                    {/* Order detail */}
-                    <div className="flex-1 p-4 overflow-hidden flex flex-col gap-3">
-
-                      {/* Progress bar */}
-                      <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-[8px] font-black">AM</div>
-                            <div><p className="text-[10px] font-bold text-gray-900">Arjun Mehta</p><p className="text-[9px] text-gray-400">YouTube Edit · 15min</p></div>
-                          </div>
-                          <span className="text-[10px] font-black text-[var(--brand-client)]">{progress}%</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                          <motion.div className="h-full rounded-full bg-gradient-to-r from-[var(--brand-client)] to-[var(--brand-teal)]"
-                            animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
-                        </div>
-                        <div className="flex justify-between text-[9px] text-gray-400 mt-1.5">
-                          <span>Due tomorrow</span>
-                          <div className="flex items-center gap-1"><Lock className="w-2.5 h-2.5 text-emerald-500" /><span className="text-emerald-600 font-semibold">₹4,500 protected</span></div>
+                        <p className="text-[9px] text-gray-400 mb-1">{e.s}</p>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map(j => <Star key={j} className="w-2 h-2 fill-amber-400 text-amber-400" />)}
+                          <span className="text-[9px] text-gray-400 ml-0.5">{e.r} ({e.rv} reviews)</span>
                         </div>
                       </div>
-
-                      {/* Chat messages */}
-                      <div className="flex-1 space-y-2 overflow-hidden">
-                        {[
-                          { from: "them", msg: "Brief received! Starting with intro sequence.", time: "10:42" },
-                          { from: "me",   msg: "Jump cuts at 2:30 mark please.",               time: "10:45" },
-                          { from: "them", msg: "On it! Preview by 4pm today 👍",               time: "10:46" },
-                          { from: "me",   msg: "Perfect, thanks!",                             time: "10:47" },
-                        ].map((m, i) => (
-                          <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 + i * 0.1 }}
-                            className={cn("flex", m.from === "me" ? "justify-end" : "")}>
-                            <div className={cn("max-w-[75%] rounded-xl px-2.5 py-1.5 text-[10px] leading-relaxed", m.from === "me" ? "bg-[var(--brand-client)] text-white rounded-br-sm" : "bg-gray-100 text-gray-700 rounded-bl-sm")}>
-                              {m.msg}
-                            </div>
-                          </motion.div>
-                        ))}
+                      <div className="text-right shrink-0">
+                        <p className="text-[10px] font-black text-gray-900 mb-1.5">From {e.p}</p>
+                        <div className="bg-[var(--brand-client)] text-white text-[9px] font-bold px-2.5 py-1 rounded-lg text-center">Hire</div>
                       </div>
-
-                      {/* Chat input */}
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-gray-100 shrink-0">
-                        <span className="text-[10px] text-gray-300 flex-1">Type a message…</span>
-                        <div className="w-5 h-5 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
-                          <ArrowRight className="w-2.5 h-2.5 text-white" />
-                        </div>
-                      </div>
-                    </div>
+                    </motion.div>
+                  ))}
+                  <div className="text-center pt-1">
+                    <span className="text-[9px] text-[var(--brand-client)] font-semibold">View all 84 verified editors →</span>
                   </div>
                 </div>
               </div>
@@ -2859,16 +2803,16 @@ export function StickyCtaBar() {
               </p>
               <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
                 <Link
-                  href="/signup/client"
+                  href="/browse"
                   className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-sky-500/20"
                 >
-                  Post a Project
+                  Browse Editors <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
-                  href="/browse"
+                  href="/signup/client"
                   className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 text-sm font-bold px-5 py-2.5 rounded-xl transition-colors border border-gray-200 dark:border-gray-700"
                 >
-                  Find an Editor <ArrowRight className="w-3.5 h-3.5" />
+                  Sign up free
                 </Link>
               </div>
             </div>
