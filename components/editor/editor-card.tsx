@@ -3,6 +3,7 @@ import { Star, Clock, CheckCircle2, MapPin, Timer, ShieldCheck } from "lucide-re
 import { cn, displayNameFromFull, formatCurrency } from "@/lib/utils";
 import { SaveEditorButton } from "@/components/client/save-editor-button";
 import { CompareToggle } from "@/components/browse/compare-toggle";
+import { PortfolioPreview } from "@/components/common/portfolio-preview";
 
 export interface EditorCardProps {
   id: string;
@@ -24,6 +25,7 @@ export interface EditorCardProps {
   verifiedPortfolioCount?: number;
   isFeatured?: boolean;
   thumbnailUrl?: string | null;
+  videoUrl?: string | null;
 }
 
 const AVATAR_GRADIENTS = [
@@ -49,7 +51,7 @@ function parseNiches(raw: string | null | undefined): string[] {
 export function EditorCard({
   id, name, displayName, title, image, bio, niche, location,
   skills, minPrice, minDelivery, avgRating, reviewCount, totalOrders, isAvailable,
-  onTimeRate, verifiedPortfolioCount, isFeatured, thumbnailUrl,
+  onTimeRate, verifiedPortfolioCount, isFeatured, thumbnailUrl, videoUrl,
 }: EditorCardProps) {
   const shownName = displayName || displayNameFromFull(name);
   const initials = shownName.slice(0, 2).toUpperCase();
@@ -61,22 +63,7 @@ export function EditorCard({
     <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden">
       {/* Visual Thumbnail Preview (16:9 ratio) */}
       <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
-        {thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={thumbnailUrl}
-            alt={shownName}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex flex-col items-center gap-1.5 text-gray-300">
-            <svg className="w-8 h-8 stroke-[1.25]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <polygon points="23 7 16 12 23 17 23 7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-[10px] font-medium tracking-wide uppercase">Portfolio Preview</span>
-          </div>
-        )}
+        <PortfolioPreview videoUrl={videoUrl ?? null} thumbnailUrl={thumbnailUrl ?? null} altText={shownName} />
 
         {/* Compare checkbox overlay */}
         <div className="absolute top-3 left-3 z-10">

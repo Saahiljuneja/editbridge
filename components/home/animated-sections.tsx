@@ -13,6 +13,7 @@ import {
   TrendingUp, X, Check, Search, ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PortfolioPreview } from "@/components/common/portfolio-preview";
 
 /* ════════════════════════════════════════════════════════════════════════════
    SCROLL PROGRESS BAR
@@ -1129,6 +1130,8 @@ interface RealEditor {
   reviewCount: number;
   skills: string[];
   image?: string | null;
+  thumbnailUrl?: string | null;
+  videoUrl?: string | null;
 }
 
 const EDITORS = [
@@ -1168,9 +1171,11 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
           skills: (e.skills ?? []).slice(0, 3),
           orders: e.totalOrders,
           href: `/editor/${e.id}`,
+          thumbnailUrl: e.thumbnailUrl ?? null,
+          videoUrl: e.videoUrl ?? null,
         }))
         .filter(e => e.skills.length > 0) // hide incomplete/test accounts
-    : EDITORS.map(e => ({ ...e, image: null, isFeatured: false }));
+    : EDITORS.map(e => ({ ...e, image: null, isFeatured: false, thumbnailUrl: null, videoUrl: null }));
 
   const filteredEditors = activeFilter === "All"
     ? allEditors
@@ -1229,9 +1234,18 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
                   className="group relative rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
                   style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
                 >
+                  {/* Visual Preview Header (16:9 ratio) */}
+                  <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+                    <PortfolioPreview
+                      videoUrl={(e as any).videoUrl}
+                      thumbnailUrl={(e as any).thumbnailUrl}
+                      altText={e.name}
+                    />
+                  </div>
+
                   {/* Card header gradient */}
                   <div className="relative px-6 pt-6 pb-5 overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${e.col}12 0%, ${e.col}04 100%)` }}>
+                    style={{ background: `linear-gradient(135deg, ${e.col}08 0%, ${e.col}02 100%)` }}>
                     <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none" style={{ background: e.col }} />
                     {/* Avatar + badge row */}
                     <div className="relative flex items-start justify-between mb-4">

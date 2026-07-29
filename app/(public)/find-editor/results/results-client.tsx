@@ -27,6 +27,7 @@ interface Match {
   matchScore: number;
   matchReason: string;
   thumbnailUrl?: string | null;
+  videoUrl?: string | null;
 }
 
 interface MatchResult {
@@ -113,6 +114,7 @@ export function FindEditorResultsClient() {
                   onTimeRate={m.onTimeRate}
                   verifiedPortfolioCount={m.verifiedPortfolioCount}
                   thumbnailUrl={m.thumbnailUrl}
+                  videoUrl={m.videoUrl}
                 />
                 <Link
                   href={`/editor/${m.id}`}

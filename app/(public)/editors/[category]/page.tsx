@@ -118,6 +118,7 @@ async function getCategoryEditors(category: CategoryConfig) {
       avgRating: avgRatingExpr,
       reviewCount: sql<number>`COUNT(DISTINCT ${reviews.id})::int`,
       thumbnailUrl: sql<string | null>`(SELECT thumbnail_url FROM portfolio_items WHERE editor_id = ${editors.id} AND thumbnail_url IS NOT NULL AND is_hidden = false LIMIT 1)`,
+      videoUrl: sql<string | null>`(SELECT url FROM portfolio_items WHERE editor_id = ${editors.id} AND url IS NOT NULL AND is_hidden = false LIMIT 1)`,
     })
     .from(editors)
     .innerJoin(users, eq(editors.userId, users.id))

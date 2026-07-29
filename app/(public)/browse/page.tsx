@@ -58,6 +58,7 @@ async function fetchEditors(params: BrowseSearchParams) {
       verifiedPortfolioCount?: number;
       isFeatured?: boolean;
       thumbnailUrl?: string | null;
+      videoUrl?: string | null;
     }>;
     total: number;
     page: number;

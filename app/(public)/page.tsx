@@ -110,6 +110,7 @@ const getHomepageData = unstable_cache(
         reviewCount: sql<number>`COALESCE((SELECT COUNT(*)::int FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client'), 0)`,
         skills: sql<string[]>`COALESCE(ARRAY(SELECT name FROM skills WHERE editor_id = ${editors.id} LIMIT 3), ARRAY[]::text[])`,
         thumbnailUrl: sql<string | null>`(SELECT thumbnail_url FROM portfolio_items WHERE editor_id = ${editors.id} AND thumbnail_url IS NOT NULL AND is_hidden = false LIMIT 1)`,
+        videoUrl: sql<string | null>`(SELECT url FROM portfolio_items WHERE editor_id = ${editors.id} AND url IS NOT NULL AND is_hidden = false LIMIT 1)`,
       })
       .from(editors)
       .innerJoin(users, eq(users.id, editors.userId))
