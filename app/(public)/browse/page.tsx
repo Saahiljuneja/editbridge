@@ -3,7 +3,7 @@ import { SearchBar } from "@/components/common/search-bar";
 import { EditorCard } from "@/components/editor/editor-card";
 import { ComparePanel } from "@/components/browse/compare-panel";
 import { TopFilterBar } from "@/components/browse/top-filter-bar";
-import { Search } from "lucide-react";
+import { Search, ShieldCheck, Star, Lock } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -190,28 +190,65 @@ export default async function BrowsePage({
 
   return (
     <div className="min-h-screen bg-gray-50 pb-safe">
-      {/* Hero bar */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-                Browse KYC-verified editors
-              </h1>
-              <p className="text-sm text-gray-400 mt-0.5">Find, compare and hire — payment held safely in escrow.</p>
+      {/* Premium Hero */}
+      <div className="relative bg-[#080E1A] overflow-hidden">
+        {/* Ambient glow layers */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-64 rounded-full bg-[#0EA5E9]/20 blur-[96px]" />
+          <div className="absolute bottom-0 left-1/4 w-64 h-48 rounded-full bg-[#7C3AED]/15 blur-[72px]" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-48 rounded-full bg-[#0EA5E9]/10 blur-[72px]" />
+        </div>
+        {/* Subtle dot-grid texture */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)", backgroundSize: "28px 28px" }}
+        />
+
+        <div className="relative max-w-3xl mx-auto px-6 pt-12 pb-10 text-center">
+          {/* Live badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/60 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            KYC-verified editors · Escrow-protected · ₹0 fraud, ever
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-[1.1] mb-3">
+            Find your perfect{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-violet-400">
+              video editor
+            </span>
+          </h1>
+          <p className="text-sm md:text-base text-white/40 mb-8 font-medium">
+            Browse 100+ hand-verified editors. Pay only when you approve the work.
+          </p>
+
+          {/* Hero search bar */}
+          <div className="relative max-w-2xl mx-auto">
+            <Suspense>
+              <SearchBar
+                placeholder="Search by name, skill, or niche…"
+                inputClassName="py-4 pl-12 pr-4 text-base rounded-2xl border-transparent bg-white shadow-2xl shadow-black/40 focus:ring-2 focus:ring-sky-400/40 focus:border-transparent placeholder:text-gray-400"
+              />
+            </Suspense>
+          </div>
+
+          {/* Trust chips */}
+          <div className="flex items-center justify-center gap-6 mt-8 flex-wrap">
+            <div className="flex items-center gap-1.5 text-xs text-white/40 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              KYC-verified
             </div>
-            <div className="flex items-center gap-3 shrink-0 text-xs text-gray-400 font-medium">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                Editors online now
-              </span>
-              <span className="text-gray-200">|</span>
-              <span>4.9★ avg rating</span>
-              <span className="text-gray-200">|</span>
-              <span>₹0 fraud, ever</span>
+            <div className="w-px h-3 bg-white/10 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-white/40 font-medium">
+              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
+              4.9★ avg rating
+            </div>
+            <div className="w-px h-3 bg-white/10 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-white/40 font-medium">
+              <Lock className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              Escrow-protected payments
             </div>
           </div>
-          <SearchBar placeholder="Search by name, skill, or niche…" />
         </div>
       </div>
 

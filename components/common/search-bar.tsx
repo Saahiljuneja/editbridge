@@ -8,11 +8,13 @@ import { cn } from "@/lib/utils";
 interface SearchBarProps {
   placeholder?: string;
   className?: string;
+  inputClassName?: string;
 }
 
 export function SearchBar({
   placeholder = "Search editors…",
   className,
+  inputClassName,
 }: SearchBarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -57,7 +59,7 @@ export function SearchBar({
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className="w-full pl-9 pr-9 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 focus:border-[var(--brand-client)] transition-colors"
+        className={cn("w-full pl-9 pr-9 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 focus:border-[var(--brand-client)] transition-colors", inputClassName)}
       />
       {value && (
         <button

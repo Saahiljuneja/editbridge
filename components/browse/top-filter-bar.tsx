@@ -108,9 +108,9 @@ export function TopFilterBar() {
   const nicheLabel = NICHES.find(n => n.value === get("niche") && n.value)?.label;
 
   return (
-    <div ref={barRef} className="bg-white border-b border-gray-100 sticky top-0 z-20">
+    <div ref={barRef} className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20 shadow-sm">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center gap-2 py-2.5">
+        <div className="flex items-center gap-2 py-3">
 
           {/* Category dropdown */}
           <DropBtn
@@ -244,18 +244,18 @@ function DropBtn({
       <button
         onClick={onToggle}
         className={cn(
-          "flex items-center gap-1 h-8 px-3.5 rounded-xl border text-[13px] font-medium transition-colors whitespace-nowrap",
+          "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[13px] font-semibold transition-all whitespace-nowrap",
           active
-            ? "border-[var(--brand-client)]/40 text-[var(--brand-client)] bg-[var(--brand-client)]/5"
-            : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
+            ? "border-[var(--brand-client)] text-[var(--brand-client)] bg-[var(--brand-client)]/8 shadow-sm"
+            : "border-gray-200 text-gray-600 bg-white hover:border-gray-300 hover:shadow-sm"
         )}
       >
         {label}
-        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform shrink-0", open && "rotate-180")} />
+        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform shrink-0 opacity-60", open && "rotate-180")} />
       </button>
       {open && (
         <div className={cn(
-          "absolute right-0 top-full mt-2 bg-white rounded-2xl border border-gray-100 shadow-xl z-30 overflow-hidden",
+          "absolute left-0 top-full mt-2 bg-white rounded-2xl border border-gray-100 shadow-2xl shadow-black/8 z-30 overflow-hidden",
           panelWidth
         )}>
           {children}
