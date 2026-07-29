@@ -28,6 +28,8 @@ interface Match {
   matchReason: string;
   thumbnailUrl?: string | null;
   videoUrl?: string | null;
+  activeFrame?: string | null;
+  hasHighlight?: boolean;
 }
 
 interface MatchResult {
@@ -115,6 +117,8 @@ export function FindEditorResultsClient() {
                   verifiedPortfolioCount={m.verifiedPortfolioCount}
                   thumbnailUrl={m.thumbnailUrl}
                   videoUrl={m.videoUrl}
+                  activeFrame={m.activeFrame}
+                  hasHighlight={m.hasHighlight}
                 />
                 <Link
                   href={`/editor/${m.id}`}

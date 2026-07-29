@@ -43,6 +43,7 @@ export async function GET(
         kycStatus: editors.kycStatus,
         isAvailable: editors.isAvailable,
         createdAt: editors.createdAt,
+        activeFrame: editors.activeFrame,
       })
       .from(editors)
       .innerJoin(users, eq(editors.userId, users.id))

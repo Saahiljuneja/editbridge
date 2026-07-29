@@ -13,6 +13,7 @@ import { getThumbnailUrl, getEmbedUrl, isExternalVideo, getVideoSource } from "@
 import { PortfolioVideoPlayer } from "@/components/public/portfolio-video-player";
 import { RequestQuoteButton } from "@/components/client/request-quote-button";
 import { PackageClickLink } from "@/components/editor/package-click-link";
+import { FRAME_STYLES, type FrameKey } from "@/lib/xp-shop-config";
 
 interface Package {
   id: string;
@@ -84,6 +85,7 @@ interface EditorProfile {
   reviews: Review[];
   avgRating: number | null;
   reviewCount: number;
+  activeFrame: string | null;
 }
 
 function Stars({ rating }: { rating: number }) {
@@ -99,17 +101,18 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function Avatar({ src, name, size = 80 }: { src: string | null; name: string; size?: number }) {
+function Avatar({ src, name, size = 80, activeFrame }: { src: string | null; name: string; size?: number; activeFrame?: string | null }) {
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const shadow = activeFrame && FRAME_STYLES[activeFrame as FrameKey] ? FRAME_STYLES[activeFrame as FrameKey] : undefined;
   if (src) return (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={name} className="rounded-full object-cover"
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, boxShadow: shadow }}
       onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
   );
   return (
     <div className="rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-semibold shrink-0"
-      style={{ width: size, height: size, fontSize: size * 0.35 }}>
+      style={{ width: size, height: size, fontSize: size * 0.35, boxShadow: shadow }}>
       {initials}
     </div>
   );
@@ -460,7 +463,7 @@ export default function EditorPublicProfile() {
         <div className="flex items-end justify-between -mt-10">
           <div className="relative shrink-0">
             <div className="ring-4 ring-white rounded-full shadow-sm">
-              <Avatar src={editor.image} name={displayName} size={88} />
+              <Avatar src={editor.image} name={displayName} size={88} activeFrame={editor.activeFrame} />
             </div>
             {editor.kycStatus === "approved" && (
               <BadgeCheck className="absolute bottom-0.5 right-0.5 w-6 h-6 text-indigo-600 fill-white" />

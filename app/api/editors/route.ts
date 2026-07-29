@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { editors, users, packages, skills, reviews } from "@/lib/db/schema";
+import { editors, users, packages, skills, reviews, xpBoosts } from "@/lib/db/schema";
 import { and, eq, ilike, or, inArray, sql, asc, desc } from "drizzle-orm";
 import { getOnTimeRates, getVerifiedPortfolioCounts } from "@/lib/trust";
 import { isFeatureEnabled } from "@/lib/feature-flags";
@@ -32,13 +32,15 @@ export async function GET(request: NextRequest) {
           reviewCount: sql<number>`COUNT(DISTINCT ${reviews.id})::int`,
           thumbnailUrl: sql<string | null>`(SELECT thumbnail_url FROM portfolio_items WHERE editor_id = ${editors.id} AND thumbnail_url IS NOT NULL AND is_hidden = false LIMIT 1)`,
           videoUrl: sql<string | null>`(SELECT url FROM portfolio_items WHERE editor_id = ${editors.id} AND url IS NOT NULL AND is_hidden = false LIMIT 1)`,
+          activeFrame: editors.activeFrame,
+          hasHighlight: sql<boolean>`EXISTS (SELECT 1 FROM xp_boosts WHERE user_id = ${editors.userId} AND type = 'profile_highlight' AND (expires_at IS NULL OR expires_at > now()))`,
         })
         .from(editors)
         .innerJoin(users, eq(editors.userId, users.id))
         .leftJoin(packages, eq(packages.editorId, editors.id))
         .leftJoin(reviews, and(eq(reviews.revieweeId, editors.userId), eq(reviews.role, "client")))
         .where(inArray(editors.id, ids))
-        .groupBy(editors.id, users.id, editors.displayName, editors.niche, editors.location);
+        .groupBy(editors.id, users.id, editors.displayName, editors.niche, editors.location, editors.activeFrame);
       const skillRows = await db.select({ editorId: skills.editorId, name: skills.name }).from(skills).where(inArray(skills.editorId, ids));
       const skillsByEditor: Record<string, string[]> = {};
       for (const s of skillRows) {
@@ -131,11 +133,9 @@ export async function GET(request: NextRequest) {
     // underlying is_featured/featured_until state.
     const featuredPlacementEnabled = await isFeatureEnabled("featured_placement");
     const featuredBoostExpr = featuredPlacementEnabled
-      ? sql`(CASE WHEN ${editors.isFeatured} = true AND ${editors.featuredUntil} > now() AND (
-          SELECT COUNT(*) FROM editors e2
-          WHERE e2.is_featured = true AND e2.featured_until > now()
-            AND (e2.featured_until < ${editors.featuredUntil} OR (e2.featured_until = ${editors.featuredUntil} AND e2.id < ${editors.id}))
-        ) < 3 THEN 0 ELSE 1 END)`
+      ? sql`(CASE WHEN (${editors.isFeatured} = true AND ${editors.featuredUntil} > now()) OR EXISTS (
+          SELECT 1 FROM xp_boosts WHERE user_id = ${editors.userId} AND type = 'featured_boost' AND (expires_at IS NULL OR expires_at > now())
+        ) THEN 0 ELSE 1 END)`
       : sql`0::int`; // typed literal — a bare `0` gets parsed as an ORDER BY ordinal position, not a value
 
     let query = db
@@ -162,6 +162,8 @@ export async function GET(request: NextRequest) {
         reviewCount: sql<number>`COUNT(DISTINCT ${reviews.id})::int`,
         thumbnailUrl: sql<string | null>`(SELECT thumbnail_url FROM portfolio_items WHERE editor_id = ${editors.id} AND thumbnail_url IS NOT NULL AND is_hidden = false LIMIT 1)`,
         videoUrl: sql<string | null>`(SELECT url FROM portfolio_items WHERE editor_id = ${editors.id} AND url IS NOT NULL AND is_hidden = false LIMIT 1)`,
+        activeFrame: editors.activeFrame,
+        hasHighlight: sql<boolean>`EXISTS (SELECT 1 FROM xp_boosts WHERE user_id = ${editors.userId} AND type = 'profile_highlight' AND (expires_at IS NULL OR expires_at > now()))`,
       })
       .from(editors)
       .innerJoin(users, eq(editors.userId, users.id))
@@ -171,7 +173,7 @@ export async function GET(request: NextRequest) {
         and(eq(reviews.revieweeId, editors.userId), eq(reviews.role, "client"))
       )
       .where(and(...conditions))
-      .groupBy(editors.id, users.id, editors.displayName, editors.title, editors.niche, editors.location)
+      .groupBy(editors.id, users.id, editors.displayName, editors.title, editors.niche, editors.location, editors.activeFrame)
       .$dynamic();
 
     // Apply delivery days HAVING filter

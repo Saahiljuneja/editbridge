@@ -4,6 +4,7 @@ import { cn, displayNameFromFull, formatCurrency } from "@/lib/utils";
 import { SaveEditorButton } from "@/components/client/save-editor-button";
 import { CompareToggle } from "@/components/browse/compare-toggle";
 import { PortfolioPreview } from "@/components/common/portfolio-preview";
+import { FRAME_STYLES, type FrameKey } from "@/lib/xp-shop-config";
 
 export interface EditorCardProps {
   id: string;
@@ -26,6 +27,8 @@ export interface EditorCardProps {
   isFeatured?: boolean;
   thumbnailUrl?: string | null;
   videoUrl?: string | null;
+  activeFrame?: string | null;
+  hasHighlight?: boolean;
 }
 
 const AVATAR_GRADIENTS = [
@@ -51,7 +54,7 @@ function parseNiches(raw: string | null | undefined): string[] {
 export function EditorCard({
   id, name, displayName, title, image, bio, niche, location,
   skills, minPrice, minDelivery, avgRating, reviewCount, totalOrders, isAvailable,
-  onTimeRate, verifiedPortfolioCount, isFeatured, thumbnailUrl, videoUrl,
+  onTimeRate, verifiedPortfolioCount, isFeatured, thumbnailUrl, videoUrl, activeFrame, hasHighlight,
 }: EditorCardProps) {
   const shownName = displayName || displayNameFromFull(name);
   const initials = shownName.slice(0, 2).toUpperCase();
@@ -60,7 +63,10 @@ export function EditorCard({
   const filledStars = avgRating !== null ? Math.round(avgRating) : 0;
 
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden">
+    <div className={cn(
+      "group relative bg-white rounded-2xl border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden",
+      hasHighlight ? "border-sky-400 ring-2 ring-sky-100/50 shadow-[0_0_15px_rgba(14,165,233,0.15)] bg-gradient-to-b from-sky-50/10 via-white to-white" : "border-gray-100"
+    )}>
       {/* Visual Thumbnail Preview (16:9 ratio) */}
       <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
         <PortfolioPreview videoUrl={videoUrl ?? null} thumbnailUrl={thumbnailUrl ?? null} altText={shownName} />
@@ -92,7 +98,10 @@ export function EditorCard({
         <div className="flex items-start gap-3.5 mb-3">
           {/* Avatar */}
           <div className="relative shrink-0">
-            <div className={cn("w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm overflow-hidden", gradient)}>
+            <div
+              className={cn("w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm overflow-hidden", gradient)}
+              style={activeFrame && FRAME_STYLES[activeFrame as FrameKey] ? { boxShadow: FRAME_STYLES[activeFrame as FrameKey] } : undefined}
+            >
               {image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={image} alt={shownName} className="w-full h-full object-cover" />
