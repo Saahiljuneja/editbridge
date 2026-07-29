@@ -154,15 +154,15 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
         <motion.div animate={{ x: ["0%","10%","0%"], y: ["0%","8%","0%"], scale:[1,1.08,1] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-1/3 -left-1/4 w-[900px] h-[700px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.22), transparent 65%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.38), transparent 60%)" }} />
         <motion.div animate={{ x: ["0%","-8%","0%"], y: ["0%","10%","0%"] }}
           transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
           className="absolute -bottom-1/4 -right-1/4 w-[800px] h-[700px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.18), transparent 65%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.32), transparent 60%)" }} />
         <motion.div animate={{ x: ["0%","6%","0%"], y: ["0%","-8%","0%"] }}
           transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 10 }}
           className="absolute top-1/3 left-1/2 w-[600px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.10), transparent 65%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.18), transparent 60%)" }} />
       </div>
 
       {/* Mouse-tracking gradient orb — desktop only */}
@@ -194,11 +194,11 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
       {/* Main content — centered */}
       <div className="relative z-10 flex-1 flex items-center px-8 lg:px-16">
-        <div className="max-w-5xl mx-auto w-full py-16 text-center">
+        <div className="max-w-5xl mx-auto w-full pt-8 pb-14 text-center">
 
           {/* Live badge */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/50 font-medium">
+            className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/50 font-medium">
             <motion.span animate={{ scale: [1, 1.8, 1] }} transition={{ duration: 1.8, repeat: Infinity }}
               className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
             {availableCount > 0 ? `${availableCount} editors available now` : "Editors online now"} · KYC-verified · ₹0 fraud, ever
@@ -206,10 +206,10 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
           {/* Headline */}
           <motion.div style={{ y: headY }} className="mb-6">
-            <h1 className="font-black tracking-[-0.04em] leading-[0.9] text-white" style={{ fontSize: "clamp(3rem, 8vw, 7rem)" }}>
+            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white" style={{ fontSize: "clamp(3rem, 8vw, 7rem)" }}>
               Hire the perfect<br />
-              video editor for{" "}
-              <span className="inline-block overflow-hidden" style={{ height: "1.1em", verticalAlign: "bottom" }}>
+              video editor for<br />
+              <div className="overflow-hidden mt-1" style={{ height: "1.05em" }}>
                 <AnimatePresence mode="wait">
                   <motion.span key={idx}
                     initial={{ clipPath: "inset(0 100% 0 0)" }}
@@ -220,7 +220,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                     {NICHES[idx]}
                   </motion.span>
                 </AnimatePresence>
-              </span>
+              </div>
             </h1>
           </motion.div>
 
@@ -251,8 +251,9 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
           {/* Niche quick-search chips */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-2 mb-10">
-            <span className="text-xs text-white/30 font-bold">Popular:</span>
+            className="mb-10">
+            <p className="text-xs text-white/25 font-bold mb-2.5 uppercase tracking-widest">Popular searches</p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
             {[
               { label: "YouTube Videos", emoji: "▶️", q: "youtube" },
               { label: "Gaming Reels", emoji: "🎮", q: "gaming" },
@@ -275,6 +276,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 {chip.label}
               </motion.a>
             ))}
+            </div>
           </motion.div>
 
           {/* Social proof + stats */}
