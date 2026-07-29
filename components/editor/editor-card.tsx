@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Star, Zap } from "lucide-react";
+import { Star, Clock, CheckCircle2, MapPin, Timer, ShieldCheck } from "lucide-react";
 import { cn, displayNameFromFull, formatCurrency } from "@/lib/utils";
 import { SaveEditorButton } from "@/components/client/save-editor-button";
 import { CompareToggle } from "@/components/browse/compare-toggle";
@@ -31,19 +31,19 @@ export interface EditorCardProps {
   hasHighlight?: boolean;
 }
 
-const GRADIENTS = [
-  ["#0EA5E9", "#6366F1"],
-  ["#6366F1", "#8B5CF6"],
-  ["#10B981", "#0EA5E9"],
-  ["#F43F5E", "#EC4899"],
-  ["#F97316", "#FBBF24"],
-  ["#06B6D4", "#3B82F6"],
+const AVATAR_GRADIENTS = [
+  "from-sky-500 to-blue-600",
+  "from-blue-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-rose-500 to-pink-600",
+  "from-orange-500 to-amber-600",
+  "from-cyan-500 to-blue-600",
 ];
 
-function cardGradient(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = id.charCodeAt(i) + ((h << 5) - h);
-  return GRADIENTS[Math.abs(h) % GRADIENTS.length];
+function avatarGradient(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_GRADIENTS[Math.abs(hash) % AVATAR_GRADIENTS.length];
 }
 
 function parseNiches(raw: string | null | undefined): string[] {
@@ -51,62 +51,36 @@ function parseNiches(raw: string | null | undefined): string[] {
   try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [raw]; } catch { return [raw]; }
 }
 
-function formatReviewCount(n: number) {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k+`;
-  return `${n}`;
-}
-
 export function EditorCard({
   id, name, displayName, title, image, bio, niche, location,
   skills, minPrice, minDelivery, avgRating, reviewCount, totalOrders, isAvailable,
-  isFeatured, thumbnailUrl, videoUrl, activeFrame, hasHighlight,
+  onTimeRate, verifiedPortfolioCount, isFeatured, thumbnailUrl, videoUrl, activeFrame, hasHighlight,
 }: EditorCardProps) {
   const shownName = displayName || displayNameFromFull(name);
   const initials = shownName.slice(0, 2).toUpperCase();
-  const [c1, c2] = cardGradient(id);
+  const gradient = avatarGradient(id);
   const niches = parseNiches(niche);
-  const cardTitle = title || niches[0] || skills[0] || "Video Editor";
-  const hasMedia = !!(thumbnailUrl || videoUrl);
+  const filledStars = avgRating !== null ? Math.round(avgRating) : 0;
 
   return (
     <div className={cn(
-      "group relative bg-white rounded-xl border flex flex-col overflow-hidden transition-all duration-200",
-      "hover:shadow-xl hover:-translate-y-1",
-      hasHighlight
-        ? "border-sky-300 shadow-[0_0_18px_rgba(14,165,233,0.18)] ring-1 ring-sky-100"
-        : "border-gray-200 shadow-sm"
+      "group relative bg-white rounded-2xl border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden",
+      hasHighlight ? "border-sky-400 ring-2 ring-sky-100/50 shadow-[0_0_15px_rgba(14,165,233,0.15)] bg-gradient-to-b from-sky-50/10 via-white to-white" : "border-gray-100"
     )}>
+      {/* Visual Thumbnail Preview (16:9 ratio) */}
+      <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+        <PortfolioPreview videoUrl={videoUrl ?? null} thumbnailUrl={thumbnailUrl ?? null} altText={shownName} />
 
-      {/* ── Thumbnail / media area ── */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-50 shrink-0">
-        {hasMedia ? (
-          <PortfolioPreview
-            videoUrl={videoUrl ?? null}
-            thumbnailUrl={thumbnailUrl ?? null}
-            altText={shownName}
-          />
-        ) : (
-          /* Gradient placeholder with large initials */
-          <div
-            className="w-full h-full flex items-center justify-center relative"
-            style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
-          >
-            <div className="absolute inset-0">
-              <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full bg-white/10 translate-y-1/2 -translate-x-1/2" />
-            </div>
-            <span className="text-white/25 text-8xl font-black select-none relative z-10">{initials}</span>
-          </div>
-        )}
-
-        {/* Overlays */}
-        <div className="absolute top-2.5 left-2.5 z-10">
+        {/* Compare checkbox overlay */}
+        <div className="absolute top-3 left-3 z-10">
           <CompareToggle editorId={id} />
         </div>
-        <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
+
+        {/* Featured badge + save button overlay */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
           {isFeatured && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/90 text-white backdrop-blur-sm shadow-sm">
-              <Star className="w-2.5 h-2.5 fill-white text-white" /> Featured
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+              <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
             </span>
           )}
           <SaveEditorButton
@@ -117,74 +91,150 @@ export function EditorCard({
             totalOrders={totalOrders}
           />
         </div>
-
-        {/* Availability dot */}
-        {isAvailable !== false && (
-          <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-semibold text-white">Available</span>
-          </div>
-        )}
       </div>
 
-      {/* ── Card body ── */}
-      <Link href={`/editor/${id}`} className="flex flex-col flex-1 p-3 pt-2.5">
-        {/* Seller row: avatar + name */}
-        <div className="flex items-center gap-2 mb-2">
-          <div
-            className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold"
-            style={{
-              background: `linear-gradient(135deg, ${c1}, ${c2})`,
-              ...(activeFrame && FRAME_STYLES[activeFrame as FrameKey]
-                ? { boxShadow: FRAME_STYLES[activeFrame as FrameKey] }
-                : {}),
-            }}
-          >
-            {image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} alt={shownName} className="w-full h-full object-cover" />
-            ) : (
-              <span>{initials}</span>
+      {/* Top section */}
+      <div className="p-5 pb-0">
+        <div className="flex items-start gap-3.5 mb-3">
+          {/* Avatar */}
+          <div className="relative shrink-0">
+            <div
+              className={cn("w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm overflow-hidden", gradient)}
+              style={activeFrame && FRAME_STYLES[activeFrame as FrameKey] ? { boxShadow: FRAME_STYLES[activeFrame as FrameKey] } : undefined}
+            >
+              {image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={image} alt={shownName} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white text-lg font-bold">{initials}</span>
+              )}
+            </div>
+            {isAvailable !== false && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-white" />
             )}
           </div>
-          <p className="text-sm font-semibold text-gray-900 truncate flex-1">{shownName}</p>
-          {totalOrders >= 10 && (
-            <span className="shrink-0 text-[10px] font-bold text-amber-500">★★</span>
-          )}
+
+          {/* Identity */}
+          <div className="min-w-0 flex-1 pr-6">
+            <p className="font-bold text-gray-900 text-sm leading-tight truncate">{shownName}</p>
+            {title ? (
+              <p className="text-xs text-gray-500 mt-0.5 truncate">{title}</p>
+            ) : niches[0] ? (
+              <p className="text-xs text-gray-500 mt-0.5 truncate">{niches[0]}</p>
+            ) : skills[0] ? (
+              <p className="text-xs text-gray-400 mt-0.5 truncate">{skills[0]}</p>
+            ) : null}
+            {/* Rating */}
+            <div className="flex items-center gap-1 mt-1.5">
+              {avgRating !== null ? (
+                <>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className={cn("w-3 h-3", i < filledStars ? "fill-amber-400 text-amber-400" : "text-gray-200 fill-gray-100")} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-semibold text-gray-700">{avgRating}</span>
+                  <span className="text-[10px] text-gray-400">({reviewCount})</span>
+                </>
+              ) : (
+                <span className="text-[10px] text-gray-400">New editor</span>
+              )}
+            </div>
+            {/* Trust badges — auto-calculated, never self-reported */}
+            {(onTimeRate != null || (verifiedPortfolioCount ?? 0) > 0) && (
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                {onTimeRate != null && (
+                  <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">
+                    <Timer className="w-2.5 h-2.5" /> {onTimeRate}% on-time
+                  </span>
+                )}
+                {(verifiedPortfolioCount ?? 0) > 0 && (
+                  <span className="flex items-center gap-1 text-[10px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 rounded-full px-1.5 py-0.5">
+                    <ShieldCheck className="w-2.5 h-2.5" /> {verifiedPortfolioCount} verified
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Gig title */}
-        <p className="text-sm text-gray-700 leading-snug line-clamp-2 mb-3 flex-1">{cardTitle}</p>
+        {/* Bio */}
+        {bio ? (
+          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-3">{bio}</p>
+        ) : (
+          <div className="mb-3" />
+        )}
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2.5">
-          {avgRating !== null ? (
-            <>
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-sm font-bold text-gray-900">{avgRating}</span>
-              <span className="text-xs text-gray-400 font-medium">({formatReviewCount(reviewCount)})</span>
-            </>
-          ) : (
-            <span className="flex items-center gap-1 text-xs text-[var(--brand-client)] font-medium">
-              <Zap className="w-3 h-3" /> New
+        {/* Niche chips */}
+        {niches.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {niches.slice(0, 2).map((n) => (
+              <span key={n} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
+                {n}
+              </span>
+            ))}
+            {niches.length > 2 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-400">+{niches.length - 2}</span>
+            )}
+          </div>
+        )}
+
+        {/* Skills */}
+        <div className="flex flex-wrap gap-1 mb-3">
+          {skills.slice(0, 3).map((skill) => (
+            <span key={skill} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
+              {skill}
+            </span>
+          ))}
+          {skills.length > 3 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
+              +{skills.length - 3}
             </span>
           )}
         </div>
+      </div>
 
-        {/* Price */}
-        <div className="border-t border-gray-100 pt-2.5 flex items-center justify-between">
+      {/* Divider */}
+      <div className="border-t border-gray-50 mx-5" />
+
+      {/* Footer */}
+      <div className="p-4 flex items-center justify-between gap-3 mt-auto">
+        <div className="min-w-0">
           {minPrice !== null ? (
-            <p className="text-sm text-gray-900">
-              From <span className="font-bold">{formatCurrency(minPrice)}</span>
+            <p className="text-xs text-gray-400 leading-tight">
+              From <span className="text-sm font-bold text-gray-900">{formatCurrency(minPrice)}</span>
             </p>
           ) : (
-            <p className="text-sm font-semibold text-[var(--brand-client)]">Free consultation</p>
+            <p className="text-xs text-gray-400">No packages yet</p>
           )}
-          {minDelivery != null && (
-            <span className="text-[11px] text-gray-400">{minDelivery}d delivery</span>
-          )}
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            {minDelivery != null && (
+              <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                <Clock className="w-3 h-3" /> {minDelivery}d
+              </span>
+            )}
+            {totalOrders > 0 && (
+              <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                <CheckCircle2 className="w-3 h-3 text-green-500" /> {totalOrders} orders
+              </span>
+            )}
+            {location && (
+              <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                <MapPin className="w-3 h-3" /> {location}
+              </span>
+            )}
+          </div>
         </div>
-      </Link>
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
+          <Link
+            href={`/editor/${id}`}
+            className="px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors"
+            style={{ background: "var(--brand-client)" }}
+          >
+            View Profile
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
