@@ -1,10 +1,9 @@
 import { Suspense } from "react";
-import { FilterPanel } from "@/components/common/filter-panel";
 import { SearchBar } from "@/components/common/search-bar";
 import { EditorCard } from "@/components/editor/editor-card";
-import { MobileFilterDrawer } from "@/components/browse/mobile-filter-drawer";
 import { ComparePanel } from "@/components/browse/compare-panel";
-import { Search, Users } from "lucide-react";
+import { TopFilterBar } from "@/components/browse/top-filter-bar";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +23,6 @@ interface BrowseSearchParams {
 
 async function fetchEditors(params: BrowseSearchParams) {
   const url = new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/editors`);
-  // `compare` is UI-only — never pass it to the API
   if (params.q) url.searchParams.set("q", params.q);
   if (params.niche) url.searchParams.set("niche", params.niche);
   if (params.experience) url.searchParams.set("experience", params.experience);
@@ -68,8 +66,8 @@ async function fetchEditors(params: BrowseSearchParams) {
 
 function EditorGridSkeleton() {
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {Array.from({ length: 9 }).map((_, i) => (
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="rounded-2xl border border-gray-100 bg-white p-5 space-y-3 animate-pulse">
           <div className="flex items-start gap-3.5">
             <div className="w-14 h-14 rounded-xl bg-gray-100 shrink-0" />
@@ -98,8 +96,9 @@ function EditorGridSkeleton() {
 }
 
 function PaginationBar({ page, totalPages, searchParams }: { page: number; totalPages: number; searchParams: BrowseSearchParams }) {
+  const maxPages = Math.min(totalPages, 7);
   return (
-    <div className="flex items-center justify-center gap-3 mt-10">
+    <div className="flex items-center justify-center gap-2 mt-10">
       {page > 1 && (
         <Link
           href={{ query: { ...searchParams, page: page - 1 } }}
@@ -109,14 +108,14 @@ function PaginationBar({ page, totalPages, searchParams }: { page: number; total
         </Link>
       )}
       <div className="flex items-center gap-1">
-        {Array.from({ length: Math.min(totalPages, 7) }).map((_, i) => {
+        {Array.from({ length: maxPages }).map((_, i) => {
           const p = i + 1;
           return (
             <Link
               key={p}
               href={{ query: { ...searchParams, page: p } }}
               className={cn(
-                "w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors",
+                "w-9 h-9 flex items-center justify-center rounded-xl text-sm font-medium transition-colors",
                 p === page
                   ? "bg-[var(--brand-client)] text-white"
                   : "text-gray-500 hover:bg-gray-100"
@@ -145,7 +144,7 @@ async function EditorGrid({ searchParams }: { searchParams: BrowseSearchParams }
 
   if (data.editors.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex flex-col items-center justify-center py-24 text-center">
         <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
           <Search className="w-7 h-7 text-gray-400" />
         </div>
@@ -160,12 +159,17 @@ async function EditorGrid({ searchParams }: { searchParams: BrowseSearchParams }
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-medium text-gray-700">
-          <span className="text-gray-900 font-bold">{data.total.toLocaleString("en-IN")}</span> editor{data.total !== 1 ? "s" : ""} found
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-sm text-gray-500">
+          <span className="font-bold text-gray-900">{data.total.toLocaleString("en-IN")}</span>{" "}
+          editor{data.total !== 1 ? "s" : ""} found
         </p>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+          <span className="text-xs text-gray-400 font-medium">KYC-verified</span>
+        </div>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {data.editors.map((editor) => (
           <EditorCard key={editor.id} {...editor} />
         ))}
@@ -183,16 +187,13 @@ export default async function BrowsePage({
   searchParams: Promise<BrowseSearchParams>;
 }) {
   const params = await searchParams;
-  const hasFilters = !!(params.q || params.niche || params.experience || params.min_price || params.max_price || params.delivery || params.min_rating || params.sort);
-  const activeFilterCount = ["niche", "experience", "min_price", "max_price", "delivery", "min_rating", "sort"]
-    .filter((k) => !!(params as Record<string, string | undefined>)[k]).length;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-safe">
       {/* Hero bar */}
       <div className="bg-white border-b border-gray-100">
-        <div className="px-8 py-6 sm:px-6 py-8">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between mb-6">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-3 justify-between mb-5">
             <div>
               <p className="text-xs font-bold text-[var(--brand-client)] uppercase tracking-widest mb-1">Marketplace</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
@@ -211,41 +212,19 @@ export default async function BrowsePage({
         </div>
       </div>
 
-      <div className="px-8 py-6 sm:px-6 py-8">
-        <div className="flex gap-8 items-start">
-          {/* Filter sidebar */}
-          <aside className="hidden lg:block w-56 shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 sticky top-6">
-            <FilterPanel />
-          </aside>
+      {/* Horizontal filter bar — sticky */}
+      <Suspense>
+        <TopFilterBar />
+      </Suspense>
 
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
-            {/* Active filters + result count bar */}
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                  <span className="text-sm text-gray-500 font-medium">
-                    {hasFilters ? "Filtered results" : "KYC-verified editors"}
-                  </span>
-                </div>
-                {hasFilters && (
-                  <Link href="/browse" className="text-xs text-[var(--brand-client)] font-medium hover:underline">
-                    Clear filters
-                  </Link>
-                )}
-              </div>
-              <MobileFilterDrawer activeCount={activeFilterCount} />
-            </div>
-
-            <Suspense fallback={<EditorGridSkeleton />}>
-              <EditorGrid searchParams={params} />
-            </Suspense>
-          </div>
-        </div>
+      {/* Editor grid */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <Suspense fallback={<EditorGridSkeleton />}>
+          <EditorGrid searchParams={params} />
+        </Suspense>
       </div>
 
-      {/* Editor comparison panel — fixed to bottom, self-fetches data */}
+      {/* Editor comparison panel */}
       <Suspense>
         <ComparePanel />
       </Suspense>
