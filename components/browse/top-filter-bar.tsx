@@ -133,7 +133,6 @@ export function TopFilterBar() {
 
           {/* Category dropdown */}
           <DropBtn
-            id="niche"
             label={nicheLabel ?? "Category"}
             active={!!nicheLabel}
             open={open === "niche"}
@@ -151,7 +150,6 @@ export function TopFilterBar() {
 
           {/* Sort */}
           <DropBtn
-            id="sort"
             label={sortLabel ?? "Sort"}
             active={!!sortLabel}
             open={open === "sort"}
@@ -166,7 +164,6 @@ export function TopFilterBar() {
 
           {/* Delivery */}
           <DropBtn
-            id="delivery"
             label={deliveryLabel ?? "Delivery"}
             active={!!deliveryLabel}
             open={open === "delivery"}
@@ -181,7 +178,6 @@ export function TopFilterBar() {
 
           {/* Rating */}
           <DropBtn
-            id="rating"
             label={ratingActive ? `★ ${RATING_OPTIONS.find(r => r.value === ratingActive)?.label ?? ratingActive}` : "Rating"}
             active={!!ratingActive}
             open={open === "rating"}
@@ -197,7 +193,6 @@ export function TopFilterBar() {
 
           {/* Budget */}
           <DropBtn
-            id="budget"
             label={budgetActive
               ? `₹${get("min_price") || "0"} – ₹${get("max_price") || "∞"}`
               : "Budget"}

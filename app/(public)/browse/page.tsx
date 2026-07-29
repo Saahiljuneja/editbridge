@@ -59,7 +59,6 @@ async function fetchEditors(params: BrowseSearchParams) {
       isFeatured?: boolean;
       thumbnailUrl?: string | null;
       videoUrl?: string | null;
-      isAvailable?: boolean;
     }>;
     total: number;
     page: number;

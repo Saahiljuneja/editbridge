@@ -119,7 +119,6 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
   const [progress, setProgress] = useState(54);
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const cardsY = useTransform(scrollYProgress, [0, 1], ["0%", "-18%"]);
   const headY  = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
   const prefersReduced = useReducedMotion();
 
@@ -139,299 +138,184 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
   }, [prefersReduced]);
 
   return (
-    <section ref={heroRef} className="relative min-h-screen bg-[#FAF5FF] overflow-hidden flex flex-col">
+    <section ref={heroRef} className="relative min-h-screen bg-[#080E1A] overflow-hidden flex flex-col">
 
-      {/* Film-cut flash on page load (Fix 22) */}
+      {/* Film-cut flash on page load */}
       <motion.div className="absolute inset-0 bg-black z-50 pointer-events-none"
         initial={{ opacity: 0.85 }} animate={{ opacity: 0 }}
         transition={{ duration: 0.07, ease: "linear" }} />
 
       {/* Subtle dot grid */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ backgroundImage: "radial-gradient(#d1d5db 1px, transparent 1px)", backgroundSize: "36px 36px" }} />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
 
-      {/* Soft aurora blobs — light pastel */}
+      {/* Ambient glow blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div animate={{ x: ["0%","12%","0%"], y: ["0%","8%","0%"], scale:[1,1.1,1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-1/2 -left-1/4 w-[900px] h-[700px] rounded-full opacity-30"
-          style={{ background: "radial-gradient(ellipse, #c4b5fd, transparent 65%)" }} />
-        <motion.div animate={{ x: ["0%","-10%","0%"], y: ["0%","12%","0%"] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 5 }}
-          className="absolute -bottom-1/4 -right-1/4 w-[800px] h-[700px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(ellipse, #6ee7b7, transparent 65%)" }} />
-        <motion.div animate={{ x: ["0%","8%","0%"], y: ["0%","-10%","0%"] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 10 }}
-          className="absolute top-1/3 left-1/2 w-[600px] h-[500px] rounded-full opacity-15"
-          style={{ background: "radial-gradient(ellipse, #a5b4fc, transparent 65%)" }} />
+        <motion.div animate={{ x: ["0%","10%","0%"], y: ["0%","8%","0%"], scale:[1,1.08,1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-1/3 -left-1/4 w-[900px] h-[700px] rounded-full"
+          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.22), transparent 65%)" }} />
+        <motion.div animate={{ x: ["0%","-8%","0%"], y: ["0%","10%","0%"] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+          className="absolute -bottom-1/4 -right-1/4 w-[800px] h-[700px] rounded-full"
+          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.18), transparent 65%)" }} />
+        <motion.div animate={{ x: ["0%","6%","0%"], y: ["0%","-8%","0%"] }}
+          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 10 }}
+          className="absolute top-1/3 left-1/2 w-[600px] h-[500px] rounded-full"
+          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.10), transparent 65%)" }} />
       </div>
 
-      {/* Mouse-tracking gradient orb — desktop only (Fix 12) */}
+      {/* Mouse-tracking gradient orb — desktop only */}
       <motion.div
         className="absolute pointer-events-none hidden lg:block rounded-full z-0"
         style={{ top: 0, left: 0, x: orbXPos, y: orbYPos, opacity: orbOpacity, width: 600, height: 600,
-          background: "radial-gradient(ellipse at center, rgba(124,111,247,0.45) 0%, rgba(14,165,233,0.18) 45%, transparent 68%)",
+          background: "radial-gradient(ellipse at center, rgba(14,165,233,0.35) 0%, rgba(124,58,237,0.15) 45%, transparent 68%)",
           filter: "blur(32px)" }}
       />
 
       {/* Top announcement bar */}
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-        className="relative z-10 border-b border-gray-100 py-3 px-6 bg-white/80 backdrop-blur-sm">
+        className="relative z-10 border-b border-white/8 py-3 px-6 bg-white/5 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <motion.span animate={{ scale: [1, 1.8, 1] }} transition={{ duration: 1.8, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-            <span className="text-[11px] text-gray-500 font-medium tracking-wide">India&apos;s verified video editing marketplace · Launched 2026</span>
+              className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+            <span className="text-[11px] text-white/40 font-medium tracking-wide">India&apos;s verified video editing marketplace · Launched 2026</span>
           </div>
-          <div className="hidden md:flex items-center divide-x divide-gray-100">
+          <div className="hidden md:flex items-center divide-x divide-white/8">
             {([["KYC Verified", ShieldCheck], ["Payment Protected", Lock], ["Revisions Included", CheckCircle]] as const).map(([label, Icon]) => (
-              <span key={label} className="flex items-center gap-1.5 px-4 text-[11px] text-gray-400 font-medium">
-                <Icon className="w-3 h-3 text-[var(--brand-client)]" />{label}
+              <span key={label} className="flex items-center gap-1.5 px-4 text-[11px] text-white/30 font-medium">
+                <Icon className="w-3 h-3 text-sky-400" />{label}
               </span>
             ))}
           </div>
         </div>
       </motion.div>
 
-      {/* Main content — two-column grid */}
-      <div className="relative z-10 flex-1 flex items-center px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto w-full py-16 grid lg:grid-cols-2 gap-12 items-center">
+      {/* Main content — centered */}
+      <div className="relative z-10 flex-1 flex items-center px-6">
+        <div className="max-w-3xl mx-auto w-full py-16 text-center">
 
-          {/* Left: text */}
-          <div>
-            {/* Badges */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6, ease: [0.22,1,0.36,1] }}
-              className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 bg-[var(--brand-client)]/8 border border-[var(--brand-client)]/20 rounded-full px-4 py-2 shadow-sm">
-                <ShieldCheck className="w-3.5 h-3.5 text-[var(--brand-client)]" />
-                <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.2em]">India&apos;s Verified Editor Marketplace</span>
+          {/* Live badge */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/50 font-medium">
+            <motion.span animate={{ scale: [1, 1.8, 1] }} transition={{ duration: 1.8, repeat: Infinity }}
+              className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
+            {availableCount > 0 ? `${availableCount} editors available now` : "Editors online now"} · KYC-verified · ₹0 fraud, ever
+          </motion.div>
+
+          {/* Headline */}
+          <motion.div style={{ y: headY }} className="mb-6">
+            <h1 className="font-black tracking-[-0.04em] leading-[0.9] text-white" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)" }}>
+              Hire the perfect<br />
+              video editor for{" "}
+              <span className="inline-block overflow-hidden" style={{ height: "1.1em", verticalAlign: "bottom" }}>
+                <AnimatePresence mode="wait">
+                  <motion.span key={idx}
+                    initial={{ clipPath: "inset(0 100% 0 0)" }}
+                    animate={{ clipPath: "inset(0 0% 0 0)" }}
+                    exit={{ clipPath: "inset(0 0% 0 100%)", transition: { duration: 0.16, ease: [0.4, 0, 1, 0] } }}
+                    transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
+                    className="block bg-gradient-to-r from-sky-400 via-violet-400 to-teal-400 bg-clip-text text-transparent">
+                    {NICHES[idx]}
+                  </motion.span>
+                </AnimatePresence>
               </span>
-              <span className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-4 py-2 shadow-sm">
-                <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em]">100% Escrow Protection</span>
-              </span>
-            </motion.div>
+            </h1>
+          </motion.div>
 
-            {/* Headline */}
-            <motion.div style={{ y: headY }}>
-              <h1 className="font-black tracking-[-0.04em] leading-[0.92] text-gray-900" style={{ fontSize: "clamp(2.5rem, 6.5vw, 5.2rem)" }}>
-                Hire the perfect <br className="hidden sm:block" />
-                video editor for <br />
-                <div className="overflow-hidden h-[1.15em] mt-1.5 inline-block">
-                  <AnimatePresence mode="wait">
-                    <motion.span key={idx}
-                      initial={{ clipPath: "inset(0 100% 0 0)" }}
-                      animate={{ clipPath: "inset(0 0% 0 0)" }}
-                      exit={{ clipPath: "inset(0 0% 0 100%)", transition: { duration: 0.16, ease: [0.4, 0, 1, 0] } }}
-                      transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
-                      className="block bg-gradient-to-r from-[var(--brand-client)] via-[#7c6ff7] to-[var(--brand-teal)] bg-clip-text text-transparent">
-                      {NICHES[idx]}
-                    </motion.span>
-                  </AnimatePresence>
-                </div>
-              </h1>
-            </motion.div>
+          {/* Description */}
+          <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.7 }}
+            className="text-white/45 text-lg leading-relaxed font-medium mb-10 max-w-xl mx-auto">
+            Browse portfolios, compare packages, and hire KYC-verified editors — every payment held safely in escrow until you approve.
+          </motion.p>
 
-            {/* Description */}
-            <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.62, duration: 0.7, ease: [0.22,1,0.36,1] }}
-              className="text-gray-400 text-lg leading-relaxed font-medium max-w-lg mt-8 mb-10">
-              Browse portfolios, compare service packages, and hire KYC-verified freelance editors directly. Every payment is held safely in escrow until you approve the work.
-            </motion.p>
+          {/* Search bar */}
+          <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.75 }}
+            className="mb-6">
+            <form action="/browse" method="get"
+              className="flex items-center gap-2 bg-white rounded-2xl p-1.5 shadow-2xl shadow-black/50 max-w-2xl mx-auto">
+              <Search className="w-5 h-5 text-gray-400 ml-3 shrink-0" />
+              <input
+                name="q"
+                type="text"
+                placeholder="Find editors for Gaming, Reels, YouTube..."
+                className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent py-3 px-1.5 min-w-0"
+              />
+              <button type="submit"
+                className="bg-[var(--brand-client)] hover:bg-sky-600 text-white text-sm font-bold px-6 py-3 rounded-xl transition-colors shrink-0">
+                Search
+              </button>
+            </form>
+          </motion.div>
 
-            {/* Search bar */}
-            <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.78, duration: 0.75, ease: [0.22,1,0.36,1] }}
-              className="space-y-4 mb-10">
-              <form action="/browse" method="get"
-                className="flex items-center gap-2 bg-white border border-gray-250 rounded-2xl p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] max-w-lg">
-                <Search className="w-5 h-5 text-gray-400 ml-3 shrink-0" />
-                <input
-                  name="q"
-                  type="text"
-                  placeholder="Find editors for Gaming, Reels, YouTube..."
-                  className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent py-2.5 px-1.5 min-w-0"
-                />
-                <button type="submit"
-                  className="bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-sm font-bold px-6 py-3 rounded-xl transition-colors shrink-0 shadow-sm">
-                  Search
-                </button>
-              </form>
-              
-              {/* Niche quick-search chips */}
-              <div className="flex flex-wrap items-center gap-2 max-w-lg">
-                <span className="text-xs text-gray-400 font-bold">Popular:</span>
-                {[
-                  { label: "YouTube Videos", emoji: "▶️", q: "youtube" },
-                  { label: "Gaming Reels", emoji: "🎮", q: "gaming" },
-                  { label: "Vlogs", emoji: "🎒", q: "vlog" },
-                  { label: "Thumbnails", emoji: "🖼️", q: "thumbnail" },
-                  { label: "After Effects", emoji: "✨", q: "after effects" },
-                  { label: "Podcasts", emoji: "🎙️", q: "podcast" },
-                ].map((chip, ci) => (
-                  <motion.a
-                    key={chip.label}
-                    href={`/browse?q=${encodeURIComponent(chip.q)}`}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.85 + ci * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    whileHover={{ scale: 1.06, y: -1 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="inline-flex items-center gap-1.5 text-xs text-gray-600 font-semibold bg-white hover:bg-[var(--brand-client)] hover:text-white border border-gray-200 hover:border-[var(--brand-client)] rounded-full px-3.5 py-1.5 transition-all shadow-sm cursor-pointer select-none"
-                  >
-                    <span className="text-[11px]">{chip.emoji}</span>
-                    {chip.label}
-                  </motion.a>
-                ))}
-              </div>
+          {/* Niche quick-search chips */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-2 mb-10">
+            <span className="text-xs text-white/30 font-bold">Popular:</span>
+            {[
+              { label: "YouTube Videos", emoji: "▶️", q: "youtube" },
+              { label: "Gaming Reels", emoji: "🎮", q: "gaming" },
+              { label: "Vlogs", emoji: "🎒", q: "vlog" },
+              { label: "Thumbnails", emoji: "🖼️", q: "thumbnail" },
+              { label: "After Effects", emoji: "✨", q: "after effects" },
+              { label: "Podcasts", emoji: "🎙️", q: "podcast" },
+            ].map((chip, ci) => (
+              <motion.a
+                key={chip.label}
+                href={`/browse?q=${encodeURIComponent(chip.q)}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.75 + ci * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ scale: 1.06, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-1.5 text-xs text-white/60 font-semibold bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/20 rounded-full px-3.5 py-1.5 transition-all cursor-pointer select-none"
+              >
+                <span className="text-[11px]">{chip.emoji}</span>
+                {chip.label}
+              </motion.a>
+            ))}
+          </motion.div>
 
-              <div className="flex items-center gap-1.5 pt-1">
-                <span className="text-xs text-gray-400">Not sure who to pick?</span>
-                <Link href="/find-editor"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] hover:underline">
-                  Let us match you <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Social proof */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.94, duration: 0.6 }}
-              className="flex items-center gap-4 flex-wrap">
+          {/* Social proof + stats */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.6 }}
+            className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap justify-center">
               <div className="flex -space-x-2.5">
                 {[["AK","var(--brand-editor)"],["PS","#059669"],["RK","#ea580c"],["VD","#2563eb"]].map(([i, bg], k) => (
-                  <div key={k} className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white shadow-sm" style={{ background: bg }}>{i}</div>
+                  <div key={k} className="w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-[9px] font-bold text-white" style={{ background: bg }}>{i}</div>
                 ))}
               </div>
-              <p className="text-gray-400 text-xs"><span className="text-gray-700 font-semibold">Early creators</span> already on EditBridge</p>
-              <div className="hidden sm:flex items-center gap-1 pl-4 border-l border-gray-100">
+              <p className="text-white/40 text-xs"><span className="text-white/70 font-semibold">Early creators</span> already on EditBridge</p>
+              <div className="flex items-center gap-1 pl-4 border-l border-white/10">
                 {[1,2,3,4,5].map(j => <Star key={j} className="w-3 h-3 text-amber-400 fill-amber-400" />)}
-                <span className="text-gray-400 text-xs ml-1">Loved by creators</span>
-              </div>
-            </motion.div>
-
-            {/* Live marketplace stats strip */}
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.05, duration: 0.6 }}
-              className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-4">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-                <span className="text-xs text-gray-500 font-semibold">{availableCount > 0 ? `${availableCount} available now` : "Editors online"}</span>
-              </div>
-              <span className="text-gray-300 text-xs select-none">·</span>
-              <span className="text-xs text-gray-500 font-semibold">4.9★ avg rating</span>
-              <span className="text-gray-300 text-xs select-none">·</span>
-              <span className="text-xs text-gray-500 font-semibold">Packages from ₹299</span>
-              <span className="text-gray-300 text-xs select-none">·</span>
-              <span className="text-xs text-gray-500 font-semibold">₹0 fraud</span>
-            </motion.div>
-
-            {/* Mobile-only editor cards — visual anchor for small screens */}
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}
-              className="mt-8 flex gap-2 overflow-x-auto pb-1 lg:hidden" style={{ scrollbarWidth: "none" }}>
-              {[
-                { initials: "AM", name: "Arjun M.", niche: "YouTube", rating: "4.9★", col: "var(--brand-editor)", avail: true },
-                { initials: "PS", name: "Priya S.", niche: "Reels",   rating: "5.0★", col: "var(--brand-client)", avail: true  },
-                { initials: "DK", name: "Divya K.", niche: "Podcasts", rating: "4.8★", col: "#059669", avail: false },
-              ].map(({ initials, name, niche, rating, col, avail }) => (
-                <div key={initials} className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm shrink-0 w-[calc(50%-4px)]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[9px] font-black shrink-0" style={{ background: col }}>{initials}</div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold text-gray-900 truncate">{name}</p>
-                      <p className="text-[9px] text-gray-400">{niche}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] text-amber-500 font-bold">{rating}</span>
-                    <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold ${avail ? "bg-emerald-50 text-emerald-600" : "bg-gray-50 text-gray-400"}`}>
-                      {avail ? "Online" : "Busy"}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Right: browser mockup */}
-          <motion.div style={{ y: cardsY }}
-            initial={{ opacity: 0, x: 40, scale: 0.96 }} animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ delay: 0.5, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:block">
-
-            {/* Browser chrome */}
-            <div className="rounded-2xl overflow-hidden shadow-[0_32px_80px_rgba(74,63,181,0.18),0_8px_32px_rgba(0,0,0,0.08)] border border-gray-200/80">
-
-              {/* Title bar */}
-              <div className="bg-gray-100 border-b border-gray-200 px-4 py-3 flex items-center gap-3">
-                <div className="flex gap-1.5">
-                  {["#ff5f57","#febc2e","#28c840"].map(c => <div key={c} className="w-3 h-3 rounded-full" style={{ background: c }} />)}
-                </div>
-                <div className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 mx-2">
-                  <Lock className="w-3 h-3 text-gray-300" />
-                  <span className="text-[11px] text-gray-400 font-mono">editbridge.in/browse</span>
-                </div>
-              </div>
-
-              {/* App shell — editor browse listing */}
-              <div className="bg-gray-50 flex flex-col overflow-hidden" style={{ height: 420 }}>
-                {/* Search bar */}
-                <div className="bg-white border-b border-gray-100 px-4 py-3">
-                  <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
-                    <Search className="w-3 h-3 text-gray-400 shrink-0" />
-                    <span className="text-[10px] text-gray-400 flex-1">Search by skill or niche…</span>
-                    <div className="bg-[var(--brand-client)] text-white text-[9px] font-bold px-2 py-0.5 rounded-lg shrink-0">Search</div>
-                  </div>
-                </div>
-                {/* Category pills */}
-                <div className="px-4 py-2 bg-white border-b border-gray-100 flex gap-1.5 overflow-hidden shrink-0">
-                  {[{ l: "All", a: true }, { l: "YouTube", a: false }, { l: "Reels", a: false }, { l: "Wedding", a: false }, { l: "Shorts", a: false }].map(({ l, a }) => (
-                    <span key={l} className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0 ${a ? "bg-[var(--brand-client)] text-white" : "bg-gray-100 text-gray-500"}`}>{l}</span>
-                  ))}
-                </div>
-                {/* Editor cards */}
-                <div className="flex-1 overflow-hidden p-3 space-y-2">
-                  {[
-                    { i: "AM", c: "#7C3AED", n: "Arjun M.", s: "YouTube Long-form", r: "4.9", rv: 42, p: "₹3,500", av: true },
-                    { i: "PS", c: "#0EA5E9", n: "Priya S.", s: "Reels & Shorts",    r: "5.0", rv: 28, p: "₹1,200", av: true },
-                    { i: "DK", c: "#059669", n: "Divya K.", s: "Wedding Films",     r: "4.8", rv: 19, p: "₹6,000", av: false },
-                  ].map((e, editorIdx) => (
-                    <motion.div key={editorIdx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + editorIdx * 0.12 }}
-                      className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-[10px] font-black shrink-0" style={{ background: e.c }}>{e.i}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <p className="text-[11px] font-bold text-gray-900 truncate">{e.n}</p>
-                          <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${e.av ? "bg-emerald-50 text-emerald-600" : "bg-gray-50 text-gray-400"}`}>{e.av ? "Online" : "Busy"}</span>
-                        </div>
-                        <p className="text-[9px] text-gray-400 mb-1">{e.s}</p>
-                        <div className="flex items-center gap-0.5">
-                          {[1, 2, 3, 4, 5].map(j => <Star key={j} className="w-2 h-2 fill-amber-400 text-amber-400" />)}
-                          <span className="text-[9px] text-gray-400 ml-0.5">{e.r} ({e.rv} reviews)</span>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-[10px] font-black text-gray-900 mb-1.5">From {e.p}</p>
-                        <div className="bg-[var(--brand-client)] text-white text-[9px] font-bold px-2.5 py-1 rounded-lg text-center">Hire</div>
-                      </div>
-                    </motion.div>
-                  ))}
-                  <div className="text-center pt-1">
-                    <span className="text-[9px] text-[var(--brand-client)] font-semibold">View all 84 verified editors →</span>
-                  </div>
-                </div>
+                <span className="text-white/40 text-xs ml-1">Loved by creators</span>
               </div>
             </div>
-
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+              <span className="text-xs text-white/40 font-medium">4.9★ avg rating</span>
+              <span className="text-white/15 text-xs">·</span>
+              <span className="text-xs text-white/40 font-medium">Packages from ₹299</span>
+              <span className="text-white/15 text-xs">·</span>
+              <span className="text-xs text-white/40 font-medium">Escrow-protected</span>
+              <span className="text-white/15 text-xs">·</span>
+              <Link href="/find-editor" className="inline-flex items-center gap-1 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors">
+                Not sure? Let us match you <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
           </motion.div>
 
         </div>
       </div>
 
       {/* Ticker */}
-      <div className="relative z-10 border-t border-gray-100 overflow-hidden py-3 bg-white/70 backdrop-blur-sm">
+      <div className="relative z-10 border-t border-white/8 overflow-hidden py-3 bg-white/5 backdrop-blur-sm">
         <motion.div className="flex whitespace-nowrap" animate={{ x: ["0%","-50%"] }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
           {[...Array(2)].map((_, k) => (
             <div key={k} className="flex">
               {["KYC-Verified Editors","Verified Payment Protection","Revisions Included","Real-time Collaboration","Identity Verified","Dispute Resolution","Fast Delivery","Launched 2026"].map(s => (
-                <span key={s} className="inline-flex items-center gap-3 text-[10px] text-gray-400 font-bold uppercase tracking-[0.18em] px-8">
-                  <span className="w-1 h-1 rounded-full bg-[var(--brand-client)]/70 inline-block" />{s}
+                <span key={s} className="inline-flex items-center gap-3 text-[10px] text-white/25 font-bold uppercase tracking-[0.18em] px-8">
+                  <span className="w-1 h-1 rounded-full bg-sky-400/60 inline-block" />{s}
                 </span>
               ))}
             </div>
