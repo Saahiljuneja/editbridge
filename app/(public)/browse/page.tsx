@@ -19,6 +19,7 @@ interface BrowseSearchParams {
   sort?: string;
   page?: string;
   compare?: string;
+  available?: string;
 }
 
 async function fetchEditors(params: BrowseSearchParams) {
@@ -32,6 +33,7 @@ async function fetchEditors(params: BrowseSearchParams) {
   if (params.min_rating || params.rating) url.searchParams.set("min_rating", params.min_rating ?? params.rating ?? "");
   if (params.sort) url.searchParams.set("sort", params.sort);
   if (params.page) url.searchParams.set("page", params.page);
+  if (params.available) url.searchParams.set("available", params.available);
 
   const res = await fetch(url.toString(), { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch editors");
@@ -57,6 +59,7 @@ async function fetchEditors(params: BrowseSearchParams) {
       isFeatured?: boolean;
       thumbnailUrl?: string | null;
       videoUrl?: string | null;
+      isAvailable?: boolean;
     }>;
     total: number;
     page: number;

@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
     const maxPrice = searchParams.get("max_price") ? Number(searchParams.get("max_price")) * 100 : null;
     const deliveryDays = searchParams.get("delivery_days") ? Number(searchParams.get("delivery_days")) : null;
     const minRating = searchParams.get("min_rating") ? Number(searchParams.get("min_rating")) : null;
+    const availableOnly = searchParams.get("available") === "true";
     const sort = searchParams.get("sort") || "popular";
     const page = Math.max(1, Number(searchParams.get("page") || "1"));
     const limit = Math.min(50, Number(searchParams.get("limit") || "12"));
@@ -65,8 +66,12 @@ export async function GET(request: NextRequest) {
 
     const conditions = [
       eq(editors.kycStatus, "approved"),
-      eq(editors.isAvailable, true),
+      eq(users.isActive, true),
     ];
+
+    if (availableOnly) {
+      conditions.push(eq(editors.isAvailable, true));
+    }
 
     if (q) {
       conditions.push(or(ilike(users.name, `%${q}%`), ilike(editors.bio, `%${q}%`))!);
@@ -163,6 +168,7 @@ export async function GET(request: NextRequest) {
         thumbnailUrl: sql<string | null>`(SELECT thumbnail_url FROM portfolio_items WHERE editor_id = ${editors.id} AND thumbnail_url IS NOT NULL AND is_hidden = false LIMIT 1)`,
         videoUrl: sql<string | null>`(SELECT url FROM portfolio_items WHERE editor_id = ${editors.id} AND url IS NOT NULL AND is_hidden = false LIMIT 1)`,
         activeFrame: editors.activeFrame,
+        isAvailable: editors.isAvailable,
         hasHighlight: sql<boolean>`EXISTS (SELECT 1 FROM xp_boosts WHERE user_id = ${editors.userId} AND type = 'profile_highlight' AND (expires_at IS NULL OR expires_at > now()))`,
       })
       .from(editors)
@@ -173,7 +179,7 @@ export async function GET(request: NextRequest) {
         and(eq(reviews.revieweeId, editors.userId), eq(reviews.role, "client"))
       )
       .where(and(...conditions))
-      .groupBy(editors.id, users.id, editors.displayName, editors.title, editors.niche, editors.location, editors.activeFrame)
+      .groupBy(editors.id, users.id, editors.displayName, editors.title, editors.niche, editors.location, editors.activeFrame, editors.isAvailable)
       .$dynamic();
 
     // Apply delivery days HAVING filter

@@ -97,7 +97,7 @@ export function TopFilterBar() {
     router.push(pathname);
   }
 
-  const activeCount = ["niche", "min_price", "max_price", "delivery", "min_rating", "sort"]
+  const activeCount = ["available", "niche", "min_price", "max_price", "delivery", "min_rating", "sort"]
     .filter((k) => !!searchParams.get(k)).length;
 
   const sortLabel = SORT_OPTIONS.find(o => o.value === get("sort") && o.value)?.label;
@@ -111,6 +111,25 @@ export function TopFilterBar() {
     <div ref={barRef} className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20 shadow-sm">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center gap-2 py-3">
+
+          {/* Available Now toggle */}
+          <button
+            onClick={() => update("available", get("available") === "true" ? "" : "true")}
+            className={cn(
+              "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[13px] font-semibold transition-all whitespace-nowrap shrink-0",
+              get("available") === "true"
+                ? "border-emerald-400 text-emerald-700 bg-emerald-50 shadow-sm"
+                : "border-gray-200 text-gray-600 bg-white hover:border-emerald-300 hover:text-emerald-600 hover:shadow-sm"
+            )}
+          >
+            <span className={cn(
+              "w-1.5 h-1.5 rounded-full shrink-0",
+              get("available") === "true" ? "bg-emerald-500 animate-pulse" : "bg-gray-300"
+            )} />
+            Available Now
+          </button>
+
+          <div className="h-6 w-px bg-gray-200 shrink-0" />
 
           {/* Category dropdown */}
           <DropBtn
