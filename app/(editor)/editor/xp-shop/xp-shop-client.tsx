@@ -2,8 +2,9 @@
 
 import { Fragment, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Zap, CheckCircle2, Clock, Sparkles, Lock, ChevronRight, AlertCircle, ArrowLeft } from "lucide-react";
+import { Zap, CheckCircle2, Clock, Sparkles, Lock, ChevronRight, AlertCircle, ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   REGULAR_SHOP_ITEMS,
@@ -14,12 +15,46 @@ import {
   type FrameKey,
 } from "@/lib/xp-shop-config";
 
+interface PurchaseHistoryItem {
+  id: string;
+  amount: number;
+  reason: string;
+  createdAt: string;
+}
+
 interface Props {
   currentXp: number;
   activeTypes: string[];
   boostExpiry: Record<string, string | null>;
   ownedFrames: string[];
   activeFrame: string | null;
+  history: PurchaseHistoryItem[];
+}
+
+function parseReason(reason: string) {
+  if (reason.startsWith("xp_shop_")) {
+    const type = reason.replace("xp_shop_", "");
+    const item = PORTFOLIO_TIERS.concat(REGULAR_SHOP_ITEMS).find(i => i.type === type);
+    return {
+      name: item?.label ?? type.replace(/_/g, " "),
+      emoji: item?.emoji ?? "🔝",
+      type: "Boost",
+    };
+  }
+  if (reason.startsWith("xp_frame_")) {
+    const key = reason.replace("xp_frame_", "");
+    const frame = PROFILE_FRAMES.find(f => f.key === key);
+    return {
+      name: frame?.label ?? key.replace(/_/g, " "),
+      emoji: frame?.emoji ?? "🖼️",
+      type: "Avatar Frame",
+    };
+  }
+  return {
+    name: reason.replace(/_/g, " "),
+    emoji: "🛍️",
+    type: "Purchase",
+  };
 }
 
 function fmtExpiry(iso: string | null | undefined) {
@@ -27,7 +62,7 @@ function fmtExpiry(iso: string | null | undefined) {
   return `Expires ${new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`;
 }
 
-export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames, activeFrame: initialActiveFrame }: Props) {
+export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames, activeFrame: initialActiveFrame, history: initialHistory }: Props) {
   const router = useRouter();
   const [xp, setXp]                     = useState(currentXp);
   const [active, setActive]             = useState(new Set(activeTypes));
@@ -37,6 +72,8 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
   const [buying, setBuying]             = useState<string | null>(null);
   const [settingFrame, setSettingFrame] = useState<string | null>(null);
   const [toast, setToast]               = useState<{ msg: string; ok: boolean } | null>(null);
+  const [localHistory, setLocalHistory] = useState<PurchaseHistoryItem[]>(initialHistory);
+  const [successItem, setSuccessItem]   = useState<{ label: string; cost: number; emoji: string; desc: string } | null>(null);
 
   function showToast(msg: string, ok: boolean) {
     setToast({ msg, ok });
@@ -53,13 +90,35 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
       });
       const data = await res.json();
       if (!res.ok) { showToast(data.error ?? "Purchase failed", false); return; }
+      
       setXp(p => p - cost);
       setActive(p => new Set([...p, type]));
       const item = PORTFOLIO_TIERS.concat(REGULAR_SHOP_ITEMS).find(i => i.type === type);
       if (item?.durationDays) {
         setExpiry(p => ({ ...p, [type]: new Date(Date.now() + item.durationDays! * 86_400_000).toISOString() }));
       }
-      showToast("Boost activated!", true);
+      
+      // Append local purchase history item
+      const newTx: PurchaseHistoryItem = {
+        id: Math.random().toString(),
+        amount: -cost,
+        reason: `xp_shop_${type}`,
+        createdAt: new Date().toISOString(),
+      };
+      setLocalHistory(p => [newTx, ...p]);
+      
+      // Trigger Success Modal
+      if (item) {
+        setSuccessItem({
+          label: item.label,
+          cost: item.cost,
+          emoji: item.emoji,
+          desc: item.desc,
+        });
+      } else {
+        showToast("Boost activated!", true);
+      }
+      
       router.refresh();
     } finally {
       setBuying(null);
@@ -76,9 +135,32 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
       });
       const data = await res.json();
       if (!res.ok) { showToast(data.error ?? "Purchase failed", false); return; }
+      
       setXp(p => p - cost);
       setOwned(p => new Set([...p, frameKey]));
-      showToast("Frame unlocked! Activate it below.", true);
+      
+      // Append local purchase history item
+      const newTx: PurchaseHistoryItem = {
+        id: Math.random().toString(),
+        amount: -cost,
+        reason: `xp_frame_${frameKey}`,
+        createdAt: new Date().toISOString(),
+      };
+      setLocalHistory(p => [newTx, ...p]);
+
+      // Trigger Success Modal
+      const frame = PROFILE_FRAMES.find(f => f.key === frameKey);
+      if (frame) {
+        setSuccessItem({
+          label: `${frame.label} Profile Frame`,
+          cost: frame.cost,
+          emoji: frame.emoji,
+          desc: "Custom glowing border around your public profile avatar.",
+        });
+      } else {
+        showToast("Frame unlocked! Activate it below.", true);
+      }
+      
       router.refresh();
     } finally {
       setBuying(null);
@@ -477,6 +559,89 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
           ))}
         </div>
       </div>
+
+      {/* Spend History */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300">Redemption History</h2>
+        {localHistory.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 text-center text-xs text-gray-400">
+            No purchases logged yet. Redeem a boost or profile frame above to begin!
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-105 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800 shadow-sm">
+            {localHistory.map(tx => {
+              const details = parseReason(tx.reason);
+              return (
+                <div key={tx.id} className="p-4 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl leading-none shrink-0">{details.emoji}</span>
+                    <div>
+                      <p className="font-bold text-gray-900 dark:text-white">{details.name}</p>
+                      <p className="text-[10px] text-gray-450 mt-0.5">
+                        {details.type} · {new Date(tx.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 font-bold text-red-500">
+                    <span>{tx.amount} XP</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Immersive Success Confetti Overlay Modal */}
+      <AnimatePresence>
+        {successItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden"
+            >
+              {/* Confetti animation background effects */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-4 left-4 animate-bounce text-xl">🎉</div>
+                <div className="absolute top-8 right-6 animate-pulse text-xl">✨</div>
+                <div className="absolute bottom-6 left-12 animate-bounce text-xl">✨</div>
+                <div className="absolute bottom-8 right-8 animate-pulse text-xl">🎉</div>
+              </div>
+
+              {/* Bounce check circle */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.15, type: "spring", damping: 15 }}
+                className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 flex items-center justify-center mx-auto mb-5 shadow-inner border border-emerald-100 dark:border-emerald-900"
+              >
+                <Check className="w-8 h-8 stroke-[3]" />
+              </motion.div>
+
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Redemption Successful</p>
+              <h3 className="text-lg font-black text-gray-900 dark:text-white mt-1.5 leading-snug">{successItem.label}</h3>
+              <p className="text-xs text-gray-400 mt-2 leading-relaxed px-2">{successItem.desc}</p>
+
+              {/* XP Spent anchor */}
+              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-905 text-sky-600 dark:text-sky-400 font-extrabold text-sm mt-6 mb-8 shadow-sm">
+                <Zap className="w-4 h-4 fill-sky-500 text-sky-500" />
+                <span>{successItem.cost} XP spent</span>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setSuccessItem(null)}
+                className="w-full py-3 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-xs font-bold rounded-2xl shadow-md transition-all active:scale-[0.98]"
+              >
+                Awesome!
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
