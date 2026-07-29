@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import { FilterPanel } from "@/components/common/filter-panel";
 import { SearchBar } from "@/components/common/search-bar";
 import { EditorCard } from "@/components/editor/editor-card";
@@ -57,6 +57,7 @@ async function fetchEditors(params: BrowseSearchParams) {
       onTimeRate?: number | null;
       verifiedPortfolioCount?: number;
       isFeatured?: boolean;
+      thumbnailUrl?: string | null;
     }>;
     total: number;
     page: number;

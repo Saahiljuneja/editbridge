@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -26,6 +26,7 @@ interface Match {
   verifiedPortfolioCount?: number;
   matchScore: number;
   matchReason: string;
+  thumbnailUrl?: string | null;
 }
 
 interface MatchResult {
@@ -111,6 +112,7 @@ export function FindEditorResultsClient() {
                   isAvailable={m.isAvailable}
                   onTimeRate={m.onTimeRate}
                   verifiedPortfolioCount={m.verifiedPortfolioCount}
+                  thumbnailUrl={m.thumbnailUrl}
                 />
                 <Link
                   href={`/editor/${m.id}`}

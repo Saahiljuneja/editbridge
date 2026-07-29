@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Star, Clock, CheckCircle2, MapPin, Timer, ShieldCheck } from "lucide-react";
 import { cn, displayNameFromFull, formatCurrency } from "@/lib/utils";
 import { SaveEditorButton } from "@/components/client/save-editor-button";
@@ -23,6 +23,7 @@ export interface EditorCardProps {
   onTimeRate?: number | null;
   verifiedPortfolioCount?: number;
   isFeatured?: boolean;
+  thumbnailUrl?: string | null;
 }
 
 const AVATAR_GRADIENTS = [
@@ -48,7 +49,7 @@ function parseNiches(raw: string | null | undefined): string[] {
 export function EditorCard({
   id, name, displayName, title, image, bio, niche, location,
   skills, minPrice, minDelivery, avgRating, reviewCount, totalOrders, isAvailable,
-  onTimeRate, verifiedPortfolioCount, isFeatured,
+  onTimeRate, verifiedPortfolioCount, isFeatured, thumbnailUrl,
 }: EditorCardProps) {
   const shownName = displayName || displayNameFromFull(name);
   const initials = shownName.slice(0, 2).toUpperCase();
@@ -58,25 +59,45 @@ export function EditorCard({
 
   return (
     <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden">
-      {/* Compare checkbox */}
-      <div className="absolute top-3 left-3 z-10">
-        <CompareToggle editorId={id} />
-      </div>
-
-      {/* Featured badge + save button */}
-      <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-        {isFeatured && (
-          <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
-            <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
-          </span>
+      {/* Visual Thumbnail Preview (16:9 ratio) */}
+      <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+        {thumbnailUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={thumbnailUrl}
+            alt={shownName}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex flex-col items-center gap-1.5 text-gray-300">
+            <svg className="w-8 h-8 stroke-[1.25]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polygon points="23 7 16 12 23 17 23 7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="text-[10px] font-medium tracking-wide uppercase">Portfolio Preview</span>
+          </div>
         )}
-        <SaveEditorButton
-          editorId={id}
-          editorName={shownName}
-          editorImage={image}
-          avgRating={avgRating}
-          totalOrders={totalOrders}
-        />
+
+        {/* Compare checkbox overlay */}
+        <div className="absolute top-3 left-3 z-10">
+          <CompareToggle editorId={id} />
+        </div>
+
+        {/* Featured badge + save button overlay */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          {isFeatured && (
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+              <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
+            </span>
+          )}
+          <SaveEditorButton
+            editorId={id}
+            editorName={shownName}
+            editorImage={image}
+            avgRating={avgRating}
+            totalOrders={totalOrders}
+          />
+        </div>
       </div>
 
       {/* Top section */}
