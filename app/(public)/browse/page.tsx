@@ -192,20 +192,23 @@ export default async function BrowsePage({
     <div className="min-h-screen bg-gray-50 pb-safe">
       {/* Hero bar */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-3 justify-between mb-5">
+        <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between mb-4">
             <div>
-              <p className="text-xs font-bold text-[var(--brand-client)] uppercase tracking-widest mb-1">Marketplace</p>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-                Find your perfect editor
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+                Browse KYC-verified editors
               </h1>
-              <p className="text-sm text-gray-400 mt-1">KYC-verified video editors and designers, ready to work.</p>
+              <p className="text-sm text-gray-400 mt-0.5">Find, compare and hire — payment held safely in escrow.</p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 rounded-full border border-green-100">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs font-semibold text-green-700">Editors Available</span>
-              </div>
+            <div className="flex items-center gap-3 shrink-0 text-xs text-gray-400 font-medium">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                Editors online now
+              </span>
+              <span className="text-gray-200">|</span>
+              <span>4.9★ avg rating</span>
+              <span className="text-gray-200">|</span>
+              <span>₹0 fraud, ever</span>
             </div>
           </div>
           <SearchBar placeholder="Search by name, skill, or niche…" />
