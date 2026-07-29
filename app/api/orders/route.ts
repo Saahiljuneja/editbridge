@@ -67,7 +67,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { packageId, useCredits, rewardDiscountAmount = 0 } = parsed.data as { packageId: string; useCredits?: boolean; rewardDiscountAmount?: number };
+  const { packageId, useCredits, rewardDiscountAmount = 0, options } = parsed.data as {
+    packageId: string;
+    useCredits?: boolean;
+    rewardDiscountAmount?: number;
+    options?: {
+      extraFast?: boolean;
+      extraRevision?: boolean;
+      sourceFiles?: boolean;
+      commercialRights?: boolean;
+    };
+  };
 
   const [pkg] = await db
     .select({
@@ -76,6 +86,10 @@ export async function POST(request: NextRequest) {
       title: packages.title,
       editorId: packages.editorId,
       isActive: packages.isActive,
+      deliveryDays: packages.deliveryDays,
+      revisionCount: packages.revisionCount,
+      includesSourceFiles: packages.includesSourceFiles,
+      includesCommercialRights: packages.includesCommercialRights,
     })
     .from(packages)
     .where(and(eq(packages.id, packageId), eq(packages.isActive, true)))
@@ -122,11 +136,21 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  let addOnsCost = 0;
+  if (options) {
+    if (options.extraFast && pkg.deliveryDays > 1) addOnsCost += 150000;
+    if (options.extraRevision && pkg.revisionCount !== -1) addOnsCost += 50000;
+    if (options.sourceFiles && !pkg.includesSourceFiles) addOnsCost += 100000;
+    if (options.commercialRights && !pkg.includesCommercialRights) addOnsCost += 75000;
+  }
+
+  const basePriceWithAddons = pkg.price + addOnsCost;
+
   const { processingFeePct } = await getPlatformSettings();
-  const PROCESSING_FEE = Math.round(pkg.price * (processingFeePct / 100));
-  // Clamp discount: cannot exceed package price, must not be negative
-  const discount = Math.max(0, Math.min(rewardDiscountAmount, pkg.price));
-  const discountedPrice = pkg.price - discount;
+  const PROCESSING_FEE = Math.round(basePriceWithAddons * (processingFeePct / 100));
+  // Clamp discount: cannot exceed package price (with add-ons), must not be negative
+  const discount = Math.max(0, Math.min(rewardDiscountAmount, basePriceWithAddons));
+  const discountedPrice = basePriceWithAddons - discount;
   const fullTotal = discountedPrice + PROCESSING_FEE;
 
   // Client credits reduce the payment amount (credits can cover up to the full total)
@@ -146,7 +170,7 @@ export async function POST(request: NextRequest) {
     razorpayOrderId: rzpOrder.id,
     key: process.env.RAZORPAY_KEY_ID,
     amount: chargeAmount,
-    packagePrice: pkg.price,
+    packagePrice: basePriceWithAddons, // Include add-ons cost in base packagePrice returned
     processingFee: PROCESSING_FEE,
     rewardDiscountAmount: discount,
     creditApplied,

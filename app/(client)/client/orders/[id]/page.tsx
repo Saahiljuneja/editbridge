@@ -50,6 +50,12 @@ type BriefData = {
   mustInclude?: string;
   mustAvoid?: string;
   additionalNotes?: string;
+  customAddons?: {
+    extraFast?: boolean;
+    extraRevision?: boolean;
+    sourceFiles?: boolean;
+    commercialRights?: boolean;
+  };
 };
 
 export default async function ClientOrderDetailPage({
@@ -136,6 +142,9 @@ export default async function ClientOrderDetailPage({
   const editorName = displayNameFromFull(editorUser?.name);
   const latestDelivery = orderDeliveries[orderDeliveries.length - 1];
   const bd = (order.briefData as BriefData | null) ?? {};
+  if (bd?.customAddons?.extraRevision && order.packageRevisionCount !== null && order.packageRevisionCount !== -1) {
+    order.packageRevisionCount += 1;
+  }
   const editorInitials = (editorUser?.name ?? "")
     .split(" ")
     .filter(Boolean)
@@ -236,7 +245,7 @@ export default async function ClientOrderDetailPage({
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-1.5">
-                        {bd.mood.map((m) => (
+                        {bd.mood.map((m: string) => (
                           <span
                             key={m}
                             className="text-xs px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100 font-medium capitalize"
@@ -300,7 +309,7 @@ export default async function ClientOrderDetailPage({
                     <div>
                       <p className="text-xs text-gray-400 mb-2">References</p>
                       <div className="space-y-1.5">
-                        {bd.referenceUrls.map((url, i) => (
+                        {bd.referenceUrls.map((url: string, i: number) => (
                           <a
                             key={i}
                             href={url}

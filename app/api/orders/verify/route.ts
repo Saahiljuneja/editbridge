@@ -19,6 +19,12 @@ const briefDataSchema = z.object({
   mustInclude: z.string().max(500).default(""),
   mustAvoid: z.string().max(500).default(""),
   additionalNotes: z.string().max(1000).default(""),
+  customAddons: z.object({
+    extraFast: z.boolean().optional(),
+    extraRevision: z.boolean().optional(),
+    sourceFiles: z.boolean().optional(),
+    commercialRights: z.boolean().optional(),
+  }).optional(),
 });
 
 const verifySchema = z.object({
@@ -68,6 +74,9 @@ export async function POST(request: NextRequest) {
       deliveryDays: packages.deliveryDays,
       editorId: packages.editorId,
       isActive: packages.isActive,
+      includesSourceFiles: packages.includesSourceFiles,
+      includesCommercialRights: packages.includesCommercialRights,
+      revisionCount: packages.revisionCount,
     })
     .from(packages)
     .where(and(eq(packages.id, packageId), eq(packages.isActive, true)))
@@ -100,14 +109,33 @@ export async function POST(request: NextRequest) {
   }
 
   const { commissionRatePct, processingFeePct } = await getPlatformSettings();
-  const PROCESSING_FEE = Math.round(pkg.price * (processingFeePct / 100));
-  // Clamp discount: cannot exceed package price, and must not be negative
-  const discount = Math.max(0, Math.min(rewardDiscountAmount, pkg.price));
-  const discountedPrice = pkg.price - discount;
+
+  const addons = briefData.customAddons;
+  let addOnsCost = 0;
+  let deadlineReductionDays = 0;
+
+  if (addons) {
+    if (addons.extraFast && pkg.deliveryDays > 1) {
+      addOnsCost += 150000;
+      deadlineReductionDays = 2;
+    }
+    if (addons.extraRevision && pkg.revisionCount !== -1) addOnsCost += 50000;
+    if (addons.sourceFiles && !pkg.includesSourceFiles) addOnsCost += 100000;
+    if (addons.commercialRights && !pkg.includesCommercialRights) addOnsCost += 75000;
+  }
+
+  const basePriceWithAddons = pkg.price + addOnsCost;
+  const PROCESSING_FEE = Math.round(basePriceWithAddons * (processingFeePct / 100));
+  // Clamp discount: cannot exceed package price (with add-ons), and must not be negative
+  const discount = Math.max(0, Math.min(rewardDiscountAmount, basePriceWithAddons));
+  const discountedPrice = basePriceWithAddons - discount;
+
   // Commission absorbs the client discount so the editor always receives pkg.price × (1 - commissionRate)
-  const fullCommission = Math.round(pkg.price * (commissionRatePct / 100));
+  const fullCommission = Math.round(basePriceWithAddons * (commissionRatePct / 100));
   const commissionAmount = Math.max(0, fullCommission - discount);
-  const deadline = new Date(Date.now() + pkg.deliveryDays * 24 * 60 * 60 * 1000);
+
+  const orderDeliveryDays = Math.max(1, pkg.deliveryDays - deadlineReductionDays);
+  const deadline = new Date(Date.now() + orderDeliveryDays * 24 * 60 * 60 * 1000);
 
   const [order] = await db
     .insert(orders)

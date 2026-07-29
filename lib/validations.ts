@@ -57,6 +57,12 @@ export const createOrderSchema = z.object({
   packageId: z.string().uuid("Invalid package ID"),
   useCredits: z.boolean().optional(),
   rewardDiscountAmount: z.number().int().min(0).default(0).optional(),
+  options: z.object({
+    extraFast: z.boolean().optional(),
+    extraRevision: z.boolean().optional(),
+    sourceFiles: z.boolean().optional(),
+    commercialRights: z.boolean().optional(),
+  }).optional(),
 });
 
 export const submitReviewSchema = z.object({

@@ -43,6 +43,12 @@ type BriefData = {
   mustInclude?: string;
   mustAvoid?: string;
   additionalNotes?: string;
+  customAddons?: {
+    extraFast?: boolean;
+    extraRevision?: boolean;
+    sourceFiles?: boolean;
+    commercialRights?: boolean;
+  };
 };
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; icon: React.ElementType }> = {
@@ -122,7 +128,10 @@ export default async function EditorOrderDetailPage({
   const payout = discountedPrice - order.commissionAmount;
   const canDeliver = ["pending", "in_progress", "revision_requested"].includes(order.status);
 
-  const briefData = order.briefData as BriefData | null;
+  const briefData = (order.briefData as BriefData | null) ?? {};
+  if (briefData?.customAddons?.extraRevision && order.packageRevisionCount !== null && order.packageRevisionCount !== -1) {
+    order.packageRevisionCount += 1;
+  }
 
   const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
   const StatusIcon = cfg.icon;
@@ -207,7 +216,7 @@ export default async function EditorOrderDetailPage({
                           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Mood / Vibe</p>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
-                          {briefData.mood.map((m) => (
+                          {briefData.mood.map((m: string) => (
                             <span key={m} className="text-xs font-medium px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
                               {m}
                             </span>
@@ -253,7 +262,7 @@ export default async function EditorOrderDetailPage({
                       <div>
                         <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Reference videos</p>
                         <div className="space-y-1.5">
-                          {briefData.referenceUrls.map((url, i) => (
+                          {briefData.referenceUrls.map((url: string, i: number) => (
                             <a
                               key={i}
                               href={url}

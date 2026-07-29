@@ -24,6 +24,8 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
       revisionCount: packages.revisionCount,
       editorName: users.name,
       editorId: packages.editorId,
+      includesSourceFiles: packages.includesSourceFiles,
+      includesCommercialRights: packages.includesCommercialRights,
     })
     .from(packages)
     .innerJoin(editors, eq(editors.id, packages.editorId))

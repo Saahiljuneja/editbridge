@@ -28,6 +28,7 @@ export async function POST(
       editorId: orders.editorId,
       status: orders.status,
       packageId: orders.packageId,
+      briefData: orders.briefData,
     })
     .from(orders)
     .where(eq(orders.id, id))
@@ -46,17 +47,23 @@ export async function POST(
         .from(packages).where(eq(packages.id, order.packageId)).limit(1)
     : [{ revisionCount: -1, title: "Custom order", revisionExtensionDays: 2 }];
 
+  let allowedRevisions = pkg?.revisionCount ?? -1;
+  const briefDataObj = order.briefData as any;
+  if (allowedRevisions !== -1 && briefDataObj?.customAddons?.extraRevision) {
+    allowedRevisions += 1;
+  }
+
   let usedRevisions = 0;
-  if (pkg && pkg.revisionCount !== -1) {
+  if (pkg && allowedRevisions !== -1) {
     const [{ value }] = await db
       .select({ value: count() })
       .from(revisionRequests)
       .where(eq(revisionRequests.orderId, id));
     usedRevisions = value;
 
-    if (usedRevisions >= pkg.revisionCount) {
+    if (usedRevisions >= allowedRevisions) {
       return NextResponse.json(
-        { error: `Revision limit of ${pkg.revisionCount} reached` },
+        { error: `Revision limit of ${allowedRevisions} reached` },
         { status: 409 }
       );
     }

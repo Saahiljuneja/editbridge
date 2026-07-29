@@ -6,6 +6,12 @@ export type BriefData = {
   mustInclude: string;
   mustAvoid: string;
   additionalNotes: string;
+  customAddons?: {
+    extraFast?: boolean;
+    extraRevision?: boolean;
+    sourceFiles?: boolean;
+    commercialRights?: boolean;
+  };
 };
 
 const MOOD_LABELS: Record<string, string> = {
@@ -50,6 +56,16 @@ export function generateBriefText(data: BriefData): string {
     lines.push(`Must avoid: ${data.mustAvoid.trim()}`);
   if (data.additionalNotes.trim())
     lines.push(`Additional notes: ${data.additionalNotes.trim()}`);
+  if (data.customAddons) {
+    const active: string[] = [];
+    if (data.customAddons.extraFast) active.push("Extra Fast Delivery");
+    if (data.customAddons.extraRevision) active.push("Additional Revision Round");
+    if (data.customAddons.sourceFiles) active.push("Source Files Upgrade");
+    if (data.customAddons.commercialRights) active.push("Commercial Use License");
+    if (active.length) {
+      lines.push(`Selected Add-ons:\n${active.map((a) => `  - [✓] ${a}`).join("\n")}`);
+    }
+  }
   return lines.join("\n");
 }
 

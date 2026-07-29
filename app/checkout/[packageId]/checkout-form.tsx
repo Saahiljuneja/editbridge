@@ -42,6 +42,8 @@ type Props = {
     revisionCount: number;
     editorName: string;
     editorId: string;
+    includesSourceFiles?: boolean;
+    includesCommercialRights?: boolean;
   };
   availableCredits: number;
 };
@@ -82,6 +84,13 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
   const [useCredits, setUseCredits] = useState(false);
   const [rewardDiscount] = useState(0);
 
+  const [addOns, setAddOns] = useState({
+    extraFast: false,
+    extraRevision: false,
+    sourceFiles: false,
+    commercialRights: false,
+  });
+
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [templateName, setTemplateName] = useState("");
 
@@ -118,8 +127,14 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
     toast.success("Template loaded into notes.");
   };
 
+  const addOnsCost =
+    (addOns.extraFast ? 150000 : 0) +
+    (addOns.extraRevision ? 50000 : 0) +
+    (addOns.sourceFiles ? 100000 : 0) +
+    (addOns.commercialRights ? 75000 : 0);
+
   const processingFeePct = 2;
-  const subtotal = pkg.price;
+  const subtotal = pkg.price + addOnsCost;
   const processingFee = Math.round(subtotal * (processingFeePct / 100));
   const fullTotal = subtotal + processingFee;
   const creditsApplied = useCredits ? Math.min(availableCredits, fullTotal - 100) : 0;
@@ -136,7 +151,12 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId: pkg.id, useCredits, rewardDiscountAmount: rewardDiscount }),
+        body: JSON.stringify({
+          packageId: pkg.id,
+          useCredits,
+          rewardDiscountAmount: rewardDiscount,
+          options: addOns,
+        }),
       });
       const orderData = await res.json();
       if (!res.ok) throw new Error(orderData.error ?? "Failed to create order");
@@ -151,7 +171,16 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
       });
 
       const cleanUrls = referenceUrls.filter((u) => u.trim() !== "");
-      const briefData = { mood: moods, musicPreference: musicPref, colorLook, referenceUrls: cleanUrls, mustInclude, mustAvoid, additionalNotes };
+      const briefData = {
+        mood: moods,
+        musicPreference: musicPref,
+        colorLook,
+        referenceUrls: cleanUrls,
+        mustInclude,
+        mustAvoid,
+        additionalNotes,
+        customAddons: addOns,
+      };
 
       const rz = new window.Razorpay({
         key: orderData.key,
@@ -497,6 +526,105 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                 </div>
               </div>
 
+              {/* Customize Your Package Add-ons */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+                    <Plus className="w-3.5 h-3.5 text-amber-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">Gig Add-ons (Customizations)</h3>
+                    <p className="text-xs text-gray-400">Tailor the editor's service to your exact needs</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3 pt-1">
+                  {/* Extra Fast Delivery */}
+                  {pkg.deliveryDays > 1 && (
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                      <input
+                        type="checkbox"
+                        checked={addOns.extraFast}
+                        onChange={(e) => setAddOns(prev => ({ ...prev, extraFast: e.target.checked }))}
+                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline gap-2">
+                          <span className="text-xs font-bold text-gray-950">⚡ Extra Fast Delivery</span>
+                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹1,500</span>
+                        </div>
+                        <p className="text-[11px] text-gray-550 mt-1">
+                          Reduces delivery deadline by 2 days (minimum 1 day). Delivery in {Math.max(1, pkg.deliveryDays - 2)} days.
+                        </p>
+                      </div>
+                    </label>
+                  )}
+
+                  {/* Additional Revision */}
+                  {pkg.revisionCount !== -1 && (
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                      <input
+                        type="checkbox"
+                        checked={addOns.extraRevision}
+                        onChange={(e) => setAddOns(prev => ({ ...prev, extraRevision: e.target.checked }))}
+                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline gap-2">
+                          <span className="text-xs font-bold text-gray-950">🔄 Additional Revision Round</span>
+                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹500</span>
+                        </div>
+                        <p className="text-[11px] text-gray-550 mt-1">
+                          Add +1 extra revision round to your package. Total revisions: {pkg.revisionCount + 1}.
+                        </p>
+                      </div>
+                    </label>
+                  )}
+
+                  {/* Source Files */}
+                  {!pkg.includesSourceFiles && (
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                      <input
+                        type="checkbox"
+                        checked={addOns.sourceFiles}
+                        onChange={(e) => setAddOns(prev => ({ ...prev, sourceFiles: e.target.checked }))}
+                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline gap-2">
+                          <span className="text-xs font-bold text-gray-950">📦 Source Files Upgrade</span>
+                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹1,000</span>
+                        </div>
+                        <p className="text-[11px] text-gray-550 mt-1">
+                          Receive raw project assets (Premiere/After Effects files) upon completion.
+                        </p>
+                      </div>
+                    </label>
+                  )}
+
+                  {/* Commercial Rights */}
+                  {!pkg.includesCommercialRights && (
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                      <input
+                        type="checkbox"
+                        checked={addOns.commercialRights}
+                        onChange={(e) => setAddOns(prev => ({ ...prev, commercialRights: e.target.checked }))}
+                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-baseline gap-2">
+                          <span className="text-xs font-bold text-gray-950">💼 Commercial Use License</span>
+                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹750</span>
+                        </div>
+                        <p className="text-[11px] text-gray-550 mt-1">
+                          Grants full commercial rights for promotional, advertising, or business use.
+                        </p>
+                      </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+
               {/* Save as template */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -634,12 +762,14 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Delivery</span>
-                <span className="font-semibold text-gray-900">{pkg.deliveryDays} days</span>
+                <span className="font-semibold text-gray-900">
+                  {addOns.extraFast ? Math.max(1, pkg.deliveryDays - 2) : pkg.deliveryDays} days
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Revisions</span>
                 <span className="font-semibold text-gray-900">
-                  {pkg.revisionCount === -1 ? "Unlimited" : `${pkg.revisionCount} rounds`}
+                  {pkg.revisionCount === -1 ? "Unlimited" : `${pkg.revisionCount + (addOns.extraRevision ? 1 : 0)} rounds`}
                 </span>
               </div>
               <div className="border-t border-gray-100 pt-3 flex justify-between">
