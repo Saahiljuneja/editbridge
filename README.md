@@ -20,11 +20,7 @@ Video Editing & Thumbnail Design Marketplace — two-sided platform connecting c
 npm install
 ```
 
-2. Copy `.env.example` to `.env.local` and fill in all values:
-
-```bash
-cp .env.example .env.local
-```
+2. Create a `.env.local` file and fill in all required environment variables.
 
 3. Push the database schema to Neon:
 
@@ -42,7 +38,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment Variables
 
-See `.env.example` for the full list of required variables. All 23 must be set before the app will start correctly.
+Configure the required database, auth, and webhook variables. All must be set before the app will start correctly.
 
 ## Tech Stack
 
