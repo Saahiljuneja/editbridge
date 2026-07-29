@@ -87,6 +87,7 @@ const getHomepageData = unstable_cache(
         location: editors.location,
         totalOrders: editors.totalOrders,
         isFeatured: editors.isFeatured,
+        activeFrame: editors.activeFrame,
         minPrice: sql<number | null>`(SELECT MIN(p.price) FROM packages p WHERE p.editor_id = ${editors.id} AND p.is_active = true)`,
         minDeliveryDays: sql<number | null>`(SELECT MIN(p.delivery_days) FROM packages p WHERE p.editor_id = ${editors.id} AND p.is_active = true)`,
         avgRating: sql<number | null>`(SELECT ROUND(AVG(r.rating)::numeric,1) FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client')`,
@@ -94,6 +95,7 @@ const getHomepageData = unstable_cache(
         skills: sql<string[]>`COALESCE(ARRAY(SELECT name FROM skills WHERE editor_id = ${editors.id} LIMIT 3), ARRAY[]::text[])`,
         thumbnailUrl: sql<string | null>`(SELECT thumbnail_url FROM portfolio_items WHERE editor_id = ${editors.id} AND thumbnail_url IS NOT NULL AND is_hidden = false LIMIT 1)`,
         videoUrl: sql<string | null>`(SELECT url FROM portfolio_items WHERE editor_id = ${editors.id} AND url IS NOT NULL AND is_hidden = false LIMIT 1)`,
+        hasHighlight: sql<boolean>`EXISTS (SELECT 1 FROM xp_boosts WHERE user_id = ${editors.userId} AND type = 'profile_highlight' AND (expires_at IS NULL OR expires_at > now()))`,
       })
       .from(editors)
       .innerJoin(users, eq(users.id, editors.userId))
@@ -111,6 +113,8 @@ const getHomepageData = unstable_cache(
       skills: Array.isArray(r.skills) ? r.skills : [],
       reviewCount: Number(r.reviewCount ?? 0),
       totalOrders: Number(r.totalOrders ?? 0),
+      activeFrame: r.activeFrame ?? null,
+      hasHighlight: Boolean(r.hasHighlight),
     }));
 
     const availableCount = Number(availableCountResult[0]?.value ?? 0);

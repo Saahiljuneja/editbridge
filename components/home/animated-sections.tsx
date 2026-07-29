@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PortfolioPreview } from "@/components/common/portfolio-preview";
+import { FRAME_STYLES, type FrameKey } from "@/lib/xp-shop-config";
 
 /* ════════════════════════════════════════════════════════════════════════════
    SCROLL PROGRESS BAR
@@ -255,14 +256,30 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 </button>
               </form>
               
-              {/* Niche quick-search */}
+              {/* Niche quick-search chips */}
               <div className="flex flex-wrap items-center gap-2 max-w-lg">
                 <span className="text-xs text-gray-400 font-bold">Popular:</span>
-                {["Gaming Reels", "Vlogs", "After Effects", "Thumbnails"].map((chip) => (
-                  <a key={chip} href={`/browse?q=${encodeURIComponent(chip)}`}
-                    className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-white hover:bg-gray-50 border border-gray-200 rounded-full px-3.5 py-1.5 transition-all shadow-sm">
-                    {chip}
-                  </a>
+                {[
+                  { label: "YouTube Videos", emoji: "▶️", q: "youtube" },
+                  { label: "Gaming Reels", emoji: "🎮", q: "gaming" },
+                  { label: "Vlogs", emoji: "🎒", q: "vlog" },
+                  { label: "Thumbnails", emoji: "🖼️", q: "thumbnail" },
+                  { label: "After Effects", emoji: "✨", q: "after effects" },
+                  { label: "Podcasts", emoji: "🎙️", q: "podcast" },
+                ].map((chip, ci) => (
+                  <motion.a
+                    key={chip.label}
+                    href={`/browse?q=${encodeURIComponent(chip.q)}`}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.85 + ci * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    whileHover={{ scale: 1.06, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="inline-flex items-center gap-1.5 text-xs text-gray-600 font-semibold bg-white hover:bg-[var(--brand-client)] hover:text-white border border-gray-200 hover:border-[var(--brand-client)] rounded-full px-3.5 py-1.5 transition-all shadow-sm cursor-pointer select-none"
+                  >
+                    <span className="text-[11px]">{chip.emoji}</span>
+                    {chip.label}
+                  </motion.a>
                 ))}
               </div>
 
@@ -1076,6 +1093,8 @@ interface RealEditor {
   image?: string | null;
   thumbnailUrl?: string | null;
   videoUrl?: string | null;
+  activeFrame?: string | null;
+  hasHighlight?: boolean;
 }
 
 const EDITORS = [
@@ -1117,9 +1136,11 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
           href: `/editor/${e.id}`,
           thumbnailUrl: e.thumbnailUrl ?? null,
           videoUrl: e.videoUrl ?? null,
+          activeFrame: e.activeFrame ?? null,
+          hasHighlight: e.hasHighlight ?? false,
         }))
         .filter(e => e.skills.length > 0) // hide incomplete/test accounts
-    : EDITORS.map(e => ({ ...e, image: null, isFeatured: false, thumbnailUrl: null, videoUrl: null }));
+    : EDITORS.map(e => ({ ...e, image: null, isFeatured: false, thumbnailUrl: null, videoUrl: null, activeFrame: null, hasHighlight: false }));
 
   const filteredEditors = activeFilter === "All"
     ? allEditors
@@ -1175,8 +1196,13 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="group relative rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
-                  style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
+                  className={cn(
+                    "group relative rounded-2xl border bg-white hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col",
+                    e.hasHighlight
+                      ? "border-sky-400 ring-2 ring-sky-100/50 shadow-sky-100"
+                      : "border-gray-100 hover:border-gray-200"
+                  )}
+                  style={{ boxShadow: e.hasHighlight ? "0 4px 20px rgba(14,165,233,0.06)" : "0 2px 12px rgba(0,0,0,0.04)" }}
                 >
                   {/* Visual Preview Header (16:9 ratio) */}
                   <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
@@ -1194,7 +1220,10 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
                     {/* Avatar + badge row */}
                     <div className="relative flex items-start justify-between mb-4">
                       <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg overflow-hidden shrink-0"
-                        style={{ background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)` }}>
+                        style={{
+                          background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)`,
+                          boxShadow: e.activeFrame && FRAME_STYLES[e.activeFrame as FrameKey] ? FRAME_STYLES[e.activeFrame as FrameKey] : undefined
+                        }}>
                         {e.image ? (
                           <img src={e.image} alt={e.name} className="w-full h-full object-cover" />
                         ) : (
