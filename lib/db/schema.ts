@@ -201,7 +201,12 @@ export const editors = pgTable("editors", {
   rankScore: real("rank_score"),        // 0–1 composite score updated nightly by cron
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  // Composite index for the browse/category query hot path:
+  // WHERE kyc_status = 'approved' AND is_available = true ORDER BY rank_score DESC
+  index("editors_kyc_available_rank_idx").on(t.kycStatus, t.isAvailable, t.rankScore),
+  index("editors_featured_idx").on(t.isFeatured, t.featuredUntil),
+]);
 
 export const kycApplications = pgTable("kyc_applications", {
   id: uuid("id").defaultRandom().primaryKey(),

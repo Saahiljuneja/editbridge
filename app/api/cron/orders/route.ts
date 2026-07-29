@@ -19,13 +19,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
-  const authHeader = req.headers.get("authorization");
-  const secretHeader = req.headers.get("x-cron-secret");
-  const isValidCron =
-    authHeader === `Bearer ${cronSecret}` ||
-    secretHeader === cronSecret;
-
-  if (!isValidCron) {
+  if (req.headers.get("authorization") !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

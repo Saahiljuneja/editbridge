@@ -65,6 +65,12 @@ export default auth(async (req: NextRequest & { auth: { user?: { role?: string; 
   ) {
     const maintenance = await isMaintenanceOn(req.nextUrl.origin);
     if (maintenance) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json(
+          { error: "Service Unavailable: Platform is undergoing maintenance." },
+          { status: 503 }
+        );
+      }
       return NextResponse.redirect(new URL("/maintenance", req.url));
     }
   }
