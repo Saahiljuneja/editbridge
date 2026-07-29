@@ -193,8 +193,8 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
       </motion.div>
 
       {/* Main content — centered */}
-      <div className="relative z-10 flex-1 flex items-center px-6">
-        <div className="max-w-3xl mx-auto w-full py-16 text-center">
+      <div className="relative z-10 flex-1 flex items-center px-8 lg:px-16">
+        <div className="max-w-5xl mx-auto w-full py-16 text-center">
 
           {/* Live badge */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
@@ -206,7 +206,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
           {/* Headline */}
           <motion.div style={{ y: headY }} className="mb-6">
-            <h1 className="font-black tracking-[-0.04em] leading-[0.9] text-white" style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)" }}>
+            <h1 className="font-black tracking-[-0.04em] leading-[0.9] text-white" style={{ fontSize: "clamp(3rem, 8vw, 7rem)" }}>
               Hire the perfect<br />
               video editor for{" "}
               <span className="inline-block overflow-hidden" style={{ height: "1.1em", verticalAlign: "bottom" }}>
