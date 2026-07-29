@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { users, accounts, sessions, verificationTokens, editors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import type { UserRole } from "@/types";
+import { onLoginStreak } from "@/lib/rewards";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -112,6 +113,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             token.roleCheckedAt = now;
           }
         }
+
+        // Daily login streak — fires on page load when the calendar date has changed.
+        // Stored in the token so we skip the DB entirely if already counted today.
+        const today = new Date().toISOString().slice(0, 10);
+        if ((token.lastStreakDate as string | undefined) !== today) {
+          token.lastStreakDate = today;
+          onLoginStreak(token.userId as string).catch(() => {});
+        }
       }
 
       // ── Credentials / first sign-in ──────────────────────────────────
@@ -133,6 +142,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } else {
           token.editorId = null;
         }
+
+        token.lastStreakDate = new Date().toISOString().slice(0, 10);
+        onLoginStreak(user.id!).catch(() => {});
       }
 
       // ── Google OAuth sign-in ─────────────────────────────────────────
@@ -209,6 +221,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           token.emailVerified = !!existing.emailVerified;
         }
+
+        token.lastStreakDate = new Date().toISOString().slice(0, 10);
+        onLoginStreak(userId).catch(() => {});
       }
 
       // ── Manual session update() ──────────────────────────────────────
@@ -256,6 +271,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (session.user && token) {
         session.user.userId = token.userId as string;
+        session.user.name = (token.name as string) ?? session.user.name;
+        session.user.image = (token.picture as string | null) ?? session.user.image;
         session.user.role = (token.role as UserRole) ?? "client";
         session.user.editorId = (token.editorId as string | null) ?? null;
         session.user.needsOnboarding = (token.needsOnboarding as boolean) ?? false;

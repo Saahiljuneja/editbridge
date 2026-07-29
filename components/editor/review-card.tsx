@@ -30,7 +30,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               className="w-9 h-9 rounded-full object-cover"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-semibold text-[#0EA5E9] shrink-0">
+            <div className="w-9 h-9 rounded-full bg-[var(--brand-client)]/10 flex items-center justify-center text-xs font-semibold text-[var(--brand-client)] shrink-0">
               {initials}
             </div>
           )}
@@ -47,8 +47,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
       )}
 
       {review.replyText && (
-        <div className="mt-3 ml-4 pl-3 border-l-2 border-[#0EA5E9]/30 space-y-0.5">
-          <p className="text-xs font-semibold text-[#0EA5E9]">Editor&apos;s reply</p>
+        <div className="mt-3 ml-4 pl-3 border-l-2 border-[var(--brand-client)]/30 space-y-0.5">
+          <p className="text-xs font-semibold text-[var(--brand-client)]">Editor&apos;s reply</p>
           <p className="text-sm text-muted-foreground">{review.replyText}</p>
         </div>
       )}

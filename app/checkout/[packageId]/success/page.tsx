@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { CheckCircle2, ArrowRight, Clock, ShieldCheck, MessageSquare } from "lucide-react";
 
 export const metadata = {
@@ -13,13 +13,13 @@ export default function CheckoutSuccessPage() {
       style={{ background: "#07050f" }}
     >
       {/* Background blobs */}
-      <div className="absolute top-1/3 left-1/4 w-96 h-96 rounded-full bg-[#0EA5E9]/12 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-96 h-96 rounded-full bg-[var(--brand-client)]/12 blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-green-500/8 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-lg w-full text-center">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2 mb-12">
-          <div className="w-7 h-7 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
             <span className="text-white font-extrabold text-xs">E</span>
           </div>
           <span className="text-lg font-extrabold text-white tracking-tight">
@@ -45,7 +45,7 @@ export default function CheckoutSuccessPage() {
           </p>
           <div className="space-y-5">
             <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/20 border border-[#0EA5E9]/30 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-[var(--brand-client)]/20 border border-[var(--brand-client)]/30 flex items-center justify-center shrink-0 mt-0.5">
                 <MessageSquare className="w-3.5 h-3.5 text-[#8B7FE8]" />
               </div>
               <div>
@@ -57,7 +57,7 @@ export default function CheckoutSuccessPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/20 border border-[#0EA5E9]/30 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-[var(--brand-client)]/20 border border-[var(--brand-client)]/30 flex items-center justify-center shrink-0 mt-0.5">
                 <Clock className="w-3.5 h-3.5 text-[#8B7FE8]" />
               </div>
               <div>
@@ -69,7 +69,7 @@ export default function CheckoutSuccessPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/20 border border-[#0EA5E9]/30 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-[var(--brand-client)]/20 border border-[var(--brand-client)]/30 flex items-center justify-center shrink-0 mt-0.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#8B7FE8]" />
               </div>
               <div>
@@ -88,7 +88,7 @@ export default function CheckoutSuccessPage() {
           <Link
             href="/orders"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm transition-colors"
-            style={{ background: "#0EA5E9" }}
+            style={{ background: "var(--brand-client)" }}
           >
             View my orders
             <ArrowRight className="w-4 h-4" />

@@ -16,7 +16,7 @@ export function MobileFilterDrawer({ activeCount }: { activeCount: number }) {
         <SlidersHorizontal className="w-3.5 h-3.5" />
         Filters
         {activeCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#0EA5E9] text-white text-[9px] font-bold flex items-center justify-center">
+          <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[var(--brand-client)] text-white text-[9px] font-bold flex items-center justify-center">
             {activeCount}
           </span>
         )}

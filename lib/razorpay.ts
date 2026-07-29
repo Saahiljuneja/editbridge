@@ -64,3 +64,8 @@ export async function createRefund(
 ) {
   return getRazorpay().payments.refund(paymentId, { amount });
 }
+
+/** Fetch a Razorpay order to verify its amount server-side. */
+export async function fetchRazorpayOrder(orderId: string) {
+  return getRazorpay().orders.fetch(orderId) as Promise<{ id: string; amount: number; currency: string; status: string }>;
+}

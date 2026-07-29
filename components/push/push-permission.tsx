@@ -80,7 +80,7 @@ export function PushPermissionPrompt() {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[300] w-[calc(100vw-2rem)] max-w-sm animate-in slide-in-from-bottom-4 duration-300">
       <div className="bg-gray-900 rounded-2xl shadow-2xl p-4 flex items-start gap-3">
-        <div className="w-9 h-9 rounded-xl bg-[#0EA5E9] flex items-center justify-center shrink-0 mt-0.5">
+        <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)] flex items-center justify-center shrink-0 mt-0.5">
           <Bell className="w-4 h-4 text-white" />
         </div>
         <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ export function PushPermissionPrompt() {
                 <button
                   onClick={handleAllow}
                   disabled={loading}
-                  className="flex-1 py-2 rounded-xl bg-[#0EA5E9] hover:bg-[#3d34a0] text-white text-xs font-semibold transition-colors disabled:opacity-60"
+                  className="flex-1 py-2 rounded-xl bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] text-white text-xs font-semibold transition-colors disabled:opacity-60"
                 >
                   {loading ? "Enabling…" : "Allow notifications"}
                 </button>

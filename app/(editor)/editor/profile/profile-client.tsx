@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -96,7 +97,7 @@ function Section({
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-4 h-4 text-[#0EA5E9] shrink-0 mt-px" />}
+          {Icon && <Icon className="w-4 h-4 text-[var(--brand-client)] shrink-0 mt-px" />}
           <div>
             <p className="text-sm font-semibold text-gray-900">{title}</p>
             {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
@@ -191,6 +192,7 @@ export function ProfileClient({
   const [maxActiveOrders, setMaxActiveOrders] = useState<number | null>(initialMaxActiveOrders);
   const [featuredVideoUrl, setFeaturedVideoUrl] = useState(initialFeaturedVideoUrl);
   const [saving, setSaving] = useState(false);
+  const { update: updateSession } = useSession();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<"profile" | "skills" | "portfolio">(
@@ -241,6 +243,7 @@ export function ProfileClient({
       });
 
       setCurrentImage(publicUrl);
+      await updateSession?.({ image: publicUrl });
       toast.success("Profile photo updated!");
     } catch {
       toast.error("Failed to upload photo.");
@@ -360,7 +363,7 @@ export function ProfileClient({
         return;
       }
       if (featuredVideoInvalid) {
-        toast.error("Featured video must be a valid YouTube or Vimeo URL.");
+        toast.error("Featured video must be a valid YouTube, Vimeo, or Google Drive URL.");
         setSaving(false);
         return;
       }
@@ -433,7 +436,7 @@ export function ProfileClient({
     finally { setSavingVacation(false); }
   }
 
-  const inputClass = "w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 bg-white transition-all";
+  const inputClass = "w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/10 bg-white transition-all";
 
   const bioHasContact = hasContactInfo(bio);
   const titleHasContact = hasContactInfo(title);
@@ -504,7 +507,7 @@ export function ProfileClient({
               onClick={handleSave}
               disabled={saving}
               className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-50 transition-opacity"
-              style={{ background: "#0EA5E9" }}
+              style={{ background: "var(--brand-client)" }}
             >
               <Save className="w-3.5 h-3.5" />
               {saving ? "Saving…" : "Save changes"}
@@ -525,7 +528,7 @@ export function ProfileClient({
 
                 {/* Avatar */}
                 <div className="relative shrink-0">
-                  <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#0EA5E9] to-[#6366F1] flex items-center justify-center">
+                  <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-[var(--brand-client)] to-[#6366F1] flex items-center justify-center">
                     {currentImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={currentImage} alt={userName} className="w-full h-full object-cover" />
@@ -537,7 +540,7 @@ export function ProfileClient({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingPhoto}
-                    className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#0EA5E9] flex items-center justify-center border-2 border-white shadow-sm hover:bg-indigo-500 transition-colors disabled:opacity-60"
+                    className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[var(--brand-client)] flex items-center justify-center border-2 border-white shadow-sm hover:bg-indigo-500 transition-colors disabled:opacity-60"
                   >
                     <Camera className={cn("w-2.5 h-2.5 text-white", uploadingPhoto && "animate-pulse")} />
                   </button>
@@ -601,7 +604,7 @@ export function ProfileClient({
 <div className="flex items-center gap-2 shrink-0">
                   <Sliders className="w-3.5 h-3.5 text-gray-400" />
                   <span className="text-xs text-gray-500">Max orders</span>
-                  <input type="number" min={1} max={50} value={maxActiveOrders ?? ""} onChange={(e) => setMaxActiveOrders(e.target.value ? Number(e.target.value) : null)} placeholder="∞" className="w-14 px-2 py-1 rounded-lg border border-gray-200 text-xs text-center outline-none focus:border-[#0EA5E9] bg-white" />
+                  <input type="number" min={1} max={50} value={maxActiveOrders ?? ""} onChange={(e) => setMaxActiveOrders(e.target.value ? Number(e.target.value) : null)} placeholder="∞" className="w-14 px-2 py-1 rounded-lg border border-gray-200 text-xs text-center outline-none focus:border-[var(--brand-client)] bg-white" />
                   {maxActiveOrders !== null && <button onClick={() => setMaxActiveOrders(null)} className="text-gray-300 hover:text-red-400 transition-colors"><X className="w-3 h-3" /></button>}
                 </div>
               </div>
@@ -626,12 +629,12 @@ export function ProfileClient({
                       type="date"
                       value={vacationDateInput}
                       onChange={(e) => setVacationDateInput(e.target.value)}
-                      className="px-2 py-1 rounded-lg border border-gray-200 text-xs outline-none focus:border-[#0EA5E9] bg-white"
+                      className="px-2 py-1 rounded-lg border border-gray-200 text-xs outline-none focus:border-[var(--brand-client)] bg-white"
                     />
                     <button
                       onClick={handleSetVacation}
                       disabled={!vacationDateInput || savingVacation}
-                      className="text-xs font-semibold text-[#0EA5E9] hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="text-xs font-semibold text-[var(--brand-client)] hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {savingVacation ? "Setting…" : "Set vacation mode"}
                     </button>
@@ -653,7 +656,7 @@ export function ProfileClient({
                   className={cn(
                     "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all",
                     activeTab === key
-                      ? "bg-[#0EA5E9] text-white shadow-sm"
+                      ? "bg-[var(--brand-client)] text-white shadow-sm"
                       : "text-gray-400 hover:text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -713,7 +716,7 @@ export function ProfileClient({
                       type="button"
                       onClick={() => coverInputRef.current?.click()}
                       disabled={uploadingCover}
-                      className="text-xs font-medium text-[#0EA5E9] hover:underline disabled:opacity-50"
+                      className="text-xs font-medium text-[var(--brand-client)] hover:underline disabled:opacity-50"
                     >
                       {uploadingCover ? "Uploading…" : coverImage ? "Change" : "Upload"}
                     </button>
@@ -769,11 +772,11 @@ export function ProfileClient({
                           className={cn(
                             "p-3.5 rounded-xl border text-left transition-all",
                             experienceLevel === value
-                              ? "border-[#0EA5E9] bg-[#0EA5E9]/5 ring-1 ring-[#0EA5E9]"
+                              ? "border-[var(--brand-client)] bg-[var(--brand-client)]/5 ring-1 ring-[var(--brand-client)]"
                               : "border-gray-200 hover:border-gray-300 bg-white"
                           )}
                         >
-                          <p className={cn("text-sm font-bold", experienceLevel === value ? "text-[#0EA5E9]" : "text-gray-800")}>{label}</p>
+                          <p className={cn("text-sm font-bold", experienceLevel === value ? "text-[var(--brand-client)]" : "text-gray-800")}>{label}</p>
                           <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
                         </button>
                       ))}
@@ -785,7 +788,7 @@ export function ProfileClient({
                         value={yearsOfExperience ?? ""}
                         onChange={(e) => setYearsOfExperience(e.target.value ? Number(e.target.value) : null)}
                         placeholder="0"
-                        className="w-20 px-3 py-2 rounded-xl border border-gray-200 text-sm text-center outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10"
+                        className="w-20 px-3 py-2 rounded-xl border border-gray-200 text-sm text-center outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/10"
                       />
                       <span className="text-sm text-gray-400">years</span>
                     </div>
@@ -821,9 +824,9 @@ export function ProfileClient({
                             }}
                             className={cn(
                               "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
-                              selected ? "bg-[#0EA5E9] text-white border-[#0EA5E9]"
+                              selected ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]"
                                 : niches.length >= 3 ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed"
-                                : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9]/30 hover:text-[#0EA5E9]"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)]/30 hover:text-[var(--brand-client)]"
                             )}
                           >{preset}</button>
                         );
@@ -851,7 +854,7 @@ export function ProfileClient({
                     {niches.filter((n) => !NICHE_PRESETS.includes(n)).length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {niches.filter((n) => !NICHE_PRESETS.includes(n)).map((n) => (
-                          <span key={n} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#0EA5E9] text-white border border-[#0EA5E9]">
+                          <span key={n} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--brand-client)] text-white border border-[var(--brand-client)]">
                             {n}<button onClick={() => setNiches(niches.filter((x) => x !== n))} className="hover:opacity-70"><X className="w-3 h-3" /></button>
                           </span>
                         ))}
@@ -875,9 +878,9 @@ export function ProfileClient({
                             }}
                             className={cn(
                               "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
-                              selected ? "bg-[#0EA5E9] text-white border-[#0EA5E9]"
+                              selected ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]"
                                 : workStyleTags.length >= 5 ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed"
-                                : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9]/30 hover:text-[#0EA5E9]"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)]/30 hover:text-[var(--brand-client)]"
                             )}
                           >{tag}</button>
                         );
@@ -905,7 +908,7 @@ export function ProfileClient({
                     {workStyleTags.filter((t) => !WORK_STYLE_OPTIONS.includes(t)).length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {workStyleTags.filter((t) => !WORK_STYLE_OPTIONS.includes(t)).map((t) => (
-                          <span key={t} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#0EA5E9] text-white border border-[#0EA5E9]">
+                          <span key={t} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--brand-client)] text-white border border-[var(--brand-client)]">
                             {t}<button onClick={() => setWorkStyleTags(workStyleTags.filter((x) => x !== t))} className="hover:opacity-70"><X className="w-3 h-3" /></button>
                           </span>
                         ))}
@@ -916,7 +919,7 @@ export function ProfileClient({
 
                 {/* Featured video */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <Section icon={Video} title="Featured Video" description="Paste a YouTube or Vimeo link — it plays directly on your public profile.">
+                  <Section icon={Video} title="Featured Video" description="Paste a YouTube, Vimeo, or Google Drive link — it plays directly on your public profile.">
                     <input
                       type="url"
                       value={featuredVideoUrl}
@@ -930,7 +933,7 @@ export function ProfileClient({
                           <iframe src={featuredVideoEmbedUrl} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
                         </div>
                       ) : (
-                        <p className="text-xs text-red-500 mt-1.5">Not a valid YouTube or Vimeo URL — it won&apos;t be saved.</p>
+                        <p className="text-xs text-red-500 mt-1.5">Not a valid YouTube, Vimeo, or Google Drive URL — it won&apos;t be saved.</p>
                       )
                     )}
                   </Section>
@@ -943,7 +946,7 @@ export function ProfileClient({
                     title="FAQ"
                     description="Answer common questions upfront — shown on your public profile."
                     action={
-                      <button onClick={() => setFaqs([...faqs, { question: "", answer: "" }])} className="flex items-center gap-1 text-xs font-semibold text-[#0EA5E9] px-2.5 py-1.5 rounded-lg bg-[#0EA5E9]/5 hover:bg-[#0EA5E9]/10 transition-colors">
+                      <button onClick={() => setFaqs([...faqs, { question: "", answer: "" }])} className="flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] px-2.5 py-1.5 rounded-lg bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors">
                         <Plus className="w-3 h-3" /> Add
                       </button>
                     }
@@ -956,7 +959,7 @@ export function ProfileClient({
                           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Quick add</p>
                           <div className="flex flex-wrap gap-2">
                             {available.map((q) => (
-                              <button key={q} onClick={() => setFaqs([...faqs, { question: q, answer: "" }])} className="px-3 py-1.5 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-500 hover:border-[#0EA5E9] hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 transition-all">
+                              <button key={q} onClick={() => setFaqs([...faqs, { question: q, answer: "" }])} className="px-3 py-1.5 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-500 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 transition-all">
                                 + {q}
                               </button>
                             ))}
@@ -982,7 +985,7 @@ export function ProfileClient({
                                   placeholder="Question" maxLength={150}
                                   className={cn(
                                     "flex-1 px-3 py-2 rounded-lg border text-sm bg-white outline-none transition-all",
-                                    qInvalid ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[#0EA5E9]"
+                                    qInvalid ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[var(--brand-client)]"
                                   )}
                                 />
                                 <button onClick={() => setFaqs(faqs.filter((_, idx) => idx !== i))} className="text-gray-300 hover:text-red-400 transition-colors p-1"><X className="w-4 h-4" /></button>
@@ -993,7 +996,7 @@ export function ProfileClient({
                                 placeholder="Answer" rows={2} maxLength={500}
                                 className={cn(
                                   "w-full px-3 py-2 rounded-lg border text-sm bg-white outline-none resize-none transition-all",
-                                  aInvalid ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[#0EA5E9]"
+                                  aInvalid ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[var(--brand-client)]"
                                 )}
                               />
                               {(qInvalid || aInvalid) && <p className="text-xs text-red-500">Contact info not allowed here.</p>}
@@ -1033,7 +1036,7 @@ export function ProfileClient({
                     title="Languages"
                     description="Languages you work in and your proficiency level."
                     action={
-                      <button onClick={() => setLanguages([...languages, { language: "", level: "" }])} className="flex items-center gap-1 text-xs font-semibold text-[#0EA5E9] px-2.5 py-1.5 rounded-lg bg-[#0EA5E9]/5 hover:bg-[#0EA5E9]/10 transition-colors">
+                      <button onClick={() => setLanguages([...languages, { language: "", level: "" }])} className="flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] px-2.5 py-1.5 rounded-lg bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors">
                         <Plus className="w-3 h-3" /> Add
                       </button>
                     }
@@ -1048,7 +1051,7 @@ export function ProfileClient({
                           <div key={i} className="rounded-xl border border-gray-200 p-4 space-y-2.5 bg-gray-50/50">
                             <div className="flex items-center gap-2">
                               <div className="relative flex-1">
-                                <select value={lang.language} onChange={(e) => { const u = [...languages]; u[i] = { ...u[i], language: e.target.value }; setLanguages(u); }} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white appearance-none pr-7 outline-none focus:border-[#0EA5E9]">
+                                <select value={lang.language} onChange={(e) => { const u = [...languages]; u[i] = { ...u[i], language: e.target.value }; setLanguages(u); }} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white appearance-none pr-7 outline-none focus:border-[var(--brand-client)]">
                                   <option value="">Select language</option>
                                   {COMMON_LANGUAGES.map((l) => <option key={l}>{l}</option>)}
                                 </select>
@@ -1058,7 +1061,7 @@ export function ProfileClient({
                             </div>
                             <div className="flex flex-wrap gap-1.5">
                               {LANGUAGE_LEVELS.map((level) => (
-                                <button key={level} onClick={() => { const u = [...languages]; u[i] = { ...u[i], level }; setLanguages(u); }} className={cn("px-2.5 py-1 rounded-full text-xs font-medium border transition-all", lang.level === level ? "bg-[#0EA5E9] text-white border-[#0EA5E9]" : "bg-white text-gray-500 border-gray-200 hover:border-[#0EA5E9]/40")}>
+                                <button key={level} onClick={() => { const u = [...languages]; u[i] = { ...u[i], level }; setLanguages(u); }} className={cn("px-2.5 py-1 rounded-full text-xs font-medium border transition-all", lang.level === level ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]" : "bg-white text-gray-500 border-gray-200 hover:border-[var(--brand-client)]/40")}>
                                   {level}
                                 </button>
                               ))}
@@ -1075,7 +1078,7 @@ export function ProfileClient({
                     title="Turnaround Time"
                     description="How long each video type typically takes you."
                     action={
-                      <button onClick={() => setTurnaround([...turnaround, { type: "", days: 1 }])} className="flex items-center gap-1 text-xs font-semibold text-[#0EA5E9] px-2.5 py-1.5 rounded-lg bg-[#0EA5E9]/5 hover:bg-[#0EA5E9]/10 transition-colors">
+                      <button onClick={() => setTurnaround([...turnaround, { type: "", days: 1 }])} className="flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] px-2.5 py-1.5 rounded-lg bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors">
                         <Plus className="w-3 h-3" /> Add
                       </button>
                     }
@@ -1088,7 +1091,7 @@ export function ProfileClient({
                           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Quick add</p>
                           <div className="flex flex-wrap gap-2">
                             {available.map((s) => (
-                              <button key={s.type} onClick={() => setTurnaround([...turnaround, { type: s.type, days: s.days }])} className="px-3 py-1.5 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-500 hover:border-[#0EA5E9] hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 transition-all">
+                              <button key={s.type} onClick={() => setTurnaround([...turnaround, { type: s.type, days: s.days }])} className="px-3 py-1.5 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-500 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 transition-all">
                                 + {s.type}
                               </button>
                             ))}
@@ -1113,10 +1116,10 @@ export function ProfileClient({
                                   placeholder="e.g. 10-min YouTube video" maxLength={50}
                                   className={cn(
                                     "flex-1 px-3 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 bg-white transition-all",
-                                    typeInvalid ? "border-red-300 focus:border-red-400 focus:ring-red-100" : "border-gray-200 focus:border-[#0EA5E9] focus:ring-[#0EA5E9]/10"
+                                    typeInvalid ? "border-red-300 focus:border-red-400 focus:ring-red-100" : "border-gray-200 focus:border-[var(--brand-client)] focus:ring-[var(--brand-client)]/10"
                                   )}
                                 />
-                                <input type="number" min={1} max={60} value={item.days} onChange={(e) => { const u = [...turnaround]; u[i] = { ...u[i], days: Number(e.target.value) }; setTurnaround(u); }} className="w-16 px-2 py-2.5 rounded-xl border border-gray-200 text-sm text-center outline-none focus:border-[#0EA5E9]" />
+                                <input type="number" min={1} max={60} value={item.days} onChange={(e) => { const u = [...turnaround]; u[i] = { ...u[i], days: Number(e.target.value) }; setTurnaround(u); }} className="w-16 px-2 py-2.5 rounded-xl border border-gray-200 text-sm text-center outline-none focus:border-[var(--brand-client)]" />
                                 <span className="text-xs text-gray-400 shrink-0">days</span>
                                 <button onClick={() => setTurnaround(turnaround.filter((_, idx) => idx !== i))} className="text-gray-300 hover:text-red-400 transition-colors"><X className="w-4 h-4" /></button>
                               </div>
@@ -1141,7 +1144,7 @@ export function ProfileClient({
                     <span className="text-xs text-gray-400">Breakdown:</span>
                     {portfolioVideoCount > 0 && (
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-100 rounded-full px-3 py-1 shadow-sm">
-                        <Play className="w-3 h-3 text-[#0EA5E9]" /> {portfolioVideoCount} video{portfolioVideoCount !== 1 ? "s" : ""}
+                        <Play className="w-3 h-3 text-[var(--brand-client)]" /> {portfolioVideoCount} video{portfolioVideoCount !== 1 ? "s" : ""}
                       </span>
                     )}
                     {portfolioImageCount > 0 && (
@@ -1154,7 +1157,7 @@ export function ProfileClient({
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {portfolioFeaturedCount} featured
                       </span>
                     )}
-                    <Link href="/editor/analytics" className="ml-auto text-xs font-medium text-[#0EA5E9] hover:underline">
+                    <Link href="/editor/analytics" className="ml-auto text-xs font-medium text-[var(--brand-client)] hover:underline">
                       View views, likes & performance →
                     </Link>
                   </div>
@@ -1209,7 +1212,7 @@ export function ProfileClient({
                   </p>
                   <Link
                     href="/editor/xp-shop"
-                    className="inline-block mt-1 text-xs font-semibold text-white bg-sky-500 hover:bg-sky-600 px-3 py-1.5 rounded-lg transition-colors"
+                    className="inline-block mt-1 text-xs font-semibold text-white bg-sky-500 hover:bg-[var(--brand-client-hover)] px-3 py-1.5 rounded-lg transition-colors"
                   >
                     Browse XP Shop
                   </Link>

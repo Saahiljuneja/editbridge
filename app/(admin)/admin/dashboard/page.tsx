@@ -10,7 +10,15 @@ import {
   Star, UserCheck, Zap, UserPlus,
 } from "lucide-react";
 import Link from "next/link";
-import { OrdersLineChart, SignupsBarChart, UserPieChart } from "./charts";
+import nextDynamic from "next/dynamic";
+
+const OrdersLineChart = nextDynamic(() => import("./charts").then(m => m.OrdersLineChart));
+const SignupsBarChart = nextDynamic(() => import("./charts").then(m => m.SignupsBarChart));
+const UserPieChart = nextDynamic(() => import("./charts").then(m => m.UserPieChart));
+const PlatformRevenueChart = nextDynamic(() => import("./charts").then(m => m.PlatformRevenueChart));
+const PlatformActiveOrdersChart = nextDynamic(() => import("./charts").then(m => m.PlatformActiveOrdersChart));
+const PlatformNicheResponseChart = nextDynamic(() => import("./charts").then(m => m.PlatformNicheResponseChart));
+const PlatformClientRepeatChart = nextDynamic(() => import("./charts").then(m => m.PlatformClientRepeatChart));
 import { LiveStats } from "./live-stats";
 
 export const dynamic = "force-dynamic";
@@ -316,6 +324,82 @@ export default async function AdminDashboardPage() {
     db.select({ value: count() }).from(users).where(sql`${users.role} = 'client'`).then(r => r[0].value),
   ]);
 
+  // ── Admin Dashboard Chart Queries ──
+  const [
+    platformMonthlyRevenue,
+    platformActiveOrdersBreakdown,
+    platformNicheResponseTimes,
+    platformClientRepeat,
+  ] = await Promise.all([
+    // 1. platform monthly GTV and commission (over the last 6 months)
+    db.execute<{ month: string; gtv: number; commission: number }>(sql`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YY') AS month,
+        COALESCE(SUM(total_amount), 0)::int AS gtv,
+        COALESCE(SUM(commission_amount), 0)::int AS commission
+      FROM orders
+      WHERE status = 'completed'
+        AND created_at >= NOW() - INTERVAL '6 months'
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY DATE_TRUNC('month', created_at)
+    `),
+
+    // 2. platform active orders by status
+    db.execute<{ status: string; count: number }>(sql`
+      SELECT status, COUNT(*)::int AS count
+      FROM orders
+      WHERE status IN ('pending', 'in_progress', 'delivered', 'revision_requested')
+      GROUP BY status
+    `),
+
+    // 3. platform response times by category/niche
+    db.execute<{ niche: string; avg_response: number }>(sql`
+      SELECT
+        COALESCE(niche, 'General') AS niche,
+        ROUND(AVG(avg_response_time))::int AS avg_response
+      FROM editors
+      WHERE kyc_status = 'approved' AND avg_response_time IS NOT NULL
+      GROUP BY niche
+      ORDER BY avg_response ASC
+      LIMIT 6
+    `),
+
+    // 4. platform client repeat-rates
+    db.execute<{ client_type: string; client_count: number }>(sql`
+      SELECT
+        CASE WHEN order_count >= 2 THEN 'Repeat Buyers' ELSE 'One-time Buyers' END AS client_type,
+        COUNT(DISTINCT client_id)::int AS client_count
+      FROM (
+        SELECT client_id, COUNT(*) AS order_count
+        FROM orders
+        WHERE status = 'completed'
+        GROUP BY client_id
+      ) sub
+      GROUP BY client_type
+    `),
+  ]);
+
+  const platformRevenueData = platformMonthlyRevenue.rows.map(r => ({
+    month: String(r.month),
+    gtv: Number(r.gtv),
+    commission: Number(r.commission),
+  }));
+
+  const platformActiveOrdersData = platformActiveOrdersBreakdown.rows.map(r => ({
+    status: String(r.status),
+    count: Number(r.count),
+  }));
+
+  const platformNicheResponseData = platformNicheResponseTimes.rows.map(r => ({
+    niche: String(r.niche),
+    avg_response: Number(r.avg_response),
+  }));
+
+  const platformClientRepeatData = platformClientRepeat.rows.map(r => ({
+    client_type: String(r.client_type),
+    client_count: Number(r.client_count),
+  }));
+
   const days = last30Days();
   const ordersMap = Object.fromEntries((ordersPerDay.rows as { date: string; value: number }[]).map(r => [r.date, r.value]));
   const signupsMap = Object.fromEntries((signupsPerDay.rows as { date: string; value: number }[]).map(r => [r.date, r.value]));
@@ -478,6 +562,56 @@ export default async function AdminDashboardPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Platform Analytics & Performance Charts ── */}
+        <div>
+          <p className="a-section-label">Platform Performance & Niche Insights</p>
+          <div className="grid lg:grid-cols-2 gap-4">
+            {/* Platform Revenue */}
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white">Earnings & GTV Growth</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Platform volume & net revenue — last 6 months</p>
+                </div>
+              </div>
+              <PlatformRevenueChart data={platformRevenueData} />
+            </div>
+
+            {/* Active Platform Workload */}
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white">Active Order Distribution</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Workload across order stages</p>
+                </div>
+              </div>
+              <PlatformActiveOrdersChart data={platformActiveOrdersData} />
+            </div>
+
+            {/* Editor Response Times by Niche */}
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white">Response Times by Niche</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Avg editor response speed (mins)</p>
+                </div>
+              </div>
+              <PlatformNicheResponseChart data={platformNicheResponseData} />
+            </div>
+
+            {/* Client Retention */}
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white">Client Repeat Rates</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">One-time vs repeat buyers proportion</p>
+                </div>
+              </div>
+              <PlatformClientRepeatChart data={platformClientRepeatData} />
             </div>
           </div>
         </div>

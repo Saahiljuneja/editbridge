@@ -18,7 +18,7 @@ export async function GET() {
         and(
           eq(orders.editorId, session.user.editorId),
           ne(messages.senderId, session.user.userId!),
-          sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`,
+          eq(messages.isRead, false),
           eq(messages.isBlocked, false)
         )
       )

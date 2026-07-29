@@ -127,7 +127,7 @@ export function DisputeChat({
                   {msg.senderImage ? (
                     <Image src={msg.senderImage} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#7c6ff7] flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--brand-client)] to-[#7c6ff7] flex items-center justify-center">
                       <span className="text-xs font-bold text-white">{(msg.senderName ?? "?")[0].toUpperCase()}</span>
                     </div>
                   )}
@@ -143,7 +143,7 @@ export function DisputeChat({
                   <div className={cn(
                     "rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
                     isMe
-                      ? "bg-[#0EA5E9] text-white rounded-tr-sm"
+                      ? "bg-[var(--brand-client)] text-white rounded-tr-sm"
                       : msg.senderRole === "admin" || msg.senderRole?.startsWith("staff_")
                         ? "bg-purple-50 border border-purple-100 text-gray-800 rounded-tl-sm"
                         : "bg-gray-100 text-gray-800 rounded-tl-sm"
@@ -167,12 +167,12 @@ export function DisputeChat({
             onKeyDown={handleKey}
             placeholder="Type your message… (Enter to send)"
             rows={2}
-            className="flex-1 resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 focus:border-[#0EA5E9] transition-colors"
+            className="flex-1 resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 focus:border-[var(--brand-client)] transition-colors"
           />
           <button
             onClick={send}
             disabled={!input.trim() || sending}
-            className="self-end w-10 h-10 rounded-xl bg-[#0EA5E9] hover:bg-[#3d34a0] disabled:opacity-40 flex items-center justify-center transition-colors shrink-0"
+            className="self-end w-10 h-10 rounded-xl bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] disabled:opacity-40 flex items-center justify-center transition-colors shrink-0"
           >
             <Send className="w-4 h-4 text-white" />
           </button>

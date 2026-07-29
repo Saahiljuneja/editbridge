@@ -41,7 +41,7 @@ export function AvailabilityToggle({ initial, kycApproved }: AvailabilityToggleP
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
         {isAvailable
-          ? <Zap className="w-4 h-4 text-[#0EA5E9]" />
+          ? <Zap className="w-4 h-4 text-[var(--brand-client)]" />
           : <Moon className="w-4 h-4 text-gray-400" />}
         <span className="font-semibold text-gray-900 text-sm">Availability</span>
       </div>
@@ -49,10 +49,10 @@ export function AvailabilityToggle({ initial, kycApproved }: AvailabilityToggleP
       <div className="p-5">
         <div className={cn(
           "flex items-center justify-between rounded-xl border px-4 py-3 transition-colors",
-          isAvailable ? "border-[#0EA5E9]/20 bg-[#0EA5E9]/5" : "border-gray-200 bg-gray-50"
+          isAvailable ? "border-[var(--brand-client)]/20 bg-[var(--brand-client)]/5" : "border-gray-200 bg-gray-50"
         )}>
           <div>
-            <p className={cn("text-sm font-semibold", isAvailable ? "text-[#0EA5E9]" : "text-gray-500")}>
+            <p className={cn("text-sm font-semibold", isAvailable ? "text-[var(--brand-client)]" : "text-gray-500")}>
               {isAvailable ? "Available for orders" : "Paused"}
             </p>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -66,7 +66,7 @@ export function AvailabilityToggle({ initial, kycApproved }: AvailabilityToggleP
             title={!kycApproved ? "Complete KYC first" : undefined}
             className={cn(
               "relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 disabled:opacity-40",
-              isAvailable ? "bg-[#0EA5E9]" : "bg-gray-300"
+              isAvailable ? "bg-[var(--brand-client)]" : "bg-gray-300"
             )}
           >
             {saving

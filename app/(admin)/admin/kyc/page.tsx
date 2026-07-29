@@ -86,10 +86,10 @@ export default async function AdminKycQueuePage({
           name="q"
           defaultValue={q}
           placeholder="Search by name or email…"
-          className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+          className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
         />
         <input type="hidden" name="status" value={status} />
-        <button type="submit" className="px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-medium hover:bg-sky-600 transition-colors">
+        <button type="submit" className="px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-client-hover)] transition-colors">
           Search
         </button>
         {q && (
@@ -108,7 +108,7 @@ export default async function AdminKycQueuePage({
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
               status === tab.value
-                ? "bg-[#0EA5E9] text-white"
+                ? "bg-[var(--brand-client)] text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             )}
           >

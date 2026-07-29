@@ -120,8 +120,8 @@ export function ExtensionPanel({
                       className={cn(
                         "w-9 h-9 rounded-lg text-sm font-semibold border transition-colors",
                         days === d
-                          ? "bg-[#7C3AED] border-[#7C3AED] text-white"
-                          : "border-border text-muted-foreground hover:border-[#7C3AED]/40"
+                          ? "bg-[var(--brand-editor)] border-[var(--brand-editor)] text-white"
+                          : "border-border text-muted-foreground hover:border-[var(--brand-editor)]/40"
                       )}
                     >
                       {d}
@@ -139,14 +139,14 @@ export function ExtensionPanel({
                   rows={3}
                   maxLength={500}
                   placeholder="e.g. The project scope grew after your last revision request, and I want to make sure the final cut is polished."
-                  className="mt-1.5 w-full text-sm px-3 py-2.5 rounded-xl border border-border outline-none focus:ring-2 focus:ring-[#7C3AED]/20 resize-none"
+                  className="mt-1.5 w-full text-sm px-3 py-2.5 rounded-xl border border-border outline-none focus:ring-2 focus:ring-[var(--brand-editor)]/20 resize-none"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={submitRequest}
                   disabled={submitting}
-                  className="px-4 py-2 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-[#6b2fd6] transition-colors disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl bg-[var(--brand-editor)] text-white text-sm font-semibold hover:bg-[var(--brand-editor-hover)] transition-colors disabled:opacity-50"
                 >
                   {submitting ? "Sending…" : "Send request"}
                 </button>

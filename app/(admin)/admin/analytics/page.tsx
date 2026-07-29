@@ -114,14 +114,14 @@ export default async function AdminAnalyticsPage() {
       value: thisMonthOrders.toLocaleString(),
       sub: pctChange(thisMonthOrders, lastMonthOrders),
       icon: ShoppingBag,
-      color: "#0EA5E9",
+      color: "var(--brand-client)",
     },
     {
       label: "New signups this month",
       value: thisMonthUsers.toLocaleString(),
       sub: pctChange(thisMonthUsers, lastMonthUsers),
       icon: Users,
-      color: "#0F6E56",
+      color: "var(--brand-teal)",
     },
     {
       label: "Revenue this month",
@@ -142,7 +142,7 @@ export default async function AdminAnalyticsPage() {
       value: avgOrderValue ? formatCurrency(avgOrderValue) : "—",
       sub: null,
       icon: BarChart2,
-      color: "#7c3aed",
+      color: "var(--brand-editor)",
     },
     {
       label: "Client retention",
@@ -202,7 +202,7 @@ export default async function AdminAnalyticsPage() {
               {dailyRows.map((row) => (
                 <div key={row.day} className="flex-1 flex flex-col items-center gap-1 group">
                   <div
-                    className="w-full rounded-t bg-[#0EA5E9]/80 group-hover:bg-[#0EA5E9] transition-colors relative"
+                    className="w-full rounded-t bg-[var(--brand-client)]/80 group-hover:bg-[var(--brand-client)] transition-colors relative"
                     style={{ height: `${Math.max((row.count / maxDaily) * 100, 4)}%` }}
                     title={`${row.day}: ${row.count} orders`}
                   />
@@ -264,14 +264,14 @@ export default async function AdminAnalyticsPage() {
         <div className="a-card p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200">Top editors by orders</h2>
-            <Link href="/admin/editors" className="text-xs text-[#0EA5E9] hover:underline">View all</Link>
+            <Link href="/admin/editors" className="text-xs text-[var(--brand-client)] hover:underline">View all</Link>
           </div>
           <div className="space-y-3">
             {topEditors.map((editor, idx) => (
               <div key={editor.id} className="flex items-center gap-3">
                 <span className="w-5 text-xs text-gray-300 dark:text-gray-600 font-bold text-right shrink-0">{idx + 1}</span>
-                <div className="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                  <span className="text-[#0EA5E9] text-xs font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[var(--brand-client)]/10 flex items-center justify-center shrink-0">
+                  <span className="text-[var(--brand-client)] text-xs font-bold">
                     {(editor.name ?? "?").slice(0, 1)}
                   </span>
                 </div>
@@ -285,7 +285,7 @@ export default async function AdminAnalyticsPage() {
                   <Award className="w-3.5 h-3.5 text-amber-400" />
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{editor.totalOrders}</span>
                 </div>
-                <Link href={`/admin/users/${editor.id}`} className="text-xs text-gray-300 dark:text-gray-600 hover:text-[#0EA5E9] transition-colors shrink-0">→</Link>
+                <Link href={`/admin/users/${editor.id}`} className="text-xs text-gray-300 dark:text-gray-600 hover:text-[var(--brand-client)] transition-colors shrink-0">→</Link>
               </div>
             ))}
           </div>

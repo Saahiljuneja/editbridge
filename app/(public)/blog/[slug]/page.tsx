@@ -1,17 +1,10 @@
-﻿export const dynamic = "force-dynamic";
-
-import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Clock, Tag, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Tag, ChevronRight, User } from "lucide-react";
 import { db } from "@/lib/db";
-import { blogPosts } from "@/lib/db/schema";
-import { eq, desc, count } from "drizzle-orm";
-
-export const metadata: Metadata = {
-  title: "Blog — EditBridge | Video Editing Tips & Guides",
-  description:
-    "Guides and tips on hiring video editors in India, YouTube growth, Reels editing, and creator workflows.",
-};
+import { blogPosts, users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
 const CATEGORY_COLORS: Record<string, string> = {
   "Hiring guide":     "bg-purple-50 text-purple-700",
@@ -22,197 +15,123 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Thumbnails":       "bg-amber-50 text-amber-700",
   "Podcast":          "bg-indigo-50 text-indigo-700",
   "Creator workflow": "bg-teal-50 text-teal-700",
-  "Platform news":    "bg-[#0EA5E9]/10 text-[#0EA5E9]",
+  "Platform news":    "bg-[var(--brand-client)]/10 text-[var(--brand-client)]",
   "General":          "bg-gray-100 text-gray-600",
 };
 
-const PER_PAGE = 10;
+const getCachedBlogPost = (slug: string) =>
+  unstable_cache(
+    async () => {
+      const [post] = await db
+        .select({
+          id: blogPosts.id,
+          title: blogPosts.title,
+          excerpt: blogPosts.excerpt,
+          content: blogPosts.content,
+          category: blogPosts.category,
+          readTime: blogPosts.readTime,
+          publishedAt: blogPosts.publishedAt,
+          authorName: users.name,
+        })
+        .from(blogPosts)
+        .innerJoin(users, eq(users.id, blogPosts.authorId))
+        .where(eq(blogPosts.slug, slug))
+        .limit(1);
 
-function formatDate(d: Date) {
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+      if (!post) return null;
+
+      return {
+        ...post,
+        publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
+      };
+    },
+    ["single-blog-post-slug", slug],
+    { revalidate: 600, tags: ["single-blog-post-slug", `blog-post-${slug}`] }
+  )();
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-export default async function BlogPage({
-  searchParams,
+export default async function BlogPostPage({
+  params,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { page: pageParam } = await searchParams;
-  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
-  const offset = (page - 1) * PER_PAGE;
-
-  const [totalResult, posts] = await Promise.all([
-    db.select({ count: count() }).from(blogPosts).where(eq(blogPosts.status, "published")),
-    db
-      .select()
-      .from(blogPosts)
-      .where(eq(blogPosts.status, "published"))
-      .orderBy(desc(blogPosts.publishedAt))
-      .limit(PER_PAGE)
-      .offset(offset),
-  ]);
-
-  const total = totalResult[0]?.count ?? 0;
-  const totalPages = Math.ceil(total / PER_PAGE);
-
-  // On page 1, first 2 posts are featured; the rest go into the list
-  const featured = page === 1 ? posts.slice(0, 2) : [];
-  const list = page === 1 ? posts.slice(2) : posts;
+  const { slug } = await params;
+  const post = await getCachedBlogPost(slug);
+  if (!post) notFound();
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="bg-[#07050f] pt-20 pb-14 px-4">
-        <div className="px-8 py-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/8 border border-white/10 text-white/50 text-xs font-medium mb-6">
-            <Tag className="w-3.5 h-3.5" />
-            EditBridge Blog
+    <div className="min-h-screen bg-gray-50 pb-16">
+      {/* Blog Article Hero Header */}
+      <section className="bg-[#07050f] pt-24 pb-16 px-6 text-left">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/50 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to blog
+          </Link>
+
+          <div className="space-y-4">
+            <span
+              className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {post.category}
+            </span>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">
+              {post.title}
+            </h1>
+            <p className="text-white/60 text-base md:text-lg leading-relaxed font-medium">
+              {post.excerpt}
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
-            Guides for creators &<br />
-            <span className="text-[#8B7FE8]">the editors who help them</span>
-          </h1>
-          <p className="text-white/50 text-base max-w-xl leading-relaxed">
-            Hiring guides, editing tips, pricing breakdowns, and creator workflows.
-          </p>
+
+          <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-white/40 pt-2 border-t border-white/10">
+            <span className="flex items-center gap-1.5">
+              <User className="w-4 h-4" /> By {post.authorName ?? "EditBridge Team"}
+            </span>
+            {post.publishedAt && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" /> {formatDate(post.publishedAt)}
+              </span>
+            )}
+            <span className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4" /> {post.readTime}
+            </span>
+          </div>
         </div>
       </section>
 
-      <div className="px-8 py-6">
-        {total === 0 ? (
-          <div className="text-center py-20 text-gray-300">
-            <p className="text-sm">No posts yet. Check back soon.</p>
+      {/* Article Content Container */}
+      <main className="max-w-3xl mx-auto px-6 mt-10">
+        <article className="bg-white border border-gray-100 rounded-2xl p-8 sm:p-10 shadow-sm">
+          {/* Simple prose container to format the markdown body text */}
+          <div className="text-gray-800 text-base leading-relaxed space-y-6 whitespace-pre-wrap">
+            {post.content}
           </div>
-        ) : (
-          <>
-            {/* Featured posts — page 1 only */}
-            {featured.length > 0 && (
-              <section className="mb-14">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Featured</p>
-                <div className="grid md:grid-cols-2 gap-5">
-                  {featured.map((post) => (
-                    <Link
-                      key={post.id}
-                      href={`/blog/${post.slug}`}
-                      className="group block bg-[#07050f] rounded-2xl p-6 hover:ring-2 hover:ring-[#0EA5E9]/50 transition-all"
-                    >
-                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold mb-4 ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
-                        {post.category}
-                      </span>
-                      <h2 className="text-lg font-bold text-white mb-3 leading-snug group-hover:text-[#8B7FE8] transition-colors">
-                        {post.title}
-                      </h2>
-                      <p className="text-white/40 text-sm leading-relaxed mb-5">{post.excerpt}</p>
-                      <div className="flex items-center justify-between text-xs text-white/25">
-                        <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{post.readTime}</span>
-                        <span>{post.publishedAt ? formatDate(post.publishedAt) : ""}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
+        </article>
 
-            {/* Post list */}
-            {list.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-5">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    {page === 1 ? "All posts" : `Page ${page} of ${totalPages}`}
-                  </p>
-                  <p className="text-xs text-gray-300">{total} posts total</p>
-                </div>
-                <div className="space-y-4">
-                  {list.map((post) => (
-                    <Link
-                      key={post.id}
-                      href={`/blog/${post.slug}`}
-                      className="group flex flex-col sm:flex-row sm:items-start gap-4 p-5 rounded-2xl border border-gray-100 hover:border-[#0EA5E9]/20 hover:bg-[#0EA5E9]/2 transition-all"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
-                            {post.category}
-                          </span>
-                          <span className="text-xs text-gray-300">{post.readTime}</span>
-                        </div>
-                        <h3 className="font-bold text-gray-900 text-base leading-snug mb-1.5 group-hover:text-[#0EA5E9] transition-colors">
-                          {post.title}
-                        </h3>
-                        <p className="text-sm text-gray-400 leading-relaxed line-clamp-2">{post.excerpt}</p>
-                      </div>
-                      <div className="flex sm:flex-col items-center sm:items-end gap-3 shrink-0">
-                        <span className="text-xs text-gray-300">{post.publishedAt ? formatDate(post.publishedAt) : ""}</span>
-                        <ArrowRight className="w-4 h-4 text-gray-200 group-hover:text-[#0EA5E9] group-hover:translate-x-0.5 transition-all" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-10 flex items-center justify-center gap-2">
-                {page > 1 ? (
-                  <Link
-                    href={`/blog?page=${page - 1}`}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9] transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" /> Previous
-                  </Link>
-                ) : (
-                  <span className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-100 text-sm font-medium text-gray-300 cursor-not-allowed">
-                    <ChevronLeft className="w-4 h-4" /> Previous
-                  </span>
-                )}
-
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <Link
-                      key={p}
-                      href={`/blog?page=${p}`}
-                      className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-semibold transition-colors ${
-                        p === page
-                          ? "bg-[#0EA5E9] text-white"
-                          : "text-gray-500 hover:bg-gray-100"
-                      }`}
-                    >
-                      {p}
-                    </Link>
-                  ))}
-                </div>
-
-                {page < totalPages ? (
-                  <Link
-                    href={`/blog?page=${page + 1}`}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9] transition-colors"
-                  >
-                    Next <ChevronRight className="w-4 h-4" />
-                  </Link>
-                ) : (
-                  <span className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-100 text-sm font-medium text-gray-300 cursor-not-allowed">
-                    Next <ChevronRight className="w-4 h-4" />
-                  </span>
-                )}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* CTA */}
-        <section className="mt-14 rounded-2xl bg-[#0EA5E9]/5 border border-[#0EA5E9]/10 p-8 text-center">
-          <p className="text-base font-bold text-gray-900 mb-2">Ready to hire a video editor?</p>
-          <p className="text-sm text-gray-500 mb-6">Browse verified editors, compare packages, and place your first order in minutes.</p>
+        {/* Call to Action card at bottom */}
+        <section className="mt-10 rounded-2xl bg-[var(--brand-client)]/5 border border-[var(--brand-client)]/10 p-8 text-center">
+          <p className="text-base font-bold text-gray-900 mb-2">Need professional video editing?</p>
+          <p className="text-sm text-gray-500 mb-6">Hire KYC-verified video editors and thumbnail artists with secure escrow payments.</p>
           <Link
             href="/browse"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm transition-opacity hover:opacity-90"
-            style={{ background: "#0EA5E9" }}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm hover:opacity-95 transition-opacity"
+            style={{ background: "var(--brand-client)" }}
           >
-            Browse editors <ArrowRight className="w-4 h-4" />
+            Browse verified editors <ChevronRight className="w-4 h-4" />
           </Link>
         </section>
-      </div>
+      </main>
     </div>
   );
 }

@@ -65,8 +65,8 @@ export function PasswordInput({
             const passed = test(value);
             return (
               <li key={label} className="flex items-center gap-2">
-                <Check className={cn("w-3.5 h-3.5 shrink-0", passed ? "text-[#0EA5E9]" : "text-gray-300")} />
-                <span className={cn("text-xs", passed ? "text-[#0EA5E9]" : "text-gray-400")}>
+                <Check className={cn("w-3.5 h-3.5 shrink-0", passed ? "text-[var(--brand-client)]" : "text-gray-300")} />
+                <span className={cn("text-xs", passed ? "text-[var(--brand-client)]" : "text-gray-400")}>
                   {label}
                 </span>
               </li>

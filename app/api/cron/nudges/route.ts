@@ -7,6 +7,7 @@ import {
   notifyInactiveClient,
   notifyEditorMonthlyDigest,
 } from "@/lib/notifications";
+import { updateCronHeartbeat } from "@/lib/cron-heartbeat";
 
 // Indian wedding season peak — nudge repeat wedding clients once each of these months.
 const WEDDING_SEASON_MONTHS = [11, 12, 1, 2];
@@ -31,8 +32,19 @@ async function claimNudge(userId: string, nudgeType: string, period: string): Pr
 // Optional ?asOf=<ISO date> lets this be tested against any point in the
 // calendar without waiting for the real wedding season or month boundary.
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    console.error("[cron] CRON_SECRET is not configured");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+  }
+
+  const authHeader = req.headers.get("authorization");
+  const secretHeader = req.headers.get("x-cron-secret");
+  const isValidCron =
+    authHeader === `Bearer ${cronSecret}` ||
+    secretHeader === cronSecret;
+
+  if (!isValidCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -170,5 +182,6 @@ export async function GET(req: NextRequest) {
   }
 
   console.log("[cron/nudges]", results);
+  await updateCronHeartbeat("nudges");
   return NextResponse.json({ ok: true, ...results });
 }

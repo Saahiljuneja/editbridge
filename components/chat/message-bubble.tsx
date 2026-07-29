@@ -78,7 +78,7 @@ export function MessageBubble({ message, isSelf }: MessageBubbleProps) {
         className={cn(
           "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm",
           isSelf
-            ? "bg-[#0EA5E9] text-white rounded-br-sm"
+            ? "bg-[var(--brand-client)] text-white rounded-br-sm"
             : isAdminMessage
               ? "bg-violet-50 border border-violet-200 text-foreground rounded-bl-sm"
               : "bg-muted text-foreground rounded-bl-sm"

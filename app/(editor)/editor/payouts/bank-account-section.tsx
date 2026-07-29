@@ -64,7 +64,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
 
   if (editing) {
     return (
-      <div className="rounded-2xl border border-[#0EA5E9]/20 bg-white p-5">
+      <div className="rounded-2xl border border-[var(--brand-client)]/20 bg-white p-5">
         <p className="text-sm font-semibold text-gray-900 mb-4">
           {isLinked ? "Update bank account" : "Link bank account"}
         </p>
@@ -76,7 +76,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               value={accountName}
               onChange={e => setAccountName(e.target.value)}
               placeholder="As per bank records"
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               required
             />
           </div>
@@ -87,7 +87,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               value={accountNumber}
               onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ""))}
               placeholder="9–18 digit account number"
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               required
             />
           </div>
@@ -99,7 +99,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               onChange={e => setIfsc(e.target.value.toUpperCase())}
               placeholder="e.g. SBIN0001234"
               maxLength={11}
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               required
             />
           </div>
@@ -111,7 +111,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               type="submit"
               disabled={saving}
               className={cn(
-                "px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-[#6d28d9] transition-colors",
+                "px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] transition-colors",
                 saving && "opacity-60 cursor-not-allowed"
               )}
             >

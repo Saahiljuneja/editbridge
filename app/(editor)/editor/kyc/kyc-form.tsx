@@ -26,7 +26,7 @@ function StepBadge({ n, done }: { n: number; done: boolean }) {
   return (
     <div className={cn(
       "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
-      done ? "bg-green-500 text-white" : "bg-[#0EA5E9] text-white"
+      done ? "bg-green-500 text-white" : "bg-[var(--brand-client)] text-white"
     )}>
       {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : n}
     </div>
@@ -139,7 +139,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                 onChange={(e) => setPanNumber(e.target.value.toUpperCase().slice(0, 10))}
                 placeholder="ABCDE1234F"
                 maxLength={10}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 bg-white"
               />
               {panNumber.length > 0 && panNumber.length < 10 && (
                 <p className="text-xs text-amber-600">{10 - panNumber.length} character{10 - panNumber.length !== 1 ? "s" : ""} remaining</p>
@@ -192,8 +192,8 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                   className={cn(
                     "rounded-xl border px-4 py-3 text-sm font-medium text-center transition-colors",
                     documentType === value
-                      ? "border-[#0EA5E9] bg-[#0EA5E9]/5 text-[#0EA5E9]"
-                      : "border-border hover:border-[#0EA5E9]/40 text-gray-600"
+                      ? "border-[var(--brand-client)] bg-[var(--brand-client)]/5 text-[var(--brand-client)]"
+                      : "border-border hover:border-[var(--brand-client)]/40 text-gray-600"
                   )}
                 >
                   {label}
@@ -211,7 +211,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                 onChange={(e) => setDocumentNumber(e.target.value.toUpperCase())}
                 placeholder={DOC_META[documentType].placeholder}
                 maxLength={30}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 bg-white"
               />
               {documentNumber.length > 0 && (() => {
                 const digits = documentNumber.replace(/\s/g, "");
@@ -335,7 +335,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
           disabled={submitting || !canSubmit}
           className={cn(
             buttonVariants({ size: "lg" }),
-            "w-full bg-[#0EA5E9] hover:bg-[#0284C7]",
+            "w-full bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)]",
             (!canSubmit || submitting) && "opacity-50 cursor-not-allowed"
           )}
         >

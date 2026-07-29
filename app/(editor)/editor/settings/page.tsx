@@ -59,7 +59,7 @@ function SaveButton({ loading, label = "Save changes" }: { loading: boolean; lab
     <button
       type="submit"
       disabled={loading}
-      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
+      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] disabled:opacity-50 transition-colors"
     >
       {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
       {loading ? "Saving…" : label}
@@ -143,7 +143,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Your full name"
-              className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30"
             />
           </div>
           <div className="space-y-1.5">
@@ -168,7 +168,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Professional Wedding & Cinematic Editor"
               maxLength={120}
-              className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30"
             />
             <p className="text-xs text-gray-400">{title.length}/120 · Shown on your profile card</p>
           </div>
@@ -180,7 +180,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               placeholder="Describe your editing style, experience, and what makes your work unique…"
               maxLength={2000}
               rows={5}
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 resize-none"
             />
             <p className="text-xs text-gray-400">{bio.length}/2000</p>
           </div>
@@ -194,7 +194,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               onChange={e => setFeaturedVideoUrl(e.target.value)}
               placeholder="https://youtube.com/watch?v=…"
               type="url"
-              className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30"
             />
             <p className="text-xs text-gray-400">Shown at the top of your public profile</p>
           </div>
@@ -362,7 +362,7 @@ function TwoFactorSection() {
               </button>
               <button
                 onClick={finishSetup}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-[#6b2fd6] transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-client-hover)] transition-colors"
               >
                 <Check className="w-3.5 h-3.5" /> I've saved these codes
               </button>
@@ -386,14 +386,14 @@ function TwoFactorSection() {
                 onChange={(e) => setVerifyCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
-                className="rounded-xl border-gray-200 text-center font-mono tracking-widest focus-visible:ring-[#0EA5E9]/30"
+                className="rounded-xl border-gray-200 text-center font-mono tracking-widest focus-visible:ring-[var(--brand-client)]/30"
               />
             </div>
             <div className="flex gap-2">
               <button
                 onClick={confirmSetup}
                 disabled={busy || verifyCode.length !== 6}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-[#6b2fd6] disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-client-hover)] disabled:opacity-50 transition-colors"
               >
                 {busy ? "Verifying…" : "Confirm & enable"}
               </button>
@@ -503,7 +503,7 @@ function TwoFactorSection() {
                   </button>
                   <button
                     onClick={() => { setRegeneratedCodes([]); setShowRegenerate(false); }}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-[#6b2fd6] transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-client-hover)] transition-colors"
                   >
                     <Check className="w-3.5 h-3.5" /> I&apos;ve saved these
                   </button>
@@ -519,7 +519,7 @@ function TwoFactorSection() {
             <button
               onClick={startSetup}
               disabled={busy}
-              className="px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-[#6b2fd6] disabled:opacity-50 transition-colors"
+              className="px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-client-hover)] disabled:opacity-50 transition-colors"
             >
               {busy ? "Starting…" : "Enable 2FA"}
             </button>
@@ -579,16 +579,16 @@ function SecurityTab() {
         <form onSubmit={handleChangePassword} className="p-6 space-y-4">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">Current password</Label>
-            <Input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} autoComplete="current-password" className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30" />
+            <Input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} autoComplete="current-password" className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">New password</Label>
-              <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30" />
+              <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">Confirm</Label>
-              <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30" />
+              <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30" />
             </div>
           </div>
           {newPassword.length > 0 && (
@@ -802,7 +802,7 @@ function PaymentsTab() {
               value={accountName}
               onChange={e => setAccountName(e.target.value)}
               placeholder="Name as per bank records"
-              className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -813,7 +813,7 @@ function PaymentsTab() {
                 onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ""))}
                 placeholder="1234567890"
                 inputMode="numeric"
-                className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30"
+                className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30"
               />
             </div>
             <div className="space-y-1.5">
@@ -823,7 +823,7 @@ function PaymentsTab() {
                 onChange={e => setIfsc(e.target.value.toUpperCase())}
                 placeholder="SBIN0001234"
                 maxLength={11}
-                className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30 font-mono"
+                className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30 font-mono"
               />
             </div>
           </div>
@@ -841,7 +841,7 @@ function PaymentsTab() {
               onChange={e => setPanNumber(e.target.value.toUpperCase().slice(0, 10))}
               placeholder="ABCDE1234F"
               maxLength={10}
-              className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30 font-mono uppercase"
+              className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30 font-mono uppercase"
             />
             <p className="text-xs text-gray-400">10 characters — 5 letters, 4 digits, 1 letter</p>
           </div>
@@ -1014,7 +1014,7 @@ function TemplatesTab() {
               type="button"
               onClick={() => setShowForm(true)}
               disabled={templates.length >= MAX_TEMPLATES}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0EA5E9] text-white text-xs font-semibold hover:bg-[#6d28d9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--brand-client)] text-white text-xs font-semibold hover:bg-[var(--brand-editor-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <Plus className="w-3.5 h-3.5" /> Add template
             </button>
@@ -1030,7 +1030,7 @@ function TemplatesTab() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Thank you for your order"
                 maxLength={60}
-                className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30"
+                className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30"
               />
             </div>
             <div className="space-y-1.5">
@@ -1042,7 +1042,7 @@ function TemplatesTab() {
                   onChange={(e) => setShortcut(e.target.value.replace(/[^a-zA-Z]/g, "").toLowerCase())}
                   placeholder="thanks"
                   maxLength={20}
-                  className="rounded-xl border-gray-200 focus-visible:ring-[#0EA5E9]/30 font-mono"
+                  className="rounded-xl border-gray-200 focus-visible:ring-[var(--brand-client)]/30 font-mono"
                 />
               </div>
             </div>
@@ -1054,7 +1054,7 @@ function TemplatesTab() {
                 placeholder="Thank you for your order! I'll get started right away."
                 maxLength={1000}
                 rows={3}
-                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 resize-none"
               />
               <p className="text-xs text-gray-400 text-right">{content.length}/1000</p>
             </div>
@@ -1089,7 +1089,7 @@ function TemplatesTab() {
                 className={cn(
                   "flex items-start gap-3 px-6 py-4 transition-colors",
                   draggingId === t.id && "opacity-40",
-                  dragOverId === t.id && "bg-[#0EA5E9]/5"
+                  dragOverId === t.id && "bg-[var(--brand-client)]/5"
                 )}
               >
                 <GripVertical className="w-4 h-4 text-gray-300 mt-0.5 cursor-grab shrink-0" />
@@ -1106,7 +1106,7 @@ function TemplatesTab() {
                   <button
                     type="button"
                     onClick={() => startEdit(t)}
-                    className="p-1.5 rounded-lg text-gray-300 hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 transition-colors"
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 transition-colors"
                     aria-label="Edit template"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -1217,7 +1217,7 @@ export default function EditorSettingsPage() {
                 className={cn(
                   "flex items-center gap-2 px-4 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
                   activeTab === tab.id
-                    ? "border-[#0EA5E9] text-[#0EA5E9]"
+                    ? "border-[var(--brand-client)] text-[var(--brand-client)]"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200"
                 )}
               >

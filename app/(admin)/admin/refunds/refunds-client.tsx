@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -88,7 +88,7 @@ export function RefundsClient() {
         toast.error(firstErr ?? data.error ?? "Refund failed.");
         return;
       }
-      toast.success("Refund issued via Razorpay. It will reflect in 5â€"7 business days.");
+      toast.success("Refund issued via Razorpay. It will reflect in 5-7 business days.");
       setSelected(null);
     } catch { toast.error("Something went wrong."); }
     finally { setSubmitting(false); }
@@ -147,7 +147,7 @@ export function RefundsClient() {
                     <p className="text-xs text-gray-400 dark:text-gray-500">{order.clientEmail}</p>
                   </td>
                   <td className="px-4 py-3.5">
-                    <Link href={`/admin/orders/${order.id}`} className="text-[#0EA5E9] hover:underline font-medium">
+                    <Link href={`/admin/orders/${order.id}`} className="text-[var(--brand-client)] hover:underline font-medium">
                       {order.packageTitle ?? "Custom"}
                     </Link>
                     {order.razorpayPaymentId && (

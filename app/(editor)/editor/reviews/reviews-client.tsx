@@ -63,7 +63,7 @@ function ReviewCard({ review }: { review: Review }) {
       {/* Reviewer + rating */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-sm font-bold text-[#0EA5E9] shrink-0">
+          <div className="w-9 h-9 rounded-full bg-[var(--brand-client)]/10 flex items-center justify-center text-sm font-bold text-[var(--brand-client)] shrink-0">
             {review.reviewerName.slice(0, 1).toUpperCase()}
           </div>
           <div>
@@ -94,7 +94,7 @@ function ReviewCard({ review }: { review: Review }) {
           {!showReplyBox && (
             <button
               onClick={() => { setShowReplyBox(true); setReplyText(savedReply); }}
-              className="text-xs text-[#0EA5E9] font-medium mt-2 hover:underline"
+              className="text-xs text-[var(--brand-client)] font-medium mt-2 hover:underline"
             >
               Edit reply
             </button>
@@ -111,7 +111,7 @@ function ReviewCard({ review }: { review: Review }) {
             placeholder="Write a professional reply…"
             rows={3}
             maxLength={500}
-            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 resize-none"
+            className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/10 resize-none"
           />
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-400">{replyText.length}/500</span>
@@ -126,7 +126,7 @@ function ReviewCard({ review }: { review: Review }) {
                 onClick={submitReply}
                 disabled={saving || !replyText.trim()}
                 className={cn(
-                  "flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg text-white bg-[#0EA5E9] hover:bg-[#0a5a45] transition-colors",
+                  "flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg text-white bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] transition-colors",
                   (saving || !replyText.trim()) && "opacity-50 cursor-not-allowed"
                 )}
               >
@@ -139,7 +139,7 @@ function ReviewCard({ review }: { review: Review }) {
       ) : !savedReply && (
         <button
           onClick={() => setShowReplyBox(true)}
-          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-[#0EA5E9] transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-[var(--brand-client)] transition-colors"
         >
           <MessageSquare className="w-3.5 h-3.5" />
           Reply to this review

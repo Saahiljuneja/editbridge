@@ -5,6 +5,7 @@ import { editors } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/r2";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 function keyFromUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -69,5 +70,6 @@ export async function PATCH(req: NextRequest) {
     .set({ ...parsed.data, updatedAt: new Date() })
     .where(eq(editors.id, session.user.editorId));
 
+  revalidatePublicPagesCache();
   return NextResponse.json({ ok: true });
 }

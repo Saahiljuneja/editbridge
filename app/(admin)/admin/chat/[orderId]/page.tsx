@@ -90,7 +90,7 @@ export default async function AdminChatConversationPage({
             <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Order conversation</p>
             <h1 className="text-lg font-bold text-gray-900">{order.packageTitle ?? "Custom order"}</h1>
           </div>
-          <Link href={`/admin/orders/${orderId}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
+          <Link href={`/admin/orders/${orderId}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2">
             View order →
           </Link>
         </div>
@@ -134,7 +134,7 @@ export default async function AdminChatConversationPage({
             const isEditorMsg = msg.senderId === editorUserId;
             const isAdmin = !isClient && !isEditorMsg;
             const label = isClient ? "Client" : isEditorMsg ? "Editor" : "Admin";
-            const labelColor = isClient ? "text-[#0EA5E9]" : isEditorMsg ? "text-violet-600" : "text-orange-600";
+            const labelColor = isClient ? "text-[var(--brand-client)]" : isEditorMsg ? "text-violet-600" : "text-orange-600";
 
             if (msg.isBlocked) {
               return (
@@ -185,7 +185,7 @@ export default async function AdminChatConversationPage({
             return (
               <div key={msg.id} className={cn("group flex items-start gap-1 px-2 py-1", isClient ? "justify-start" : "justify-end flex-row-reverse")}>
                 <BlockMessageButton messageId={msg.id} />
-                <div className={cn("max-w-[75%] rounded-2xl px-4 py-2.5 text-sm shadow-sm", isClient ? "bg-white border border-gray-100 rounded-bl-sm" : "bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 rounded-br-sm")}>
+                <div className={cn("max-w-[75%] rounded-2xl px-4 py-2.5 text-sm shadow-sm", isClient ? "bg-white border border-gray-100 rounded-bl-sm" : "bg-[var(--brand-client)]/10 border border-[var(--brand-client)]/20 rounded-br-sm")}>
                   <div className="flex items-center justify-between gap-4 mb-1">
                     <span className={cn("text-[10px] font-semibold", labelColor)}>{msg.senderName} · {label}</span>
                     <span className="text-[10px] text-gray-400 shrink-0">{formatDateTime(msg.createdAt)}</span>
@@ -193,7 +193,7 @@ export default async function AdminChatConversationPage({
                   {msg.content && <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{msg.content}</p>}
                   {msg.fileUrl && msg.fileName && (
                     <a href={getPublicUrl(msg.fileUrl)} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 mt-1.5 text-xs text-[#0EA5E9] hover:underline">
+                      className="flex items-center gap-1.5 mt-1.5 text-xs text-[var(--brand-client)] hover:underline">
                       <Download className="w-3 h-3 shrink-0" />
                       {msg.fileName}
                     </a>

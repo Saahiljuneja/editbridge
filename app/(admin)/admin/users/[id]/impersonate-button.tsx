@@ -18,8 +18,18 @@ export function ImpersonateButton({ userId }: { userId: string }) {
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error ?? "Failed."); return; }
-      // Open the switch URL in a new tab — it will set a real session cookie and redirect
-      window.open(`/api/auth/impersonate-switch?token=${encodeURIComponent(data.token)}`, "_blank");
+      // Open the switch URL via POST form submit in a new tab to avoid query param token leakage
+      const newTab = window.open("", "_blank");
+      if (newTab) {
+        newTab.document.write(`
+          <form id="switch-form" method="POST" action="/api/auth/impersonate-switch">
+            <input type="hidden" name="token" value="${data.token}" />
+          </form>
+          <script>
+            document.getElementById('switch-form').submit();
+          </script>
+        `);
+      }
       toast.success(`Impersonation tab opened. You remain logged in here as admin.`);
     } catch { toast.error("Something went wrong."); }
     finally { setLoading(false); }

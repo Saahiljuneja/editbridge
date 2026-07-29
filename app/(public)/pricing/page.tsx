@@ -447,7 +447,7 @@ export default function PricingPage() {
                   </div>
 
                   <Link href="/signup/editor"
-                    className="inline-flex items-center gap-2 w-full justify-center bg-white hover:bg-white/90 text-[#0EA5E9] font-bold px-6 py-3.5 rounded-2xl text-sm transition-all mt-auto shadow-[0_6px_20px_rgba(0,0,0,0.15)]">
+                    className="inline-flex items-center gap-2 w-full justify-center bg-white hover:bg-white/90 text-[var(--brand-client)] font-bold px-6 py-3.5 rounded-2xl text-sm transition-all mt-auto shadow-[0_6px_20px_rgba(0,0,0,0.15)]">
                     Apply as editor <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>

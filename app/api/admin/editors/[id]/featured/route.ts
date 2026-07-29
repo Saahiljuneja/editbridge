@@ -5,6 +5,7 @@ import { editors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { logAction } from "@/lib/audit";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 export async function PATCH(
   req: Request,
@@ -39,5 +40,6 @@ export async function PATCH(
     entityId: id,
   });
 
+  revalidatePublicPagesCache();
   return NextResponse.json({ ok: true });
 }

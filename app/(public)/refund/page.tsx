@@ -83,19 +83,19 @@ export default function RefundPolicyPage() {
         ))}
 
         {/* Quick tip box */}
-        <div className="rounded-2xl bg-[#0EA5E9]/5 border border-[#0EA5E9]/10 p-6">
+        <div className="rounded-2xl bg-[var(--brand-client)]/5 border border-[var(--brand-client)]/10 p-6">
           <p className="text-sm font-semibold text-gray-900 mb-1">Need to raise a dispute?</p>
           <p className="text-sm text-gray-500 mb-4">Go to your order page and click "Raise Dispute" — our team reviews all disputes within 3–5 business days.</p>
-          <Link href="/orders" className="text-sm font-semibold text-[#0EA5E9] hover:underline">
+          <Link href="/orders" className="text-sm font-semibold text-[var(--brand-client)] hover:underline">
             View my orders →
           </Link>
         </div>
 
         {/* Footer links */}
         <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-400">
-          <Link href="/terms" className="hover:text-[#0EA5E9]">Terms of Service</Link>
-          <Link href="/privacy" className="hover:text-[#0EA5E9]">Privacy Policy</Link>
-          <Link href="/contact" className="hover:text-[#0EA5E9]">Contact Us</Link>
+          <Link href="/terms" className="hover:text-[var(--brand-client)]">Terms of Service</Link>
+          <Link href="/privacy" className="hover:text-[var(--brand-client)]">Privacy Policy</Link>
+          <Link href="/contact" className="hover:text-[var(--brand-client)]">Contact Us</Link>
         </div>
       </div>
     </div>

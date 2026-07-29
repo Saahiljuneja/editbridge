@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { createOrder, verifySignature } from "@/lib/razorpay";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { z } from "zod";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 const DURATION_PRICING: Record<number, number> = {
   7: 99900,
@@ -93,6 +94,7 @@ export async function POST(request: NextRequest) {
       .set({ isFeatured: true, featuredUntil, updatedAt: new Date() })
       .where(eq(editors.id, session.user.editorId));
 
+    revalidatePublicPagesCache();
     return NextResponse.json({ success: true, featuredUntil });
   }
 

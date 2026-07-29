@@ -239,7 +239,7 @@ export default async function AdminKycDetailPage({
                     )}
                   </div>
                   {h.id !== id && (
-                    <Link href={`/admin/kyc/${h.id}`} className="text-xs text-[#0EA5E9] hover:underline shrink-0">
+                    <Link href={`/admin/kyc/${h.id}`} className="text-xs text-[var(--brand-client)] hover:underline shrink-0">
                       View →
                     </Link>
                   )}

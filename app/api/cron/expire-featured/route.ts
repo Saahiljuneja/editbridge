@@ -3,10 +3,23 @@ import { db } from "@/lib/db";
 import { editors, users } from "@/lib/db/schema";
 import { and, eq, lt, inArray } from "drizzle-orm";
 import { notifyFeaturedExpired } from "@/lib/notifications";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
+import { updateCronHeartbeat } from "@/lib/cron-heartbeat";
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    console.error("[cron] CRON_SECRET is not configured");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+  }
+
+  const authHeader = req.headers.get("authorization");
+  const secretHeader = req.headers.get("x-cron-secret");
+  const isValidCron =
+    authHeader === `Bearer ${cronSecret}` ||
+    secretHeader === cronSecret;
+
+  if (!isValidCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -18,6 +31,7 @@ export async function GET(req: NextRequest) {
     .where(and(eq(editors.isFeatured, true), lt(editors.featuredUntil, now)));
 
   if (expired.length === 0) {
+    await updateCronHeartbeat("expire-featured");
     return NextResponse.json({ expired: 0 });
   }
 
@@ -37,5 +51,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  revalidatePublicPagesCache();
+  await updateCronHeartbeat("expire-featured");
   return NextResponse.json({ expired: expired.length });
 }

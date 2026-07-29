@@ -146,7 +146,7 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
                 </Badge>
               </td>
               <td className="px-4 py-3.5 text-right">
-                <Link href={`/admin/kyc/${row.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
+                <Link href={`/admin/kyc/${row.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2">
                   Review →
                 </Link>
               </td>

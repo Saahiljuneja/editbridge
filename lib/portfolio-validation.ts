@@ -10,9 +10,10 @@ export const MAX_DESCRIPTION_LENGTH = 300;
 
 const YOUTUBE_RE = /^https?:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/)[\w-]{11}/i;
 const VIMEO_RE = /^https?:\/\/(www\.|player\.)?vimeo\.com\/(video\/)?\d+/i;
+const GDRIVE_RE = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]{10,})/i;
 
 export function isEmbeddableVideoUrl(url: string): boolean {
-  return YOUTUBE_RE.test(url) || VIMEO_RE.test(url);
+  return YOUTUBE_RE.test(url) || VIMEO_RE.test(url) || GDRIVE_RE.test(url);
 }
 
 // An internal R2 object key, or a "/api/file/{key}" proxy path — never an external

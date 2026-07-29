@@ -27,10 +27,10 @@ export default function GrievancePage() {
         {/* Grievance Officer */}
         <section>
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Grievance Officer</p>
-          <div className="rounded-2xl border border-[#0EA5E9]/15 bg-[#0EA5E9]/3 p-6">
+          <div className="rounded-2xl border border-[var(--brand-client)]/15 bg-[var(--brand-client)]/3 p-6">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-                <Shield className="w-5 h-5 text-[#0EA5E9]" />
+              <div className="w-10 h-10 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center shrink-0">
+                <Shield className="w-5 h-5 text-[var(--brand-client)]" />
               </div>
               <div>
                 <p className="font-bold text-gray-900 text-base">Saahil Juneja</p>
@@ -38,7 +38,7 @@ export default function GrievancePage() {
                 <div className="mt-3 space-y-1.5">
                   <a
                     href="mailto:grievance@editbridge.in"
-                    className="flex items-center gap-2 text-sm text-[#0EA5E9] font-medium hover:underline"
+                    className="flex items-center gap-2 text-sm text-[var(--brand-client)] font-medium hover:underline"
                   >
                     <Mail className="w-4 h-4" />
                     grievance@editbridge.in
@@ -83,7 +83,7 @@ export default function GrievancePage() {
               },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50">
-                <div className="w-7 h-7 rounded-full bg-[#0EA5E9] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[var(--brand-client)] text-white text-xs font-bold flex items-center justify-center shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -110,7 +110,7 @@ export default function GrievancePage() {
               "Any violation of EditBridge's Terms of Service",
             ].map((item) => (
               <div key={item} className="flex items-start gap-2.5 p-3 rounded-xl border border-gray-100">
-                <CheckCircle className="w-4 h-4 text-[#0EA5E9] shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-[var(--brand-client)] shrink-0 mt-0.5" />
                 <p className="text-sm text-gray-600 leading-relaxed">{item}</p>
               </div>
             ))}
@@ -160,7 +160,7 @@ export default function GrievancePage() {
               href="https://sachet.rbi.org.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#0EA5E9] hover:underline"
+              className="text-[var(--brand-client)] hover:underline"
             >
               gac.meity.gov.in
             </a>
@@ -170,11 +170,11 @@ export default function GrievancePage() {
 
         {/* Footer links */}
         <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-400">
-          <Link href="/terms" className="hover:text-[#0EA5E9]">Terms of Service</Link>
-          <Link href="/privacy" className="hover:text-[#0EA5E9]">Privacy Policy</Link>
-          <Link href="/refund" className="hover:text-[#0EA5E9]">Refund Policy</Link>
-          <Link href="/disclaimer" className="hover:text-[#0EA5E9]">Disclaimer</Link>
-          <Link href="/contact" className="hover:text-[#0EA5E9]">Contact Us</Link>
+          <Link href="/terms" className="hover:text-[var(--brand-client)]">Terms of Service</Link>
+          <Link href="/privacy" className="hover:text-[var(--brand-client)]">Privacy Policy</Link>
+          <Link href="/refund" className="hover:text-[var(--brand-client)]">Refund Policy</Link>
+          <Link href="/disclaimer" className="hover:text-[var(--brand-client)]">Disclaimer</Link>
+          <Link href="/contact" className="hover:text-[var(--brand-client)]">Contact Us</Link>
         </div>
       </div>
     </div>

@@ -81,7 +81,7 @@ export function FeaturedPurchase({ isCurrentlyFeatured, daysRemaining, featuredU
         description: `Featured placement — ${selected} days`,
         order_id: razorpayOrderId,
         prefill: { name: session?.user?.name ?? "", email: session?.user?.email ?? "" },
-        theme: { color: "#0EA5E9" },
+        theme: { color: "var(--brand-client)" },
         modal: { ondismiss: () => setLoading(false), backdropclose: false, escape: false, animation: false },
         handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
           try {
@@ -155,11 +155,11 @@ export function FeaturedPurchase({ isCurrentlyFeatured, daysRemaining, featuredU
             onClick={() => setSelected(d.days)}
             className={cn(
               "relative rounded-xl border-2 p-4 text-center transition-colors",
-              selected === d.days ? "border-[#0EA5E9] bg-[#0EA5E9]/5" : "border-gray-200 hover:border-gray-300"
+              selected === d.days ? "border-[var(--brand-client)] bg-[var(--brand-client)]/5" : "border-gray-200 hover:border-gray-300"
             )}
           >
             {d.recommended && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0EA5E9] text-white">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--brand-client)] text-white">
                 Best value
               </span>
             )}
@@ -174,7 +174,7 @@ export function FeaturedPurchase({ isCurrentlyFeatured, daysRemaining, featuredU
         disabled={loading}
         onClick={handlePurchase}
         className={cn(
-          "w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-[#0284C7] transition-colors mt-5",
+          "w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] transition-colors mt-5",
           loading && "opacity-50 cursor-not-allowed"
         )}
       >

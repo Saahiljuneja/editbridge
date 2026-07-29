@@ -19,7 +19,7 @@ export async function GET() {
       and(
         eq(orders.clientId, userId),
         ne(messages.senderId, userId),
-        sql`${orders.status} NOT IN ('completed','cancelled')`,
+        eq(messages.isRead, false),
         eq(messages.isBlocked, false)
       )
     );

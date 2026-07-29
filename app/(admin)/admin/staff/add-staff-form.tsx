@@ -51,7 +51,7 @@ export function AddStaffForm() {
       {!open ? (
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-medium hover:bg-[#3d34a0] transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-editor-hover)] transition-colors"
         >
           <UserPlus className="w-4 h-4" />
           Add staff member
@@ -74,7 +74,7 @@ export function AddStaffForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="team@example.com"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               />
             </div>
             <div>
@@ -82,7 +82,7 @@ export function AddStaffForm() {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               >
                 {STAFF_ROLES.map((r) => (
                   <option key={r.value} value={r.value}>{r.label}</option>
@@ -94,7 +94,7 @@ export function AddStaffForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 py-2 rounded-lg bg-[#0EA5E9] text-white text-sm font-medium hover:bg-[#3d34a0] disabled:opacity-50 transition-colors"
+              className="flex-1 py-2 rounded-lg bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-editor-hover)] disabled:opacity-50 transition-colors"
             >
               {submitting ? "Adding…" : "Add member"}
             </button>

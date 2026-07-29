@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { portfolioItems, orders } from "@/lib/db/schema";
 import { and, eq, count } from "drizzle-orm";
 import { cleanupOrphanedPortfolioFiles } from "@/lib/portfolio-cleanup";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 import {
   MAX_FEATURED_ITEMS,
   isSafeInternalPath,
@@ -120,6 +121,7 @@ export async function PATCH(
     if (replacedRows.length > 0) cleanupOrphanedPortfolioFiles(editorId, replacedRows).catch(() => {});
   }
 
+  revalidatePublicPagesCache();
   return NextResponse.json(updated);
 }
 
@@ -141,7 +143,10 @@ export async function DELETE(
     .where(and(eq(portfolioItems.id, id), eq(portfolioItems.editorId, editorId)))
     .returning({ url: portfolioItems.url, beforeUrl: portfolioItems.beforeUrl, thumbnailUrl: portfolioItems.thumbnailUrl });
 
-  if (deleted) cleanupOrphanedPortfolioFiles(editorId, [deleted]).catch(() => {});
+  if (deleted) {
+    cleanupOrphanedPortfolioFiles(editorId, [deleted]).catch(() => {});
+    revalidatePublicPagesCache();
+  }
 
   return NextResponse.json({ success: true });
 }

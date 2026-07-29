@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { notifications, editors } from "@/lib/db/schema";
+import { notifications, editors, userPreferences } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createElement } from "react";
 import { sendEmail } from "@/lib/resend";
@@ -47,12 +47,23 @@ export function parsePrefs<T>(raw: string | null | undefined, fallback: T): T {
 }
 
 async function getEditorPrefRow(editorId: string) {
-  const [row] = await db
-    .select({ emailPreferences: editors.emailPreferences, notifPreferences: editors.notifPreferences })
-    .from(editors)
+  const rows = await db
+    .select({
+      emailPreferences: userPreferences.emailPreferences,
+      notifPreferences: userPreferences.notifPreferences,
+    })
+    .from(userPreferences)
+    .innerJoin(editors, eq(editors.userId, userPreferences.userId))
     .where(eq(editors.id, editorId))
     .limit(1);
-  return row;
+
+  if (rows.length === 0) {
+    return {
+      emailPreferences: JSON.stringify(DEFAULT_EMAIL_PREFS),
+      notifPreferences: JSON.stringify(DEFAULT_NOTIF_PREFS),
+    };
+  }
+  return rows[0];
 }
 
 export async function editorWantsEmail(editorId: string, key: keyof EmailPrefs): Promise<boolean> {

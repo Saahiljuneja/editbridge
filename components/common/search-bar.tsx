@@ -57,7 +57,7 @@ export function SearchBar({
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className="w-full pl-9 pr-9 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 focus:border-[#0EA5E9] transition-colors"
+        className="w-full pl-9 pr-9 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 focus:border-[var(--brand-client)] transition-colors"
       />
       {value && (
         <button

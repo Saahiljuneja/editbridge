@@ -76,7 +76,7 @@ export function NotificationBell() {
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "relative flex items-center justify-center w-8 h-8 rounded-lg transition-colors",
-          open ? "bg-[#0EA5E9]/10 text-[#0EA5E9]" : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+          open ? "bg-[var(--brand-client)]/10 text-[var(--brand-client)]" : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
         )}
         aria-label="Notifications"
       >
@@ -105,7 +105,7 @@ export function NotificationBell() {
               {unread > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="flex items-center gap-1 text-xs text-[#0EA5E9] hover:underline font-medium"
+                  className="flex items-center gap-1 text-xs text-[var(--brand-client)] hover:underline font-medium"
                 >
                   <CheckCheck className="w-3 h-3" /> Mark all read
                 </button>

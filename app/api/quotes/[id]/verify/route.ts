@@ -5,7 +5,7 @@ import { quoteRequests, orders, editors, users } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { verifySignature } from "@/lib/razorpay";
 import { createInAppNotification, notifyOrderPlacedEditor, editorWantsNotif } from "@/lib/notifications";
-import { onClientOrderPlaced, onRepeatClientPair, consumeCredits } from "@/lib/rewards";
+import { consumeCredits } from "@/lib/rewards";
 import { getPlatformSettings } from "@/lib/platform-settings";
 import { z } from "zod";
 
@@ -82,8 +82,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     await consumeCredits(session.user.userId!, creditApplied, order.id);
   }
 
-  onClientOrderPlaced(session.user.userId!, order.id).catch(() => {});
-  onRepeatClientPair(session.user.userId!, quote.editorId).catch(() => {});
+
 
   const [editor] = await db.select({ userId: editors.userId })
     .from(editors).where(eq(editors.id, quote.editorId)).limit(1);

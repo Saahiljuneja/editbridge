@@ -1,17 +1,20 @@
 import { db } from "@/lib/db";
-import { userPoints, pointTransactions, userBadges, userCredits, notifications, orders, editors, reviews, portfolioItems, disputes, savedEditors } from "@/lib/db/schema";
+import { userPoints, pointTransactions, userBadges, userCredits, notifications, orders, editors, reviews, portfolioItems, disputes, savedEditors, users } from "@/lib/db/schema";
 import { eq, and, sql, gte, count } from "drizzle-orm";
 
 // ─── Level thresholds ─────────────────────────────────────────────────────────
 
 export const LEVELS = [
-  { name: "bronze",   min: 0,     max: 499  },
-  { name: "silver",   min: 500,   max: 1999 },
-  { name: "gold",     min: 2000,  max: 4999 },
-  { name: "platinum", min: 5000,  max: Infinity },
+  { name: "bronze",   min: 0,      max: 499   },
+  { name: "silver",   min: 500,    max: 1999  },
+  { name: "gold",     min: 2000,   max: 4999  },
+  { name: "platinum", min: 5000,   max: 9999  },
+  { name: "diamond",  min: 10000,  max: 24999 },
+  { name: "master",   min: 25000,  max: 49999 },
+  { name: "legend",   min: 50000,  max: Infinity },
 ] as const;
 
-export type Level = "bronze" | "silver" | "gold" | "platinum";
+export type Level = "bronze" | "silver" | "gold" | "platinum" | "diamond" | "master" | "legend";
 
 export function calcLevel(totalXp: number): Level {
   for (const l of [...LEVELS].reverse()) {
@@ -79,12 +82,15 @@ async function awardBadge(userId: string, badge: string) {
   });
 }
 
+const LEVEL_RANK: Record<Level, number> = { bronze: 0, silver: 1, gold: 2, platinum: 3, diamond: 4, master: 5, legend: 6 };
+
 async function addPoints(userId: string, amount: number, reason: string, metadata: Record<string, unknown> = {}) {
   const pts = await getOrCreatePoints(userId);
-  const newTotal = pts.total + amount;
-  const newCurrent = pts.current + amount;
-  const newLevel = calcLevel(newTotal);
-  const oldLevel = pts.level as Level;
+  // Clamp to 0 — XP never goes negative, but level can drop when total decreases
+  const newTotal   = Math.max(0, pts.total + amount);
+  const newCurrent = Math.max(0, pts.current + amount);
+  const newLevel   = calcLevel(newTotal);
+  const oldLevel   = pts.level as Level;
 
   await db.update(userPoints).set({
     total: newTotal,
@@ -95,20 +101,33 @@ async function addPoints(userId: string, amount: number, reason: string, metadat
 
   await db.insert(pointTransactions).values({ userId, amount, reason, metadata });
 
-  // Notify on level up
   if (newLevel !== oldLevel) {
-    const perks: Record<Level, string> = {
-      bronze:   "",
-      silver:   "You can now offer 4 packages. Clients also get a discount on orders with you.",
-      gold:     "You're featured in browse results! Clients get a bigger discount.",
-      platinum: "You've unlocked priority support and a custom profile banner.",
-    };
-    await db.insert(notifications).values({
-      userId,
-      type: "level_up",
-      title: `Level up! You're now ${newLevel.charAt(0).toUpperCase() + newLevel.slice(1)} 🎉`,
-      body: perks[newLevel] || "Keep up the great work!",
-    });
+    const leveledUp = LEVEL_RANK[newLevel] > LEVEL_RANK[oldLevel];
+
+    if (leveledUp) {
+      const perks: Record<Level, string> = {
+        bronze:   "",
+        silver:   "You can now offer 4 packages. Clients also get a discount on orders with you.",
+        gold:     "You're featured in browse results! Clients get a bigger discount.",
+        platinum: "You've unlocked priority support and a custom profile banner.",
+        diamond:  "You've reached Diamond rank — 15% client discount and diamond placement in search.",
+        master:   "Master rank achieved — top-10 placement and 20% client discount. You're elite.",
+        legend:   "🔥 Legend status. You're in the top tier — top-3 spotlight, 25% discount, and a dedicated account manager.",
+      };
+      await db.insert(notifications).values({
+        userId,
+        type: "level_up",
+        title: `Level up! You're now ${newLevel.charAt(0).toUpperCase() + newLevel.slice(1)} 🎉`,
+        body: perks[newLevel] || "Keep up the great work!",
+      });
+    } else {
+      await db.insert(notifications).values({
+        userId,
+        type: "level_up",
+        title: `Rank dropped to ${newLevel.charAt(0).toUpperCase() + newLevel.slice(1)} (rank down)`,
+        body: "Your XP was reduced due to a recent penalty. Deliver quality work to recover your rank.",
+      });
+    }
   }
 
   return newLevel;
@@ -133,9 +152,34 @@ export async function onEditorOrderCompleted(editorUserId: string, editorId: str
   // 50 XP per completed order
   await addPoints(editorUserId, 50, "order_completed", { orderId });
 
-  // +15 XP for early delivery
-  if (deliveredBeforeDeadline) {
-    await addPoints(editorUserId, 15, "early_delivery", { orderId });
+  // Tiered XP for early delivery:
+  // Delivered >12 hours early: +15 XP
+  // Delivered >24 hours early: +20 XP
+  const [order] = await db
+    .select({ deadline: orders.deadline, deliveredAt: orders.deliveredAt })
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .limit(1);
+
+  if (order && order.deadline && order.deliveredAt) {
+    const diffMs = order.deadline.getTime() - order.deliveredAt.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    if (diffHours >= 24) {
+      await addPoints(editorUserId, 20, "early_delivery", { orderId, earlyHours: diffHours });
+    } else if (diffHours >= 12) {
+      await addPoints(editorUserId, 15, "early_delivery", { orderId, earlyHours: diffHours });
+    } else if (diffHours < 0) {
+      // Late delivery — delivered after the deadline
+      await addPoints(editorUserId, -20, "late_delivery_penalty", { orderId, lateHours: Math.abs(diffHours) });
+      await db.insert(notifications).values({
+        userId: editorUserId,
+        type: "badge_earned",
+        title: "Late delivery — XP penalty",
+        body: `This order was delivered after the deadline. -20 XP deducted. Always aim to deliver on time.`,
+        link: "/editor/rewards",
+      });
+    }
   }
 
   // Count total completed orders for this editor
@@ -235,18 +279,99 @@ export async function onEditorOrderCompleted(editorUserId: string, editorId: str
       sql`${orders.updatedAt} >= ${weekStart}`
     ));
   if ((weekRow?.c ?? 0) >= 5) await awardBadge(editorUserId, "streak_master");
+
+  // Consecutive order streak: every 5 completed orders in a row (no cancellation in between) → +100 XP
+  await checkOrderStreak(editorUserId, editorId);
 }
 
-/** Called when a client sends an editor a quote request (+10 XP, max 3/day) */
-export async function onQuoteReceived(editorUserId: string) {
-  const dayStart = new Date();
-  dayStart.setHours(0, 0, 0, 0);
-  const [todayCount] = await db
-    .select({ c: sql<number>`COUNT(*)::int` })
-    .from(pointTransactions)
-    .where(and(eq(pointTransactions.userId, editorUserId), eq(pointTransactions.reason, "quote_received"), gte(pointTransactions.createdAt, dayStart)));
-  if ((todayCount?.c ?? 0) < 3) {
-    await addPoints(editorUserId, 10, "quote_received");
+
+
+async function checkOrderStreak(editorUserId: string, editorId: string) {
+  // Look at terminal-state orders sorted most-recent first
+  const recentOrders = await db
+    .select({ status: orders.status })
+    .from(orders)
+    .where(and(
+      eq(orders.editorId, editorId),
+      sql`${orders.status} IN ('completed', 'cancelled')`
+    ))
+    .orderBy(sql`${orders.updatedAt} DESC`)
+    .limit(100);
+
+  let streak = 0;
+  for (const o of recentOrders) {
+    if (o.status === "completed") streak++;
+    else break;
+  }
+
+  if (streak > 0 && streak % 5 === 0) {
+    const milestone = streak / 5;
+    const [existing] = await db
+      .select({ id: pointTransactions.id })
+      .from(pointTransactions)
+      .where(and(
+        eq(pointTransactions.userId, editorUserId),
+        eq(pointTransactions.reason, "order_streak_5"),
+        sql`${pointTransactions.metadata}->>'milestone' = ${milestone.toString()}`
+      ))
+      .limit(1);
+    if (!existing) {
+      await addPoints(editorUserId, 100, "order_streak_5", { milestone, streak });
+      await db.insert(notifications).values({
+        userId: editorUserId,
+        type: "badge_earned",
+        title: `${streak}-order win streak! 🔥`,
+        body: `You completed ${streak} orders in a row without a cancellation. +100 XP!`,
+        link: "/editor/rewards",
+      });
+    }
+  }
+}
+
+/** Called on every sign-in — updates the login streak and awards +25 XP every 7 consecutive days */
+export async function onLoginStreak(userId: string) {
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD" UTC
+
+  const [user] = await db
+    .select({ lastLoginDate: users.lastLoginDate, loginStreakDays: users.loginStreakDays })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (!user) return;
+  if (user.lastLoginDate === today) return; // already counted today
+
+  const yesterday = new Date();
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+  const newStreak = user.lastLoginDate === yesterdayStr ? (user.loginStreakDays + 1) : 1;
+
+  await db
+    .update(users)
+    .set({ loginStreakDays: newStreak, lastLoginDate: today, updatedAt: new Date() })
+    .where(eq(users.id, userId));
+
+  if (newStreak % 7 === 0) {
+    const milestone = newStreak / 7;
+    const [existing] = await db
+      .select({ id: pointTransactions.id })
+      .from(pointTransactions)
+      .where(and(
+        eq(pointTransactions.userId, userId),
+        eq(pointTransactions.reason, "login_streak_7"),
+        sql`${pointTransactions.metadata}->>'milestone' = ${milestone.toString()}`
+      ))
+      .limit(1);
+    if (!existing) {
+      await addPoints(userId, 25, "login_streak_7", { milestone, streak: newStreak });
+      await db.insert(notifications).values({
+        userId,
+        type: "badge_earned",
+        title: `${newStreak}-day login streak! 🔥`,
+        body: `You've logged in ${newStreak} days in a row. +25 XP!`,
+      });
+    }
   }
 }
 
@@ -255,8 +380,17 @@ export async function onEditorAnsweredQuestion(editorUserId: string) {
   await addPoints(editorUserId, 5, "qa_answered");
 }
 
-/** Called when a portfolio item is added (+15 XP, max 5 items total) */
+/** Called when a portfolio item is added (+15 XP, max 5 items, KYC-approved editors only) */
 export async function onPortfolioItemAdded(editorUserId: string, editorId: string) {
+  const [ed] = await db
+    .select({ kycStatus: editors.kycStatus })
+    .from(editors)
+    .where(eq(editors.id, editorId))
+    .limit(1);
+
+  // Only award XP to KYC-verified editors — prevents random uploads farming XP
+  if (!ed || ed.kycStatus !== "approved") return;
+
   const [countRow] = await db
     .select({ c: count() })
     .from(portfolioItems)
@@ -287,18 +421,19 @@ export async function onEditorCreated(userId: string) {
   }
 }
 
-/** Called when a review is received by an editor (any rating ≥ 3 earns XP) */
+/** Called when a review is received by an editor */
 export async function onFiveStarReview(editorUserId: string, rating: number) {
-  if (rating < 3) return;
   if (rating === 5) {
     await addPoints(editorUserId, 25, "five_star_review");
     await checkTopRated(editorUserId);
-  } else {
-    await addPoints(editorUserId, 10, "review_received", { rating });
+  } else if (rating === 4) {
+    await addPoints(editorUserId, 15, "review_received", { rating });
+  } else if (rating === 3) {
+    await addPoints(editorUserId, 5, "review_received", { rating });
   }
 }
 
-/** Called when a client places an order — on the 3rd order with the same editor, reward both */
+/** Called when a client's order is completed — on the 3rd completed order with the same editor, reward both */
 export async function onRepeatClientPair(clientUserId: string, editorId: string) {
   const [editorRow] = await db
     .select({ userId: editors.userId })
@@ -310,7 +445,7 @@ export async function onRepeatClientPair(clientUserId: string, editorId: string)
   const [countRow] = await db
     .select({ c: sql<number>`COUNT(*)::int` })
     .from(orders)
-    .where(and(eq(orders.clientId, clientUserId), eq(orders.editorId, editorId)));
+    .where(and(eq(orders.clientId, clientUserId), eq(orders.editorId, editorId), eq(orders.status, "completed")));
 
   if ((countRow?.c ?? 0) === 3) {
     await addPoints(clientUserId, 30, "repeat_client_bonus", { editorId });
@@ -332,12 +467,19 @@ export async function onRepeatClientPair(clientUserId: string, editorId: string)
 
 async function checkTopRated(editorUserId: string) {
   const [editorRow] = await db
-    .select({ id: editors.id, totalOrders: editors.totalOrders })
+    .select({ id: editors.id })
     .from(editors)
     .where(eq(editors.userId, editorUserId))
     .limit(1);
 
-  if (!editorRow || editorRow.totalOrders < 50) return;
+  if (!editorRow) return;
+
+  const [countRow] = await db
+    .select({ c: sql<number>`COUNT(*)::int` })
+    .from(orders)
+    .where(and(eq(orders.editorId, editorRow.id), eq(orders.status, "completed")));
+
+  if ((countRow?.c ?? 0) < 50) return;
 
   // Must also have avg rating ≥ 4.5 across all reviews received
   const [ratingRow] = await db
@@ -388,29 +530,29 @@ export async function onEditorProfileUpdated(editorUserId: string, editorId: str
   }
 }
 
-/** Called when a client places an order */
-export async function onClientOrderPlaced(clientUserId: string, orderId: string) {
+/** Called when a client's order is completed */
+export async function onClientOrderCompleted(clientUserId: string, orderId: string) {
   await addPoints(clientUserId, 20, "order_placed", { orderId });
 
   const [row] = await db
     .select({ total: sql<number>`COUNT(*)::int` })
     .from(orders)
-    .where(eq(orders.clientId, clientUserId));
+    .where(and(eq(orders.clientId, clientUserId), eq(orders.status, "completed")));
   const total = row?.total ?? 0;
 
   if (total >= 1)  await awardBadge(clientUserId, "first_order");
   if (total >= 5)  await awardBadge(clientUserId, "supporter");
   if (total >= 25) await awardBadge(clientUserId, "power_client");
 
-  // ₹200 credit on 10th order
-  if (total === 10) await addCredit(clientUserId, 20000, "10 orders placed milestone");
+  // ₹200 credit on 10th completed order
+  if (total === 10) await addCredit(clientUserId, 20000, "10 orders completed milestone");
 
-  // Loyal Client: orders placed across at least 3 distinct calendar months
+  // Loyal Client: completed orders placed across at least 3 distinct calendar months
   if (!(await hasBadge(clientUserId, "loyal_client"))) {
     const [monthRow] = await db
       .select({ distinctMonths: sql<number>`COUNT(DISTINCT DATE_TRUNC('month', ${orders.createdAt}))::int` })
       .from(orders)
-      .where(eq(orders.clientId, clientUserId));
+      .where(and(eq(orders.clientId, clientUserId), eq(orders.status, "completed")));
     if ((monthRow?.distinctMonths ?? 0) >= 3) {
       await awardBadge(clientUserId, "loyal_client");
     }
@@ -418,14 +560,112 @@ export async function onClientOrderPlaced(clientUserId: string, orderId: string)
 }
 
 /** Called when a client leaves a review */
-export async function onClientReviewLeft(clientUserId: string) {
-  await addPoints(clientUserId, 20, "review_left");
+export async function onClientReviewLeft(clientUserId: string, orderId: string) {
+  // 1. Verify order is completed (only after payment released)
+  const [order] = await db
+    .select({ status: orders.status })
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .limit(1);
+
+  if (!order || order.status !== "completed") return;
+
+  // 2. Maximum 1 review XP per order & no XP if review edited/resubmitted later
+  const [existingTx] = await db
+    .select({ id: pointTransactions.id })
+    .from(pointTransactions)
+    .where(
+      and(
+        eq(pointTransactions.userId, clientUserId),
+        eq(pointTransactions.reason, "review_left"),
+        sql`${pointTransactions.metadata}->>'orderId' = ${orderId}`
+      )
+    )
+    .limit(1);
+
+  if (existingTx) return;
+
+  // 3. Award XP
+  await addPoints(clientUserId, 20, "review_left", { orderId });
 
   const [reviewCount] = await db
     .select({ c: sql<number>`COUNT(*)::int` })
     .from(pointTransactions)
     .where(and(eq(pointTransactions.userId, clientUserId), eq(pointTransactions.reason, "review_left")));
   if ((reviewCount?.c ?? 0) >= 10) await awardBadge(clientUserId, "top_reviewer");
+}
+
+// ─── Penalty triggers ────────────────────────────────────────────────────────
+
+/** Editor: order was cancelled (-40 XP). Call when cancellation is editor-attributable. */
+export async function onEditorOrderCancelled(editorUserId: string, orderId: string) {
+  const [existing] = await db
+    .select({ id: pointTransactions.id })
+    .from(pointTransactions)
+    .where(and(
+      eq(pointTransactions.userId, editorUserId),
+      eq(pointTransactions.reason, "order_cancelled_penalty"),
+      sql`${pointTransactions.metadata}->>'orderId' = ${orderId}`
+    ))
+    .limit(1);
+  if (existing) return;
+
+  await addPoints(editorUserId, -40, "order_cancelled_penalty", { orderId });
+  await db.insert(notifications).values({
+    userId: editorUserId,
+    type: "badge_earned",
+    title: "Order cancelled — XP penalty",
+    body: "An order was cancelled on your side. -40 XP deducted. Consistent cancellations affect your rank.",
+    link: "/editor/rewards",
+  });
+}
+
+/** Editor: portfolio items flagged as spam by admin (-25 XP). */
+export async function onPortfolioSpam(editorUserId: string) {
+  await addPoints(editorUserId, -25, "spam_portfolio_penalty");
+  await db.insert(notifications).values({
+    userId: editorUserId,
+    type: "badge_earned",
+    title: "Portfolio flagged as spam — XP penalty",
+    body: "One or more portfolio items were removed for violating quality guidelines. -25 XP deducted.",
+    link: "/editor/portfolio",
+  });
+}
+
+/** Editor: review manipulation detected by admin (-100 XP). */
+export async function onFakeReview(editorUserId: string) {
+  await addPoints(editorUserId, -100, "fake_review_penalty");
+  await db.insert(notifications).values({
+    userId: editorUserId,
+    type: "badge_earned",
+    title: "Review manipulation detected — XP penalty",
+    body: "A review linked to your account was flagged as inauthentic. -100 XP deducted. This may lead to suspension.",
+    link: "/editor/rewards",
+  });
+}
+
+/** Client: chargeback or payment fraud detected (-100 XP). */
+export async function onChargebackFraud(clientUserId: string) {
+  await addPoints(clientUserId, -100, "chargeback_fraud_penalty");
+  await db.insert(notifications).values({
+    userId: clientUserId,
+    type: "badge_earned",
+    title: "Chargeback fraud detected — XP penalty",
+    body: "A fraudulent chargeback was raised on your account. -100 XP deducted. Continued abuse will result in suspension.",
+    link: "/client/rewards",
+  });
+}
+
+/** Client or editor: abusive behaviour reported and confirmed (-50 XP). */
+export async function onAbusiveBehavior(userId: string, role: "editor" | "client") {
+  await addPoints(userId, -50, "abusive_behavior_penalty");
+  await db.insert(notifications).values({
+    userId,
+    type: "badge_earned",
+    title: "Abusive behaviour reported — XP penalty",
+    body: "A report of abusive conduct on your account has been confirmed. -50 XP deducted. Repeated violations lead to a permanent ban.",
+    link: `/${role}/rewards`,
+  });
 }
 
 /** Get a user's full rewards profile */
@@ -534,13 +774,17 @@ export async function getUserProgress(userId: string, role: "editor" | "client",
   return result;
 }
 
+const LEVEL_ORDER_ALL: Level[] = ["bronze", "silver", "gold", "platinum", "diamond", "master", "legend"];
+
 /** Perks unlocked by level */
 export function getLevelPerks(level: Level) {
+  const idx = LEVEL_ORDER_ALL.indexOf(level);
   return {
-    maxPackages: level === "bronze" ? 3 : level === "silver" ? 4 : 5,
-    featuredInBrowse: level === "gold" || level === "platinum",
-    clientDiscountPercent: level === "silver" ? 2 : level === "gold" ? 5 : level === "platinum" ? 10 : 0,
-    prioritySupport: level === "platinum",
-    customBanner: level === "platinum",
+    maxPackages: idx < 1 ? 3 : idx < 2 ? 4 : 5,
+    featuredInBrowse: idx >= 2,
+    clientDiscountPercent: ([0, 2, 5, 10, 15, 20, 25] as const)[idx] ?? 0,
+    prioritySupport: idx >= 3,
+    customBanner: idx >= 3,
+    accountManager: idx >= 6,
   };
 }

@@ -42,27 +42,59 @@ export async function getAnnualPayoutTotal(editorId: string, fy: number): Promis
   return row?.total ?? 0;
 }
 
+// Returns the total TDS deducted from an editor in a given FY.
+export async function getAnnualTdsDeducted(editorId: string, fy: number): Promise<number> {
+  const fyStart = getFyStart(fy);
+  const fyEnd   = getFyEnd(fy);
+
+  const [row] = await db
+    .select({ total: sql<number>`COALESCE(SUM(${payouts.tdsAmount}), 0)::int` })
+    .from(payouts)
+    .where(
+      and(
+        eq(payouts.editorId, editorId),
+        sql`${payouts.createdAt} >= ${fyStart}`,
+        sql`${payouts.createdAt} <= ${fyEnd}`
+      )
+    );
+
+  return row?.total ?? 0;
+}
+
 // Core TDS decision function.
-// payoutAmountPaise  = grossAmount - commissionAmount for this order
-// annualTotalPaise   = sum of (gross - commission) for all prior payouts this FY
-// hasPan             = editor has a PAN number on file
+// payoutAmountPaise     = grossAmount - commissionAmount for this order
+// annualTotalSoFarPaise = sum of (gross - commission) for all prior payouts this FY
+// priorTdsDeductedPaise = sum of tdsAmount for all prior payouts this FY
+// hasPan                = editor has a PAN number on file
 export function computeTds({
   payoutAmountPaise,
   annualTotalSoFarPaise,
+  priorTdsDeductedPaise,
   hasPan,
 }: {
   payoutAmountPaise: number;
   annualTotalSoFarPaise: number;
+  priorTdsDeductedPaise: number;
   hasPan: boolean;
 }): { tdsAmount: number; tdsRatePct: number } {
-  const crossesThreshold =
-    annualTotalSoFarPaise >= TDS_THRESHOLD_PAISE ||                        // already over
-    annualTotalSoFarPaise + payoutAmountPaise > TDS_THRESHOLD_PAISE;       // this payout pushes over
+  const cumulativeTotal = annualTotalSoFarPaise + payoutAmountPaise;
+  const crossesThreshold = cumulativeTotal > TDS_THRESHOLD_PAISE;
 
   if (!crossesThreshold) return { tdsAmount: 0, tdsRatePct: 0 };
 
   const tdsRatePct = hasPan ? TDS_RATE_WITH_PAN : TDS_RATE_WITHOUT_PAN;
-  const tdsAmount  = Math.floor(payoutAmountPaise * tdsRatePct / 100);
+  
+  // Calculate target cumulative TDS on the entire amount earned so far in this FY
+  const cumulativeTds = Math.floor((cumulativeTotal * tdsRatePct) / 100);
+  
+  // Current TDS is the difference between cumulative target TDS and prior TDS already deducted.
+  // Clamp it to maximum of the current payoutAmountPaise to avoid negative payouts,
+  // letting unpaid TDS carry forward to subsequent payouts.
+  const tdsAmount = Math.min(
+    Math.max(0, cumulativeTds - priorTdsDeductedPaise),
+    payoutAmountPaise
+  );
+
   return { tdsAmount, tdsRatePct };
 }
 
@@ -73,13 +105,19 @@ export async function computeTdsForEditor(
 ): Promise<{ tdsAmount: number; tdsRatePct: number; annualTotalPaise: number }> {
   const fy = getFinancialYear();
 
-  const [[editorRow], annualTotalPaise] = await Promise.all([
+  const [[editorRow], annualTotalPaise, priorTdsDeductedPaise] = await Promise.all([
     db.select({ panNumber: editors.panNumber }).from(editors).where(eq(editors.id, editorId)).limit(1),
     getAnnualPayoutTotal(editorId, fy),
+    getAnnualTdsDeducted(editorId, fy),
   ]);
 
   const hasPan = !!(editorRow?.panNumber?.trim());
-  const { tdsAmount, tdsRatePct } = computeTds({ payoutAmountPaise, annualTotalSoFarPaise: annualTotalPaise, hasPan });
+  const { tdsAmount, tdsRatePct } = computeTds({
+    payoutAmountPaise,
+    annualTotalSoFarPaise: annualTotalPaise,
+    priorTdsDeductedPaise,
+    hasPan,
+  });
 
   return { tdsAmount, tdsRatePct, annualTotalPaise };
 }

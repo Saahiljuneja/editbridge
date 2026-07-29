@@ -82,7 +82,7 @@ export function WatchlistClient() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Link href={`/admin/users/${editor.userId}`}
-                      className="font-semibold text-sm text-gray-900 dark:text-white hover:text-[#7C3AED] hover:underline">
+                      className="font-semibold text-sm text-gray-900 dark:text-white hover:text-[var(--brand-editor)] hover:underline">
                       {editor.name ?? "Unknown"}
                     </Link>
                     <span className={cn(

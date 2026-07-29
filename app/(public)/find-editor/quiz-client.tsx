@@ -113,7 +113,7 @@ export function FindEditorQuizClient() {
               key={i}
               className={cn(
                 "h-1.5 flex-1 rounded-full transition-colors",
-                i <= step ? "bg-[#0EA5E9]" : "bg-gray-200"
+                i <= step ? "bg-[var(--brand-client)]" : "bg-gray-200"
               )}
             />
           ))}
@@ -224,7 +224,7 @@ export function FindEditorQuizClient() {
               disabled={!canAdvance || submitting}
               className={cn(
                 "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all",
-                canAdvance && !submitting ? "bg-[#0EA5E9] hover:opacity-90" : "bg-gray-200 cursor-not-allowed"
+                canAdvance && !submitting ? "bg-[var(--brand-client)] hover:opacity-90" : "bg-gray-200 cursor-not-allowed"
               )}
             >
               {submitting ? (
@@ -277,7 +277,7 @@ function OptionButton({
       className={cn(
         "rounded-xl border px-4 py-3 text-sm font-semibold text-left transition-all",
         selected
-          ? "border-[#0EA5E9] bg-[#0EA5E9]/8 text-[#0EA5E9]"
+          ? "border-[var(--brand-client)] bg-[var(--brand-client)]/8 text-[var(--brand-client)]"
           : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
       )}
     >

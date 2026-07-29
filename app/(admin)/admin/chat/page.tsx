@@ -104,7 +104,7 @@ export default async function AdminChatPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <Link href={`/admin/chat/${row.orderId}`} className="font-medium text-[#0EA5E9] hover:underline underline-offset-2 truncate max-w-[120px] block">
+                      <Link href={`/admin/chat/${row.orderId}`} className="font-medium text-[var(--brand-client)] hover:underline underline-offset-2 truncate max-w-[120px] block">
                         {row.packageTitle ?? "Custom order"}
                       </Link>
                     </td>
@@ -209,7 +209,7 @@ async function ConversationsTable(_: { orderId: undefined }) {
               <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-200 font-semibold">{row.messageCount}</td>
               <td className="px-4 py-3 text-right text-gray-400 dark:text-gray-500 text-xs whitespace-nowrap">{formatDateTime(row.lastMessageAt)}</td>
               <td className="px-4 py-3 text-right">
-                <Link href={`/admin/chat/${row.orderId}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2 whitespace-nowrap">
+                <Link href={`/admin/chat/${row.orderId}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2 whitespace-nowrap">
                   View chat &rarr;
                 </Link>
               </td>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -43,13 +43,21 @@ const ROLE_LABELS: Record<string, string> = {
   staff_moderation: "Staff · Moderation",
 };
 
-export function Navbar() {
+export function Navbar({
+  logoUrl, platformName,
+  themeBannerEnabled, themeBannerText, themeBannerBg, themeBannerTextColor,
+}: {
+  logoUrl?: string; platformName?: string;
+  themeBannerEnabled?: boolean; themeBannerText?: string;
+  themeBannerBg?: string; themeBannerTextColor?: string;
+} = {}) {
   const { data: session } = useSession();
   const pathname = usePathname();
 
-  const [mobileOpen,  setMobileOpen]  = useState(false);
-  const [moreOpen,    setMoreOpen]    = useState(false);
-  const [userOpen,    setUserOpen]    = useState(false);
+  const [mobileOpen,        setMobileOpen]        = useState(false);
+  const [moreOpen,          setMoreOpen]          = useState(false);
+  const [userOpen,          setUserOpen]          = useState(false);
+  const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
 
   type AnnouncementBar = { id: string; title: string; body: string; type: string };
   const [announcements, setAnnouncements] = useState<AnnouncementBar[]>([]);
@@ -102,20 +110,37 @@ export function Navbar() {
     session?.user?.role === "editor"          ? "/editor/dashboard"
     : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_")
                                               ? "/admin/dashboard"
-    : "/dashboard";
+    : "/client/dashboard";
 
   const roleLabel = ROLE_LABELS[session?.user?.role ?? ""] ?? "Member";
   const isActive  = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <>
+      {/* ── Theme banner (platform settings) ── */}
+      {themeBannerEnabled && themeBannerText && !themeBannerDismissed && (
+        <div className="relative px-4 py-2.5 text-center" style={{ background: themeBannerBg }}>
+          <p className="text-xs sm:text-sm font-medium pr-8" style={{ color: themeBannerTextColor }}>
+            {themeBannerText}
+          </p>
+          <button
+            onClick={() => setThemeBannerDismissed(true)}
+            aria-label="Dismiss"
+            className="absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100 transition-opacity"
+            style={{ color: themeBannerTextColor }}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* ── Announcement bar (DB-driven) ── */}
       {currentAnnouncement && (
         <div className={cn(
           "relative px-4 py-2.5 text-center",
           currentAnnouncement.type === "warning"     ? "bg-amber-500"
           : currentAnnouncement.type === "maintenance" ? "bg-red-600"
-          : "bg-gradient-to-r from-[#0EA5E9] to-[#7c6ff7]"
+          : "bg-gradient-to-r from-[var(--brand-client)] to-[#7c6ff7]"
         )}>
           <p className="text-xs sm:text-sm text-white font-medium pr-8">
             {currentAnnouncement.type === "warning" && "⚠️ "}
@@ -151,12 +176,21 @@ export function Navbar() {
 
             {/* ── Logo ── */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0 mr-8 group">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7c6ff7] to-[#0EA5E9] flex items-center justify-center shadow-[0_2px_8px_rgba(74,63,181,0.4)] group-hover:shadow-[0_4px_16px_rgba(74,63,181,0.5)] transition-all">
-                <span className="text-white font-black text-sm">E</span>
-              </div>
-              <span className="text-[1.15rem] font-black tracking-tight text-gray-900">
-                Edit<span className="text-[#0EA5E9]">Bridge</span>
-              </span>
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt={platformName ?? "Logo"} className="h-8 w-auto max-w-[140px] object-contain" />
+              ) : (
+                <>
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7c6ff7] to-[var(--brand-client)] flex items-center justify-center shadow-[0_2px_8px_rgba(74,63,181,0.4)] group-hover:shadow-[0_4px_16px_rgba(74,63,181,0.5)] transition-all">
+                    <span className="text-white font-black text-sm">E</span>
+                  </div>
+                  <span className="text-[1.15rem] font-black tracking-tight text-gray-900">
+                    {platformName
+                      ? platformName
+                      : <>Edit<span className="text-[var(--brand-client)]">Bridge</span></>}
+                  </span>
+                </>
+              )}
             </Link>
 
             {/* ── Desktop nav ── */}
@@ -166,7 +200,7 @@ export function Navbar() {
                   className={cn(
                     "px-3.5 py-2 rounded-xl text-sm font-medium transition-all",
                     isActive(href)
-                      ? "text-[#0EA5E9] bg-[#0EA5E9]/8"
+                      ? "text-[var(--brand-client)] bg-[var(--brand-client)]/8"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   )}>
                   {label}
@@ -178,7 +212,7 @@ export function Navbar() {
                 <button onClick={() => setMoreOpen(o => !o)}
                   className={cn(
                     "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all",
-                    moreOpen ? "text-[#0EA5E9] bg-[#0EA5E9]/8" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    moreOpen ? "text-[var(--brand-client)] bg-[var(--brand-client)]/8" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   )}>
                   Resources
                   <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
@@ -233,7 +267,7 @@ export function Navbar() {
                   <div className="relative">
                     <button onClick={() => setUserOpen(o => !o)}
                       className="flex items-center gap-2 px-2 py-1.5 rounded-xl border transition-all border-gray-200 bg-gray-50 hover:bg-gray-100">
-                      <div className="w-7 h-7 rounded-lg bg-[#0EA5E9] flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
+                      <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
                         {session.user?.image
                           // eslint-disable-next-line @next/next/no-img-element
                           ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
@@ -256,7 +290,7 @@ export function Navbar() {
                         <div className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden">
                           <div className="px-4 py-4 border-b border-gray-100">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-[#0EA5E9] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+                              <div className="w-10 h-10 rounded-xl bg-[var(--brand-client)] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
                                 {session.user?.image
                                   // eslint-disable-next-line @next/next/no-img-element
                                   ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
@@ -291,12 +325,8 @@ export function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link href="/login"
-                    className="hidden sm:block px-3.5 py-2 rounded-xl text-sm font-medium transition-all text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                    Sign in
-                  </Link>
-                  <Link href="/signup"
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all bg-[#0EA5E9] hover:bg-[#0284C7] shadow-[0_2px_12px_rgba(14,165,233,0.4)] hover:shadow-[0_4px_20px_rgba(14,165,233,0.55)] hover:-translate-y-px">
+<Link href="/signup"
+                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] shadow-[0_2px_12px_rgba(14,165,233,0.4)] hover:shadow-[0_4px_20px_rgba(14,165,233,0.55)] hover:-translate-y-px">
                     Get started
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>

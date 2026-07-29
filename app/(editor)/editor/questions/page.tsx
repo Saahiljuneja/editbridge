@@ -9,7 +9,7 @@ import { formatDateTime, displayNameFromFull } from "@/lib/utils";
 import { QuestionAnswerForm } from "./question-answer-form";
 import { Clock, CheckCircle, HelpCircle } from "lucide-react";
 
-const COLOR = "#0EA5E9";
+const COLOR = "var(--brand-client)";
 
 export default async function EditorQuestionsPage() {
   const session = await auth();

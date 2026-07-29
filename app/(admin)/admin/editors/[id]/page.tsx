@@ -84,7 +84,7 @@ export default async function AdminEditorDetailPage({ params }: { params: Promis
             </Badge>
           </div>
         </div>
-        <Link href={`/admin/users/${editor.userId}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline">
+        <Link href={`/admin/users/${editor.userId}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline">
           Manage account →
         </Link>
       </div>
@@ -147,7 +147,7 @@ export default async function AdminEditorDetailPage({ params }: { params: Promis
                 <td className="px-4 py-3 text-right tabular-nums">{formatCurrency(order.totalAmount)}</td>
                 <td className="px-4 py-3 text-right text-gray-400 text-xs">{formatDate(order.createdAt)}</td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/admin/orders/${order.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline">View →</Link>
+                  <Link href={`/admin/orders/${order.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline">View →</Link>
                 </td>
               </tr>
             ))}

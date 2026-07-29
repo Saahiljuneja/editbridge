@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { editors, users, savedEditors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notifyEditorAvailable } from "@/lib/notifications";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 // Notify clients who saved this editor that they're accepting orders again.
 async function notifySavedClients(editorId: string) {
@@ -47,6 +48,7 @@ export async function PATCH(req: NextRequest) {
       .where(eq(editors.id, editorId));
 
     if (!wasAvailable && isAvailable) notifySavedClients(editorId).catch(() => {});
+    revalidatePublicPagesCache();
     return NextResponse.json({ ok: true });
   }
 
@@ -60,5 +62,6 @@ export async function PATCH(req: NextRequest) {
     .where(eq(editors.id, editorId));
 
   if (!wasAvailable && body.isAvailable) notifySavedClients(editorId).catch(() => {});
+  revalidatePublicPagesCache();
   return NextResponse.json({ ok: true });
 }

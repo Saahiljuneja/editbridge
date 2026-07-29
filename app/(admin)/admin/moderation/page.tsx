@@ -77,7 +77,7 @@ export default async function AdminModerationPage() {
         <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Blocked messages</p>
           <p className="text-3xl font-bold text-amber-600">{blockedMsgCount}</p>
-          <Link href="/admin/chat" className="text-xs text-[#0EA5E9] underline underline-offset-2 mt-1 block">
+          <Link href="/admin/chat" className="text-xs text-[var(--brand-client)] underline underline-offset-2 mt-1 block">
             View in Chat Oversight ?
           </Link>
         </div>

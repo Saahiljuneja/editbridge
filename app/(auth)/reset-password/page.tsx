@@ -59,7 +59,7 @@ function ResetPasswordForm() {
     return (
       <div className="text-center py-4">
         <p className="text-gray-500 mb-4">Invalid or missing reset token.</p>
-        <Link href="/forgot-password" className="text-[#0EA5E9] font-medium hover:underline">
+        <Link href="/forgot-password" className="text-[var(--brand-client)] font-medium hover:underline">
           Request a new link
         </Link>
       </div>
@@ -104,7 +104,7 @@ function ResetPasswordForm() {
 
         <Button
           type="submit"
-          className="w-full bg-[#0EA5E9] hover:bg-[#3b31a0]"
+          className="w-full bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]"
           disabled={loading}
         >
           {loading ? "Updating…" : "Update password"}

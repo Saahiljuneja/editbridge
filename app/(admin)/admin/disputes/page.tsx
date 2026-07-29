@@ -83,7 +83,7 @@ export default async function AdminDisputesPage({
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/admin/disputes/${row.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
+                  <Link href={`/admin/disputes/${row.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2">
                     View
                   </Link>
                 </td>
@@ -113,7 +113,7 @@ export default async function AdminDisputesPage({
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
               tab === t.value
-                ? "bg-[#0EA5E9] text-white"
+                ? "bg-[var(--brand-client)] text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             )}
           >

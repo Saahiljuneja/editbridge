@@ -126,8 +126,8 @@ export default async function AdminPaymentsPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Total GMV (completed)", value: formatCurrency(totalGmv), icon: DollarSign, color: "#0F6E56" },
-          { label: "Processing fees collected", value: formatCurrency(totalProcessingFees), icon: CreditCard, color: "#0EA5E9" },
+          { label: "Total GMV (completed)", value: formatCurrency(totalGmv), icon: DollarSign, color: "var(--brand-teal)" },
+          { label: "Processing fees collected", value: formatCurrency(totalProcessingFees), icon: CreditCard, color: "var(--brand-client)" },
           { label: "Commission earned", value: formatCurrency(totalCommission), icon: ArrowUpRight, color: "#2563eb" },
           { label: "Payouts pending release", value: formatCurrency(pendingPayoutTotal), icon: Clock, color: "#d97706" },
         ].map(({ label, value, icon: Icon, color }) => (
@@ -193,7 +193,7 @@ export default async function AdminPaymentsPage() {
                         )}
                       </td>
                       <td className="px-5 py-3.5">
-                        <Link href={`/admin/orders/${payout.orderId}`} className="text-xs text-[#0EA5E9] hover:underline">
+                        <Link href={`/admin/orders/${payout.orderId}`} className="text-xs text-[var(--brand-client)] hover:underline">
                           Order
                         </Link>
                       </td>
@@ -261,7 +261,7 @@ export default async function AdminPaymentsPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <Link href={`/admin/orders/${order.id}`} className="text-xs text-[#0EA5E9] hover:underline whitespace-nowrap">
+                      <Link href={`/admin/orders/${order.id}`} className="text-xs text-[var(--brand-client)] hover:underline whitespace-nowrap">
                         View
                       </Link>
                     </td>

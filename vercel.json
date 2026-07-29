@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/expire-featured",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/offline-notifications",
+      "schedule": "*/10 * * * *"
     }
   ]
 }

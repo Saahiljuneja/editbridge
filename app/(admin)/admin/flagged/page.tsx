@@ -78,7 +78,7 @@ export default async function AdminFlaggedPage() {
                     </td>
                     <td className="px-4 py-3.5 text-gray-400 dark:text-gray-500 text-xs">{formatDate(user.updatedAt)}</td>
                     <td className="px-4 py-3.5 text-right">
-                      <Link href={`/admin/users/${user.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
+                      <Link href={`/admin/users/${user.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2">
                         Manage →
                       </Link>
                     </td>

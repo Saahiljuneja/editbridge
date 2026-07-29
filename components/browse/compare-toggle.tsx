@@ -37,8 +37,8 @@ export function CompareToggle({ editorId }: { editorId: string }) {
       className={cn(
         "flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-[11px] font-semibold border shadow-sm transition-all",
         isSelected
-          ? "bg-[#0EA5E9] border-[#0EA5E9] text-white opacity-100"
-          : "bg-white/95 border-gray-200 text-gray-500 opacity-0 group-hover:opacity-100 hover:border-[#0EA5E9]/50 hover:text-[#0EA5E9]"
+          ? "bg-[var(--brand-client)] border-[var(--brand-client)] text-white opacity-100"
+          : "bg-white/95 border-gray-200 text-gray-500 opacity-0 group-hover:opacity-100 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)]"
       )}
     >
       <span
@@ -47,7 +47,7 @@ export function CompareToggle({ editorId }: { editorId: string }) {
           isSelected ? "bg-white border-white" : "border-gray-300"
         )}
       >
-        {isSelected && <Check className="w-2.5 h-2.5 text-[#0EA5E9]" strokeWidth={3} />}
+        {isSelected && <Check className="w-2.5 h-2.5 text-[var(--brand-client)]" strokeWidth={3} />}
       </span>
       Compare
     </button>

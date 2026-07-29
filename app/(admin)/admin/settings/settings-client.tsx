@@ -57,7 +57,7 @@ export function SettingsClient({ initial }: { initial: Settings }) {
   const isMaintenance = settings.maintenance_mode === "true";
   const hasWindow = !!(settings.maintenance_start && settings.maintenance_end);
 
-  const inputCls = "w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30";
+  const inputCls = "w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30";
 
   return (
     <div className="px-8 py-6 space-y-6">
@@ -69,7 +69,7 @@ export function SettingsClient({ initial }: { initial: Settings }) {
         <button
           onClick={save}
           disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-client-hover)] disabled:opacity-50 transition-colors"
         >
           <Save className="w-4 h-4" />
           {saving ? "Saving…" : "Save changes"}

@@ -45,7 +45,7 @@ export function PushClient({ subscriberCount }: { subscriberCount: number }) {
       <div className="rounded-2xl bg-gray-900 p-5">
         <p className="text-xs text-gray-400 uppercase tracking-widest mb-3 font-semibold">Preview</p>
         <div className="rounded-xl bg-white/10 backdrop-blur border border-white/10 p-4 flex gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0EA5E9] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[var(--brand-client)] flex items-center justify-center shrink-0">
             <BellRing className="w-5 h-5 text-white" />
           </div>
           <div>

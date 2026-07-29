@@ -400,7 +400,7 @@ export function blocksToHtml(blocks: Block[]): string {
 // ─── Palette block defs ───────────────────────────────────────────────────────
 
 const PALETTE: { type: BlockType; label: string; icon: React.ElementType; desc: string; color: string; bg: string }[] = [
-  { type: "hero",    label: "Hero",     icon: Sparkles,       desc: "Heading + text + CTA button",  color: "#7c3aed", bg: "#ede9fe" },
+  { type: "hero",    label: "Hero",     icon: Sparkles,       desc: "Heading + text + CTA button",  color: "var(--brand-editor)", bg: "#ede9fe" },
   { type: "heading", label: "Heading",  icon: Heading1,       desc: "H1, H2 or H3 title",           color: "#1d4ed8", bg: "#dbeafe" },
   { type: "text",    label: "Text",     icon: Type,           desc: "Paragraph of text",             color: "#0369a1", bg: "#e0f2fe" },
   { type: "button",  label: "Button",   icon: MousePointer,   desc: "Call-to-action button",         color: "#0f766e", bg: "#ccfbf1" },

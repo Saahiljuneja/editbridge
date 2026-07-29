@@ -64,7 +64,7 @@ export function SendEmailForm({ userId, userRole }: { userId: string; userRole: 
             <select
               value={type}
               onChange={e => setType(e.target.value as EmailType)}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
             >
               {availableOptions.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -80,7 +80,7 @@ export function SendEmailForm({ userId, userRole }: { userId: string; userRole: 
                 onChange={e => setReason(e.target.value)}
                 rows={2}
                 placeholder="Explain why the KYC was rejected…"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 resize-none"
               />
             </div>
           )}
@@ -93,7 +93,7 @@ export function SendEmailForm({ userId, userRole }: { userId: string; userRole: 
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
                   placeholder="Email subject…"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
                 />
               </div>
               <div>
@@ -103,7 +103,7 @@ export function SendEmailForm({ userId, userRole }: { userId: string; userRole: 
                   onChange={e => setMessage(e.target.value)}
                   rows={4}
                   placeholder="Message body…"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 resize-none"
                 />
               </div>
             </>
@@ -113,7 +113,7 @@ export function SendEmailForm({ userId, userRole }: { userId: string; userRole: 
             <button
               onClick={handleSend}
               disabled={loading}
-              className="flex-1 py-2 rounded-lg bg-[#0EA5E9] text-white text-sm font-medium hover:bg-[#3d34a0] disabled:opacity-50 transition-colors"
+              className="flex-1 py-2 rounded-lg bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-editor-hover)] disabled:opacity-50 transition-colors"
             >
               {loading ? "Sending…" : "Send email"}
             </button>

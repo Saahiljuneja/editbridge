@@ -3,7 +3,7 @@ import { users, referrals, orders } from "@/lib/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { addCredit, awardBadgePublic } from "@/lib/rewards";
 
-const REFERRAL_CREDIT_PAISE = 20000; // ₹200 per successful referral
+const REFERRAL_CREDIT_PAISE = 10000; // ₹100 per successful referral
 
 // Generate a short unique referral code
 function makeCode(userId: string): string {
@@ -41,7 +41,7 @@ export async function recordReferral(referrerId: string, refereeId: string): Pro
   await db.insert(referrals).values({ referrerId, refereeId });
 }
 
-// Called when referee places their first paid order — awards credit to referrer
+// Called when referee completes their first order — awards credit to referrer
 export async function maybeTriggerReferralReward(refereeId: string, orderId: string): Promise<void> {
   const [referral] = await db
     .select({ id: referrals.id, referrerId: referrals.referrerId, rewardedAt: referrals.rewardedAt })
@@ -50,6 +50,15 @@ export async function maybeTriggerReferralReward(refereeId: string, orderId: str
     .limit(1);
 
   if (!referral) return;
+
+  // Check order amount is ₹1000+ (100,000 Paise)
+  const [order] = await db
+    .select({ totalAmount: orders.totalAmount })
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .limit(1);
+
+  if (!order || order.totalAmount < 100000) return;
 
   // Mark rewarded
   await db.update(referrals).set({ orderId, creditAwarded: REFERRAL_CREDIT_PAISE, rewardedAt: new Date() }).where(eq(referrals.id, referral.id));

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useState, useEffect } from "react";
 import { signIn, getSession } from "next-auth/react";
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/client/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -135,7 +135,7 @@ function LoginForm() {
             <Label htmlFor="password">Password</Label>
             <Link
               href="/forgot-password"
-              className="text-xs text-[#0EA5E9] hover:underline"
+              className="text-xs text-[var(--brand-client)] hover:underline"
             >
               Forgot password?
             </Link>
@@ -153,7 +153,7 @@ function LoginForm() {
 
         <Button
           type="submit"
-          className="w-full bg-[#0EA5E9] hover:bg-[#3b31a0]"
+          className="w-full bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]"
           disabled={loading}
         >
           {loading ? "Signing in…" : "Sign in"}
@@ -162,7 +162,7 @@ function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-gray-500">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-[#0EA5E9] font-medium hover:underline">
+        <Link href="/signup" className="text-[var(--brand-client)] font-medium hover:underline">
           Sign up
         </Link>
       </p>

@@ -42,14 +42,14 @@ export function ReferralCard() {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
-        <Gift className="w-4 h-4 text-[#0EA5E9]" />
+        <Gift className="w-4 h-4 text-[var(--brand-client)]" />
         <h2 className="font-semibold text-gray-900 text-sm">Refer & Earn</h2>
       </div>
 
       <div className="p-5 space-y-4">
         <p className="text-xs text-gray-500 leading-relaxed">
           Share your link. When someone signs up and places their first order, you both earn{" "}
-          <span className="font-semibold text-[#0EA5E9]">₹200 in credits</span>.
+          <span className="font-semibold text-[var(--brand-client)]">₹100 in credits</span>.
         </p>
 
         {/* Stats row */}
@@ -57,7 +57,7 @@ export function ReferralCard() {
           {[
             { label: "Referred", value: data.total, icon: Users, color: "text-gray-700" },
             { label: "Rewarded", value: data.rewarded, icon: Check, color: "text-green-600" },
-            { label: "Earned", value: formatCurrency(data.totalEarned), icon: IndianRupee, color: "text-[#0EA5E9]" },
+            { label: "Earned", value: formatCurrency(data.totalEarned), icon: IndianRupee, color: "text-[var(--brand-client)]" },
           ].map(({ label, value, color }) => (
             <div key={label} className="rounded-xl bg-gray-50 py-3 px-2">
               <p className={cn("text-base font-bold", color)}>{value}</p>
@@ -77,7 +77,7 @@ export function ReferralCard() {
               "px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-1.5 transition-colors shrink-0",
               copied
                 ? "bg-green-100 text-green-700"
-                : "bg-[#0EA5E9] text-white hover:bg-[#3d34a0]"
+                : "bg-[var(--brand-client)] text-white hover:bg-[var(--brand-editor-hover)]"
             )}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

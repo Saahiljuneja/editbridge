@@ -101,7 +101,7 @@ export function PreOrderQA({
         {canAsk && !myPendingQuestion && (
           <button
             onClick={() => (isLoggedIn ? setOpen(true) : router.push("/login"))}
-            className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white bg-[#0EA5E9] hover:opacity-90 transition-opacity shrink-0"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white bg-[var(--brand-client)] hover:opacity-90 transition-opacity shrink-0"
           >
             Ask a question
           </button>
@@ -148,7 +148,7 @@ export function PreOrderQA({
           <button
             onClick={loadMore}
             disabled={loadingMore}
-            className="text-sm font-medium text-[#0EA5E9] hover:underline disabled:opacity-50"
+            className="text-sm font-medium text-[var(--brand-client)] hover:underline disabled:opacity-50"
           >
             {loadingMore ? "Loading…" : "Show more questions"}
           </button>
@@ -170,7 +170,7 @@ export function PreOrderQA({
                 onChange={(e) => setDraft(e.target.value)}
                 rows={4}
                 placeholder="e.g. Can you match the editing style from this reference video?"
-                className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
                 maxLength={500}
               />
               <p className="text-xs text-gray-400">{draft.length}/500</p>
@@ -180,7 +180,7 @@ export function PreOrderQA({
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 rounded-xl font-semibold text-white text-sm disabled:opacity-60 transition-opacity bg-[#0EA5E9]"
+                className="w-full py-3 rounded-xl font-semibold text-white text-sm disabled:opacity-60 transition-opacity bg-[var(--brand-client)]"
               >
                 {submitting ? "Sending…" : "Send question"}
               </button>

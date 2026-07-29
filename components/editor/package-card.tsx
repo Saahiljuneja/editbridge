@@ -96,7 +96,7 @@ export function PackageCard({
         {showBookButton && (
           <Link
             href={bookHref}
-            className={cn(buttonVariants(), "w-full bg-[#0EA5E9] hover:bg-[#0284C7] justify-center")}
+            className={cn(buttonVariants(), "w-full bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] justify-center")}
           >
             Book Now
           </Link>

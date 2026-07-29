@@ -90,7 +90,7 @@ export default async function AdminChargebacksPage() {
               {cb.status === "open" && (
                 <a href={`https://dashboard.razorpay.com/app/disputes/${cb.paymentId}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="text-xs font-semibold text-[#0EA5E9] hover:underline shrink-0 flex items-center gap-1">
+                  className="text-xs font-semibold text-[var(--brand-client)] hover:underline shrink-0 flex items-center gap-1">
                   Respond <ExternalLink className="w-3 h-3" />
                 </a>
               )}

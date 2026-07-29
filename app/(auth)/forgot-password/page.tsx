@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
           If an account exists for <strong>{email}</strong>, you&apos;ll receive a
           password reset link within a few minutes.
         </p>
-        <Link href="/login" className="text-[#0EA5E9] text-sm font-medium hover:underline">
+        <Link href="/login" className="text-[var(--brand-client)] text-sm font-medium hover:underline">
           Back to sign in
         </Link>
       </div>
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
 
         <Button
           type="submit"
-          className="w-full bg-[#0EA5E9] hover:bg-[#3b31a0]"
+          className="w-full bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]"
           disabled={loading}
         >
           {loading ? "Sending…" : "Send reset link"}
@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
 
       <p className="mt-6 text-center text-sm text-gray-500">
         Remember your password?{" "}
-        <Link href="/login" className="text-[#0EA5E9] font-medium hover:underline">
+        <Link href="/login" className="text-[var(--brand-client)] font-medium hover:underline">
           Sign in
         </Link>
       </p>

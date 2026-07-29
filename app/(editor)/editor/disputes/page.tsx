@@ -107,7 +107,7 @@ export default async function EditorDisputesPage() {
                       <p className="font-semibold text-gray-900">{row.packageTitle}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         Client: {row.clientName} · Opened {formatDate(row.createdAt)} ·{" "}
-                        <Link href={`/editor/orders/${row.orderId}`} className="text-[#0EA5E9] hover:underline">View order →</Link>
+                        <Link href={`/editor/orders/${row.orderId}`} className="text-[var(--brand-client)] hover:underline">View order →</Link>
                       </p>
                     </div>
                   </div>
@@ -127,7 +127,7 @@ export default async function EditorDisputesPage() {
                         {row.evidenceText && (
                           <div>
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Your response</p>
-                            <p className="text-sm text-gray-700 leading-relaxed bg-[#0EA5E9]/5 border border-[#0EA5E9]/15 rounded-xl px-4 py-3">{row.evidenceText}</p>
+                            <p className="text-sm text-gray-700 leading-relaxed bg-[var(--brand-client)]/5 border border-[var(--brand-client)]/15 rounded-xl px-4 py-3">{row.evidenceText}</p>
                           </div>
                         )}
                         {row.resolutionType && (

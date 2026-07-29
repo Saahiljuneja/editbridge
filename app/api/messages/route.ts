@@ -10,6 +10,7 @@ import { createInAppNotification, editorWantsNotif } from "@/lib/notifications";
 import { createOrderEvent } from "@/lib/order-events";
 import { createHash } from "crypto";
 import { z } from "zod";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const sendSchema = sendMessageSchema.extend({
   orderId: z.string().uuid(),
@@ -48,6 +49,11 @@ export async function POST(request: NextRequest) {
 
   if (!isClient && !isEditor) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const rl = await checkRateLimit(`msg:${userId}:${orderId}`, 30, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Too many messages — slow down" }, { status: 429 });
   }
 
   const filter = filterContent(content);

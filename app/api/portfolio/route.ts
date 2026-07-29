@@ -5,6 +5,7 @@ import { portfolioItems } from "@/lib/db/schema";
 import { eq, asc, and, inArray, count } from "drizzle-orm";
 import { onPortfolioItemAdded } from "@/lib/rewards";
 import { cleanupOrphanedPortfolioFiles } from "@/lib/portfolio-cleanup";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 import {
   MAX_FEATURED_ITEMS,
   isValidPortfolioUrl,
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
+    revalidatePublicPagesCache();
     return NextResponse.json(copy, { status: 201 });
   }
 
@@ -101,6 +103,7 @@ export async function POST(request: NextRequest) {
 
   onPortfolioItemAdded(session.user.userId!, editorId).catch(() => {});
 
+  revalidatePublicPagesCache();
   return NextResponse.json(item, { status: 201 });
 }
 
@@ -152,6 +155,7 @@ export async function PATCH(request: NextRequest) {
       await db.update(portfolioItems).set({ category: sanitizeCategory(category) }).where(where);
     }
 
+    revalidatePublicPagesCache();
     return NextResponse.json({ success: true });
   }
 
@@ -167,6 +171,7 @@ export async function PATCH(request: NextRequest) {
     )
   );
 
+  revalidatePublicPagesCache();
   return NextResponse.json({ success: true });
 }
 

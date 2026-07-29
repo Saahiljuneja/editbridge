@@ -8,7 +8,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { Clock, RefreshCw, Video, ChevronDown, FileArchive, Briefcase } from "lucide-react";
 import type { Package } from "@/types";
 
-const ACCENT = "#0EA5E9";
+const ACCENT = "var(--brand-client)";
 
 const VIDEO_LENGTH_OPTIONS = [
   "Up to 1 min",
@@ -636,7 +636,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                     type="checkbox"
                     checked={sel}
                     onChange={() => toggleAddon(a.value)}
-                    className="w-3.5 h-3.5 shrink-0 accent-[#0EA5E9]"
+                    className="w-3.5 h-3.5 shrink-0 accent-[var(--brand-client)]"
                   />
                   <span className="text-xs font-medium" style={sel ? { color: ACCENT } : { color: "#374151" }}>
                     {a.label}
@@ -738,7 +738,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               type="checkbox"
               checked={includesSourceFiles}
               onChange={(e) => setIncludesSourceFiles(e.target.checked)}
-              className="mt-0.5 w-3.5 h-3.5 shrink-0 accent-[#0EA5E9]"
+              className="mt-0.5 w-3.5 h-3.5 shrink-0 accent-[var(--brand-client)]"
             />
             <div>
               <p className="text-xs font-semibold" style={includesSourceFiles ? { color: ACCENT } : { color: "#374151" }}>
@@ -760,7 +760,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               type="checkbox"
               checked={includesCommercialRights}
               onChange={(e) => setIncludesCommercialRights(e.target.checked)}
-              className="mt-0.5 w-3.5 h-3.5 shrink-0 accent-[#0EA5E9]"
+              className="mt-0.5 w-3.5 h-3.5 shrink-0 accent-[var(--brand-client)]"
             />
             <div>
               <p className="text-xs font-semibold" style={includesCommercialRights ? { color: ACCENT } : { color: "#374151" }}>

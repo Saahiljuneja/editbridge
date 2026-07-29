@@ -5,8 +5,7 @@ import { packages, editors, orders, users, clientBlocks, preOrderQuestions } fro
 import { and, eq, isNull } from "drizzle-orm";
 import { verifySignature } from "@/lib/razorpay";
 import { notifyOrderPlacedClient, notifyOrderPlacedEditor, createInAppNotification, editorWantsNotif } from "@/lib/notifications";
-import { onClientOrderPlaced, onRepeatClientPair, consumeCredits } from "@/lib/rewards";
-import { maybeTriggerReferralReward } from "@/lib/referrals";
+import { consumeCredits } from "@/lib/rewards";
 import { getPlatformSettings } from "@/lib/platform-settings";
 import { generateBriefText } from "@/lib/brief";
 import { createOrderEvent } from "@/lib/order-events";
@@ -148,10 +147,6 @@ export async function POST(request: NextRequest) {
     await consumeCredits(session.user.userId!, creditApplied, order.id);
   }
 
-  // Rewards (fire-and-forget)
-  onClientOrderPlaced(session.user.userId!, order.id).catch(() => {});
-  onRepeatClientPair(session.user.userId!, editor.id).catch(() => {});
-  maybeTriggerReferralReward(session.user.userId!, order.id).catch(() => {});
 
   // Fetch names + emails for notifications (fire-and-forget)
   const [clientUser, editorUser] = await Promise.all([

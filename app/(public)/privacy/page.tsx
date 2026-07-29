@@ -96,7 +96,7 @@ export default function PrivacyPage() {
         badge="Legal"
         title="Privacy Policy"
         subtitle="Last updated: July 2026"
-        accentColor="#0F6E56"
+        accentColor="var(--brand-teal)"
       />
 
       <div className="px-8 py-6 w-full">
@@ -107,7 +107,7 @@ export default function PrivacyPage() {
               className="rounded-xl border border-gray-100 bg-white p-6"
             >
               <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-[#0F6E56]/10 text-[#0F6E56] text-xs font-bold flex items-center justify-center shrink-0">
+                <span className="w-6 h-6 rounded-full bg-[var(--brand-teal)]/10 text-[var(--brand-teal)] text-xs font-bold flex items-center justify-center shrink-0">
                   {num}
                 </span>
                 {title}
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
                 <ul className="space-y-1.5 text-sm text-gray-500 mb-3">
                   {items.map((item) => (
                     <li key={item} className="flex items-start gap-2">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#0F6E56]/40 shrink-0" />
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--brand-teal)]/40 shrink-0" />
                       {item}
                     </li>
                   ))}

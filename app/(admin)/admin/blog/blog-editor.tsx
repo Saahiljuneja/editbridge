@@ -146,7 +146,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
             onClick={() => save("published")}
             disabled={saving}
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ background: "#0EA5E9" }}
+            style={{ background: "var(--brand-client)" }}
           >
             <Send className="w-3.5 h-3.5" />
             {isEdit && post?.status === "published" ? "Update" : "Publish"}
@@ -226,7 +226,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 value={slug}
                 onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
                 placeholder="post-url-slug"
-                className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#0EA5E9] transition-colors font-mono"
+                className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[var(--brand-client)] transition-colors font-mono"
               />
               {!slugManual && (
                 <p className="text-xs text-gray-300 mt-1">Auto-generated from title</p>
@@ -241,7 +241,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#0EA5E9] transition-colors"
+                className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[var(--brand-client)] transition-colors"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -257,7 +257,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
               <input
                 value={readTime}
                 onChange={(e) => setReadTime(e.target.value)}
-                className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#0EA5E9] transition-colors"
+                className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[var(--brand-client)] transition-colors"
               />
               <p className="text-xs text-gray-300 mt-1">Auto-calculated from word count</p>
             </div>
@@ -276,7 +276,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                   ["1. item", "Numbered list"],
                 ].map(([syntax, desc]) => (
                   <div key={syntax} className="flex items-center justify-between gap-2">
-                    <code className="text-[#0EA5E9] bg-[#0EA5E9]/5 px-1.5 py-0.5 rounded">{syntax}</code>
+                    <code className="text-[var(--brand-client)] bg-[var(--brand-client)]/5 px-1.5 py-0.5 rounded">{syntax}</code>
                     <span className="text-gray-300 text-right">{desc}</span>
                   </div>
                 ))}

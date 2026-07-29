@@ -98,9 +98,9 @@ export default function CookiePolicyPage() {
 
         {/* Footer links */}
         <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-400">
-          <Link href="/privacy" className="hover:text-[#0EA5E9]">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-[#0EA5E9]">Terms of Service</Link>
-          <Link href="/contact" className="hover:text-[#0EA5E9]">Contact Us</Link>
+          <Link href="/privacy" className="hover:text-[var(--brand-client)]">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-[var(--brand-client)]">Terms of Service</Link>
+          <Link href="/contact" className="hover:text-[var(--brand-client)]">Contact Us</Link>
         </div>
       </div>
     </div>

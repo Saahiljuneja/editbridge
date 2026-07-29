@@ -21,7 +21,7 @@ export default function TwoFactorPage() {
       const role = session?.user?.role;
       if (role === "admin" || role?.startsWith("staff_")) router.replace("/admin/dashboard");
       else if (role === "editor") router.replace("/editor/dashboard");
-      else router.replace("/dashboard");
+      else router.replace("/client/dashboard");
     }
   }, [status, session, router]);
 
@@ -58,7 +58,7 @@ export default function TwoFactorPage() {
       toast.success("Verified!");
       if (role === "admin" || role?.startsWith("staff_")) router.replace("/admin/dashboard");
       else if (role === "editor") router.replace("/editor/dashboard");
-      else router.replace("/dashboard");
+      else router.replace("/client/dashboard");
     } catch {
       toast.error("Something went wrong. Please try again.");
       setSubmitting(false);
@@ -82,8 +82,8 @@ export default function TwoFactorPage() {
 
   return (
     <>
-      <div className="w-12 h-12 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
-        <ShieldCheck className="w-6 h-6 text-[#0EA5E9]" />
+      <div className="w-12 h-12 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4">
+        <ShieldCheck className="w-6 h-6 text-[var(--brand-client)]" />
       </div>
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Two-factor verification</h1>
       <p className="text-sm text-gray-500 mb-6">
@@ -104,7 +104,7 @@ export default function TwoFactorPage() {
             disabled={submitting}
             placeholder="000000"
             maxLength={6}
-            className="w-full text-center text-2xl font-mono tracking-[0.5em] px-4 py-3.5 rounded-xl border border-gray-200 outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:opacity-50"
+            className="w-full text-center text-2xl font-mono tracking-[0.5em] px-4 py-3.5 rounded-xl border border-gray-200 outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/20 disabled:opacity-50"
           />
         </div>
       ) : (
@@ -117,12 +117,12 @@ export default function TwoFactorPage() {
             onChange={(e) => handleBackupChange(e.target.value)}
             disabled={submitting}
             placeholder="XXXX-XXXX"
-            className="w-full text-center text-lg font-mono tracking-widest px-4 py-3.5 rounded-xl border border-gray-200 outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 disabled:opacity-50"
+            className="w-full text-center text-lg font-mono tracking-widest px-4 py-3.5 rounded-xl border border-gray-200 outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/20 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={submitting || code.trim().length === 0}
-            className="w-full py-3 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-[#3d34a0] transition-colors disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-editor-hover)] transition-colors disabled:opacity-50"
           >
             {submitting ? "Verifying…" : "Verify"}
           </button>
@@ -131,7 +131,7 @@ export default function TwoFactorPage() {
 
       <button
         onClick={() => { setUseBackup((v) => !v); setCode(""); }}
-        className="mt-4 flex items-center gap-1.5 text-sm text-[#0EA5E9] hover:underline mx-auto"
+        className="mt-4 flex items-center gap-1.5 text-sm text-[var(--brand-client)] hover:underline mx-auto"
       >
         <KeyRound className="w-3.5 h-3.5" />
         {useBackup ? "Use authenticator code instead" : "Use backup code"}

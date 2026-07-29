@@ -21,7 +21,7 @@ const ALLOWED: UserRole[] = ["admin", "staff_support", "staff_dispute", "staff_m
 
 const ROLE_COLORS: Record<string, string> = {
   client: "bg-blue-100 text-blue-700",
-  editor: "bg-[#0EA5E9]/10 text-[#0EA5E9]",
+  editor: "bg-[var(--brand-client)]/10 text-[var(--brand-client)]",
   admin: "bg-red-100 text-red-700",
   staff_kyc: "bg-amber-100 text-amber-700",
   staff_support: "bg-green-100 text-green-700",
@@ -93,7 +93,7 @@ export default async function AdminUserDetailPage({
       </div>
 
       <div className="flex items-start gap-4 mb-8">
-        <div className="w-12 h-12 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-lg font-bold text-[#0EA5E9] shrink-0">
+        <div className="w-12 h-12 rounded-full bg-[var(--brand-client)]/10 flex items-center justify-center text-lg font-bold text-[var(--brand-client)] shrink-0">
           {(user.name ?? user.email).slice(0, 1).toUpperCase()}
         </div>
         <div>

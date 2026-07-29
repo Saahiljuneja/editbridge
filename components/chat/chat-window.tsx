@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import pusherClient from "@/lib/pusher-client";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Send, Paperclip, X, MessageSquareText } from "lucide-react";
+import { Send, Paperclip, X, MessageSquareText, BookmarkPlus, Loader2 } from "lucide-react";
 
 interface ResponseTemplate {
   id: string;
@@ -43,6 +43,12 @@ export function ChatWindow({
   const [showPicker, setShowPicker] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Response Template creation states
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [newTemplateTitle, setNewTemplateTitle] = useState("");
+  const [newTemplateShortcut, setNewTemplateShortcut] = useState("");
+  const [savingTemplate, setSavingTemplate] = useState(false);
 
   useEffect(() => {
     if (!isEditor) return;
@@ -150,8 +156,50 @@ export function ChatWindow({
     }
   }
 
+  async function handleSaveAsTemplate() {
+    if (!content.trim()) return;
+    if (!newTemplateTitle.trim()) {
+      toast.error("Please enter a title for the template.");
+      return;
+    }
+    if (newTemplateShortcut && !/^[a-z]+$/.test(newTemplateShortcut)) {
+      toast.error("Shortcut must contain lowercase letters only.");
+      return;
+    }
+
+    setSavingTemplate(true);
+    try {
+      const res = await fetch("/api/editor/response-templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newTemplateTitle.trim(),
+          content: content.trim(),
+          shortcut: newTemplateShortcut.trim() || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const errMsg = data.error 
+          ? (typeof data.error === "object" ? Object.values(data.error).flat().join(", ") : data.error) 
+          : "Failed to save template";
+        throw new Error(errMsg);
+      }
+
+      setTemplates((prev) => [...prev, data]);
+      setNewTemplateTitle("");
+      setNewTemplateShortcut("");
+      setShowSaveTemplateModal(false);
+      toast.success("Message saved as quick-reply template!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save template");
+    } finally {
+      setSavingTemplate(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] rounded-2xl border border-border bg-white overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-12rem)] rounded-2xl border border-border bg-white overflow-hidden relative">
       {/* Header */}
       <div className="px-5 py-4 border-b border-border flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-semibold text-[#0EA5E9]">
@@ -208,7 +256,65 @@ export function ChatWindow({
         </div>
       )}
 
-      {/* Input */}
+      {/* Save Template Modal Overlay */}
+      {showSaveTemplateModal && (
+        <div className="absolute inset-0 bg-black/40 z-20 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-5 w-full max-w-sm border border-gray-100 shadow-xl space-y-4">
+            <div>
+              <p className="font-bold text-gray-900 text-sm">Save message as template</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">This will add the current input text to your quick-reply menu.</p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-semibold text-gray-700 uppercase tracking-wider mb-1">Template Title</label>
+                <input
+                  value={newTemplateTitle}
+                  onChange={(e) => setNewTemplateTitle(e.target.value)}
+                  placeholder="e.g. Greeting, Follow-up"
+                  maxLength={60}
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-gray-700 uppercase tracking-wider mb-1">Shortcut (lowercase letters only, optional)</label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">/</span>
+                  <input
+                    value={newTemplateShortcut}
+                    onChange={(e) => setNewTemplateShortcut(e.target.value)}
+                    placeholder="thanks"
+                    maxLength={20}
+                    className="w-full rounded-xl border border-gray-200 pl-6 pr-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                  />
+                </div>
+              </div>
+              <div className="border border-gray-50 rounded-xl bg-gray-50/50 p-3 text-[11px] text-gray-500 max-h-24 overflow-y-auto italic">
+                &ldquo;{content.trim()}&rdquo;
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end text-xs">
+              <button
+                type="button"
+                onClick={() => setShowSaveTemplateModal(false)}
+                disabled={savingTemplate}
+                className="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-lg text-gray-600 font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveAsTemplate}
+                disabled={savingTemplate || !newTemplateTitle.trim()}
+                className="px-4 py-2 rounded-lg text-white font-semibold flex items-center gap-1.5 disabled:opacity-50 bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+              >
+                {savingTemplate ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Template"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Input Form */}
       <form onSubmit={handleSend} className="relative px-5 py-4 border-t border-border flex items-end gap-2">
         {/* Response template "/" picker — editor-only */}
         {isEditor && showPicker && (
@@ -255,6 +361,18 @@ export function ChatWindow({
           <Paperclip className="w-4 h-4" />
         </button>
 
+        {isEditor && content.trim().length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowSaveTemplateModal(true)}
+            className="p-2 rounded-lg text-muted-foreground hover:text-[#0EA5E9] hover:bg-muted transition-colors shrink-0"
+            title="Save as quick-reply template"
+            aria-label="Save as template"
+          >
+            <BookmarkPlus className="w-4 h-4" />
+          </button>
+        )}
+
         <Textarea
           ref={textareaRef}
           value={content}
@@ -275,7 +393,7 @@ export function ChatWindow({
           disabled={sending || (!content.trim() && !attachKey)}
           className={cn(
             buttonVariants({ size: "sm" }),
-            "bg-[#0EA5E9] hover:bg-[#3d34a0] shrink-0 px-3",
+            "bg-[#0EA5E9] hover:bg-sky-600 shrink-0 px-3",
             (sending || (!content.trim() && !attachKey)) && "opacity-50 cursor-not-allowed"
           )}
           aria-label="Send message"

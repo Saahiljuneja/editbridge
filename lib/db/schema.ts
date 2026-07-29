@@ -11,6 +11,7 @@ import {
   primaryKey,
   unique,
   index,
+  real,
 } from "drizzle-orm/pg-core";
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
@@ -105,11 +106,12 @@ export const users = pgTable("users", {
   onboarded: boolean("onboarded").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
   referralCode: text("referral_code").unique(),
-  notifPreferences: text("notif_preferences"),  // JSON: client notification prefs
   twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
   twoFactorSecret: text("two_factor_secret"), // AES-256 encrypted at rest — never returned by any API
   twoFactorBackupCodes: text("two_factor_backup_codes").array(), // hashed one-time codes
   twoFactorVerifiedAt: timestamp("two_factor_verified_at", { mode: "date" }), // internal single-use gate consumed by the jwt callback right after a successful /2fa check — never read or set by client code
+  loginStreakDays: integer("login_streak_days").notNull().default(0),
+  lastLoginDate: text("last_login_date"), // "YYYY-MM-DD" UTC — used for 7-day login streak
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
@@ -130,7 +132,9 @@ export const accounts = pgTable("accounts", {
   scope: text("scope"),
   id_token: text("id_token"),
   session_state: text("session_state"),
-});
+}, (t) => [
+  index("accounts_user_id_idx").on(t.userId),
+]);
 
 export const sessions = pgTable("sessions", {
   sessionToken: text("session_token").primaryKey(),
@@ -138,7 +142,9 @@ export const sessions = pgTable("sessions", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
-});
+}, (t) => [
+  index("sessions_user_id_idx").on(t.userId),
+]);
 
 export const verificationTokens = pgTable(
   "verification_tokens",
@@ -175,8 +181,6 @@ export const editors = pgTable("editors", {
   kycRejectionReason: text("kyc_rejection_reason"),
   location: text("location"),
   previousClients: text("previous_clients"),
-  emailPreferences: text("email_preferences"),   // JSON: { newOrder, revision, message, marketing }
-  notifPreferences: text("notif_preferences"),   // JSON: { newOrder, revision, message, review }
   isAvailable: boolean("is_available").notNull().default(true),
   maxActiveOrders: integer("max_active_orders"),
   revisionScopeNote: text("revision_scope_note"), // editor-defined scope: what is/isn't a revision
@@ -189,10 +193,12 @@ export const editors = pgTable("editors", {
   bankAccountNumber: text("bank_account_number"),
   bankIfsc: text("bank_ifsc"),
   panNumber: text("pan_number"),
+  panNumberHash: text("pan_number_hash"), // HMAC-SHA256 of PAN — used for duplicate detection after encryption
   kycRejectionCount: integer("kyc_rejection_count").notNull().default(0),
   kycApprovedAt: timestamp("kyc_approved_at", { mode: "date" }),
   vacationUntil: timestamp("vacation_until", { mode: "date" }),
   activeFrame: text("active_frame"),    // active profile frame key, e.g. "frame_gold"
+  rankScore: real("rank_score"),        // 0–1 composite score updated nightly by cron
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
@@ -224,7 +230,9 @@ export const skills = pgTable("skills", {
     .notNull()
     .references(() => editors.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-});
+}, (t) => [
+  index("skills_editor_id_idx").on(t.editorId),
+]);
 
 export const tools = pgTable("tools", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -232,7 +240,9 @@ export const tools = pgTable("tools", {
     .notNull()
     .references(() => editors.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-});
+}, (t) => [
+  index("tools_editor_id_idx").on(t.editorId),
+]);
 
 export const portfolioItems = pgTable("portfolio_items", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -257,7 +267,10 @@ export const portfolioItems = pgTable("portfolio_items", {
   commentsCount: integer("comments_count").notNull().default(0),
   viewsCount: integer("views_count").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("portfolio_items_editor_id_idx").on(t.editorId),
+  index("portfolio_items_order_id_idx").on(t.orderId),
+]);
 
 // ─── Portfolio Likes ──────────────────────────────────────────────────────────
 
@@ -368,7 +381,8 @@ export const orders = pgTable("orders", {
   razorpayPaymentId: text("razorpay_payment_id"),
   creditApplied: integer("credit_applied").notNull().default(0), // paise — client credits deducted from payment
   rewardDiscountAmount: integer("reward_discount_amount").notNull().default(0), // paise — % reward discount on package price (absorbed by editor)
-  acceptedAt: timestamp("accepted_at", { mode: "date" }),   // when editor accepted (in_progress)
+  acceptedAt: timestamp("accepted_at", { mode: "date" }),   // when editor accepted (pending → in_progress)
+  editorAcceptanceNote: text("editor_acceptance_note"),    // optional note from editor when accepting
   deliveredAt: timestamp("delivered_at", { mode: "date" }), // when delivery was submitted
   completedAt: timestamp("completed_at", { mode: "date" }), // when client approved
   cancelledAt: timestamp("cancelled_at", { mode: "date" }),
@@ -380,7 +394,12 @@ export const orders = pgTable("orders", {
   originalDeadline: timestamp("original_deadline", { mode: "date" }), // deadline before the extension was applied
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("orders_client_id_idx").on(t.clientId),
+  index("orders_editor_status_idx").on(t.editorId, t.status),
+  index("orders_deadline_idx").on(t.deadline),
+  index("orders_delivered_at_idx").on(t.deliveredAt),
+]);
 
 export const deliveries = pgTable("deliveries", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -395,7 +414,9 @@ export const deliveries = pgTable("deliveries", {
     .notNull()
     .references(() => users.id),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("deliveries_order_id_idx").on(t.orderId),
+]);
 
 export const revisionRequests = pgTable("revision_requests", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -426,8 +447,13 @@ export const messages = pgTable("messages", {
   isWarning: boolean("is_warning").notNull().default(false),
   isBlocked: boolean("is_blocked").notNull().default(false),
   blockedReason: text("blocked_reason"),
+  isRead: boolean("is_read").notNull().default(false),
+  emailNotified: boolean("email_notified").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("messages_order_id_idx").on(t.orderId),
+  index("messages_is_read_email_notified_idx").on(t.isRead, t.emailNotified),
+]);
 
 // ─── Reviews ──────────────────────────────────────────────────────────────────
 
@@ -448,7 +474,9 @@ export const reviews = pgTable("reviews", {
   replyText: text("reply_text"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("reviews_reviewee_id_idx").on(t.revieweeId),
+]);
 
 // ─── Disputes ─────────────────────────────────────────────────────────────────
 
@@ -493,7 +521,9 @@ export const payouts = pgTable("payouts", {
   settledAt: timestamp("settled_at", { mode: "date" }),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("payouts_editor_id_idx").on(t.editorId),
+]);
 
 // ─── Order events (timeline) ───────────────────────────────────────────────────
 
@@ -522,7 +552,9 @@ export const notifications = pgTable("notifications", {
   broadcastId: uuid("broadcast_id"),
   isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("notifications_user_read_idx").on(t.userId, t.isRead),
+]);
 
 // ─── Broadcasts ──────────────────────────────────────────────────────────────
 
@@ -623,7 +655,9 @@ export const pointTransactions = pgTable("point_transactions", {
   reason: text("reason").notNull(),                   // e.g. "order_completed", "five_star_review"
   metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-});
+}, (t) => [
+  index("point_transactions_user_reason_idx").on(t.userId, t.reason),
+]);
 
 export const userBadges = pgTable("user_badges", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -832,6 +866,17 @@ export const briefTemplates = pgTable("brief_templates", {
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 }, (t) => [index("brief_templates_user_idx").on(t.userId)]);
 
+// ─── Rate limits (sliding window, keyed by action:userId) ────────────────────
+
+export const rateLimits = pgTable("rate_limits", {
+  key: text("key").notNull(),
+  windowStart: timestamp("window_start", { mode: "date" }).notNull(),
+  count: integer("count").notNull().default(0),
+}, (t) => [
+  primaryKey({ columns: [t.key, t.windowStart] }),
+  index("rate_limits_window_start_idx").on(t.windowStart),
+]);
+
 // ─── Password reset tokens ────────────────────────────────────────────────────
 
 export const passwordResetTokens = pgTable("password_reset_tokens", {
@@ -843,3 +888,20 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
   expires: timestamp("expires", { mode: "date" }).notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
+
+// ─── User preferences (isolated settings) ───────────────────────────────────
+
+export const userPreferences = pgTable("user_preferences", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  emailPreferences: text("email_preferences"), // JSON for editor email prefs
+  notifPreferences: text("notif_preferences"), // JSON for client/editor notifications
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+}, (t) => [
+  index("user_preferences_user_id_idx").on(t.userId),
+]);
+

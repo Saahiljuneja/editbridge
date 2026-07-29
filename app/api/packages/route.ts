@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { editors, packages, userPoints } from "@/lib/db/schema";
 import { eq, count } from "drizzle-orm";
 import { createPackageSchema } from "@/lib/validations";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 import { getPlatformSettings } from "@/lib/platform-settings";
 import { getLevelPerks, calcLevel } from "@/lib/rewards";
 import type { Level } from "@/lib/rewards";
@@ -123,5 +124,6 @@ export async function POST(request: NextRequest) {
     })
     .returning();
 
+  revalidatePublicPagesCache();
   return NextResponse.json(created, { status: 201 });
 }

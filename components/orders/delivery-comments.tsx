@@ -125,7 +125,7 @@ export function DeliveryComments({ deliveryId, currentUserId, videoRef }: Delive
                   {c.timestampSec != null && (
                     <button
                       onClick={() => seekTo(c.timestampSec!)}
-                      className="flex items-center gap-0.5 text-[10px] text-[#0EA5E9] font-semibold bg-[#0EA5E9]/10 px-1.5 py-0.5 rounded-full hover:bg-[#0EA5E9]/20 transition-colors"
+                      className="flex items-center gap-0.5 text-[10px] text-[var(--brand-client)] font-semibold bg-[var(--brand-client)]/10 px-1.5 py-0.5 rounded-full hover:bg-[var(--brand-client)]/20 transition-colors"
                     >
                       <Clock className="w-2.5 h-2.5" />
                       {fmtTime(c.timestampSec)}
@@ -150,7 +150,7 @@ export function DeliveryComments({ deliveryId, currentUserId, videoRef }: Delive
             className={cn(
               "flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg mb-2 transition-colors",
               atTimestamp
-                ? "bg-[#0EA5E9]/10 text-[#0EA5E9]"
+                ? "bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
                 : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             )}
           >
@@ -165,14 +165,14 @@ export function DeliveryComments({ deliveryId, currentUserId, videoRef }: Delive
             onChange={e => setText(e.target.value)}
             placeholder="Leave feedback on this delivery…"
             maxLength={1000}
-            className="flex-1 rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+            className="flex-1 rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
             style={{ fontSize: "16px" }}
           />
           <button
             type="submit"
             disabled={sending || !text.trim()}
             className={cn(
-              "px-3 py-2 rounded-lg bg-[#0EA5E9] text-white text-sm font-medium flex items-center gap-1.5 transition-opacity",
+              "px-3 py-2 rounded-lg bg-[var(--brand-client)] text-white text-sm font-medium flex items-center gap-1.5 transition-opacity",
               (sending || !text.trim()) && "opacity-40 cursor-not-allowed"
             )}
           >

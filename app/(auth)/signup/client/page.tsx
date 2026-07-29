@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
@@ -94,7 +94,7 @@ export default function ClientSignupPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ role: "client" }),
           });
-          signIn("google", { callbackUrl: "/dashboard" });
+          signIn("google", { callbackUrl: "/client/dashboard" });
         }}
         disabled={googleLoading}
       >
@@ -146,7 +146,7 @@ export default function ClientSignupPage() {
           />
         </div>
 
-        <Button type="submit" className="w-full bg-[#0EA5E9] hover:bg-[#3b31a0]" disabled={loading}>
+        <Button type="submit" className="w-full bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]" disabled={loading}>
           {loading ? "Creating account…" : "Create account"}
         </Button>
 
@@ -160,7 +160,7 @@ export default function ClientSignupPage() {
 
       <p className="mt-6 text-center text-sm text-gray-500">
         Already have an account?{" "}
-        <Link href="/login" className="text-[#0EA5E9] font-medium hover:underline">Sign in</Link>
+        <Link href="/login" className="text-[var(--brand-client)] font-medium hover:underline">Sign in</Link>
       </p>
     </>
   );

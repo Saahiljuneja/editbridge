@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PauseCircle, X } from "lucide-react";
+import { PauseCircle, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function AutoPauseBanner({ activeCount }: { activeCount: number }) {
@@ -21,7 +21,7 @@ export function AutoPauseBanner({ activeCount }: { activeCount: number }) {
       });
       if (!res.ok) { toast.error("Failed to pause availability."); return; }
       setPaused(true);
-      toast.success("Availability paused — you won't receive new orders until you turn it back on in your profile.");
+      toast.success("Availability paused — you won't receive new orders until you turn it back on.");
     } catch {
       toast.error("Something went wrong.");
     } finally {
@@ -47,13 +47,16 @@ export function AutoPauseBanner({ activeCount }: { activeCount: number }) {
           disabled={pausing}
           className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold transition-colors disabled:opacity-60"
         >
-          <PauseCircle className="w-3.5 h-3.5" />
-          {pausing ? "Pausing…" : "Pause availability"}
+          {pausing ? (
+            <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Pausing…</>
+          ) : (
+            <><PauseCircle className="w-3.5 h-3.5" /> Pause availability</>
+          )}
         </button>
       </div>
       <button
         onClick={() => setVisible(false)}
-        className="text-amber-400 hover:text-amber-600 shrink-0 mt-0.5"
+        className="w-7 h-7 rounded-lg hover:bg-amber-100 flex items-center justify-center text-amber-400 hover:text-amber-600 shrink-0 transition-colors"
       >
         <X className="w-4 h-4" />
       </button>

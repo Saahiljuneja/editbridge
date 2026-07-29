@@ -8,10 +8,10 @@ import { formatCurrency } from "@/lib/utils";
 
 
 const STATUS_COLORS: Record<string, string> = {
-  completed:          "#0EA5E9",
+  completed:          "var(--brand-client)",
   in_progress:        "#3B82F6",
   pending:            "#9CA3AF",
-  delivered:          "#0EA5E9",
+  delivered:          "var(--brand-client)",
   revision_requested: "#F59E0B",
   cancelled:          "#EF4444",
   disputed:           "#F97316",
@@ -53,7 +53,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
                 formatter={(v) => [formatCurrency(Number(v ?? 0)), "Earnings"]}
                 contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB", fontSize: 12 }}
               />
-              <Bar dataKey="earnings" fill="#0EA5E9" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="earnings" fill="var(--brand-client)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -73,7 +73,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
                     <div className="flex items-center gap-2">
                       <span
                         className="inline-block w-2 h-2 rounded-full shrink-0"
-                        style={{ background: "#0EA5E9" }}
+                        style={{ background: "var(--brand-client)" }}
                       />
                       <span className="text-sm font-medium text-gray-800 truncate max-w-[160px]">{pkg.title}</span>
                     </div>
@@ -83,7 +83,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
                     <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full"
-                        style={{ width: `${pkg.completionRate}%`, background: "#0EA5E9" }}
+                        style={{ width: `${pkg.completionRate}%`, background: "var(--brand-client)" }}
                       />
                     </div>
                     <span className="text-xs font-medium text-gray-500 w-12 text-right">{formatCurrency(pkg.earnings)}</span>

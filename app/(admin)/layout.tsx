@@ -20,7 +20,7 @@ export default async function AdminLayout({
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.twoFactorPending) redirect("/2fa");
-  if (!ADMIN_ROLES.includes(session.user.role as UserRole)) redirect("/dashboard");
+  if (!ADMIN_ROLES.includes(session.user.role as UserRole)) redirect("/client/dashboard");
 
   return (
     <AdminThemeProvider>

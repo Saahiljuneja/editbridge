@@ -82,7 +82,7 @@ export default function TermsPage() {
         badge="Legal"
         title="Terms of Service"
         subtitle="Last updated: July 2026"
-        accentColor="#0EA5E9"
+        accentColor="var(--brand-client)"
       />
 
       <div className="px-8 py-6 w-full">
@@ -93,7 +93,7 @@ export default function TermsPage() {
               className="rounded-xl border border-gray-100 bg-white p-6"
             >
               <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs font-bold flex items-center justify-center shrink-0">
+                <span className="w-6 h-6 rounded-full bg-[var(--brand-client)]/10 text-[var(--brand-client)] text-xs font-bold flex items-center justify-center shrink-0">
                   {num}
                 </span>
                 {title}

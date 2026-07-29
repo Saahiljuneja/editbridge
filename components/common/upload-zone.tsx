@@ -73,7 +73,7 @@ export function UploadZone({
         className={cn(
           "relative border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer",
           dragOver
-            ? "border-[#0EA5E9] bg-purple-50"
+            ? "border-[var(--brand-client)] bg-purple-50"
             : "border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-gray-100"
         )}
       >
@@ -87,7 +87,7 @@ export function UploadZone({
 
         {fileName ? (
           <div className="flex items-center justify-center gap-3">
-            <FileIcon className="h-5 w-5 text-[#0EA5E9]" />
+            <FileIcon className="h-5 w-5 text-[var(--brand-client)]" />
             <span className="text-sm text-gray-700 truncate max-w-xs">
               {fileName}
             </span>
@@ -115,7 +115,7 @@ export function UploadZone({
         <div className="space-y-1">
           <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#0EA5E9] rounded-full transition-all duration-300"
+              className="h-full bg-[var(--brand-client)] rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

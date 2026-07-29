@@ -75,13 +75,13 @@ export default async function KycPendingPage() {
             <p className="text-sm">Your documents are reviewed by our KYC team.</p>
           </div>
           <div className="flex items-start gap-3">
-            <Mail className="w-5 h-5 text-[#0EA5E9] shrink-0 mt-0.5" />
+            <Mail className="w-5 h-5 text-[var(--brand-client)] shrink-0 mt-0.5" />
             <p className="text-sm">
               You will receive an email once your application is approved or if additional information is required.
             </p>
           </div>
           <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-[#0EA5E9] shrink-0 mt-0.5" />
+            <CheckCircle className="w-5 h-5 text-[var(--brand-client)] shrink-0 mt-0.5" />
             <p className="text-sm">
               Once approved, your profile will go live and you can start building your packages.
             </p>
@@ -91,7 +91,7 @@ export default async function KycPendingPage() {
 
       <p className="text-sm text-muted-foreground mb-6">
         Questions? Email us at{" "}
-        <a href="mailto:support@editbridge.in" className="text-[#0EA5E9] underline">
+        <a href="mailto:support@editbridge.in" className="text-[var(--brand-client)] underline">
           support@editbridge.in
         </a>
       </p>

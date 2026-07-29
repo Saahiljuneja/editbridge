@@ -22,12 +22,12 @@ export default function GlobalError({
     >
       {/* Background blobs */}
       <div className="absolute top-1/4 left-1/3 w-96 h-96 rounded-full bg-red-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/3 w-80 h-80 rounded-full bg-[#0EA5E9]/15 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-80 h-80 rounded-full bg-[var(--brand-client)]/15 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-md w-full">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2 mb-12">
-          <div className="w-7 h-7 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
             <span className="text-white font-extrabold text-xs">E</span>
           </div>
           <span className="text-lg font-extrabold text-white tracking-tight">
@@ -55,7 +55,7 @@ export default function GlobalError({
           <button
             onClick={reset}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm transition-colors"
-            style={{ background: "#0EA5E9" }}
+            style={{ background: "var(--brand-client)" }}
           >
             <RefreshCw className="w-4 h-4" />
             Try again

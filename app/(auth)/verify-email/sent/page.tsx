@@ -6,8 +6,8 @@ export const metadata = { title: "Check your email — EditBridge" };
 export default function VerifyEmailSentPage() {
   return (
     <div className="text-center">
-      <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mx-auto mb-5">
-        <Mail className="w-7 h-7 text-[#0EA5E9]" />
+      <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mx-auto mb-5">
+        <Mail className="w-7 h-7 text-[var(--brand-client)]" />
       </div>
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your inbox</h1>
       <p className="text-sm text-gray-500 leading-relaxed mb-6">
@@ -18,7 +18,7 @@ export default function VerifyEmailSentPage() {
       </p>
       <Link
         href="/login"
-        className="text-sm text-[#0EA5E9] font-medium hover:underline"
+        className="text-sm text-[var(--brand-client)] font-medium hover:underline"
       >
         Back to sign in
       </Link>

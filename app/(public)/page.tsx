@@ -31,142 +31,188 @@ import { editors, orders, portfolioItems, users, blogPosts } from "@/lib/db/sche
 import { count, eq, desc, and, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { displayNameFromFull } from "@/lib/utils";
+import { unstable_cache } from "next/cache";
+
+const getHomepageData = unstable_cache(
+  async () => {
+    const clientUsers = alias(users, "client_users");
+    const editorUsers = alias(users, "editor_users");
+
+    const [quizEnabled, editorCountResult, completedOrdersResult, showcaseRows, leaderboardRows, activityRows, blogRows, editorRows, availableCountResult, totalPaidResult] = await Promise.all([
+      isFeatureEnabled("find_editor_quiz"),
+      db.select({ value: count() }).from(editors).where(eq(editors.kycStatus, "approved")),
+      db.select({ value: count() }).from(orders).where(eq(orders.status, "completed")),
+      db.select({
+        id: portfolioItems.id,
+        title: portfolioItems.title,
+        category: portfolioItems.category,
+        editorName: users.name,
+        likesCount: portfolioItems.likesCount,
+        viewsCount: portfolioItems.viewsCount,
+      })
+      .from(portfolioItems)
+      .innerJoin(editors, and(eq(editors.id, portfolioItems.editorId), eq(editors.kycStatus, "approved")))
+      .innerJoin(users, eq(users.id, editors.userId))
+      .orderBy(desc(portfolioItems.likesCount))
+      .limit(3),
+      db.select({
+        id: editors.id,
+        name: users.name,
+        niche: editors.niche,
+        totalOrders: editors.totalOrders,
+        avgRating: sql<number | null>`(SELECT ROUND(AVG(r.rating)::numeric,1) FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client')`,
+      })
+      .from(editors)
+      .innerJoin(users, eq(users.id, editors.userId))
+      .where(and(eq(editors.kycStatus, "approved"), eq(users.isActive, true)))
+      .orderBy(desc(editors.totalOrders))
+      .limit(5),
+      db.select({
+        clientName: clientUsers.name,
+        editorName: editorUsers.name,
+        editorNiche: editors.niche,
+        totalAmount: orders.totalAmount,
+        completedAt: orders.completedAt,
+      })
+      .from(orders)
+      .innerJoin(clientUsers, eq(clientUsers.id, orders.clientId))
+      .innerJoin(editors, eq(editors.id, orders.editorId))
+      .innerJoin(editorUsers, eq(editorUsers.id, editors.userId))
+      .where(eq(orders.status, "completed"))
+      .orderBy(desc(orders.completedAt))
+      .limit(10),
+      db.select({
+        id: blogPosts.id,
+        title: blogPosts.title,
+        slug: blogPosts.slug,
+        excerpt: blogPosts.excerpt,
+        category: blogPosts.category,
+        readTime: blogPosts.readTime,
+        publishedAt: blogPosts.publishedAt,
+      })
+      .from(blogPosts)
+      .where(eq(blogPosts.status, "published"))
+      .orderBy(desc(blogPosts.publishedAt))
+      .limit(3),
+      db.select({
+        id: editors.id,
+        name: users.name,
+        image: users.image,
+        displayName: editors.displayName,
+        niche: editors.niche,
+        title: editors.title,
+        location: editors.location,
+        totalOrders: editors.totalOrders,
+        isFeatured: editors.isFeatured,
+        minPrice: sql<number | null>`(SELECT MIN(p.price) FROM packages p WHERE p.editor_id = ${editors.id} AND p.is_active = true)`,
+        minDeliveryDays: sql<number | null>`(SELECT MIN(p.delivery_days) FROM packages p WHERE p.editor_id = ${editors.id} AND p.is_active = true)`,
+        avgRating: sql<number | null>`(SELECT ROUND(AVG(r.rating)::numeric,1) FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client')`,
+        reviewCount: sql<number>`COALESCE((SELECT COUNT(*)::int FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client'), 0)`,
+        skills: sql<string[]>`COALESCE(ARRAY(SELECT name FROM skills WHERE editor_id = ${editors.id} LIMIT 3), ARRAY[]::text[])`,
+      })
+      .from(editors)
+      .innerJoin(users, eq(users.id, editors.userId))
+      .where(and(eq(editors.kycStatus, "approved"), eq(users.isActive, true)))
+      .orderBy(desc(editors.isFeatured), desc(editors.totalOrders))
+      .limit(5),
+      db.select({ value: count() }).from(editors).where(and(eq(editors.kycStatus, "approved"), eq(editors.isAvailable, true))),
+      db.select({ value: sql<number>`COALESCE(SUM(total_amount), 0)::bigint` }).from(orders).where(eq(orders.status, "completed")),
+    ]);
+
+    const featuredEditors = editorRows.map(r => ({
+      ...r,
+      name: r.name ?? "",
+      displayName: r.displayName ?? null,
+      skills: Array.isArray(r.skills) ? r.skills : [],
+      reviewCount: Number(r.reviewCount ?? 0),
+      totalOrders: Number(r.totalOrders ?? 0),
+    }));
+
+    const availableCount = Number(availableCountResult[0]?.value ?? 0);
+    const totalPaid = Number(totalPaidResult[0]?.value ?? 0);
+    const showLeaderboard = leaderboardRows.some(e => e.totalOrders > 0);
+    const editorCount = editorCountResult[0]?.value ?? 100;
+    const completedOrders = completedOrdersResult[0]?.value ?? 0;
+    const showcaseItems = showcaseRows.map(r => ({
+      id: r.id,
+      title: r.title ?? "",
+      category: r.category ?? "",
+      editorName: displayNameFromFull(r.editorName ?? ""),
+      likesCount: r.likesCount,
+      viewsCount: r.viewsCount,
+    }));
+    const leaderboardEditors = leaderboardRows.map(r => ({
+      ...r,
+      name: displayNameFromFull(r.name ?? ""),
+      initials: (r.name ?? "??").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
+    }));
+
+    const ACTIVITY_COLORS = { order: "var(--brand-client)", approved: "#059669", review: "#d97706" };
+    const activityFeed = activityRows.map((r, i) => {
+      const cName = displayNameFromFull(r.clientName ?? "");
+      const eName = displayNameFromFull(r.editorName ?? "");
+      const amountINR = r.totalAmount ? `₹${(r.totalAmount / 100).toLocaleString("en-IN")}` : null;
+      const isEven = i % 2 === 0;
+      return {
+        type: isEven ? "approved" : "order",
+        name: isEven ? cName : cName,
+        action: isEven
+          ? `approved delivery from ${eName} — payment released`
+          : `booked ${eName} for ${r.editorNiche ?? "video editing"}`,
+        time: (() => {
+          if (!r.completedAt) return "recently";
+          const d = Date.now() - new Date(r.completedAt).getTime();
+          if (d < 3_600_000) return `${Math.max(1, Math.round(d / 60_000))}m ago`;
+          if (d < 86_400_000) return `${Math.round(d / 3_600_000)}h ago`;
+          return `${Math.round(d / 86_400_000)}d ago`;
+        })(),
+        col: isEven ? ACTIVITY_COLORS.approved : ACTIVITY_COLORS.order,
+        amount: amountINR,
+      };
+    });
+
+    const serializedBlogRows = blogRows.map(r => ({
+      ...r,
+      publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
+    }));
+
+    return {
+      quizEnabled,
+      featuredEditors,
+      availableCount,
+      totalPaid,
+      showLeaderboard,
+      editorCount,
+      completedOrders,
+      showcaseItems,
+      leaderboardEditors,
+      activityFeed,
+      blogRows: serializedBlogRows,
+    };
+  },
+  ["homepage-data"],
+  { revalidate: 300, tags: ["homepage-data"] }
+);
 
 export default async function HomePage() {
-  const clientUsers = alias(users, "client_users");
-  const editorUsers = alias(users, "editor_users");
+  const {
+    quizEnabled,
+    featuredEditors,
+    availableCount,
+    totalPaid,
+    showLeaderboard,
+    editorCount,
+    completedOrders,
+    showcaseItems,
+    leaderboardEditors,
+    activityFeed,
+    blogRows,
+  } = await getHomepageData();
 
-  const [quizEnabled, editorCountResult, completedOrdersResult, showcaseRows, leaderboardRows, activityRows, blogRows, editorRows, availableCountResult, totalPaidResult] = await Promise.all([
-    isFeatureEnabled("find_editor_quiz"),
-    db.select({ value: count() }).from(editors).where(eq(editors.kycStatus, "approved")),
-    db.select({ value: count() }).from(orders).where(eq(orders.status, "completed")),
-    db.select({
-      id: portfolioItems.id,
-      title: portfolioItems.title,
-      category: portfolioItems.category,
-      editorName: users.name,
-      likesCount: portfolioItems.likesCount,
-      viewsCount: portfolioItems.viewsCount,
-    })
-    .from(portfolioItems)
-    .innerJoin(editors, and(eq(editors.id, portfolioItems.editorId), eq(editors.kycStatus, "approved")))
-    .innerJoin(users, eq(users.id, editors.userId))
-    .orderBy(desc(portfolioItems.likesCount))
-    .limit(3),
-    db.select({
-      id: editors.id,
-      name: users.name,
-      niche: editors.niche,
-      totalOrders: editors.totalOrders,
-      avgRating: sql<number | null>`(SELECT ROUND(AVG(r.rating)::numeric,1) FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client')`,
-    })
-    .from(editors)
-    .innerJoin(users, eq(users.id, editors.userId))
-    .where(and(eq(editors.kycStatus, "approved"), eq(users.isActive, true)))
-    .orderBy(desc(editors.totalOrders))
-    .limit(5),
-    db.select({
-      clientName: clientUsers.name,
-      editorName: editorUsers.name,
-      editorNiche: editors.niche,
-      totalAmount: orders.totalAmount,
-      completedAt: orders.completedAt,
-    })
-    .from(orders)
-    .innerJoin(clientUsers, eq(clientUsers.id, orders.clientId))
-    .innerJoin(editors, eq(editors.id, orders.editorId))
-    .innerJoin(editorUsers, eq(editorUsers.id, editors.userId))
-    .where(eq(orders.status, "completed"))
-    .orderBy(desc(orders.completedAt))
-    .limit(10),
-    db.select({
-      id: blogPosts.id,
-      title: blogPosts.title,
-      slug: blogPosts.slug,
-      excerpt: blogPosts.excerpt,
-      category: blogPosts.category,
-      readTime: blogPosts.readTime,
-      publishedAt: blogPosts.publishedAt,
-    })
-    .from(blogPosts)
-    .where(eq(blogPosts.status, "published"))
-    .orderBy(desc(blogPosts.publishedAt))
-    .limit(3),
-    db.select({
-      id: editors.id,
-      name: users.name,
-      displayName: editors.displayName,
-      niche: editors.niche,
-      title: editors.title,
-      location: editors.location,
-      totalOrders: editors.totalOrders,
-      isFeatured: editors.isFeatured,
-      minPrice: sql<number | null>`(SELECT MIN(p.price) FROM packages p WHERE p.editor_id = ${editors.id} AND p.is_active = true)`,
-      minDeliveryDays: sql<number | null>`(SELECT MIN(p.delivery_days) FROM packages p WHERE p.editor_id = ${editors.id} AND p.is_active = true)`,
-      avgRating: sql<number | null>`(SELECT ROUND(AVG(r.rating)::numeric,1) FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client')`,
-      reviewCount: sql<number>`COALESCE((SELECT COUNT(*)::int FROM reviews r INNER JOIN orders o ON r.order_id = o.id WHERE o.editor_id = ${editors.id} AND r.role = 'client'), 0)`,
-      skills: sql<string[]>`COALESCE(ARRAY(SELECT name FROM skills WHERE editor_id = ${editors.id} LIMIT 3), ARRAY[]::text[])`,
-    })
-    .from(editors)
-    .innerJoin(users, eq(users.id, editors.userId))
-    .where(and(eq(editors.kycStatus, "approved"), eq(users.isActive, true)))
-    .orderBy(desc(editors.isFeatured), desc(editors.totalOrders))
-    .limit(5),
-    db.select({ value: count() }).from(editors).where(and(eq(editors.kycStatus, "approved"), eq(editors.isAvailable, true))),
-    db.select({ value: sql<number>`COALESCE(SUM(total_amount), 0)::bigint` }).from(orders).where(eq(orders.status, "completed")),
-  ]);
-
-  const featuredEditors = editorRows.map(r => ({
-    ...r,
-    name: r.name ?? "",
-    displayName: r.displayName ?? null,
-    skills: Array.isArray(r.skills) ? r.skills : [],
-    reviewCount: Number(r.reviewCount ?? 0),
-    totalOrders: Number(r.totalOrders ?? 0),
+  const blogPosts = blogRows.map((post) => ({
+    ...post,
+    publishedAt: post.publishedAt ? new Date(post.publishedAt) : null,
   }));
-
-  const availableCount = Number(availableCountResult[0]?.value ?? 0);
-  const totalPaid = Number(totalPaidResult[0]?.value ?? 0);
-  const showLeaderboard = leaderboardRows.some(e => e.totalOrders > 0);
-  const editorCount = editorCountResult[0]?.value ?? 100;
-  const completedOrders = completedOrdersResult[0]?.value ?? 0;
-  const showcaseItems = showcaseRows.map(r => ({
-    id: r.id,
-    title: r.title ?? "",
-    category: r.category ?? "",
-    editorName: displayNameFromFull(r.editorName ?? ""),
-    likesCount: r.likesCount,
-    viewsCount: r.viewsCount,
-  }));
-  const leaderboardEditors = leaderboardRows.map(r => ({
-    ...r,
-    name: displayNameFromFull(r.name ?? ""),
-    initials: (r.name ?? "??").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
-  }));
-
-  const ACTIVITY_COLORS = { order: "#0EA5E9", approved: "#059669", review: "#d97706" };
-  const activityFeed = activityRows.map((r, i) => {
-    const cName = displayNameFromFull(r.clientName ?? "");
-    const eName = displayNameFromFull(r.editorName ?? "");
-    const amountINR = r.totalAmount ? `₹${(r.totalAmount / 100).toLocaleString("en-IN")}` : null;
-    const isEven = i % 2 === 0;
-    return {
-      type: isEven ? "approved" : "order",
-      name: isEven ? cName : cName,
-      action: isEven
-        ? `approved delivery from ${eName} — payment released`
-        : `booked ${eName} for ${r.editorNiche ?? "video editing"}`,
-      time: (() => {
-        if (!r.completedAt) return "recently";
-        const d = Date.now() - new Date(r.completedAt).getTime();
-        if (d < 3_600_000) return `${Math.max(1, Math.round(d / 60_000))}m ago`;
-        if (d < 86_400_000) return `${Math.round(d / 3_600_000)}h ago`;
-        return `${Math.round(d / 86_400_000)}d ago`;
-      })(),
-      col: isEven ? ACTIVITY_COLORS.approved : ACTIVITY_COLORS.order,
-      amount: amountINR,
-    };
-  });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -235,7 +281,7 @@ export default async function HomePage() {
         <ComparisonSection />
         <AnimatedScrollingReviews />
         <ForEditorsSection />
-        <BlogPreviewSection posts={blogRows} />
+        <BlogPreviewSection posts={blogPosts} />
         <AnimatedAbout />
         <AnimatedFAQ />
         <AnimatedCTA />

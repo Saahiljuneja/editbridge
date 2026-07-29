@@ -14,7 +14,7 @@ import type { Package } from "@/types";
 
 const CATEGORY_META: Record<string, { label: string; sub: string; color: string }> = {
   wedding:     { label: "Wedding & Events",         sub: "Wedding films, event highlights, receptions",       color: "#ec4899" },
-  corporate:   { label: "Corporate / Brand",        sub: "Brand promos, company videos, training",            color: "#0ea5e9" },
+  corporate:   { label: "Corporate / Brand",        sub: "Brand promos, company videos, training",            color: "var(--brand-client)" },
   product:     { label: "Product / Commercial",     sub: "Product ads, unboxing, e-commerce videos",          color: "#f97316" },
   education:   { label: "Educational / Tutorial",   sub: "Online courses, explainers, how-to videos",         color: "#eab308" },
   vlog:        { label: "Vlog / Personal",          sub: "Personal vlogs, day-in-life, lifestyle diaries",    color: "#f43f5e" },
@@ -26,7 +26,7 @@ const CATEGORY_META: Record<string, { label: string; sub: string; color: string 
   sports:      { label: "Sports & Fitness",         sub: "Workout videos, sports highlights, reels",          color: "#ef4444" },
   scitech:     { label: "Science & Technology",     sub: "Tech reviews, science explainers, gadget videos",   color: "#3b82f6" },
   animation:   { label: "Animation & Motion",       sub: "2D/3D animation, motion graphics, visual effects",  color: "#6366f1" },
-  realestate:  { label: "Real Estate",              sub: "Property tours, listing videos, agent promos",      color: "#0f6e56" },
+  realestate:  { label: "Real Estate",              sub: "Property tours, listing videos, agent promos",      color: "var(--brand-teal)" },
   documentary: { label: "Documentary / Film",       sub: "Short films, mini-docs, narrative content",         color: "#374151" },
   fashion:     { label: "Fashion & Lifestyle",      sub: "Lookbooks, hauls, lifestyle & beauty content",      color: "#db2777" },
   pets:        { label: "Pets & Animals",           sub: "Pet vlogs, animal content, rescue stories",         color: "#84cc16" },
@@ -247,7 +247,7 @@ export function PackagesManager({
         </div>
         <button
           onClick={() => setShowPicker((v) => !v)}
-          className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl bg-[#0EA5E9] text-white hover:bg-[#0284c7] transition-colors shadow-sm"
+          className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Add category set
@@ -276,10 +276,10 @@ export function PackagesManager({
                     onClick={() => setPickerCat(sel ? "" : c.value)}
                     className={cn(
                       "rounded-xl border p-3 text-left transition-all",
-                      sel ? "bg-[#0EA5E9]/10 border-[#0EA5E9]" : "border-gray-200 bg-white hover:border-gray-300"
+                      sel ? "bg-[var(--brand-client)]/10 border-[var(--brand-client)]" : "border-gray-200 bg-white hover:border-gray-300"
                     )}
                   >
-                    <p className={cn("text-xs font-semibold leading-snug", sel ? "text-[#0EA5E9]" : "text-gray-700")}>
+                    <p className={cn("text-xs font-semibold leading-snug", sel ? "text-[var(--brand-client)]" : "text-gray-700")}>
                       {c.label}
                     </p>
                     <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{c.sub}</p>
@@ -293,7 +293,7 @@ export function PackagesManager({
                 value={pickerCatCustom}
                 onChange={(e) => setPickerCatCustom(e.target.value)}
                 placeholder="e.g. Food & Cooking, ASMR, Unboxing…"
-                className="w-full px-3 py-2 rounded-xl border border-[#0EA5E9] text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#0EA5E9]/20"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--brand-client)] text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20"
               />
             )}
           </div>
@@ -312,11 +312,11 @@ export function PackagesManager({
                   className={cn(
                     "rounded-xl border p-3 text-left transition-all",
                     pickerFmt === f.value
-                      ? "bg-[#0EA5E9]/10 border-[#0EA5E9]"
+                      ? "bg-[var(--brand-client)]/10 border-[var(--brand-client)]"
                       : "border-gray-200 bg-white hover:border-gray-300"
                   )}
                 >
-                  <p className={cn("text-xs font-semibold", pickerFmt === f.value ? "text-[#0EA5E9]" : "text-gray-700")}>
+                  <p className={cn("text-xs font-semibold", pickerFmt === f.value ? "text-[var(--brand-client)]" : "text-gray-700")}>
                     {f.label}
                   </p>
                   <p className="text-[11px] text-gray-400 mt-0.5">{f.sub}</p>
@@ -335,7 +335,7 @@ export function PackagesManager({
             <button
               onClick={addSet}
               disabled={!canAdd}
-              className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl bg-[#0EA5E9] text-white hover:bg-[#3b31a0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-editor-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Create set <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -346,14 +346,14 @@ export function PackagesManager({
       {/* Empty state */}
       {setKeys.length === 0 && !showPicker && (
         <div className="rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mx-auto mb-4">
-            <Video className="w-7 h-7 text-[#0EA5E9]" />
+          <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mx-auto mb-4">
+            <Video className="w-7 h-7 text-[var(--brand-client)]" />
           </div>
           <p className="text-base font-semibold text-gray-700 mb-1">No services yet</p>
           <p className="text-sm text-gray-400 mb-5">Start by adding a category set, then list your services inside it.</p>
           <button
             onClick={() => setShowPicker(true)}
-            className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-[#0EA5E9] text-white hover:bg-[#0284c7] transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-colors"
           >
             <Plus className="w-4 h-4" /> Add your first category set
           </button>
@@ -441,7 +441,7 @@ export function PackagesManager({
                                 className={cn(
                                   "p-1.5 rounded-lg border transition-colors",
                                   isThisEditing
-                                    ? "border-[#0EA5E9]/30 bg-[#0EA5E9]/10 text-[#0EA5E9]"
+                                    ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
                                     : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600 hover:bg-gray-50"
                                 )}
                                 title="Edit"
@@ -493,7 +493,7 @@ export function PackagesManager({
                         {((pkg.addons?.length ?? 0) > 0 || pkg.includesSourceFiles || pkg.includesCommercialRights) && (
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {pkg.addons?.map((a) => (
-                              <span key={a} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/20">
+                              <span key={a} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/20">
                                 {ADDON_LABELS[a] ?? a.replace(/_/g, " ")}
                               </span>
                             ))}
@@ -529,7 +529,7 @@ export function PackagesManager({
 
                       {/* Inline edit form */}
                       {isThisEditing && (
-                        <div className="border-t border-gray-100 p-5 bg-[#0EA5E9]/[0.02]">
+                        <div className="border-t border-gray-100 p-5 bg-[var(--brand-client)]/[0.02]">
                           <PackageBuilderForm
                             existing={pkg}
                             lockedCategory={category === "__none__" ? null : category}
@@ -545,7 +545,7 @@ export function PackagesManager({
 
                 {/* Add service button / inline create form */}
                 {isEditingHere && editingPkg === null ? (
-                  <div className="rounded-xl border border-[#0EA5E9]/25 bg-white p-5 shadow-sm">
+                  <div className="rounded-xl border border-[var(--brand-client)]/25 bg-white p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <p className="text-sm font-semibold text-gray-800">
                         New service — {setLabel(key)}
@@ -564,7 +564,7 @@ export function PackagesManager({
                 ) : (
                   <button
                     onClick={() => openForm(key, null)}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-3.5 text-sm font-semibold text-gray-400 hover:border-[#0EA5E9]/50 hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/[0.02] transition-all"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-3.5 text-sm font-semibold text-gray-400 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/[0.02] transition-all"
                   >
                     <Plus className="w-4 h-4" /> Add service
                   </button>

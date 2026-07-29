@@ -51,9 +51,19 @@ export interface FilterResult {
   reason?: string;
 }
 
+// Zero-width and invisible characters used to break pattern matching.
+// U+200B Zero Width Space, U+200C Non-Joiner, U+200D Joiner,
+// U+FEFF No-Break Space (BOM), U+00AD Soft Hyphen, U+2060 Word Joiner.
+const ZERO_WIDTH_RE = /[​‌‍﻿­⁠]/g;
+
 export function filterContent(content: string): FilterResult {
+  // NFKC normalization collapses Unicode compatibility forms (fullwidth letters,
+  // superscripts, etc.) to their ASCII equivalents, defeating homoglyph bypass.
+  // Zero-width characters are stripped outright — they're invisible splitters.
+  const text = content.normalize("NFKC").replace(ZERO_WIDTH_RE, "");
+
   for (const pattern of CONTACT_PATTERNS) {
-    if (pattern.test(content)) {
+    if (pattern.test(text)) {
       return {
         flagged: true,
         filterType: "contact_info",
@@ -62,7 +72,7 @@ export function filterContent(content: string): FilterResult {
     }
   }
   for (const pattern of ABUSE_WORDS) {
-    if (pattern.test(content)) {
+    if (pattern.test(text)) {
       return {
         flagged: true,
         filterType: "abuse",

@@ -14,7 +14,7 @@ import { FileUpload, UploadedFile, getReadableFileSize } from "@/components/comm
 import { useUpload } from "@/lib/hooks/use-upload";
 import { toast } from "sonner";
 import { MAX_FEATURED_ITEMS } from "@/lib/portfolio-validation";
-import { getYouTubeId, getVimeoId, getThumbnailUrl, getEmbedUrl, isExternalVideo } from "@/lib/portfolio-media";
+import { getYouTubeId, getVimeoId, getGoogleDriveId, getThumbnailUrl, getEmbedUrl, isExternalVideo } from "@/lib/portfolio-media";
 
 // ── Click-outside helper ─────────────────────────────────────────────────────
 
@@ -364,8 +364,8 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
   async function handleAddUrl() {
     const trimmed = urlInput.trim();
     if (!trimmed) return;
-    if (!getYouTubeId(trimmed) && !getVimeoId(trimmed)) {
-      toast.error("Please paste a valid YouTube or Vimeo URL.");
+    if (!getYouTubeId(trimmed) && !getVimeoId(trimmed) && !getGoogleDriveId(trimmed)) {
+      toast.error("Please paste a valid YouTube, Vimeo, or Google Drive URL.");
       return;
     }
     setAddingUrl(true);
@@ -572,11 +572,11 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
         {/* View toggle */}
         <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
           <button onClick={() => setViewMode("grid")} aria-label="Grid view" aria-pressed={viewMode === "grid"}
-            className={cn("px-2.5 py-1.5 transition-colors", viewMode === "grid" ? "bg-[#0EA5E9] text-white" : "text-gray-400 hover:text-gray-600")}>
+            className={cn("px-2.5 py-1.5 transition-colors", viewMode === "grid" ? "bg-[var(--brand-client)] text-white" : "text-gray-400 hover:text-gray-600")}>
             <LayoutGrid className="w-3.5 h-3.5" />
           </button>
           <button onClick={() => setViewMode("list")} aria-label="List view" aria-pressed={viewMode === "list"}
-            className={cn("px-2.5 py-1.5 transition-colors", viewMode === "list" ? "bg-[#0EA5E9] text-white" : "text-gray-400 hover:text-gray-600")}>
+            className={cn("px-2.5 py-1.5 transition-colors", viewMode === "list" ? "bg-[var(--brand-client)] text-white" : "text-gray-400 hover:text-gray-600")}>
             <List className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -594,7 +594,7 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
               {SORT_OPTIONS.map(o => (
                 <button key={o.value} onClick={() => { setSortMode(o.value); setShowSortMenu(false); }}
                   className={cn("w-full text-left px-4 py-2 text-xs transition-colors",
-                    sortMode === o.value ? "text-[#0EA5E9] font-semibold bg-[#0EA5E9]/5" : "text-gray-700 hover:bg-gray-50"
+                    sortMode === o.value ? "text-[var(--brand-client)] font-semibold bg-[var(--brand-client)]/5" : "text-gray-700 hover:bg-gray-50"
                   )}>
                   {o.label}
                 </button>
@@ -616,13 +616,13 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
             <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0" />
             <button onClick={() => setCategoryFilter(null)}
               className={cn("px-3 py-1 rounded-full text-xs font-medium border transition-all shrink-0 whitespace-nowrap",
-                !categoryFilter ? "bg-[#0EA5E9] text-white border-[#0EA5E9]" : "bg-white text-gray-500 border-gray-200 hover:border-gray-300")}>
+                !categoryFilter ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]" : "bg-white text-gray-500 border-gray-200 hover:border-gray-300")}>
               All
             </button>
             {allCategories.map(cat => (
               <button key={cat} onClick={() => setCategoryFilter(cat === categoryFilter ? null : cat)}
                 className={cn("px-3 py-1 rounded-full text-xs font-medium border transition-all shrink-0 whitespace-nowrap",
-                  categoryFilter === cat ? "bg-[#0EA5E9] text-white border-[#0EA5E9]" : "bg-white text-gray-500 border-gray-200 hover:border-gray-300")}>
+                  categoryFilter === cat ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]" : "bg-white text-gray-500 border-gray-200 hover:border-gray-300")}>
                 {cat}
               </button>
             ))}
@@ -700,10 +700,10 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
                     <input value={bulkCategory} onChange={e => setBulkCategory(e.target.value)}
                       onKeyDown={e => { if (e.key === "Enter" && bulkCategory.trim()) bulkAction("setCategory", { category: bulkCategory.trim() }); }}
                       placeholder="Custom category…" maxLength={60}
-                      className="flex-1 text-xs px-2 py-1.5 rounded-lg border border-gray-200 outline-none focus:border-[#0EA5E9] transition-all" />
+                      className="flex-1 text-xs px-2 py-1.5 rounded-lg border border-gray-200 outline-none focus:border-[var(--brand-client)] transition-all" />
                     <button onClick={() => bulkCategory.trim() && bulkAction("setCategory", { category: bulkCategory.trim() })}
                       disabled={!bulkCategory.trim()}
-                      className="px-2.5 py-1.5 rounded-lg bg-[#0EA5E9] text-white text-xs font-semibold disabled:opacity-40 transition-colors">
+                      className="px-2.5 py-1.5 rounded-lg bg-[var(--brand-client)] text-white text-xs font-semibold disabled:opacity-40 transition-colors">
                       Apply
                     </button>
                   </div>
@@ -822,10 +822,10 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
       {/* ── Add options ── */}
       <div className="space-y-3">
         {showUrlPanel && (
-          <div className="rounded-2xl border border-[#0EA5E9]/30 bg-[#0EA5E9]/5 p-4 space-y-3">
+          <div className="rounded-2xl border border-[var(--brand-client)]/30 bg-[var(--brand-client)]/5 p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <LinkIcon className="w-4 h-4 text-[#0EA5E9] shrink-0" />
-              <p className="text-sm font-semibold text-gray-800">Add YouTube or Vimeo video</p>
+              <LinkIcon className="w-4 h-4 text-[var(--brand-client)] shrink-0" />
+              <p className="text-sm font-semibold text-gray-800">Add YouTube, Vimeo, or Google Drive video</p>
               <button onClick={() => { setShowUrlPanel(false); setUrlInput(""); }} aria-label="Close" className="ml-auto text-gray-400 hover:text-gray-600">
                 <X className="w-4 h-4" />
               </button>
@@ -834,13 +834,13 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
               <input autoFocus value={urlInput} onChange={e => setUrlInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleAddUrl()}
                 placeholder="https://www.youtube.com/watch?v=..."
-                className="flex-1 text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all" />
+                className="flex-1 text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/10 transition-all" />
               <button onClick={handleAddUrl} disabled={addingUrl || !urlInput.trim()}
-                className="px-4 py-2.5 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-sky-600 disabled:opacity-50 transition-colors">
+                className="px-4 py-2.5 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-client-hover)] disabled:opacity-50 transition-colors">
                 {addingUrl ? "Adding…" : "Add"}
               </button>
             </div>
-            <p className="text-xs text-gray-400">Paste any YouTube or Vimeo link — no file upload needed.</p>
+            <p className="text-xs text-gray-400">Paste any YouTube, Vimeo, or Google Drive link — no file upload needed.</p>
           </div>
         )}
 
@@ -848,7 +848,7 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
           <FileUpload.DropZone onDropFiles={handleDropFiles} accept="image/*,video/*"
             label={items.length === 0 ? "Start building your portfolio" : undefined}
             hint={items.length === 0
-              ? `Drop a video or image here, or add a YouTube / Vimeo link below · Max ${maxFileSizeMb ?? 5000} MB`
+              ? `Drop a video or image here, or add a YouTube / Vimeo / Google Drive link below · Max ${maxFileSizeMb ?? 5000} MB`
               : `MP4, MOV, AVI, MKV, JPG, PNG · Max ${maxFileSizeMb ?? 5000} MB`} />
           {uploadQueue.length > 0 && (
             <FileUpload.List>
@@ -863,9 +863,9 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
 
         {!showUrlPanel && (
           <button onClick={() => setShowUrlPanel(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-[#0EA5E9] hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 transition-all">
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 transition-all">
             <LinkIcon className="w-4 h-4" />
-            Add YouTube / Vimeo link instead
+            Add YouTube / Vimeo / Google Drive link instead
           </button>
         )}
       </div>
@@ -923,9 +923,9 @@ function PortfolioCard({
       className={cn(
         "bg-white border rounded-2xl overflow-hidden transition-all select-none",
         isDragging && "opacity-40 scale-95",
-        isDragOver && "border-[#0EA5E9] ring-2 ring-[#0EA5E9]/20",
+        isDragOver && "border-[var(--brand-client)] ring-2 ring-[var(--brand-client)]/20",
         !isDragging && !isDragOver && "border-gray-200",
-        isSelected && "ring-2 ring-[#0EA5E9] border-[#0EA5E9]",
+        isSelected && "ring-2 ring-[var(--brand-client)] border-[var(--brand-client)]",
         item.isFeatured && !isSelected && "ring-2 ring-amber-400/50 border-amber-300",
         item.isHidden && "opacity-60",
       )}
@@ -936,7 +936,7 @@ function PortfolioCard({
         <button onClick={onToggleSelect}
           aria-label={isSelected ? "Deselect item" : "Select item"}
           className={cn("absolute top-2 left-2 z-20 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
-            isSelected ? "bg-[#0EA5E9] border-[#0EA5E9]" : "bg-white/80 border-white/80 hover:border-gray-300"
+            isSelected ? "bg-[var(--brand-client)] border-[var(--brand-client)]" : "bg-white/80 border-white/80 hover:border-gray-300"
           )}>
           {isSelected && <Check className="w-3 h-3 text-white" />}
         </button>
@@ -952,7 +952,8 @@ function PortfolioCard({
           <div className="absolute top-9 left-2 z-10 flex flex-col items-start gap-1">
             {external && (
               <span className="bg-black/60 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <LinkIcon className="w-2.5 h-2.5" />{getYouTubeId(item.url) ? "YouTube" : "Vimeo"}
+                <LinkIcon className="w-2.5 h-2.5" />
+                {getYouTubeId(item.url) ? "YouTube" : getVimeoId(item.url) ? "Vimeo" : getGoogleDriveId(item.url) ? "Google Drive" : "Link"}
               </span>
             )}
             {item.isHidden && (
@@ -1036,7 +1037,7 @@ function PortfolioCard({
                 </span>
               )}
               {item.category && (
-                <span className="text-[10px] font-semibold text-[#0EA5E9] bg-[#0EA5E9]/10 px-2 py-0.5 rounded-full truncate">
+                <span className="text-[10px] font-semibold text-[var(--brand-client)] bg-[var(--brand-client)]/10 px-2 py-0.5 rounded-full truncate">
                   {item.category}
                 </span>
               )}
@@ -1067,7 +1068,7 @@ function PortfolioCard({
               <button onClick={onFeature} aria-label={item.isFeatured ? "Unfeature item" : "Feature item"} className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors">
                 {item.isFeatured ? <StarOff className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />}
               </button>
-              <button onClick={onEdit} aria-label="Edit item" className={cn("p-1.5 rounded-lg transition-colors", isEditing ? "bg-[#0EA5E9]/10 text-[#0EA5E9]" : "text-gray-400 hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5")}>
+              <button onClick={onEdit} aria-label="Edit item" className={cn("p-1.5 rounded-lg transition-colors", isEditing ? "bg-[var(--brand-client)]/10 text-[var(--brand-client)]" : "text-gray-400 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5")}>
                 <Edit3 className="w-3.5 h-3.5" />
               </button>
               <button onClick={onDelete} aria-label="Delete item" className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
@@ -1094,7 +1095,7 @@ function PortfolioCard({
         </div>
 
         {score < 4 && !isEditing && !isPending && (
-          <button onClick={onEdit} className="mt-2 w-full text-xs text-[#0EA5E9] border border-dashed border-[#0EA5E9]/30 rounded-xl py-1.5 hover:bg-[#0EA5E9]/5 transition-colors">
+          <button onClick={onEdit} className="mt-2 w-full text-xs text-[var(--brand-client)] border border-dashed border-[var(--brand-client)]/30 rounded-xl py-1.5 hover:bg-[var(--brand-client)]/5 transition-colors">
             + Complete this listing
           </button>
         )}
@@ -1153,8 +1154,8 @@ function PortfolioListRow({
       className={cn(
         "bg-white border rounded-xl flex items-center gap-3 px-3 py-2.5 transition-all select-none",
         isDragging && "opacity-40 scale-[0.98]",
-        isDragOver && "border-[#0EA5E9] ring-2 ring-[#0EA5E9]/20",
-        !isDragging && !isDragOver && (isSelected ? "border-[#0EA5E9] ring-1 ring-[#0EA5E9]" : "border-gray-200"),
+        isDragOver && "border-[var(--brand-client)] ring-2 ring-[var(--brand-client)]/20",
+        !isDragging && !isDragOver && (isSelected ? "border-[var(--brand-client)] ring-1 ring-[var(--brand-client)]" : "border-gray-200"),
         item.isHidden && "opacity-60",
       )}
     >
@@ -1168,7 +1169,7 @@ function PortfolioListRow({
       <button onClick={onToggleSelect}
         aria-label={isSelected ? "Deselect item" : "Select item"}
         className={cn("w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-all",
-          isSelected ? "bg-[#0EA5E9] border-[#0EA5E9]" : "border-gray-300 hover:border-gray-400"
+          isSelected ? "bg-[var(--brand-client)] border-[var(--brand-client)]" : "border-gray-300 hover:border-gray-400"
         )}>
         {isSelected && <Check className="w-3 h-3 text-white" />}
       </button>
@@ -1207,7 +1208,7 @@ function PortfolioListRow({
           {item.orderId && <ShieldCheck className="w-3 h-3 text-indigo-500 shrink-0" />}
         </div>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          {item.category && <span className="text-[10px] text-[#0EA5E9]">{item.category}</span>}
+          {item.category && <span className="text-[10px] text-[var(--brand-client)]">{item.category}</span>}
           {item.tags?.slice(0, 3).map(t => (
             <span key={t} className="text-[10px] bg-gray-100 text-gray-500 rounded px-1">{t}</span>
           ))}
@@ -1225,10 +1226,10 @@ function PortfolioListRow({
           <button onClick={onHide} aria-label={item.isHidden ? "Show item" : "Hide item"} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
             {item.isHidden ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
           </button>
-          <button onClick={onDuplicate} aria-label="Duplicate item" className="p-1.5 rounded-lg text-gray-400 hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5 transition-colors">
+          <button onClick={onDuplicate} aria-label="Duplicate item" className="p-1.5 rounded-lg text-gray-400 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 transition-colors">
             <Copy className="w-3.5 h-3.5" />
           </button>
-          <button onClick={onEdit} aria-label="Edit item" className={cn("p-1.5 rounded-lg transition-colors", isEditing ? "bg-[#0EA5E9]/10 text-[#0EA5E9]" : "text-gray-400 hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5")}>
+          <button onClick={onEdit} aria-label="Edit item" className={cn("p-1.5 rounded-lg transition-colors", isEditing ? "bg-[var(--brand-client)]/10 text-[var(--brand-client)]" : "text-gray-400 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5")}>
             <Edit3 className="w-3.5 h-3.5" />
           </button>
           <button onClick={onDelete} aria-label="Delete item" className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
@@ -1415,14 +1416,14 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Title</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. YouTube highlight reel for TechChannel" maxLength={100}
-              className="mt-1.5 w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all" />
+              className="mt-1.5 w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/10 transition-all" />
           </div>
 
           {/* Description */}
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Description</label>
             <textarea value={description} onChange={e => setDesc(e.target.value)} placeholder="Briefly describe the project, client, and what you did…" maxLength={300} rows={3}
-              className="mt-1.5 w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all resize-none" />
+              className="mt-1.5 w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/10 transition-all resize-none" />
             <p className="text-right text-[11px] text-gray-400 mt-0.5">{description.length}/300</p>
           </div>
 
@@ -1431,7 +1432,7 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Category</label>
             {!showCustom ? (
               <div className="mt-1.5 relative">
-                <select value={category} onChange={e => setCategory(e.target.value)} className="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white appearance-none outline-none focus:border-[#0EA5E9] pr-9">
+                <select value={category} onChange={e => setCategory(e.target.value)} className="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white appearance-none outline-none focus:border-[var(--brand-client)] pr-9">
                   <option value="">Select category…</option>
                   {PORTFOLIO_CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -1439,10 +1440,10 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
               </div>
             ) : (
               <input autoFocus value={customCat} onChange={e => setCustomCat(e.target.value)} placeholder="Type custom category…" maxLength={60}
-                className="mt-1.5 w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[#0EA5E9]" />
+                className="mt-1.5 w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:border-[var(--brand-client)]" />
             )}
             <button type="button" onClick={() => { setShowCustom(s => !s); setCategory(""); setCustomCat(""); }}
-              className="mt-1.5 text-xs text-[#0EA5E9] hover:underline flex items-center gap-1">
+              className="mt-1.5 text-xs text-[var(--brand-client)] hover:underline flex items-center gap-1">
               <Plus className="w-3 h-3" />{showCustom ? "Pick from list" : "Custom category"}
             </button>
           </div>
@@ -1466,7 +1467,7 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
               <input value={tagInput} onChange={e => setTagInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } }}
                 placeholder="e.g. cinematic, color grading…" maxLength={30} disabled={tags.length >= 10}
-                className="flex-1 text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white outline-none focus:border-[#0EA5E9] transition-all disabled:opacity-50" />
+                className="flex-1 text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white outline-none focus:border-[var(--brand-client)] transition-all disabled:opacity-50" />
               <button type="button" onClick={addTag} disabled={!tagInput.trim() || tags.length >= 10} aria-label="Add tag"
                 className="px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition-colors">
                 <Plus className="w-4 h-4" />
@@ -1515,7 +1516,7 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
                   <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-black/50 px-1.5 py-0.5 rounded">Will save on submit</span>
                 </div>
               ) : item.beforeUrl ? (
-                <div className="mt-1.5 flex items-center gap-2 text-xs text-[#0EA5E9] bg-[#0EA5E9]/5 rounded-xl px-4 py-3 border border-[#0EA5E9]/20">
+                <div className="mt-1.5 flex items-center gap-2 text-xs text-[var(--brand-client)] bg-[var(--brand-client)]/5 rounded-xl px-4 py-3 border border-[var(--brand-client)]/20">
                   <ArrowLeftRight className="w-3.5 h-3.5 shrink-0" />
                   Before image uploaded — use the slider above to compare
                 </div>
@@ -1530,7 +1531,7 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
                   </FileUpload.Root>
                 </div>
               ) : (
-                <button type="button" onClick={() => setShowBeforeUpload(true)} className="mt-1.5 w-full flex items-center justify-center gap-2 text-sm text-gray-500 border border-dashed border-gray-300 rounded-xl py-3 hover:border-[#0EA5E9] hover:text-[#0EA5E9] transition-colors">
+                <button type="button" onClick={() => setShowBeforeUpload(true)} className="mt-1.5 w-full flex items-center justify-center gap-2 text-sm text-gray-500 border border-dashed border-gray-300 rounded-xl py-3 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)] transition-colors">
                   <ArrowLeftRight className="w-4 h-4" /> Add Before image for slider
                 </button>
               )}
@@ -1544,7 +1545,7 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
               <span className="font-normal text-gray-400 normal-case tracking-normal">(optional)</span>
             </label>
             <div className="mt-1.5 relative">
-              <select value={orderId} onChange={e => setOrderId(e.target.value)} className="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white appearance-none outline-none focus:border-[#0EA5E9] pr-9">
+              <select value={orderId} onChange={e => setOrderId(e.target.value)} className="w-full text-sm px-4 py-2.5 rounded-xl border border-gray-200 bg-white appearance-none outline-none focus:border-[var(--brand-client)] pr-9">
                 <option value="">Not linked</option>
                 {completedOrders.map(o => (
                   <option key={o.id} value={o.id}>
@@ -1560,7 +1561,7 @@ function EditDrawer({ item, completedOrders, sliderVal, onSliderChange, onSave, 
 
         <div className="px-6 py-4 border-t border-gray-100 flex gap-3 bg-white">
           <button type="button" onClick={handleSaveClick} disabled={isSaving}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-sky-600 disabled:opacity-60 transition-colors">
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-client-hover)] disabled:opacity-60 transition-colors">
             {isSaving ? "Saving…" : (<><Check className="w-4 h-4" /> Save changes</>)}
           </button>
           <button type="button" onClick={onClose} disabled={isSaving}

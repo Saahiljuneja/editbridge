@@ -110,7 +110,7 @@ export default async function AdminAbusePage() {
                 <span className="text-sm font-bold text-amber-600 shrink-0">{row.account_count} accounts</span>
                 <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">First: {formatDate(new Date(row.first_seen))}</p>
                 <Link href={`/admin/users?search=${encodeURIComponent("@" + row.domain)}`}
-                  className="text-xs font-semibold text-[#0EA5E9] hover:underline shrink-0">
+                  className="text-xs font-semibold text-[var(--brand-client)] hover:underline shrink-0">
                   View &rarr;
                 </Link>
               </div>
@@ -123,7 +123,7 @@ export default async function AdminAbusePage() {
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
           <p className="font-semibold text-gray-900 dark:text-white text-sm">Recent Suspensions</p>
-          <Link href="/admin/users?suspended=true" className="text-xs font-semibold text-[#0EA5E9] hover:underline">
+          <Link href="/admin/users?suspended=true" className="text-xs font-semibold text-[var(--brand-client)] hover:underline">
             View all suspended &rarr;
           </Link>
         </div>
@@ -142,7 +142,7 @@ export default async function AdminAbusePage() {
                 </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{formatDate(new Date(row.created_at))}</p>
                 {row.target_id && (
-                  <Link href={`/admin/users/${row.target_id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline shrink-0">
+                  <Link href={`/admin/users/${row.target_id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline shrink-0">
                     Profile &rarr;
                   </Link>
                 )}

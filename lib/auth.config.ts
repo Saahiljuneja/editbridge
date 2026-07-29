@@ -14,6 +14,8 @@ export const authConfig: NextAuthConfig = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         session.user.role = token.role as any;
         session.user.needsOnboarding = (token.needsOnboarding as boolean) ?? false;
+        // Expose twoFactorPending so edge middleware can redirect to /2fa without a DB call.
+        session.user.twoFactorPending = (token.twoFactorPending as boolean) ?? false;
       }
       return session;
     },

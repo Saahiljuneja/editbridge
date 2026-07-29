@@ -167,7 +167,7 @@ export function ShowcaseClient() {
           className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
         >
           <span className="flex items-center gap-2">
-            <Plus className="w-4 h-4 text-[#7C3AED]" /> Add clip to showcase
+            <Plus className="w-4 h-4 text-[var(--brand-editor)]" /> Add clip to showcase
           </span>
           <X className={cn("w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform", !showForm && "rotate-45")} />
         </button>
@@ -178,7 +178,7 @@ export function ShowcaseClient() {
             <div>
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Editor</label>
               {selectedEditor ? (
-                <div className="mt-1.5 flex items-center justify-between rounded-xl border border-[#7C3AED]/30 bg-[#7C3AED]/5 dark:bg-[#7C3AED]/10 px-3 py-2">
+                <div className="mt-1.5 flex items-center justify-between rounded-xl border border-[var(--brand-editor)]/30 bg-[var(--brand-editor)]/5 dark:bg-[var(--brand-editor)]/10 px-3 py-2">
                   <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
                     {selectedEditor.displayName || displayNameFromFull(selectedEditor.name)}
                     {selectedEditor.title && <span className="text-gray-400 dark:text-gray-500 font-normal"> · {selectedEditor.title}</span>}
@@ -194,7 +194,7 @@ export function ShowcaseClient() {
                     value={editorQuery}
                     onChange={(e) => setEditorQuery(e.target.value)}
                     placeholder="Search editor by name…"
-                    className="w-full text-sm pl-9 pr-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                    className="w-full text-sm pl-9 pr-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[var(--brand-editor)] focus:ring-2 focus:ring-[var(--brand-editor)]/10"
                   />
                   {editorResults.length > 0 && (
                     <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg overflow-hidden">
@@ -221,7 +221,7 @@ export function ShowcaseClient() {
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="https://youtube.com/watch?v=…"
-                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[var(--brand-editor)] focus:ring-2 focus:ring-[var(--brand-editor)]/10"
               />
               {videoUrl.trim() && !preview?.ok && (
                 <p className="text-xs text-red-500 mt-1">Only YouTube and Vimeo links are supported.</p>
@@ -241,7 +241,7 @@ export function ShowcaseClient() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. YouTube highlight reel — TechChannel"
                 maxLength={120}
-                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[var(--brand-editor)] focus:ring-2 focus:ring-[var(--brand-editor)]/10"
               />
             </div>
 
@@ -254,14 +254,14 @@ export function ShowcaseClient() {
                 rows={2}
                 maxLength={300}
                 placeholder="Short context about the project…"
-                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10 resize-none"
+                className="mt-1.5 w-full text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-[var(--brand-editor)] focus:ring-2 focus:ring-[var(--brand-editor)]/10 resize-none"
               />
             </div>
 
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-[#6b2fd6] transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand-editor)] text-white text-sm font-semibold hover:bg-[var(--brand-editor-hover)] transition-colors disabled:opacity-50"
             >
               {saving ? "Adding…" : "Add to showcase"}
             </button>

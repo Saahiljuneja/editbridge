@@ -52,22 +52,20 @@ export default async function EditorLayout({
 
   return (
     <EditorKycGuard kycStatus={kycGuardStatus}>
-      <div className="min-h-screen bg-background">
-        <div className="flex">
-          <EditorSidebar
-            featuredPlacementEnabled={featuredPlacementEnabled}
-            userName={session.user.name ?? ""}
-            userImage={session.user.image ?? null}
-            xpLevel={xpLevel}
-            editorId={editorId ?? null}
-            userId={session.user.userId ?? null}
-          />
-          <div className="flex-1 flex flex-col min-w-0">
-            {children}
-          </div>
-        </div>
-      <PushPermissionPrompt />
+      <div className="h-screen overflow-hidden flex">
+        <EditorSidebar
+          featuredPlacementEnabled={featuredPlacementEnabled}
+          userName={session.user.name ?? ""}
+          userImage={session.user.image ?? null}
+          xpLevel={xpLevel}
+          editorId={editorId ?? null}
+          userId={session.user.userId ?? null}
+        />
+        <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
+          {children}
+        </main>
       </div>
+      <PushPermissionPrompt />
     </EditorKycGuard>
   );
 }

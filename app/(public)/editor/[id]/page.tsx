@@ -9,7 +9,8 @@ import {
   BadgeCheck, Globe, Briefcase, Award, X, ArrowLeftRight
 } from "lucide-react";
 import { displayNameFromFull } from "@/lib/utils";
-import { getThumbnailUrl, getEmbedUrl, isExternalVideo } from "@/lib/portfolio-media";
+import { getThumbnailUrl, getEmbedUrl, isExternalVideo, getVideoSource } from "@/lib/portfolio-media";
+import { PortfolioVideoPlayer } from "@/components/public/portfolio-video-player";
 import { RequestQuoteButton } from "@/components/client/request-quote-button";
 import { PackageClickLink } from "@/components/editor/package-click-link";
 
@@ -201,7 +202,10 @@ function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (ind
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
       {items.map((item, index) => {
-        const thumb = item.type === "video" ? (item.thumbnailUrl || getThumbnailUrl(item.url)) : null;
+        const thumb = item.type === "video"
+          ? (item.thumbnailUrl || getThumbnailUrl(item.url))
+          : null;
+        const source = item.type === "video" ? getVideoSource(item.url) : null;
         return (
           <button key={item.id} onClick={() => onOpen(index)}
             className="group relative aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200 text-left">
@@ -218,9 +222,18 @@ function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (ind
                   </div>
                 </>
               ) : (
-                /* Uploaded video, no thumbnail set — dark placeholder */
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                /* External video or direct video without thumbnail — gradient placeholder */
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 gap-1">
                   <Play className="w-8 h-8 text-white/70 group-hover:text-white transition-colors" />
+                  {source && source !== "direct" && (
+                    <span className={`text-[9px] font-bold uppercase tracking-wider text-white/50 px-1.5 py-0.5 rounded ${
+                      source === "youtube" ? "bg-red-600/60" :
+                      source === "vimeo"   ? "bg-sky-500/60" :
+                      "bg-green-600/60"
+                    }`}>
+                      {source === "youtube" ? "YouTube" : source === "vimeo" ? "Vimeo" : "Drive"}
+                    </span>
+                  )}
                 </div>
               )
             ) : (
@@ -253,21 +266,32 @@ function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (ind
   );
 }
 
-function LightboxMedia({ item }: { item: PortfolioItem }) {
+function LightboxMedia({ item, editorName, editorVerified }: {
+  item: PortfolioItem;
+  editorName?: string | null;
+  editorVerified?: boolean;
+}) {
   const [sliderVal, setSliderVal] = useState(50);
-  const embedUrl = item.type === "video" ? getEmbedUrl(item.url) : null;
-  const external = item.type === "video" && isExternalVideo(item.url);
   const hasBA = item.type === "image" && !!item.beforeUrl;
+  const isVideo = item.type === "video";
+
+  if (isVideo) {
+    return (
+      <PortfolioVideoPlayer
+        url={item.url}
+        thumbnailUrl={item.thumbnailUrl}
+        title={item.title}
+        editorName={editorName}
+        editorVerified={editorVerified}
+        aspectRatio="16/9"
+        className="w-full"
+      />
+    );
+  }
 
   return (
     <div className="relative w-full rounded-xl overflow-hidden bg-black" style={{ aspectRatio: "16/9" }}>
-      {item.type === "video" ? (
-        external && embedUrl ? (
-          <iframe src={embedUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-        ) : (
-          <video src={item.url} controls autoPlay className="w-full h-full object-contain" />
-        )
-      ) : hasBA ? (
+      {hasBA ? (
         <div className="relative w-full h-full overflow-hidden select-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={item.url} alt={item.title ?? "After"} className="absolute inset-0 w-full h-full object-contain" />
@@ -296,11 +320,13 @@ function LightboxMedia({ item }: { item: PortfolioItem }) {
   );
 }
 
-function PortfolioLightbox({ items, index, onClose, onNavigate }: {
+function PortfolioLightbox({ items, index, onClose, onNavigate, editorName, editorVerified }: {
   items: PortfolioItem[];
   index: number;
   onClose: () => void;
   onNavigate: (index: number) => void;
+  editorName?: string | null;
+  editorVerified?: boolean;
 }) {
   const item = items[index];
 
@@ -341,7 +367,7 @@ function PortfolioLightbox({ items, index, onClose, onNavigate }: {
       )}
 
       <div className="max-w-4xl w-full max-h-full flex flex-col items-center" onClick={e => e.stopPropagation()}>
-        <LightboxMedia key={item.id} item={item} />
+        <LightboxMedia key={item.id} item={item} editorName={editorName} editorVerified={editorVerified} />
 
         {(item.title || item.description || item.category || item.orderId) && (
           <div className="w-full mt-4 text-white">
@@ -723,6 +749,8 @@ export default function EditorPublicProfile() {
           index={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
+          editorName={displayName}
+          editorVerified={editor.kycStatus === "approved"}
         />
       )}
     </div>

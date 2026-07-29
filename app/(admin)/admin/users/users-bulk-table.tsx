@@ -12,7 +12,7 @@ import { Download } from "lucide-react";
 
 const ROLE_COLORS: Record<string, string> = {
   client: "bg-blue-100 text-blue-700",
-  editor: "bg-[#0EA5E9]/10 text-[#0EA5E9]",
+  editor: "bg-[var(--brand-client)]/10 text-[var(--brand-client)]",
   admin: "bg-red-100 text-red-700",
   staff_kyc: "bg-amber-100 text-amber-700",
   staff_support: "bg-green-100 text-green-700",
@@ -163,7 +163,7 @@ export function UsersBulkTable({
                   onChange={(e) => setReason(e.target.value)}
                   placeholder={`Reason for ${pendingAction} (optional)`}
                   maxLength={300}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 w-64"
+                  className="rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 w-64"
                 />
                 <button
                   onClick={confirmAction}
@@ -196,7 +196,7 @@ export function UsersBulkTable({
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAll}
-                    className="rounded border-gray-300 accent-[#0EA5E9]"
+                    className="rounded border-gray-300 accent-[var(--brand-client)]"
                     aria-label="Select all"
                   />
                 </th>
@@ -225,7 +225,7 @@ export function UsersBulkTable({
                         type="checkbox"
                         checked={selected.has(row.id)}
                         onChange={() => toggle(row.id)}
-                        className="rounded border-gray-300 accent-[#0EA5E9]"
+                        className="rounded border-gray-300 accent-[var(--brand-client)]"
                       />
                     )}
                   </td>
@@ -246,7 +246,7 @@ export function UsersBulkTable({
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/admin/users/${row.id}`} className="text-xs font-semibold text-[#0EA5E9] hover:underline underline-offset-2">
+                  <Link href={`/admin/users/${row.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2">
                     View →
                   </Link>
                 </td>

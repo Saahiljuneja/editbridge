@@ -12,6 +12,26 @@ export type PlatformConfig = {
   maxDeliveryDays: number;
   allowedFileTypes: string[];
   maxFileSizeMb: number;
+  fontHeading: string;
+  fontBody: string;
+  brandPrimary: string;
+  brandEditor: string;
+  brandClient: string;
+  brandTeal: string;
+  siteRadius: string;
+  logoUrl: string;
+  faviconUrl: string;
+  platformTagline: string;
+  announcementEnabled: boolean;
+  announcementText: string;
+  announcementBg: string;
+  announcementTextColor: string;
+  siteDarkMode: "light" | "dark" | "system";
+  emailHeaderColor: string;
+  socialTwitter: string;
+  socialInstagram: string;
+  socialLinkedin: string;
+  customCss: string;
 };
 
 type CachedConfig = PlatformConfig & { ts: number };
@@ -20,36 +40,39 @@ let _cache: CachedConfig | null = null;
 const TTL = 60_000;
 
 const ALL_KEYS = [
-  "platform_name",
-  "support_email",
-  "commission_rate_pct",
-  "processing_fee_pct",
-  "min_revisions",
-  "max_revisions",
-  "max_delivery_days",
-  "allowed_file_types",
-  "max_file_size_mb",
+  "platform_name", "support_email",
+  "commission_rate_pct", "processing_fee_pct",
+  "min_revisions", "max_revisions", "max_delivery_days",
+  "allowed_file_types", "max_file_size_mb",
+  "font_heading", "font_body",
+  "brand_primary", "brand_editor", "brand_client", "brand_teal", "site_radius",
+  "logo_url", "favicon_url", "platform_tagline",
+  "announcement_enabled", "announcement_text", "announcement_bg", "announcement_text_color",
+  "site_dark_mode",
+  "email_header_color",
+  "social_twitter", "social_instagram", "social_linkedin",
+  "custom_css",
 ];
 
 export async function getPlatformSettings(): Promise<PlatformConfig> {
   if (_cache && Date.now() - _cache.ts < TTL) {
-    return {
-      name: _cache.name,
-      supportEmail: _cache.supportEmail,
-      commissionRatePct: _cache.commissionRatePct,
-      processingFeePct: _cache.processingFeePct,
-      minRevisions: _cache.minRevisions,
-      maxRevisions: _cache.maxRevisions,
-      maxDeliveryDays: _cache.maxDeliveryDays,
-      allowedFileTypes: _cache.allowedFileTypes,
-      maxFileSizeMb: _cache.maxFileSizeMb,
-    };
+    const { ts: _ts, ...rest } = _cache;
+    return rest;
   }
 
-  const rows = await db
-    .select({ key: platformSettings.key, value: platformSettings.value })
-    .from(platformSettings)
-    .where(inArray(platformSettings.key, ALL_KEYS));
+  let rows: { key: string; value: string }[] = [];
+  try {
+    rows = await db
+      .select({ key: platformSettings.key, value: platformSettings.value })
+      .from(platformSettings)
+      .where(inArray(platformSettings.key, ALL_KEYS));
+  } catch (err) {
+    console.error("[getPlatformSettings] Database connection failed, using default configuration:", err);
+    if (_cache) {
+      const { ts: _ts, ...rest } = _cache;
+      return rest;
+    }
+  }
 
   const map: Record<string, string> = {};
   for (const row of rows) map[row.key] = row.value;
@@ -67,6 +90,26 @@ export async function getPlatformSettings(): Promise<PlatformConfig> {
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean),
     maxFileSizeMb: Math.max(1, Number(map.max_file_size_mb ?? 500)),
+    fontHeading:         map.font_heading           || "",
+    fontBody:            map.font_body              || "",
+    brandPrimary:        map.brand_primary          || "#7C3AED",
+    brandEditor:         map.brand_editor           || "#7C3AED",
+    brandClient:         map.brand_client           || "#0EA5E9",
+    brandTeal:           map.brand_teal             || "#0F6E56",
+    siteRadius:          map.site_radius            || "0.625rem",
+    logoUrl:             map.logo_url               || "",
+    faviconUrl:          map.favicon_url            || "",
+    platformTagline:     map.platform_tagline       || "",
+    announcementEnabled: map.announcement_enabled   === "true",
+    announcementText:    map.announcement_text      || "",
+    announcementBg:      map.announcement_bg        || "#7C3AED",
+    announcementTextColor: map.announcement_text_color || "#ffffff",
+    siteDarkMode:        (map.site_dark_mode as PlatformConfig["siteDarkMode"]) || "light",
+    emailHeaderColor:    map.email_header_color     || "#7C3AED",
+    socialTwitter:       map.social_twitter         || "",
+    socialInstagram:     map.social_instagram       || "",
+    socialLinkedin:      map.social_linkedin        || "",
+    customCss:           map.custom_css             || "",
   };
 
   _cache = { ...cfg, ts: Date.now() };

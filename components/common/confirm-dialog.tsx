@@ -54,7 +54,7 @@ export function ConfirmDialog({
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
-            className={!destructive ? "bg-[#0EA5E9] hover:bg-[#3b31a0]" : ""}
+            className={!destructive ? "bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]" : ""}
             onClick={onConfirm}
             disabled={isLoading}
           >

@@ -153,7 +153,7 @@ export function OrderEventTimeline({ orderId, className }: OrderEventTimelinePro
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="flex items-center gap-1 text-xs font-medium text-[#0EA5E9] hover:underline mt-1"
+          className="flex items-center gap-1 text-xs font-medium text-[var(--brand-client)] hover:underline mt-1"
         >
           View full timeline ({events.length} events) <ChevronDown className="w-3.5 h-3.5" />
         </button>

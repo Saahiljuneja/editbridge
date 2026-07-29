@@ -23,7 +23,7 @@ export const FEATURE_FLAG_REGISTRY = {
 export type FeatureFlagKey = keyof typeof FEATURE_FLAG_REGISTRY;
 
 let _cache: { map: Record<string, boolean>; ts: number } | null = null;
-const TTL = 30_000;
+const TTL = 5_000;
 
 async function loadFlags(): Promise<Record<string, boolean>> {
   if (_cache && Date.now() - _cache.ts < TTL) return _cache.map;

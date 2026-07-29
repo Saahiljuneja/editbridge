@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -73,7 +73,7 @@ function VerifyEmailContent() {
             const role = session?.user?.role;
             const dest = role === "editor" ? "/editor/dashboard"
               : (role === "admin" || role?.startsWith("staff_")) ? "/admin/dashboard"
-              : "/dashboard";
+              : "/client/dashboard";
             setTimeout(() => router.push(dest), 1800);
             return;
           }
@@ -142,9 +142,9 @@ function VerifyEmailContent() {
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 18 }}
-            className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mx-auto mb-5"
+            className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mx-auto mb-5"
           >
-            <Mail className="w-7 h-7 text-[#0EA5E9]" />
+            <Mail className="w-7 h-7 text-[var(--brand-client)]" />
           </motion.div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Check your email</h1>
@@ -163,7 +163,7 @@ function VerifyEmailContent() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="flex items-center justify-center gap-1.5 text-sm text-[#0EA5E9] mt-4"
+                className="flex items-center justify-center gap-1.5 text-sm text-[var(--brand-client)] mt-4"
               >
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 Verifying…
@@ -176,7 +176,7 @@ function VerifyEmailContent() {
             <button
               onClick={handleResend}
               disabled={resendCooldown > 0 || resending}
-              className="flex items-center gap-1 text-[#0EA5E9] font-medium hover:underline disabled:opacity-40 disabled:no-underline"
+              className="flex items-center gap-1 text-[var(--brand-client)] font-medium hover:underline disabled:opacity-40 disabled:no-underline"
             >
               {resending && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}

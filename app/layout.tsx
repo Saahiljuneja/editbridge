@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Rubik, Nunito_Sans } from "next/font/google";
+import { Rubik, DM_Sans } from "next/font/google";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
@@ -12,11 +13,11 @@ const rubik = Rubik({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-const nunitoSans = Nunito_Sans({
+const dmSans = DM_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,14 +29,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { siteDarkMode, brandClient, brandEditor, brandTeal, customCss } = await getPlatformSettings();
+  const themeClass = siteDarkMode === "dark" ? "dark" : "";
+  const platformCss = `:root{--brand-client:${brandClient};--brand-editor:${brandEditor};--brand-teal:${brandTeal};}${customCss ? `\n${customCss}` : ""}`;
   return (
-    <html lang="en" className={`${rubik.variable} ${nunitoSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${rubik.variable} ${dmSans.variable} ${GeistMono.variable} h-full antialiased${themeClass ? ` ${themeClass}` : ""}`}>
       <body className="min-h-full flex flex-col">
+        {/* React 19 hoists <style precedence> to <head> automatically */}
+        <style href="platform-vars" precedence="high" dangerouslySetInnerHTML={{ __html: platformCss }} />
         <Providers>
           {children}
           <Toaster richColors position="top-right" />

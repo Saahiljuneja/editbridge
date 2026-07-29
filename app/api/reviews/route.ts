@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Client reviewed the editor → award editor for 5-star
     onFiveStarReview(revieweeId, rating).catch(() => {});
     // Client gets XP for leaving review
-    onClientReviewLeft(userId).catch(() => {});
+    onClientReviewLeft(userId, orderId).catch(() => {});
   }
 
   // Notify reviewee (fire-and-forget)

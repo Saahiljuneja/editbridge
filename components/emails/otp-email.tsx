@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export function OtpEmailTemplate({ name, otp, platformName = "EditBridge" }: { name: string; otp: string; platformName?: string }) {
+export function OtpEmailTemplate({ name, otp, platformName = "EditBridge", emailHeaderColor = "#07050f" }: { name: string; otp: string; platformName?: string; emailHeaderColor?: string }) {
   const digits = otp.split("");
   return (
     <html>
@@ -14,7 +14,7 @@ export function OtpEmailTemplate({ name, otp, platformName = "EditBridge" }: { n
             <td align="center">
               <table width="100%" cellPadding={0} cellSpacing={0} style={{ maxWidth: 520, backgroundColor: "#ffffff", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
                 <tr>
-                  <td style={{ backgroundColor: "#07050f", padding: "32px 40px" }}>
+                  <td style={{ backgroundColor: emailHeaderColor, padding: "32px 40px" }}>
                     <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
                       {platformName}
                     </p>

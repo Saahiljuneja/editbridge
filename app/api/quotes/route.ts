@@ -5,7 +5,6 @@ import { quoteRequests, editors, users } from "@/lib/db/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { z } from "zod";
 import { createInAppNotification, editorWantsNotif } from "@/lib/notifications";
-import { onQuoteReceived } from "@/lib/rewards";
 
 const createSchema = z.object({
   editorId: z.string().uuid(),
@@ -60,7 +59,6 @@ export async function POST(req: NextRequest) {
     expiresAt,
   }).returning({ id: quoteRequests.id });
 
-  onQuoteReceived(editor.userId).catch(() => {});
 
   // Notify editor
   const [clientUser] = await db.select({ name: users.name })

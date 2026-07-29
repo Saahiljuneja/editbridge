@@ -59,7 +59,7 @@ export function TaxReportSection() {
           <select
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
-            className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 bg-white"
+            className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 bg-white"
           >
             <option value={thisFY}>{label(thisFY)} (year to date)</option>
             <option value={lastFY}>{label(lastFY)}</option>
@@ -68,7 +68,7 @@ export function TaxReportSection() {
             type="button"
             onClick={handleDownload}
             disabled={loading}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] disabled:opacity-50 transition-colors"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
             {loading ? "Preparing…" : "Download PDF"}

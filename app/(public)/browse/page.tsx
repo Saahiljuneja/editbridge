@@ -116,7 +116,7 @@ function PaginationBar({ page, totalPages, searchParams }: { page: number; total
               className={cn(
                 "w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors",
                 p === page
-                  ? "bg-[#0EA5E9] text-white"
+                  ? "bg-[var(--brand-client)] text-white"
                   : "text-gray-500 hover:bg-gray-100"
               )}
             >
@@ -187,7 +187,7 @@ export default async function BrowsePage({
         <div className="px-8 py-6 sm:px-6 py-8">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between mb-6">
             <div>
-              <p className="text-xs font-bold text-[#0EA5E9] uppercase tracking-widest mb-1">Marketplace</p>
+              <p className="text-xs font-bold text-[var(--brand-client)] uppercase tracking-widest mb-1">Marketplace</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 Find your perfect editor
               </h1>
@@ -221,7 +221,7 @@ export default async function BrowsePage({
                   {hasFilters ? "Showing filtered results" : "All editors"}
                 </span>
                 {hasFilters && (
-                  <Link href="/browse" className="text-xs text-[#0EA5E9] font-medium hover:underline">
+                  <Link href="/browse" className="text-xs text-[var(--brand-client)] font-medium hover:underline">
                     Clear filters
                   </Link>
                 )}

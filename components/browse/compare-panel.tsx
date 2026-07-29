@@ -52,7 +52,7 @@ export function ComparePanel() {
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-2xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
         <div className="flex items-center gap-2 shrink-0">
-          <GitCompareArrows className="w-4 h-4 text-[#0EA5E9]" />
+          <GitCompareArrows className="w-4 h-4 text-[var(--brand-client)]" />
           <span className="text-sm font-semibold text-gray-800">
             {compareIds.length} selected
           </span>
@@ -63,7 +63,7 @@ export function ComparePanel() {
             const name = editor.displayName || displayNameFromFull(editor.name);
             return (
               <div key={editor.id} className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-full pl-1 pr-2 py-1 shrink-0">
-                <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-br from-[#0EA5E9] to-violet-600 flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-br from-[var(--brand-client)] to-violet-600 flex items-center justify-center shrink-0">
                   {editor.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={editor.image} alt={name} className="w-full h-full object-cover" />
@@ -87,7 +87,7 @@ export function ComparePanel() {
           <button
             onClick={() => router.push(`/compare?editors=${compareIds.join(",")}`)}
             disabled={compareIds.length < 2}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#0EA5E9] hover:bg-[#3d34a0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Compare now <ArrowRight className="w-3.5 h-3.5" />
           </button>

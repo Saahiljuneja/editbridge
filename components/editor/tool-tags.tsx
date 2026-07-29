@@ -132,8 +132,8 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
         className={cn(
           "w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all",
           open
-            ? "border-[#0EA5E9] bg-[#0EA5E9]/5 text-[#0EA5E9]"
-            : "border-dashed border-gray-300 text-gray-500 hover:border-[#0EA5E9]/50 hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5"
+            ? "border-[var(--brand-client)] bg-[var(--brand-client)]/5 text-[var(--brand-client)]"
+            : "border-dashed border-gray-300 text-gray-500 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5"
         )}
       >
         <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
         <div className="border border-gray-200 rounded-2xl shadow-lg overflow-hidden bg-white">
           {/* Search bar */}
           <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/60">
-            <div className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3 py-2 focus-within:border-[#0EA5E9] focus-within:ring-2 focus-within:ring-[#0EA5E9]/10 transition-all">
+            <div className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3 py-2 focus-within:border-[var(--brand-client)] focus-within:ring-2 focus-within:ring-[var(--brand-client)]/10 transition-all">
               <Search className="w-4 h-4 text-gray-400 shrink-0" />
               <input
                 ref={searchRef}
@@ -185,8 +185,8 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                           selected
-                            ? "bg-[#0EA5E9] text-white border-[#0EA5E9]"
-                            : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9] hover:text-[#0EA5E9]"
+                            ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)]"
                         )}
                       >
                         {selected && <CheckCircle2 className="w-3 h-3" />}
@@ -213,7 +213,7 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
                       className={cn(
                         "w-full text-left px-3 py-2.5 text-xs font-medium transition-all flex items-center justify-between gap-1",
                         activeCategory === cat
-                          ? "bg-white text-[#0EA5E9] border-r-2 border-[#0EA5E9]"
+                          ? "bg-white text-[var(--brand-client)] border-r-2 border-[var(--brand-client)]"
                           : "text-gray-500 hover:text-gray-800 hover:bg-white/60"
                       )}
                     >
@@ -222,7 +222,7 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
                         <span className="truncate">{cat}</span>
                       </span>
                       {count > 0 && (
-                        <span className="shrink-0 w-4 h-4 rounded-full bg-[#0EA5E9] text-white text-[10px] flex items-center justify-center font-bold">
+                        <span className="shrink-0 w-4 h-4 rounded-full bg-[var(--brand-client)] text-white text-[10px] flex items-center justify-center font-bold">
                           {count}
                         </span>
                       )}
@@ -247,8 +247,8 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
                           selected
-                            ? "bg-[#0EA5E9] text-white border-[#0EA5E9] shadow-sm"
-                            : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9] hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/5"
+                            ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)] shadow-sm"
+                            : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5"
                         )}
                       >
                         {selected && <CheckCircle2 className="w-3 h-3 shrink-0" />}
@@ -263,7 +263,7 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
 
           {/* Custom input row */}
           <div className="border-t border-gray-100 px-4 py-3 bg-gray-50/40 flex items-center gap-3">
-            <div className="flex-1 flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 focus-within:border-[#0EA5E9] focus-within:ring-2 focus-within:ring-[#0EA5E9]/10 transition-all">
+            <div className="flex-1 flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 focus-within:border-[var(--brand-client)] focus-within:ring-2 focus-within:ring-[var(--brand-client)]/10 transition-all">
               <span className="text-xs text-gray-400 shrink-0">Custom:</span>
               <input
                 ref={customRef}
@@ -278,7 +278,7 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
                 <button
                   type="button"
                   onClick={() => { addTag(customInput); setCustomInput(""); customRef.current?.focus(); }}
-                  className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-lg bg-[#0EA5E9] text-white"
+                  className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-lg bg-[var(--brand-client)] text-white"
                 >
                   Add
                 </button>
@@ -294,7 +294,7 @@ export function ToolTags({ tags, onChange, placeholder = "e.g. Resolve Fusion", 
           {tags.map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1.5 bg-[#0EA5E9]/10 text-[#0EA5E9] text-xs px-3 py-1.5 rounded-full font-medium border border-[#0EA5E9]/20"
+              className="flex items-center gap-1.5 bg-[var(--brand-client)]/10 text-[var(--brand-client)] text-xs px-3 py-1.5 rounded-full font-medium border border-[var(--brand-client)]/20"
             >
               {tag}
               <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 transition-colors">

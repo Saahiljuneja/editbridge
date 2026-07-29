@@ -59,7 +59,7 @@ export function RoleChangeForm({
       <select
         value={role}
         onChange={(e) => setRole(e.target.value as UserRole)}
-        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
       >
         {ROLES.map((r) => (
           <option key={r.value} value={r.value}>{r.label}</option>
@@ -70,7 +70,7 @@ export function RoleChangeForm({
         disabled={submitting || role === currentRole}
         className={cn(
           buttonVariants({ size: "sm" }),
-          "bg-[#0EA5E9] hover:bg-[#3d34a0]",
+          "bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]",
           (submitting || role === currentRole) && "opacity-50 cursor-not-allowed"
         )}
       >

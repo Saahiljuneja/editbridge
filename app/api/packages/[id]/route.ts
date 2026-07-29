@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { packages } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createPackageSchema } from "@/lib/validations";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 export async function PATCH(
   request: NextRequest,
@@ -38,6 +39,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Package not found" }, { status: 404 });
   }
 
+  revalidatePublicPagesCache();
   return NextResponse.json(updated);
 }
 
@@ -68,5 +70,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Package not found" }, { status: 404 });
   }
 
+  revalidatePublicPagesCache();
   return NextResponse.json({ success: true });
 }

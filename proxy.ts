@@ -5,12 +5,13 @@ import type { NextRequest } from "next/server";
 
 const { auth } = NextAuth(authConfig);
 
-const STAFF_ROLES = [
+const ADMIN_ROLES = new Set([
+  "admin",
   "staff_kyc",
   "staff_support",
   "staff_dispute",
   "staff_moderation",
-];
+]);
 
 async function isMaintenanceOn(origin: string): Promise<boolean> {
   try {
@@ -25,37 +26,82 @@ async function isMaintenanceOn(origin: string): Promise<boolean> {
   }
 }
 
-export default auth(async (req: NextRequest & { auth: { user?: { role?: string; editorId?: string | null; needsOnboarding?: boolean } } | null }) => {
+// Paths that require any authenticated session (client routes).
+const CLIENT_PROTECTED_PREFIXES = [
+  "/client/dashboard",
+  "/client/orders",
+  "/client/messages",
+  "/client/calendar",
+  "/client/disputes",
+  "/client/help",
+  "/client/notifications",
+  "/client/payment-methods",
+  "/client/quotes",
+  "/client/referrals",
+  "/client/reorder",
+  "/client/reviews",
+  "/client/rewards",
+  "/client/saved",
+  "/client/saved-portfolio",
+  "/client/settings",
+  "/client/transactions",
+  "/client/analytics",
+  "/client/brief-templates",
+  "/checkout",
+];
+
+export default auth(async (req: NextRequest & { auth: { user?: { role?: string; editorId?: string | null; needsOnboarding?: boolean; twoFactorPending?: boolean } } | null }) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
   const role = session?.user?.role;
 
   // ── Maintenance mode ─────────────────────────────────────────────────────────
-  // Skip the check for maintenance page itself and for admins
-  if (!pathname.startsWith("/maintenance") && role !== "admin") {
+  // We MUST bypass both /maintenance and the api endpoint /api/maintenance-check itself
+  // to avoid infinite redirection loops and middleware recursion.
+  if (
+    !pathname.startsWith("/maintenance") &&
+    !pathname.startsWith("/api/maintenance-check") &&
+    role !== "admin"
+  ) {
     const maintenance = await isMaintenanceOn(req.nextUrl.origin);
     if (maintenance) {
       return NextResponse.redirect(new URL("/maintenance", req.url));
     }
   }
 
-  // ── Onboarding redirect for first-time Google users ─────────────────────────
-  if (session?.user?.needsOnboarding && pathname !== "/onboarding") {
-    return NextResponse.redirect(new URL("/onboarding", req.url));
+  // ── 2FA — redirect incomplete sessions to /2fa before any other check ────────
+  if (session?.user?.twoFactorPending && pathname !== "/2fa" && !pathname.startsWith("/api/")) {
+    return NextResponse.redirect(new URL("/2fa", req.url));
   }
 
-  // ── Smart dashboard redirect — editors land on /editor/dashboard ─────────────
-  if (pathname === "/dashboard" && role === "editor") {
-    return NextResponse.redirect(new URL("/editor/dashboard", req.url));
+  // ── Redirect already-logged-in users away from auth pages ───────────────────
+  if (session && !session.user?.twoFactorPending) {
+    if (pathname === "/login" || pathname === "/signup") {
+      const dest = ADMIN_ROLES.has(role ?? "") ? "/admin/dashboard"
+                 : role === "editor"            ? "/editor/dashboard"
+                 : "/client/dashboard";
+      return NextResponse.redirect(new URL(dest, req.url));
+    }
+  }
+
+  // ── Smart dashboard redirect ──
+  if (pathname === "/dashboard") {
+    if (!session) {
+      return NextResponse.redirect(new URL("/login?next=%2Fclient%2Fdashboard", req.url));
+    }
+    const dest = ADMIN_ROLES.has(role ?? "") ? "/admin/dashboard"
+               : role === "editor"            ? "/editor/dashboard"
+               : "/client/dashboard";
+    return NextResponse.redirect(new URL(dest, req.url));
   }
 
   // ── Admin / staff routes ────────────────────────────────────────────────────
   if (pathname.startsWith("/admin")) {
     if (!session) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, req.url));
     }
-    if (role !== "admin" && !STAFF_ROLES.includes(role ?? "")) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+    if (!ADMIN_ROLES.has(role ?? "")) {
+      return NextResponse.redirect(new URL("/client/dashboard", req.url));
     }
     return NextResponse.next();
   }
@@ -67,31 +113,20 @@ export default auth(async (req: NextRequest & { auth: { user?: { role?: string; 
   }
 
   // ── Editor portal routes: /editor/dashboard, /editor/kyc, etc. ──────────────
-  // NOTE: must not match "/editors/*" (public category SEO landing pages).
   if (pathname === "/editor" || pathname.startsWith("/editor/")) {
     if (!session) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, req.url));
     }
     if (role !== "editor") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/client/dashboard", req.url));
     }
     return NextResponse.next();
   }
 
-  // ── Authenticated routes (any role) ─────────────────────────────────────────
-  const authRequired = [
-    "/dashboard",
-    "/orders",
-    "/checkout",
-    "/messages",
-    "/settings",
-  ];
-
-  if (authRequired.some((path) => pathname.startsWith(path))) {
+  // ── Client-side protected paths ──────────────────────────────────────────────
+  if (CLIENT_PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     if (!session) {
-      const loginUrl = new URL("/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, req.url));
     }
     return NextResponse.next();
   }
@@ -101,6 +136,6 @@ export default auth(async (req: NextRequest & { auth: { user?: { role?: string; 
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js)$).*)",
   ],
 };

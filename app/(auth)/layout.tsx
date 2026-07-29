@@ -22,13 +22,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         style={{ background: "linear-gradient(145deg, #07050f 0%, #1a1040 60%, #0c1a10 100%)" }}
       >
         {/* Background blobs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#0EA5E9]/25 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[#0EA5E9]/20 blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[var(--brand-client)]/25 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[var(--brand-client)]/20 blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[#6C5CE7]/10 blur-2xl pointer-events-none" />
 
         {/* Logo */}
         <Link href="/" className="relative z-10 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
             <span className="text-white font-extrabold text-sm">E</span>
           </div>
           <span className="text-xl font-extrabold text-white tracking-tight">
@@ -69,7 +69,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               &quot;{TESTIMONIAL.text}&quot;
             </p>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#6C5CE7] flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--brand-client)] to-[#6C5CE7] flex items-center justify-center text-white text-xs font-bold">
                 {TESTIMONIAL.name[0]}
               </div>
               <div>
@@ -90,11 +90,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white overflow-y-auto">
         {/* Mobile logo */}
         <Link href="/" className="lg:hidden mb-8 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
             <span className="text-white font-extrabold text-xs">E</span>
           </div>
           <span className="text-xl font-extrabold text-gray-900 tracking-tight">
-            Edit<span className="text-[#0EA5E9]">Bridge</span>
+            Edit<span className="text-[var(--brand-client)]">Bridge</span>
           </span>
         </Link>
 

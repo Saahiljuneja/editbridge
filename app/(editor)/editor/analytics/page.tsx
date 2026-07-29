@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -7,7 +7,11 @@ import { orders, packages, reviews, portfolioItems } from "@/lib/db/schema";
 import { eq, sql, and, count, sum } from "drizzle-orm";
 import { formatCurrency } from "@/lib/utils";
 import { TrendingUp, ShoppingBag, Star, IndianRupee, BarChart3, Target, Heart, Eye, MessageCircle } from "lucide-react";
-import { AnalyticsCharts } from "./analytics-charts";
+import nextDynamic from "next/dynamic";
+
+const AnalyticsCharts = nextDynamic(
+  () => import("./analytics-charts").then((m) => m.AnalyticsCharts)
+);
 import { ProfileAnalyticsSection } from "@/components/editor/profile-analytics-section";
 
 export default async function EditorAnalyticsPage() {
@@ -173,7 +177,7 @@ export default async function EditorAnalyticsPage() {
         {/* Feed / Portfolio stats */}
         <div>
           <h2 className="font-semibold text-gray-900 text-sm mb-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-[#0EA5E9]" /> Feed Performance
+            <BarChart3 className="w-4 h-4 text-[var(--brand-client)]" /> Feed Performance
           </h2>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {[

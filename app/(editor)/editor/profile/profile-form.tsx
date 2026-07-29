@@ -150,7 +150,7 @@ export function ProfileForm({
           disabled={saving}
           className={cn(
             buttonVariants(),
-            "bg-[#0EA5E9] hover:bg-[#0284C7]",
+            "bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)]",
             saving && "opacity-50 cursor-not-allowed"
           )}
         >

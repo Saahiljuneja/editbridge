@@ -55,8 +55,8 @@ export default async function EditorSavedPortfolioPage() {
             <h1 className="text-xl font-bold text-gray-900">Saved Portfolio</h1>
             <p className="text-sm text-gray-400 mt-0.5">{rows.length} bookmarked item{rows.length !== 1 ? "s" : ""}</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
-            <Bookmark className="w-4 h-4 text-[#0EA5E9]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
+            <Bookmark className="w-4 h-4 text-[var(--brand-client)]" />
           </div>
         </div>
       </div>
@@ -64,12 +64,12 @@ export default async function EditorSavedPortfolioPage() {
       <div className="px-8 py-6 ">
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
-              <Bookmark className="w-7 h-7 text-[#0EA5E9]" />
+            <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4">
+              <Bookmark className="w-7 h-7 text-[var(--brand-client)]" />
             </div>
             <h3 className="text-base font-semibold text-gray-900 mb-1">No saved items yet</h3>
             <p className="text-sm text-gray-400 mb-5">Bookmark portfolio items from the feed to find them here.</p>
-            <Link href="/feed" className="inline-flex items-center gap-2 bg-[#0EA5E9] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-sky-600 transition-colors">
+            <Link href="/feed" className="inline-flex items-center gap-2 bg-[var(--brand-client)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-[var(--brand-client-hover)] transition-colors">
               <Film className="w-4 h-4" /> Browse Feed
             </Link>
           </div>

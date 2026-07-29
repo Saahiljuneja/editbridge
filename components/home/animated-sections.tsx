@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import {
@@ -184,7 +184,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
           <div className="hidden md:flex items-center divide-x divide-gray-100">
             {([["KYC Verified", ShieldCheck], ["Payment Protected", Lock], ["Revisions Included", CheckCircle]] as const).map(([label, Icon]) => (
               <span key={label} className="flex items-center gap-1.5 px-4 text-[11px] text-gray-400 font-medium">
-                <Icon className="w-3 h-3 text-[#0EA5E9]" />{label}
+                <Icon className="w-3 h-3 text-[var(--brand-client)]" />{label}
               </span>
             ))}
           </div>
@@ -200,9 +200,9 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
             {/* Badge */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6, ease: [0.22,1,0.36,1] }}
               className="flex flex-wrap items-center gap-2 mb-10">
-              <span className="inline-flex items-center gap-2 bg-[#0EA5E9]/8 border border-[#0EA5E9]/20 rounded-full px-4 py-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                <span className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.2em]">India&apos;s #1 Video Editing Marketplace</span>
+              <span className="inline-flex items-center gap-2 bg-[var(--brand-client)]/8 border border-[var(--brand-client)]/20 rounded-full px-4 py-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-[var(--brand-client)]" />
+                <span className="text-[11px] font-black text-[var(--brand-client)] uppercase tracking-[0.2em]">India&apos;s #1 Video Editing Marketplace</span>
               </span>
               <span className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-4 py-2">
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
@@ -229,7 +229,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                       animate={{ clipPath: "inset(0 0% 0 0)" }}
                       exit={{ clipPath: "inset(0 0% 0 100%)", transition: { duration: 0.16, ease: [0.4, 0, 1, 0] } }}
                       transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
-                      className="block bg-gradient-to-r from-[#0EA5E9] via-[#7c6ff7] to-[#0F6E56] bg-clip-text text-transparent">
+                      className="block bg-gradient-to-r from-[var(--brand-client)] via-[#7c6ff7] to-[var(--brand-teal)] bg-clip-text text-transparent">
                       {NICHES[idx]}
                     </motion.span>
                   </AnimatePresence>
@@ -256,7 +256,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                   className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent py-2 px-1 min-w-0"
                 />
                 <button type="submit"
-                  className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shrink-0">
+                  className="bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shrink-0">
                   Search
                 </button>
               </form>
@@ -272,7 +272,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
               <div className="mt-3 flex items-center gap-1.5">
                 <span className="text-xs text-gray-400">Not sure who to pick?</span>
                 <Link href="/find-editor"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#0EA5E9] hover:underline">
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] hover:underline">
                   Let us match you <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -282,7 +282,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.94, duration: 0.6 }}
               className="flex items-center gap-4 flex-wrap">
               <div className="flex -space-x-2.5">
-                {[["AK","#7c3aed"],["PS","#059669"],["RK","#ea580c"],["VD","#2563eb"]].map(([i, bg], k) => (
+                {[["AK","var(--brand-editor)"],["PS","#059669"],["RK","#ea580c"],["VD","#2563eb"]].map(([i, bg], k) => (
                   <div key={k} className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white shadow-sm" style={{ background: bg }}>{i}</div>
                 ))}
               </div>
@@ -297,8 +297,8 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }}
               className="mt-8 flex gap-2 overflow-x-auto pb-1 lg:hidden" style={{ scrollbarWidth: "none" }}>
               {[
-                { initials: "AM", name: "Arjun M.", niche: "YouTube", rating: "4.9★", col: "#7c3aed", avail: true },
-                { initials: "PS", name: "Priya S.", niche: "Reels",   rating: "5.0★", col: "#0EA5E9", avail: true  },
+                { initials: "AM", name: "Arjun M.", niche: "YouTube", rating: "4.9★", col: "var(--brand-editor)", avail: true },
+                { initials: "PS", name: "Priya S.", niche: "Reels",   rating: "5.0★", col: "var(--brand-client)", avail: true  },
                 { initials: "DK", name: "Divya K.", niche: "Podcasts", rating: "4.8★", col: "#059669", avail: false },
               ].map(({ initials, name, niche, rating, col, avail }) => (
                 <div key={initials} className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm shrink-0 w-[calc(50%-4px)]">
@@ -347,7 +347,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 <div className="w-48 bg-gray-50 border-r border-gray-100 flex flex-col shrink-0">
                   <div className="p-4 border-b border-gray-100">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
                         <span className="text-white text-[8px] font-black">E</span>
                       </div>
                       <span className="text-xs font-bold text-gray-900">EditBridge</span>
@@ -361,7 +361,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                       { label: "Payments",   active: false },
                       { label: "Settings",   active: false },
                     ].map(({ label, active }) => (
-                      <div key={label} className={cn("px-3 py-2 rounded-lg text-[11px] font-medium mb-0.5 flex items-center gap-2", active ? "bg-[#0EA5E9] text-white" : "text-gray-500 hover:bg-gray-100")}>
+                      <div key={label} className={cn("px-3 py-2 rounded-lg text-[11px] font-medium mb-0.5 flex items-center gap-2", active ? "bg-[var(--brand-client)] text-white" : "text-gray-500 hover:bg-gray-100")}>
                         <div className={cn("w-1.5 h-1.5 rounded-full", active ? "bg-white/60" : "bg-gray-300")} />
                         {label}
                       </div>
@@ -384,7 +384,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                       <p className="text-xs font-bold text-gray-900">My Orders</p>
                       <p className="text-[10px] text-gray-400">2 active · 1 delivered</p>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-[#0EA5E9] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg">
+                    <div className="flex items-center gap-1.5 bg-[var(--brand-client)] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg">
                       + New order
                     </div>
                   </div>
@@ -395,11 +395,11 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                     {/* Order list */}
                     <div className="w-44 border-r border-gray-100 overflow-hidden shrink-0">
                       {[
-                        { init: "AM", col: "#7c3aed", name: "Arjun M.", tag: "In progress", tagCol: "#0EA5E9", tagBg: "#f5f3ff" },
+                        { init: "AM", col: "var(--brand-editor)", name: "Arjun M.", tag: "In progress", tagCol: "var(--brand-client)", tagBg: "#f5f3ff" },
                         { init: "PS", col: "#059669", name: "Priya S.",  tag: "Delivered",   tagCol: "#059669", tagBg: "#f0fdf4" },
-                        { init: "RK", col: "#ea580c", name: "Rahul K.", tag: "In progress", tagCol: "#0EA5E9", tagBg: "#f5f3ff" },
+                        { init: "RK", col: "#ea580c", name: "Rahul K.", tag: "In progress", tagCol: "var(--brand-client)", tagBg: "#f5f3ff" },
                       ].map(({ init, col, name, tag, tagCol, tagBg }, i) => (
-                        <div key={name} className={cn("px-3 py-3 border-b border-gray-50 flex items-center gap-2.5", i === 0 && "bg-[#0EA5E9]/[0.04] border-l-2 border-l-[#0EA5E9]")}>
+                        <div key={name} className={cn("px-3 py-3 border-b border-gray-50 flex items-center gap-2.5", i === 0 && "bg-[var(--brand-client)]/[0.04] border-l-2 border-l-[var(--brand-client)]")}>
                           <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[9px] font-black shrink-0" style={{ background: col }}>{init}</div>
                           <div className="min-w-0">
                             <p className="text-[11px] font-semibold text-gray-800 truncate">{name}</p>
@@ -419,10 +419,10 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                             <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-[8px] font-black">AM</div>
                             <div><p className="text-[10px] font-bold text-gray-900">Arjun Mehta</p><p className="text-[9px] text-gray-400">YouTube Edit · 15min</p></div>
                           </div>
-                          <span className="text-[10px] font-black text-[#0EA5E9]">{progress}%</span>
+                          <span className="text-[10px] font-black text-[var(--brand-client)]">{progress}%</span>
                         </div>
                         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                          <motion.div className="h-full rounded-full bg-gradient-to-r from-[#0EA5E9] to-[#0F6E56]"
+                          <motion.div className="h-full rounded-full bg-gradient-to-r from-[var(--brand-client)] to-[var(--brand-teal)]"
                             animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
                         </div>
                         <div className="flex justify-between text-[9px] text-gray-400 mt-1.5">
@@ -441,7 +441,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                         ].map((m, i) => (
                           <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 + i * 0.1 }}
                             className={cn("flex", m.from === "me" ? "justify-end" : "")}>
-                            <div className={cn("max-w-[75%] rounded-xl px-2.5 py-1.5 text-[10px] leading-relaxed", m.from === "me" ? "bg-[#0EA5E9] text-white rounded-br-sm" : "bg-gray-100 text-gray-700 rounded-bl-sm")}>
+                            <div className={cn("max-w-[75%] rounded-xl px-2.5 py-1.5 text-[10px] leading-relaxed", m.from === "me" ? "bg-[var(--brand-client)] text-white rounded-br-sm" : "bg-gray-100 text-gray-700 rounded-bl-sm")}>
                               {m.msg}
                             </div>
                           </motion.div>
@@ -451,7 +451,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                       {/* Chat input */}
                       <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 border border-gray-100 shrink-0">
                         <span className="text-[10px] text-gray-300 flex-1">Type a message…</span>
-                        <div className="w-5 h-5 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
                           <ArrowRight className="w-2.5 h-2.5 text-white" />
                         </div>
                       </div>
@@ -473,7 +473,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
             <div key={k} className="flex">
               {["KYC-Verified Editors","Verified Payment Protection","Revisions Included","Real-time Collaboration","Identity Verified","Dispute Resolution","Fast Delivery","Launched 2026"].map(s => (
                 <span key={s} className="inline-flex items-center gap-3 text-[10px] text-gray-400 font-bold uppercase tracking-[0.18em] px-8">
-                  <span className="w-1 h-1 rounded-full bg-[#0EA5E9]/70 inline-block" />{s}
+                  <span className="w-1 h-1 rounded-full bg-[var(--brand-client)]/70 inline-block" />{s}
                 </span>
               ))}
             </div>
@@ -509,7 +509,7 @@ export function AnimatedFindEditorCTA() {
           <MagBtn className="relative z-10 shrink-0">
             <Link
               href="/find-editor"
-              className="inline-flex items-center gap-2.5 bg-white text-[#0EA5E9] hover:bg-white/92 font-black px-8 py-4 text-sm rounded-2xl shadow-2xl transition-all whitespace-nowrap"
+              className="inline-flex items-center gap-2.5 bg-white text-[var(--brand-client)] hover:bg-white/92 font-black px-8 py-4 text-sm rounded-2xl shadow-2xl transition-all whitespace-nowrap"
             >
               Take the quiz <ArrowRight className="w-4 h-4" />
             </Link>
@@ -579,7 +579,7 @@ const TRUST_STATS_DATA = [
     label: "Avg. kickoff time",
     sub: "Platform average",
     desc: "From booking to editor starting your project.",
-    bg: "bg-[#0F6E56]",
+    bg: "bg-[var(--brand-teal)]",
     Icon: Zap,
     svg: (
       <svg className="absolute right-0 top-0 w-48 h-48 pointer-events-none" viewBox="0 0 200 200" fill="none">
@@ -648,13 +648,13 @@ export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPai
    LIVE ACTIVITY FEED
 ════════════════════════════════════════════════════════════════════════════ */
 const ACTIVITY = [
-  { type: "order",    name: "Ankit V.",  action: "placed an order with Priya S.",        time: "2m ago",   col: "#0EA5E9", amount: "₹1,200" },
+  { type: "order",    name: "Ankit V.",  action: "placed an order with Priya S.",        time: "2m ago",   col: "var(--brand-client)", amount: "₹1,200" },
   { type: "approved", name: "Rohan S.",  action: "approved delivery — ₹3,825 released",  time: "5m ago",   col: "#059669", amount: "₹3,825" },
-  { type: "order",    name: "Divya K.",  action: "booked Arjun M. for YouTube edit",     time: "11m ago",  col: "#0EA5E9", amount: "₹4,500" },
+  { type: "order",    name: "Divya K.",  action: "booked Arjun M. for YouTube edit",     time: "11m ago",  col: "var(--brand-client)", amount: "₹4,500" },
   { type: "review",   name: "Meera P.",  action: "left 5★ review — 'Delivered early!'",  time: "18m ago",  col: "#d97706", amount: null     },
-  { type: "order",    name: "Karan D.",  action: "placed a thumbnail design order",      time: "24m ago",  col: "#0EA5E9", amount: "₹800"  },
+  { type: "order",    name: "Karan D.",  action: "placed a thumbnail design order",      time: "24m ago",  col: "var(--brand-client)", amount: "₹800"  },
   { type: "approved", name: "Sneha R.",  action: "approved Reels package delivery",      time: "31m ago",  col: "#059669", amount: "₹1,700" },
-  { type: "order",    name: "Vivek D.",  action: "booked podcast editing — 3 eps",       time: "45m ago",  col: "#0EA5E9", amount: "₹5,400" },
+  { type: "order",    name: "Vivek D.",  action: "booked podcast editing — 3 eps",       time: "45m ago",  col: "var(--brand-client)", amount: "₹5,400" },
   { type: "approved", name: "Priya M.",  action: "payment released after approval",      time: "1h ago",   col: "#059669", amount: "₹2,200" },
 ];
 
@@ -700,8 +700,8 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
           {/* Left — text */}
           <Reveal className="min-w-0">
             <div className="flex items-center gap-3 mb-5">
-              <div className="h-px w-10 bg-[#0EA5E9]" />
-              <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Live platform</span>
+              <div className="h-px w-10 bg-[var(--brand-client)]" />
+              <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Live platform</span>
             </div>
             <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-[1.0] mb-6">
               Orders happening<br /><span className="text-gray-200">right now.</span>
@@ -712,8 +712,8 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
             </p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { v: "< 2hrs", l: "Avg. first response",   c: "#0EA5E9", Icon: Clock, delay: 0.15 },
-                { v: "6",      l: "Content niches covered", c: "#0F6E56", Icon: Zap,   delay: 0.28 },
+                { v: "< 2hrs", l: "Avg. first response",   c: "var(--brand-client)", Icon: Clock, delay: 0.15 },
+                { v: "6",      l: "Content niches covered", c: "var(--brand-teal)", Icon: Zap,   delay: 0.28 },
               ].map(({ v, l, c, Icon, delay }) => (
                 <motion.div
                   key={l}
@@ -826,7 +826,7 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
                 <span className="text-[11px] text-gray-400">
                   {hasRealData ? "Showing live order activity" : "Every order is escrow-protected"}
                 </span>
-                <span className="text-[11px] text-[#0EA5E9] font-semibold">Payments verified & protected</span>
+                <span className="text-[11px] text-[var(--brand-client)] font-semibold">Payments verified & protected</span>
               </div>
             </div>
           </Reveal>
@@ -859,7 +859,7 @@ const MOCKUP_CONTENT = [
       ))}
     </div>
     {[
-      {init:"AM",name:"Arjun Mehta",role:"YouTube Long-form",r:4.9,rev:8,p:"₹3,500",col:"#7c3aed",del:"3 days"},
+      {init:"AM",name:"Arjun Mehta",role:"YouTube Long-form",r:4.9,rev:8,p:"₹3,500",col:"var(--brand-editor)",del:"3 days"},
       {init:"PS",name:"Priya Sharma",role:"Thumbnails & Branding",r:5.0,rev:5,p:"₹1,200",col:"#059669",del:"1 day"},
       {init:"RK",name:"Rahul Kumar",role:"Reels & Short-form",r:4.8,rev:11,p:"₹2,000",col:"#ea580c",del:"2 days"},
     ].map((e,i) => (
@@ -884,7 +884,7 @@ const MOCKUP_CONTENT = [
   // 02 Pay
   <div key="checkout" className="p-5 space-y-3">
     <div className="flex items-center gap-2 mb-1">
-      <div className="w-7 h-7 rounded-lg bg-[#7c3aed] flex items-center justify-center text-white text-[9px] font-black">AM</div>
+      <div className="w-7 h-7 rounded-lg bg-[var(--brand-editor)] flex items-center justify-center text-white text-[9px] font-black">AM</div>
       <div><p className="text-xs font-bold text-gray-900">Arjun Mehta</p><p className="text-[10px] text-gray-400">YouTube Edit — Pro Package</p></div>
     </div>
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2.5">
@@ -1132,10 +1132,11 @@ interface RealEditor {
   avgRating: number | null;
   reviewCount: number;
   skills: string[];
+  image?: string | null;
 }
 
 const EDITORS = [
-  { name: "Arjun Mehta",  initials: "AM", role: "YouTube Long-form",      loc: "Mumbai",    rating: 4.9, reviews: 8,  price: "₹3,500", time: "3 days", col: "#7c3aed", badge: "KYC Verified",  badgeCls: "bg-amber-50 text-amber-700 border-amber-200",     skills: ["Premiere Pro","Color Grading","After Effects"],   orders: 12 },
+  { name: "Arjun Mehta",  initials: "AM", role: "YouTube Long-form",      loc: "Mumbai",    rating: 4.9, reviews: 8,  price: "₹3,500", time: "3 days", col: "var(--brand-editor)", badge: "KYC Verified",  badgeCls: "bg-amber-50 text-amber-700 border-amber-200",     skills: ["Premiere Pro","Color Grading","After Effects"],   orders: 12 },
   { name: "Priya Sharma", initials: "PS", role: "Thumbnails & Branding",  loc: "Bangalore", rating: 5.0, reviews: 5,  price: "₹1,200", time: "1 day",  col: "#059669", badge: "KYC Verified",  badgeCls: "bg-emerald-50 text-emerald-700 border-emerald-200",skills: ["Photoshop","Canva Pro","Typography"],              orders: 9   },
   { name: "Rahul Kumar",  initials: "RK", role: "Reels & Short-form",     loc: "Delhi",     rating: 4.8, reviews: 11, price: "₹2,000", time: "2 days", col: "#ea580c", badge: "Fast Delivery", badgeCls: "bg-blue-50 text-blue-700 border-blue-200",        skills: ["CapCut","Motion Graphics","Sound Design"],        orders: 15 },
   { name: "Nisha Patel",  initials: "NP", role: "Corporate & Brand Ads",  loc: "Ahmedabad", rating: 4.7, reviews: 6,  price: "₹5,000", time: "5 days", col: "#2563eb", badge: "KYC Verified",  badgeCls: "bg-violet-50 text-violet-700 border-violet-200",  skills: ["DaVinci","After Effects","VFX"],                  orders: 7   },
@@ -1158,6 +1159,7 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
     ? realEditors
         .map((e, i) => ({
           name: e.displayName ?? e.name,
+          image: e.image ?? null,
           initials: (e.displayName ?? e.name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
           role: (() => { const n = e.niche; if (!n) return e.title ?? "Video Editor"; try { const p = JSON.parse(n); return Array.isArray(p) ? p[0] : n; } catch { return n; } })(),
           loc: e.location ?? "India",
@@ -1165,14 +1167,14 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
           reviews: e.reviewCount,
           price: e.minPrice ? `₹${Math.round(e.minPrice / 100).toLocaleString("en-IN")}` : "₹1,500",
           time: e.minDeliveryDays ? `${e.minDeliveryDays} day${e.minDeliveryDays === 1 ? "" : "s"}` : "3 days",
-          col: (["#7c3aed","#059669","#ea580c","#2563eb","#db2777"] as string[])[i % 5],
+          col: (["var(--brand-editor)","#059669","#ea580c","#2563eb","#db2777"] as string[])[i % 5],
           isFeatured: e.isFeatured,
           skills: (e.skills ?? []).slice(0, 3),
           orders: e.totalOrders,
           href: `/editor/${e.id}`,
         }))
         .filter(e => e.skills.length > 0) // hide incomplete/test accounts
-    : EDITORS.map(e => ({ ...e, isFeatured: false }));
+    : EDITORS.map(e => ({ ...e, image: null, isFeatured: false }));
 
   const filteredEditors = activeFilter === "All"
     ? allEditors
@@ -1189,14 +1191,14 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
         <div className="flex items-end justify-between mb-10 flex-wrap gap-6">
           <Reveal>
             <div className="flex items-center gap-3 mb-5">
-              <div className="h-px w-10 bg-[#0EA5E9]"/>
-              <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Our editors</span>
+              <div className="h-px w-10 bg-[var(--brand-client)]"/>
+              <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Our editors</span>
             </div>
             <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-none">
               Verified talent.<br /><span className="text-gray-200">Ready now.</span>
             </h2>
           </Reveal>
-          <Link href="/browse" className="inline-flex items-center gap-2 border border-gray-200 text-gray-500 hover:text-[#0EA5E9] hover:border-[#0EA5E9]/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
+          <Link href="/browse" className="inline-flex items-center gap-2 border border-gray-200 text-gray-500 hover:text-[var(--brand-client)] hover:border-[var(--brand-client)]/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
             All editors <ArrowUpRight className="w-4 h-4"/>
           </Link>
         </div>
@@ -1208,8 +1210,8 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
               className={cn(
                 "text-xs font-semibold px-4 py-2 rounded-full border transition-all",
                 activeFilter === label
-                  ? "bg-[#0EA5E9] text-white border-[#0EA5E9] shadow-sm"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9]"
+                  ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)] shadow-sm"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)]"
               )}>
               {label}
             </button>
@@ -1237,13 +1239,17 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
                     <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none" style={{ background: e.col }} />
                     {/* Avatar + badge row */}
                     <div className="relative flex items-start justify-between mb-4">
-                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg"
+                      <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg overflow-hidden shrink-0"
                         style={{ background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)` }}>
-                        {e.initials}
+                        {e.image ? (
+                          <img src={e.image} alt={e.name} className="w-full h-full object-cover" />
+                        ) : (
+                          e.initials
+                        )}
                       </div>
                       {e.isFeatured
                         ? <span className="text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2.5 py-1">Featured</span>
-                        : <span className="text-[9px] font-bold bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/20 rounded-full px-2.5 py-1 flex items-center gap-1">
+                        : <span className="text-[9px] font-bold bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/20 rounded-full px-2.5 py-1 flex items-center gap-1">
                             <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
                           </span>
                       }
@@ -1303,17 +1309,17 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: filteredEditors.length * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-[#0EA5E9]/40 hover:bg-[#0EA5E9]/3 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
+              className="relative rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-[var(--brand-client)]/40 hover:bg-[var(--brand-client)]/3 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
             >
-              <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4 group-hover:bg-[#0EA5E9]/15 transition-colors">
-                <ArrowUpRight className="w-6 h-6 text-[#0EA5E9]" />
+              <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--brand-client)]/15 transition-colors">
+                <ArrowUpRight className="w-6 h-6 text-[var(--brand-client)]" />
               </div>
               <h3 className="font-black text-gray-800 text-lg mb-2">Become a verified editor</h3>
               <p className="text-sm text-gray-400 mb-6 leading-relaxed max-w-[200px]">
                 Join EditBridge, get KYC verified, and start earning from clients across India.
               </p>
               <Link href="/signup/editor"
-                className="inline-flex items-center gap-2 bg-[#0EA5E9] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all"
+                className="inline-flex items-center gap-2 bg-[var(--brand-client)] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all"
                 style={{ boxShadow: "0 6px 20px rgba(14,165,233,0.35)" }}>
                 Apply now <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -1323,7 +1329,7 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
 
         {/* View all */}
         <div className="mt-10 flex justify-center">
-          <Link href="/browse" className="inline-flex items-center gap-2 border border-[#0EA5E9]/30 text-[#0EA5E9] hover:bg-[#0EA5E9]/5 font-semibold px-6 py-3 rounded-xl text-sm transition-all">
+          <Link href="/browse" className="inline-flex items-center gap-2 border border-[var(--brand-client)]/30 text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 font-semibold px-6 py-3 rounded-xl text-sm transition-all">
             View all 100+ editors <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -1339,9 +1345,9 @@ const AFTER_WAVEFORM = Array.from({ length: 40 }, (_, i) => Math.round(30 + Math
 const BEFORE_WAVEFORM = Array.from({ length: 40 }, (_, i) => Math.round(10 + Math.abs(Math.sin(i * 2.1)) * 40 + (i % 5 === 0 ? 30 : 0)));
 
 const BA_TABS = [
-  { label: "YouTube Long-form",  file: "YouTube_Final_v3.prproj",  lut: "CINEMATIC WARM", col: "#0EA5E9", before: "Raw vlog footage · flat color · no cuts",  after: "Color graded · jump cuts · motion titles" },
-  { label: "Instagram Reels",   file: "Reels_v2_Final.prproj",     lut: "VIVID MOBILE",   col: "#7c3aed", before: "Vertical raw clip · no music sync",          after: "Beat-synced cuts · transitions · captions" },
-  { label: "Podcast Edit",      file: "Podcast_EP23_Clean.prproj", lut: "CLEAN VOICE",    col: "#0F6E56", before: "Raw recording · filler words · background noise", after: "Noise removed · chapter marks · waveform eq" },
+  { label: "YouTube Long-form",  file: "YouTube_Final_v3.prproj",  lut: "CINEMATIC WARM", col: "var(--brand-client)", before: "Raw vlog footage · flat color · no cuts",  after: "Color graded · jump cuts · motion titles" },
+  { label: "Instagram Reels",   file: "Reels_v2_Final.prproj",     lut: "VIVID MOBILE",   col: "var(--brand-editor)", before: "Vertical raw clip · no music sync",          after: "Beat-synced cuts · transitions · captions" },
+  { label: "Podcast Edit",      file: "Podcast_EP23_Clean.prproj", lut: "CLEAN VOICE",    col: "var(--brand-teal)", before: "Raw recording · filler words · background noise", after: "Noise removed · chapter marks · waveform eq" },
 ];
 
 export function BeforeAfterSection() {
@@ -1373,9 +1379,9 @@ export function BeforeAfterSection() {
       <div className="relative max-w-6xl mx-auto">
         <Reveal className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-5">
-            <div className="h-px w-10 bg-[#7c3aed]" />
-            <span className="text-[10px] font-black text-[#7c3aed] uppercase tracking-[0.28em]">The transformation</span>
-            <div className="h-px w-10 bg-[#7c3aed]" />
+            <div className="h-px w-10 bg-[var(--brand-editor)]" />
+            <span className="text-[10px] font-black text-[var(--brand-editor)] uppercase tracking-[0.28em]">The transformation</span>
+            <div className="h-px w-10 bg-[var(--brand-editor)]" />
           </div>
           <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.0]">Before → After.<br /><span className="text-white/20">See the difference.</span></h2>
           <p className="text-white/30 text-lg mt-6 max-w-xl mx-auto leading-relaxed">Drag the slider. Raw footage on the left, professionally edited on the right.</p>
@@ -1476,9 +1482,9 @@ export function BeforeAfterSection() {
                     <div className="w-7 text-[7px] text-white/25 text-right shrink-0 font-mono">V2</div>
                     <div className="flex-1 h-3.5 bg-white/[0.04] rounded overflow-hidden relative flex gap-0.5 p-0.5">
                       <div className="w-[12%]" />
-                      <motion.div initial={{ width: 0 }} whileInView={{ width: "22%" }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.6, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "#7c3aed99" }} />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: "22%" }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.6, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "var(--brand-editor)99" }} />
                       <div className="w-[8%]" />
-                      <motion.div initial={{ width: 0 }} whileInView={{ width: "18%" }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.75, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "#7c3aed99" }} />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: "18%" }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.75, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "var(--brand-editor)99" }} />
                     </div>
                   </div>
                   {/* Color — grade node, full length amber */}
@@ -1614,7 +1620,7 @@ export function BeforeAfterSection() {
         </div>
 
         <Reveal className="mt-10 text-center">
-          <Link href="/browse" className="inline-flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-semibold px-7 py-3.5 rounded-xl text-sm transition-colors shadow-[0_8px_24px_rgba(14,165,233,0.45)]">
+          <Link href="/browse" className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white font-semibold px-7 py-3.5 rounded-xl text-sm transition-colors shadow-[0_8px_24px_rgba(14,165,233,0.45)]">
             Find your editor <ArrowRight className="w-4 h-4" />
           </Link>
         </Reveal>
@@ -1627,12 +1633,12 @@ export function BeforeAfterSection() {
    WHY EDITBRIDGE — feature bento grid
 ════════════════════════════════════════════════════════════════════════════ */
 const WHY_FEATURES = [
-  { icon: ShieldCheck,   title: "KYC-Verified Editors",         desc: "Every editor completes government ID verification before accepting any order — passport, Aadhaar, or PAN verified by our team. You always know exactly who you're working with: a real, credentialed professional.",  col: "#0EA5E9", span: "lg:col-span-2", hero: true },
+  { icon: ShieldCheck,   title: "KYC-Verified Editors",         desc: "Every editor completes government ID verification before accepting any order — passport, Aadhaar, or PAN verified by our team. You always know exactly who you're working with: a real, credentialed professional.",  col: "var(--brand-client)", span: "lg:col-span-2", hero: true },
   { icon: Lock,          title: "Verified Payment Protection",  desc: "Your payment is held securely until you approve the final delivery. If something goes wrong, you get your money back.",      col: "#2563eb" },
-  { icon: MessageSquare, title: "Real-time Collaboration",      desc: "Briefs, files, revisions, and feedback — all in one place. No scattered DMs, no lost files.",                              col: "#0F6E56" },
+  { icon: MessageSquare, title: "Real-time Collaboration",      desc: "Briefs, files, revisions, and feedback — all in one place. No scattered DMs, no lost files.",                              col: "var(--brand-teal)" },
   { icon: FileCheck,     title: "Revisions Included",           desc: "Every package comes with revision rounds built in. Your editor works until you're satisfied — no extra charges.",           col: "#d97706" },
   { icon: ThumbsUp,      title: "Verified Reviews Only",        desc: "Stars are only left by clients who actually placed and completed an order. No fake reviews, ever.",                         col: "#db2777" },
-  { icon: Zap,           title: "Structured Dispute Resolution",desc: "Dedicated support for every disagreement. Clear timelines, fair outcomes, and a team that takes both sides seriously.",    col: "#7c3aed", span: "lg:col-span-3", full: true },
+  { icon: Zap,           title: "Structured Dispute Resolution",desc: "Dedicated support for every disagreement. Clear timelines, fair outcomes, and a team that takes both sides seriously.",    col: "var(--brand-editor)", span: "lg:col-span-3", full: true },
 ];
 
 export function AnimatedWhySection() {
@@ -1640,7 +1646,7 @@ export function AnimatedWhySection() {
     <section className="bg-white py-14 md:py-28 px-6 overflow-hidden relative">
       <div className="relative max-w-6xl mx-auto">
         <Reveal className="text-center mb-14">
-          <div className="flex items-center justify-center gap-3 mb-5"><div className="h-px w-10 bg-[#0EA5E9]"/><span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Why EditBridge</span><div className="h-px w-10 bg-[#0EA5E9]"/></div>
+          <div className="flex items-center justify-center gap-3 mb-5"><div className="h-px w-10 bg-[var(--brand-client)]"/><span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Why EditBridge</span><div className="h-px w-10 bg-[var(--brand-client)]"/></div>
           <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-[1.0]">Everything you need.<br /><span className="text-gray-300">Built into one platform.</span></h2>
         </Reveal>
 
@@ -1708,11 +1714,11 @@ export function AnimatedWhySection() {
    ABOUT
 ════════════════════════════════════════════════════════════════════════════ */
 const ABOUT_ORDER_ROWS = [
-  { label: "Client",  val: "Rohan S.",          sub: "YouTube Creator · Delhi",    col: "#0EA5E9" },
+  { label: "Client",  val: "Rohan S.",          sub: "YouTube Creator · Delhi",    col: "var(--brand-client)" },
   { label: "Editor",  val: "Arjun Mehta",        sub: "KYC Verified · Top Rated",  col: "#059669" },
   { label: "Package", val: "YouTube Edit Pro",   sub: "₹4,500 · 3 day delivery",   col: "#d97706" },
   { label: "Payment", val: "₹4,500 protected",   sub: "Released on approval only",  col: "#2563eb" },
-  { label: "Status",  val: "In progress",        sub: "Day 2 of 3 · 68% complete", col: "#0F6E56" },
+  { label: "Status",  val: "In progress",        sub: "Day 2 of 3 · 68% complete", col: "var(--brand-teal)" },
 ];
 
 export function AnimatedAbout() {
@@ -1743,7 +1749,7 @@ export function AnimatedAbout() {
             <p className="text-white/55 text-lg leading-relaxed mb-10">We launched EditBridge in 2026 because hiring video editors in India was broken — ghosted after payment, late deliveries, unverified strangers. We built the platform we always needed: every editor KYC-verified, every payment protected, every dispute resolved.</p>
           </Reveal>
           <div className="grid grid-cols-2 gap-3">
-            {[["5+","Content niches supported","#0EA5E9"],["India","Built for Indian creators","#0F6E56"],["48hrs","Avg. project kickoff time","#2563eb"],["2026","The year we started","#d97706"]].map(([val,lab,col])=>(
+            {[["5+","Content niches supported","var(--brand-client)"],["India","Built for Indian creators","var(--brand-teal)"],["48hrs","Avg. project kickoff time","#2563eb"],["2026","The year we started","#d97706"]].map(([val,lab,col])=>(
               <Reveal key={lab} delay={0.2}>
                 <motion.div whileHover={{y:-2,borderColor:`${col}40`}} className="border border-white/[0.06] bg-white/[0.03] rounded-2xl p-5 transition-all" style={{}}>
                   <p className="text-2xl font-black mb-1" style={{color:col as string}}>{val}</p>
@@ -1758,8 +1764,8 @@ export function AnimatedAbout() {
           <TiltCard intensity={5}>
             <div className="rounded-3xl overflow-hidden p-7"
               style={{background:"linear-gradient(#0f0b22,#0f0b22) padding-box, linear-gradient(135deg,rgba(74,63,181,0.5),rgba(15,110,86,0.25)) border-box", border:"1px solid transparent"}}>
-              <div className="absolute top-0 right-0 w-60 h-60 rounded-full bg-[#0EA5E9]/20 blur-3xl pointer-events-none"/>
-              <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full bg-[#0F6E56]/15 blur-2xl pointer-events-none"/>
+              <div className="absolute top-0 right-0 w-60 h-60 rounded-full bg-[var(--brand-client)]/20 blur-3xl pointer-events-none"/>
+              <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full bg-[var(--brand-teal)]/15 blur-2xl pointer-events-none"/>
               <div className="relative">
                 <p className="text-[10px] text-white/20 uppercase tracking-[0.2em] font-black mb-6">A real protected order</p>
                 <div className="space-y-2.5" ref={cardRef}>
@@ -1808,15 +1814,15 @@ export function AnimatedAbout() {
    SCROLLING REVIEWS
 ════════════════════════════════════════════════════════════════════════════ */
 const REVIEWS = [
-  { quote: "Found a YouTube editor in 10 minutes. KYC verified, delivered in 48 hours. My thumbnail CTR jumped from 5.8% to 11.2% after the first edit.", author: "Karan D.", role: "YouTuber · 280k subs", initials: "KD", col: "#7c3aed", rating: 5 },
+  { quote: "Found a YouTube editor in 10 minutes. KYC verified, delivered in 48 hours. My thumbnail CTR jumped from 5.8% to 11.2% after the first edit.", author: "Karan D.", role: "YouTuber · 280k subs", initials: "KD", col: "var(--brand-editor)", rating: 5 },
   { quote: "Paid, editor delivered, money stayed in escrow the whole time. Never had a freelancer experience this clean in India — by a very long shot.", author: "Meera P.", role: "Reels Creator · Pune · 98k", initials: "MP", col: "#059669", rating: 5 },
   { quote: "My Reels editor consistently delivers in under 36 hours. Since switching, my average view duration went from 12s to 28s — reel performance doubled.", author: "Sneha R.", role: "Instagram Creator · 90k followers", initials: "SR", col: "#db2777", rating: 5 },
   { quote: "Every editor is government-ID verified. That single fact made me trust this platform more than any other marketplace I've used in 4 years of content.", author: "Ankit V.", role: "Podcast Creator · Delhi · 45k", initials: "AV", col: "#ea580c", rating: 5 },
   { quote: "3 editors. 3 orders. All delivered on brief, all on time. I've never had that consistency from a single freelancer, let alone three different people.", author: "Rohan S.", role: "YouTuber · 120k subs", initials: "RS", col: "#2563eb", rating: 5 },
-  { quote: "Brief, chat, files, payment — all in one place. Zero WhatsApp back-and-forth. My production workflow is 3× faster than it was 6 months ago.", author: "Divya K.", role: "Brand Creator · Bangalore", initials: "DK", col: "#0F6E56", rating: 5 },
-  { quote: "Turnaround cut from 9 days to 2 days. My channel went from 55k to 94k subscribers in 3 months. The editing quality is genuinely TV-level.", author: "Vivek D.", role: "Tech YouTuber · 94k subs", initials: "VD", col: "#0EA5E9", rating: 5 },
+  { quote: "Brief, chat, files, payment — all in one place. Zero WhatsApp back-and-forth. My production workflow is 3× faster than it was 6 months ago.", author: "Divya K.", role: "Brand Creator · Bangalore", initials: "DK", col: "var(--brand-teal)", rating: 5 },
+  { quote: "Turnaround cut from 9 days to 2 days. My channel went from 55k to 94k subscribers in 3 months. The editing quality is genuinely TV-level.", author: "Vivek D.", role: "Tech YouTuber · 94k subs", initials: "VD", col: "var(--brand-client)", rating: 5 },
   { quote: "3 free revisions included — the editor treated every single one seriously. Final video hit 2.4M views on my channel. Best ₹4,500 I've ever spent.", author: "Priya M.", role: "Lifestyle Creator · Mumbai · 210k", initials: "PM", col: "#d97706", rating: 5 },
-  { quote: "Was sceptical about a new platform. After my first order I understood — the KYC + escrow system solves the exact two fears that stopped me hiring freelancers.", author: "Arjun S.", role: "Gaming Creator · Hyderabad · 38k", initials: "AS", col: "#7c3aed", rating: 5 },
+  { quote: "Was sceptical about a new platform. After my first order I understood — the KYC + escrow system solves the exact two fears that stopped me hiring freelancers.", author: "Arjun S.", role: "Gaming Creator · Hyderabad · 38k", initials: "AS", col: "var(--brand-editor)", rating: 5 },
   { quote: "Hired a podcast editor within hours of signing up. Episode audio went from 'recorded on phone' to 'sounds like a studio'. Listeners immediately noticed.", author: "Nisha T.", role: "Podcast Host · Chennai · 22k", initials: "NT", col: "#059669", rating: 5 },
 ];
 
@@ -1853,9 +1859,9 @@ export function AnimatedScrollingReviews() {
     <section className="bg-gray-50 py-12 md:py-20 overflow-hidden">
       <Reveal className="text-center mb-12 px-6">
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="h-px w-10 bg-[#0EA5E9]" />
-          <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Creator reviews</span>
-          <div className="h-px w-10 bg-[#0EA5E9]" />
+          <div className="h-px w-10 bg-[var(--brand-client)]" />
+          <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Creator reviews</span>
+          <div className="h-px w-10 bg-[var(--brand-client)]" />
         </div>
         <h2 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
           Loved by creators<br /><span className="text-gray-300">across India.</span>
@@ -1891,7 +1897,7 @@ export function AnimatedScrollingReviews() {
    TESTIMONIALS
 ════════════════════════════════════════════════════════════════════════════ */
 const QUOTES = [
-  { quote: "EditBridge cut my turnaround from a week to 2 days. My channel grew 40% in 3 months. The payment protection made me trust it completely from day one.", author: "Karan D.", role: "YouTuber",           initials: "KD", col: "#7c3aed", contentType: "YouTube Long-form", subs: "280k subscribers" },
+  { quote: "EditBridge cut my turnaround from a week to 2 days. My channel grew 40% in 3 months. The payment protection made me trust it completely from day one.", author: "Karan D.", role: "YouTuber",           initials: "KD", col: "var(--brand-editor)", contentType: "YouTube Long-form", subs: "280k subscribers" },
   { quote: "Paid, editor delivered, they couldn't touch a rupee till I said so. Best freelance experience I've had in India — by a long shot.",            author: "Meera P.", role: "Reels Creator",          initials: "MP", col: "#059669", contentType: "Instagram Reels",  subs: "98k followers"    },
   { quote: "Every editor I hired was KYC verified. That single fact made me trust the platform more than any other marketplace I've ever used.",           author: "Ankit V.", role: "Podcast Creator",        initials: "AV", col: "#ea580c", contentType: "Podcast",          subs: "45k listeners"    },
   { quote: "3 editors. 3 orders. All on time, all exactly as briefed. I've never had that consistency anywhere else. EditBridge is the real deal.",         author: "Rohan S.", role: "YouTuber",           initials: "RS", col: "#2563eb", contentType: "YouTube Long-form", subs: "120k subscribers" },
@@ -1909,7 +1915,7 @@ export function AnimatedTestimonials() {
   return (
     <section className="bg-white py-14 md:py-28 px-6">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center gap-4 mb-16"><div className="h-px w-10 bg-[#0EA5E9]"/><span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">What creators say</span></div>
+        <div className="flex items-center gap-4 mb-16"><div className="h-px w-10 bg-[var(--brand-client)]"/><span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">What creators say</span></div>
         <div className="relative min-h-[240px]">
           <div className="absolute -top-4 -left-2 text-[100px] leading-none font-black text-gray-100 select-none pointer-events-none z-0">&ldquo;</div>
           <AnimatePresence mode="wait" custom={dir}>
@@ -1936,7 +1942,7 @@ export function AnimatedTestimonials() {
         </div>
         <div className="flex items-center gap-4 mt-12">
           <button onClick={()=>go(-1)} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-400 transition-all"><ChevronLeft className="w-4 h-4"/></button>
-          <div className="flex gap-2">{QUOTES.map((_,i)=><button key={i} onClick={()=>{setDir(i>cur?1:-1);setCur(i);}} className={cn("rounded-full transition-all",i===cur?"w-8 h-2 bg-[#0EA5E9]":"w-2 h-2 bg-gray-200 hover:bg-gray-300")}/>)}</div>
+          <div className="flex gap-2">{QUOTES.map((_,i)=><button key={i} onClick={()=>{setDir(i>cur?1:-1);setCur(i);}} className={cn("rounded-full transition-all",i===cur?"w-8 h-2 bg-[var(--brand-client)]":"w-2 h-2 bg-gray-200 hover:bg-gray-300")}/>)}</div>
           <button onClick={()=>go(1)} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-400 transition-all"><ChevronRight className="w-4 h-4"/></button>
           <span className="ml-auto text-xs text-gray-300 font-medium">{cur+1} / {QUOTES.length}</span>
         </div>
@@ -1970,7 +1976,7 @@ export function NicheBar() {
             <motion.span key={label}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ delay: 0.1 + i * 0.06, duration: 0.5 }}>
-              <Link href={href} className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.18em] whitespace-nowrap hover:text-[#0EA5E9] transition-colors">
+              <Link href={href} className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.18em] whitespace-nowrap hover:text-[var(--brand-client)] transition-colors">
                 {label}
               </Link>
             </motion.span>
@@ -1984,7 +1990,7 @@ export function NicheBar() {
 /* ════════════════════════════════════════════════════════════════════════════
    SHOWCASE PREVIEW — 3-tile strip from curated portfolio
 ════════════════════════════════════════════════════════════════════════════ */
-const SHOWCASE_COLORS = ["#0EA5E9", "#7c3aed", "#0F6E56"];
+const SHOWCASE_COLORS = ["var(--brand-client)", "var(--brand-editor)", "var(--brand-teal)"];
 
 interface ShowcaseItem {
   id: string;
@@ -2007,7 +2013,7 @@ export function ShowcasePreviewSection({ items }: { items: ShowcaseItem[] }) {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
           <Reveal>
-            <div className="flex items-center gap-3 mb-4"><div className="h-px w-10 bg-[#7c3aed]"/><span className="text-[10px] font-black text-[#7c3aed] uppercase tracking-[0.28em]">Showcase</span></div>
+            <div className="flex items-center gap-3 mb-4"><div className="h-px w-10 bg-[var(--brand-editor)]"/><span className="text-[10px] font-black text-[var(--brand-editor)] uppercase tracking-[0.28em]">Showcase</span></div>
             <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none">
               Real work.<br /><span className="text-white/20">By real editors.</span>
             </h2>
@@ -2096,7 +2102,7 @@ export function LeaderboardTeaser({ editors: eds }: { editors: LeaderboardEditor
             <TrendingUp className="w-4 h-4 text-amber-500" />
             <span className="text-xs font-black text-gray-400 uppercase tracking-[0.24em]">Top editors this week</span>
           </div>
-          <Link href="/leaderboard" className="text-xs text-[#0EA5E9] hover:underline font-semibold flex items-center gap-1">
+          <Link href="/leaderboard" className="text-xs text-[var(--brand-client)] hover:underline font-semibold flex items-center gap-1">
             Full leaderboard <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
@@ -2116,7 +2122,7 @@ export function LeaderboardTeaser({ editors: eds }: { editors: LeaderboardEditor
                 </div>
                 <span className="absolute -top-2 -right-2 text-sm">{RANK_BADGES[i]}</span>
               </div>
-              <p className="text-sm font-bold text-gray-900 group-hover:text-[#0EA5E9] transition-colors">{ed.name}</p>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors">{ed.name}</p>
               <p className="text-[10px] text-gray-400 mb-2 truncate max-w-[9rem]">{ed.niche ?? "Video Editing"}</p>
               <div className="flex items-center gap-1 text-[11px] text-amber-500 font-bold">
                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -2211,7 +2217,7 @@ export function ComparisonSection() {
                   </div>
                   {val ? (
                     <div className={cn("w-6 h-6 rounded-full flex items-center justify-center shrink-0",
-                      mobileTab === "eb" ? "bg-[#0EA5E9]" : "bg-emerald-500/10 border border-emerald-500/20"
+                      mobileTab === "eb" ? "bg-[var(--brand-client)]" : "bg-emerald-500/10 border border-emerald-500/20"
                     )} style={mobileTab === "eb" ? { boxShadow: "0 0 10px rgba(14,165,233,0.4)" } : {}}>
                       <Check className={cn("w-3 h-3", mobileTab === "eb" ? "text-white" : "text-emerald-500")} strokeWidth={3} />
                     </div>
@@ -2337,7 +2343,7 @@ export function ComparisonSection() {
                           whileInView={{ scale: 1, rotate: 0 }}
                           viewport={{ once: true }}
                           transition={{ delay: i * 0.045 + 0.18, duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
-                          className="w-7 h-7 rounded-full bg-[#0EA5E9] flex items-center justify-center"
+                          className="w-7 h-7 rounded-full bg-[var(--brand-client)] flex items-center justify-center"
                           style={{ boxShadow: "0 0 14px rgba(14,165,233,0.45)" }}
                         >
                           <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
@@ -2377,7 +2383,7 @@ export function ComparisonSection() {
         <Reveal delay={0.35} className="text-center mt-10">
           <MagBtn className="inline-block">
             <Link href="/browse"
-              className="inline-flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-black px-8 py-3.5 rounded-2xl text-sm transition-colors shadow-lg shadow-sky-500/25">
+              className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white font-black px-8 py-3.5 rounded-2xl text-sm transition-colors shadow-lg shadow-sky-500/25">
               Find your editor <ArrowRight className="w-4 h-4" />
             </Link>
           </MagBtn>
@@ -2396,7 +2402,7 @@ const PRICING_TIERS = [
     range: "₹800 – ₹2,500",
     desc: "Quick turnaround edits — Reels, Shorts, simple cuts.",
     features: ["1–2 minute output", "Delivery in 24–48h", "1 revision included"],
-    col: "#0F6E56",
+    col: "var(--brand-teal)",
     popular: false,
   },
   {
@@ -2404,7 +2410,7 @@ const PRICING_TIERS = [
     range: "₹2,500 – ₹8,000",
     desc: "YouTube long-form, podcast edits, branded content.",
     features: ["5–20 minute output", "Colour grading", "2–3 revisions", "Source files"],
-    col: "#0EA5E9",
+    col: "var(--brand-client)",
     popular: true,
   },
   {
@@ -2412,7 +2418,7 @@ const PRICING_TIERS = [
     range: "₹8,000 – ₹25,000+",
     desc: "Brand campaigns, corporate ads, VFX-heavy productions.",
     features: ["Any length", "VFX & motion graphics", "Unlimited revisions", "Dedicated editor"],
-    col: "#7c3aed",
+    col: "var(--brand-editor)",
     popular: false,
   },
 ];
@@ -2435,12 +2441,12 @@ export function PricingPreviewSection() {
               <div className={cn(
                 "relative rounded-3xl p-8 flex flex-col h-full border transition-all",
                 tier.popular
-                  ? "border-[#0EA5E9]/30 shadow-xl shadow-sky-500/10"
+                  ? "border-[var(--brand-client)]/30 shadow-xl shadow-sky-500/10"
                   : "border-gray-100 hover:border-gray-200"
               )}>
                 {tier.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#0EA5E9] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-sky-500/30">
+                    <span className="bg-[var(--brand-client)] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-sky-500/30">
                       Most popular
                     </span>
                   </div>
@@ -2519,9 +2525,9 @@ export function ForEditorsSection() {
         <Reveal from="right">
           <div className="relative p-7 lg:p-14 h-full flex flex-col justify-between overflow-hidden border-t md:border-t-0 md:border-l border-white/[0.06]" style={{ background: "linear-gradient(135deg, #1a1030 0%, #0d0d1a 100%)" }}>
             <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "radial-gradient(rgba(124,58,237,0.8) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-            <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-15" style={{ background: "radial-gradient(ellipse, #7c3aed, transparent 70%)" }} />
+            <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-15" style={{ background: "radial-gradient(ellipse, var(--brand-editor), transparent 70%)" }} />
             <div className="relative">
-              <p className="text-[10px] font-black text-[#7c3aed]/60 uppercase tracking-[0.28em] mb-6">For editors</p>
+              <p className="text-[10px] font-black text-[var(--brand-editor)]/60 uppercase tracking-[0.28em] mb-6">For editors</p>
               <h3 className="text-3xl lg:text-4xl font-black text-white leading-tight mb-5">
                 Turn your skills<br />into steady<br />income.
               </h3>
@@ -2531,14 +2537,14 @@ export function ForEditorsSection() {
               <ul className="space-y-3 mb-10">
                 {["Guaranteed payment via escrow — always", "Keep 85% of every order value", "Verified profile builds trust & credibility"].map(item => (
                   <li key={item} className="flex items-start gap-3 text-sm text-white/60">
-                    <CheckCircle className="w-4 h-4 text-[#7c3aed]/70 shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-[var(--brand-editor)]/70 shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
             <Link href="/signup/editor"
-              className="inline-flex items-center gap-2 self-start bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-black px-7 py-3.5 rounded-2xl text-sm transition-colors shadow-lg shadow-violet-900/40">
+              className="inline-flex items-center gap-2 self-start bg-[var(--brand-editor)] hover:bg-[var(--brand-editor-hover)] text-white font-black px-7 py-3.5 rounded-2xl text-sm transition-colors shadow-lg shadow-violet-900/40">
               Apply as Editor <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -2575,7 +2581,7 @@ export function EditorEarningsCalculator() {
         <Reveal className="text-center mb-14">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-10" style={{ background: "rgba(124,58,237,0.4)" }} />
-            <span className="text-[10px] font-black text-[#7c3aed] uppercase tracking-[0.28em]">For editors</span>
+            <span className="text-[10px] font-black text-[var(--brand-editor)] uppercase tracking-[0.28em]">For editors</span>
             <div className="h-px w-10" style={{ background: "rgba(124,58,237,0.4)" }} />
           </div>
           <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none mb-4">
@@ -2599,7 +2605,7 @@ export function EditorEarningsCalculator() {
                 <input type="range" min={1} max={20} step={1} value={ordersPerMonth}
                   onChange={e => setOrdersPerMonth(Number(e.target.value))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-                  style={{ accentColor: "#7c3aed", background: `linear-gradient(to right, #7c3aed ${((ordersPerMonth - 1) / 19) * 100}%, rgba(255,255,255,0.1) 0%)` }} />
+                  style={{ accentColor: "var(--brand-editor)", background: `linear-gradient(to right, var(--brand-editor) ${((ordersPerMonth - 1) / 19) * 100}%, rgba(255,255,255,0.1) 0%)` }} />
                 <div className="flex justify-between text-[11px] mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
                   <span>1 order</span><span>20 orders</span>
                 </div>
@@ -2614,7 +2620,7 @@ export function EditorEarningsCalculator() {
                 <input type="range" min={500} max={20000} step={100} value={avgPrice}
                   onChange={e => setAvgPrice(Number(e.target.value))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-                  style={{ accentColor: "#7c3aed", background: `linear-gradient(to right, #7c3aed ${((avgPrice - 500) / 19500) * 100}%, rgba(255,255,255,0.1) 0%)` }} />
+                  style={{ accentColor: "var(--brand-editor)", background: `linear-gradient(to right, var(--brand-editor) ${((avgPrice - 500) / 19500) * 100}%, rgba(255,255,255,0.1) 0%)` }} />
                 <div className="flex justify-between text-[11px] mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
                   <span>₹500</span><span>₹20,000</span>
                 </div>
@@ -2643,7 +2649,7 @@ export function EditorEarningsCalculator() {
               ))}
               <div className="pt-2">
                 <Link href="/signup/editor"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-black px-7 py-3.5 rounded-2xl text-sm transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-[var(--brand-editor)] hover:bg-[var(--brand-editor-hover)] text-white font-black px-7 py-3.5 rounded-2xl text-sm transition-colors"
                   style={{ boxShadow: "0 8px 32px rgba(124,58,237,0.35)" }}>
                   Start earning — Apply as Editor <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -2677,9 +2683,9 @@ export function BlogPreviewSection({ posts }: { posts: BlogPost[] }) {
   ];
 
   const CAT_COLORS: Record<string, string> = {
-    "For Clients": "#0EA5E9",
-    "For Editors": "#7c3aed",
-    "Insights":    "#0F6E56",
+    "For Clients": "var(--brand-client)",
+    "For Editors": "var(--brand-editor)",
+    "Insights":    "var(--brand-teal)",
     "Platform":    "#F59E0B",
   };
 
@@ -2694,7 +2700,7 @@ export function BlogPreviewSection({ posts }: { posts: BlogPost[] }) {
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <Link href="/blog" className="inline-flex items-center gap-2 border border-gray-200 text-gray-500 hover:text-[#0EA5E9] hover:border-[#0EA5E9]/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
+            <Link href="/blog" className="inline-flex items-center gap-2 border border-gray-200 text-gray-500 hover:text-[var(--brand-client)] hover:border-[var(--brand-client)]/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
               All posts <ArrowUpRight className="w-4 h-4"/>
             </Link>
           </Reveal>
@@ -2710,11 +2716,11 @@ export function BlogPreviewSection({ posts }: { posts: BlogPost[] }) {
                     <span className="text-[10px] font-bold px-3 py-1 rounded-full" style={{ background: `${catCol}12`, color: catCol }}>{post.category}</span>
                     <span className="text-[10px] text-gray-300">{post.readTime}</span>
                   </div>
-                  <h3 className="text-base font-black text-gray-900 leading-snug mb-3 group-hover:text-[#0EA5E9] transition-colors flex-1">
+                  <h3 className="text-base font-black text-gray-900 leading-snug mb-3 group-hover:text-[var(--brand-client)] transition-colors flex-1">
                     {post.title}
                   </h3>
                   <p className="text-sm text-gray-400 leading-relaxed mb-6">{post.excerpt}</p>
-                  <div className="flex items-center gap-1.5 text-[#0EA5E9] text-xs font-bold mt-auto">
+                  <div className="flex items-center gap-1.5 text-[var(--brand-client)] text-xs font-bold mt-auto">
                     Read more <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -2756,9 +2762,9 @@ export function AnimatedFAQ() {
       <div className="max-w-3xl mx-auto">
         <Reveal className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-5">
-            <div className="h-px w-10 bg-[#0EA5E9]" />
-            <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">Common questions</span>
-            <div className="h-px w-10 bg-[#0EA5E9]" />
+            <div className="h-px w-10 bg-[var(--brand-client)]" />
+            <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Common questions</span>
+            <div className="h-px w-10 bg-[var(--brand-client)]" />
           </div>
           <h2 className="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight leading-tight">
             Questions before<br /><span className="text-gray-300">you commit.</span>
@@ -2800,7 +2806,7 @@ export function AnimatedFAQ() {
         <Reveal delay={0.3} className="mt-10 text-center">
           <p className="text-sm text-gray-400">
             Still unsure?{" "}
-            <Link href="/help" className="text-[#0EA5E9] font-semibold hover:underline">Read our full Help Centre →</Link>
+            <Link href="/help" className="text-[var(--brand-client)] font-semibold hover:underline">Read our full Help Centre →</Link>
           </p>
         </Reveal>
       </div>
@@ -2844,7 +2850,7 @@ export function StickyCtaBar() {
               <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
                 <Link
                   href="/signup/client"
-                  className="inline-flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0284C7] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-sky-500/20"
+                  className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-sky-500/20"
                 >
                   Post a Project
                 </Link>
@@ -2865,7 +2871,7 @@ export function StickyCtaBar() {
 
 export function AnimatedCTA() {
   return (
-    <section className="relative overflow-hidden bg-[#0EA5E9] py-16 md:py-32 px-6">
+    <section className="relative overflow-hidden bg-[var(--brand-client)] py-16 md:py-32 px-6">
       <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage:"radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)",backgroundSize:"28px 28px"}}/>
       <svg className="absolute inset-0 w-full h-full opacity-[0.06] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <filter id="cta-grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
@@ -2876,7 +2882,7 @@ export function AnimatedCTA() {
         animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         className="absolute inset-0 pointer-events-none opacity-[0.18]"
-        style={{ backgroundImage: "linear-gradient(135deg, #0EA5E9 0%, #7c3aed 25%, #0F6E56 50%, #F59E0B 75%, #0EA5E9 100%)", backgroundSize: "400% 400%" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #0EA5E9 0%, var(--brand-editor) 25%, #0F6E56 50%, #F59E0B 75%, #0EA5E9 100%)", backgroundSize: "400% 400%" }}
       />
       <motion.div animate={{scale:[1,1.2,1],opacity:[0.3,0.55,0.3]}} transition={{duration:8,repeat:Infinity,ease:"easeInOut"}}
         className="absolute top-0 right-0 w-[700px] h-[600px] rounded-full pointer-events-none"
@@ -2895,7 +2901,7 @@ export function AnimatedCTA() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <MagBtn>
               <Link href="/browse"
-                className="relative inline-flex items-center gap-2.5 bg-white hover:bg-gray-50 text-[#0EA5E9] font-black px-10 py-4 text-base rounded-2xl overflow-hidden group transition-all"
+                className="relative inline-flex items-center gap-2.5 bg-white hover:bg-gray-50 text-[var(--brand-client)] font-black px-10 py-4 text-base rounded-2xl overflow-hidden group transition-all"
                 style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.20)" }}>
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"/>
                 Find your editor <ArrowRight className="w-5 h-5"/>
@@ -2932,7 +2938,7 @@ export function AnimatedCTA() {
 const PARTNERS = [
   { name: "Razorpay Escrow",   accent: "#2D6FEB", label: "RBI-regulated payments" },
   { name: "256-bit SSL",        accent: "#059669", label: "All connections secured" },
-  { name: "KYC Verified",       accent: "#7c3aed", label: "Every editor, verified"  },
+  { name: "KYC Verified",       accent: "var(--brand-editor)", label: "Every editor, verified"  },
   { name: "Dispute Protection", accent: "#d97706", label: "Admin-mediated resolution"},
 ];
 
@@ -2974,7 +2980,7 @@ export function CombinedStrip() {
         <div className="flex items-center gap-8 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           {NICHES_BAR.map(({ label, href }, i) => (
             <motion.span key={label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.06 * i, duration: 0.5 }}>
-              <Link href={href} className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.18em] whitespace-nowrap hover:text-[#0EA5E9] transition-colors">
+              <Link href={href} className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.18em] whitespace-nowrap hover:text-[var(--brand-client)] transition-colors">
                 {label}
               </Link>
             </motion.span>
@@ -3008,8 +3014,8 @@ export function CombinedStrip() {
 ════════════════════════════════════════════════════════════════════════════ */
 const PRICE_TIERS = [
   { label: "Reels & Shorts",    from: "₹800",   icon: Zap,         color: "#059669" },
-  { label: "YouTube Long-form", from: "₹2,500", icon: TrendingUp,  color: "#0EA5E9" },
-  { label: "Brand Films",       from: "₹8,000", icon: Star,        color: "#7c3aed" },
+  { label: "YouTube Long-form", from: "₹2,500", icon: TrendingUp,  color: "var(--brand-client)" },
+  { label: "Brand Films",       from: "₹8,000", icon: Star,        color: "var(--brand-editor)" },
 ];
 
 export function PriceAnchorSection() {
@@ -3026,12 +3032,12 @@ export function PriceAnchorSection() {
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 font-medium leading-tight">{label}</p>
-                <p className="text-sm font-black text-gray-800 group-hover:text-[#0EA5E9] transition-colors leading-tight">{from}</p>
+                <p className="text-sm font-black text-gray-800 group-hover:text-[var(--brand-client)] transition-colors leading-tight">{from}</p>
               </div>
             </Link>
           ))}
         </div>
-        <Link href="/pricing" className="text-xs text-[#0EA5E9] font-semibold hover:underline shrink-0 whitespace-nowrap">
+        <Link href="/pricing" className="text-xs text-[var(--brand-client)] font-semibold hover:underline shrink-0 whitespace-nowrap">
           All pricing →
         </Link>
       </div>
@@ -3068,7 +3074,7 @@ export function UrgencySignal({ count }: { count: number }) {
 ════════════════════════════════════════════════════════════════════════════ */
 export function GuaranteeBar() {
   return (
-    <section className="bg-[#0F6E56] px-6 py-5 overflow-hidden">
+    <section className="bg-[var(--brand-teal)] px-6 py-5 overflow-hidden">
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
         <div className="flex items-center gap-3 shrink-0">
           <ShieldCheck className="w-7 h-7 text-white/80 shrink-0" />
@@ -3092,17 +3098,17 @@ export function GuaranteeBar() {
 ════════════════════════════════════════════════════════════════════════════ */
 const ESCROW_STEPS = [
   {
-    n: "01", icon: Lock, color: "#0EA5E9",
+    n: "01", icon: Lock, color: "var(--brand-client)",
     title: "You pay — into escrow",
     desc: "Your money goes into a secure escrow account — never directly to the editor. The editor can't touch a rupee until you approve.",
   },
   {
-    n: "02", icon: MessageSquare, color: "#7c3aed",
+    n: "02", icon: MessageSquare, color: "var(--brand-editor)",
     title: "Editor works to your brief",
     desc: "Share your brief, reference clips, and deadlines. The editor starts immediately. Platform enforces their delivery deadline automatically.",
   },
   {
-    n: "03", icon: CheckCircle, color: "#0F6E56",
+    n: "03", icon: CheckCircle, color: "var(--brand-teal)",
     title: "You review — revisions included",
     desc: "Review the delivered work at your own pace. Not happy? Request revisions — they're included in every package. No extra charges, no arguments.",
   },
@@ -3120,9 +3126,9 @@ export function EscrowFlowSection() {
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.7) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.7) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
       <div className="max-w-6xl mx-auto relative z-10">
         <Reveal className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 rounded-full px-4 py-1.5 mb-5">
-            <Lock className="w-3 h-3 text-[#0EA5E9]" />
-            <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.2em]">How your money is protected</span>
+          <div className="inline-flex items-center gap-2 bg-[var(--brand-client)]/10 border border-[var(--brand-client)]/20 rounded-full px-4 py-1.5 mb-5">
+            <Lock className="w-3 h-3 text-[var(--brand-client)]" />
+            <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.2em]">How your money is protected</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
             Every rupee protected.<br /><span className="text-white/25">Every step of the way.</span>
@@ -3136,7 +3142,7 @@ export function EscrowFlowSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
           {/* Connector line — desktop only */}
           <div className="absolute top-8 left-[12.5%] right-[12.5%] h-px hidden lg:block"
-            style={{ background: "linear-gradient(90deg, #0EA5E9, #7c3aed, #0F6E56, #F59E0B)" }} />
+            style={{ background: "linear-gradient(90deg, #0EA5E9, var(--brand-editor), #0F6E56, #F59E0B)" }} />
 
           {ESCROW_STEPS.map(({ n, icon: Icon, color, title, desc }, i) => (
             <Reveal key={n} delay={i * 0.1}>
@@ -3161,12 +3167,12 @@ export function EscrowFlowSection() {
         {/* Guarantee callout */}
         <Reveal delay={0.4}>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left bg-white/[0.04] border border-white/[0.08] rounded-2xl px-8 py-5">
-            <ShieldCheck className="w-7 h-7 text-[#0F6E56] shrink-0" />
+            <ShieldCheck className="w-7 h-7 text-[var(--brand-teal)] shrink-0" />
             <p className="text-white/60 text-sm leading-relaxed max-w-xl">
               <span className="text-white font-bold">Still unhappy after revisions?</span> Raise a dispute. Our team reviews both sides and issues a full refund if the work genuinely misses the brief. Zero questions asked.
             </p>
             <Link href="/how-it-works"
-              className="shrink-0 text-[#0EA5E9] text-xs font-bold hover:underline whitespace-nowrap">
+              className="shrink-0 text-[var(--brand-client)] text-xs font-bold hover:underline whitespace-nowrap">
               Full guarantee details →
             </Link>
           </div>
@@ -3180,12 +3186,12 @@ export function EscrowFlowSection() {
    WORK GALLERY — visual proof of delivered creative output
 ════════════════════════════════════════════════════════════════════════════ */
 const GALLERY_ITEMS = [
-  { label: "YouTube Thumbnail", niche: "Tech · 1.4M views", aspect: "16/9", w: "col-span-2", bg: "from-[#0EA5E9] via-[#7c3aed] to-[#06040f]", badge: "YT", plays: "1.4M", badgeBg: "#FF0000" },
-  { label: "Reels Cover",       niche: "Lifestyle · 890k",  aspect: "9/16",  w: "row-span-2", bg: "from-[#F59E0B] via-[#EF4444] to-[#7c3aed]", badge: "IG", plays: "890k", badgeBg: "#E1306C" },
-  { label: "Brand Film Frame",  niche: "Corporate · Cinema", aspect: "16/9", w: "",           bg: "from-[#0F6E56] via-[#0EA5E9] to-[#06040f]",  badge: "▶", plays: "2.1M", badgeBg: "#059669" },
-  { label: "Podcast Cover",     niche: "Interview · Ep.48",  aspect: "1/1",  w: "",           bg: "from-[#7c3aed] via-[#db2777] to-[#06040f]",  badge: "🎙", plays: "48k", badgeBg: "#7c3aed" },
-  { label: "YouTube Short",     niche: "Comedy · 3.2M",     aspect: "9/16",  w: "",           bg: "from-[#F59E0B] via-[#0EA5E9] to-[#0F6E56]",  badge: "S", plays: "3.2M", badgeBg: "#FF0000" },
-  { label: "Wedding Film",      niche: "Cinematic · Reel",   aspect: "16/9", w: "col-span-2", bg: "from-[#d97706] via-[#7c3aed] to-[#06040f]",  badge: "▶", plays: "42k", badgeBg: "#d97706" },
+  { label: "YouTube Thumbnail", niche: "Tech · 1.4M views", aspect: "16/9", w: "col-span-2", bg: "from-[var(--brand-client)] via-[var(--brand-editor)] to-[#06040f]", badge: "YT", plays: "1.4M", badgeBg: "#FF0000" },
+  { label: "Reels Cover",       niche: "Lifestyle · 890k",  aspect: "9/16",  w: "row-span-2", bg: "from-[#F59E0B] via-[#EF4444] to-[var(--brand-editor)]", badge: "IG", plays: "890k", badgeBg: "#E1306C" },
+  { label: "Brand Film Frame",  niche: "Corporate · Cinema", aspect: "16/9", w: "",           bg: "from-[var(--brand-teal)] via-[var(--brand-client)] to-[#06040f]",  badge: "▶", plays: "2.1M", badgeBg: "#059669" },
+  { label: "Podcast Cover",     niche: "Interview · Ep.48",  aspect: "1/1",  w: "",           bg: "from-[var(--brand-editor)] via-[#db2777] to-[#06040f]",  badge: "🎙", plays: "48k", badgeBg: "var(--brand-editor)" },
+  { label: "YouTube Short",     niche: "Comedy · 3.2M",     aspect: "9/16",  w: "",           bg: "from-[#F59E0B] via-[var(--brand-client)] to-[var(--brand-teal)]",  badge: "S", plays: "3.2M", badgeBg: "#FF0000" },
+  { label: "Wedding Film",      niche: "Cinematic · Reel",   aspect: "16/9", w: "col-span-2", bg: "from-[#d97706] via-[var(--brand-editor)] to-[#06040f]",  badge: "▶", plays: "42k", badgeBg: "#d97706" },
 ];
 
 export function WorkGallerySection() {
@@ -3195,15 +3201,15 @@ export function WorkGallerySection() {
         <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-px w-8 bg-[#0EA5E9]" />
-              <span className="text-[10px] font-black text-[#0EA5E9] uppercase tracking-[0.22em]">Creative output</span>
+              <div className="h-px w-8 bg-[var(--brand-client)]" />
+              <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.22em]">Creative output</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight">
               This is what gets delivered.<br />
               <span className="text-gray-300">On EditBridge.</span>
             </h2>
           </div>
-          <Link href="/browse" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-bold text-[#0EA5E9] hover:underline">
+          <Link href="/browse" className="shrink-0 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand-client)] hover:underline">
             Browse editors <ArrowRight className="w-4 h-4" />
           </Link>
         </Reveal>
@@ -3267,7 +3273,7 @@ export function BackToTopButton() {
           exit={{ opacity: 0, scale: 0.8, y: 8 }}
           transition={{ duration: 0.2 }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full bg-gray-900/80 backdrop-blur-sm border border-white/10 text-white flex items-center justify-center hover:bg-[#0EA5E9] transition-colors shadow-xl"
+          className="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full bg-gray-900/80 backdrop-blur-sm border border-white/10 text-white flex items-center justify-center hover:bg-[var(--brand-client)] transition-colors shadow-xl"
           aria-label="Back to top">
           <ChevronUp className="w-5 h-5" />
         </motion.button>

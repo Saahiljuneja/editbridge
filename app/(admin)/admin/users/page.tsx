@@ -76,7 +76,7 @@ export default async function AdminUsersPage({
           placeholder="Search by name or email…"
           className="flex-1 a-input rounded-lg px-3 py-2"
         />
-        <button type="submit" className="px-4 py-2 rounded-lg bg-[#0EA5E9] text-white text-sm font-medium hover:bg-sky-600 transition-colors">
+        <button type="submit" className="px-4 py-2 rounded-lg bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-client-hover)] transition-colors">
           Search
         </button>
         {q && (

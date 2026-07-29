@@ -34,7 +34,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         <Link
           href="/browse"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-          style={{ background: "#0EA5E9" }}
+          style={{ background: "var(--brand-client)" }}
         >
           Browse editors <ArrowRight className="w-4 h-4" />
         </Link>
@@ -63,7 +63,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
         <p className="text-sm text-gray-400">One or more of these editors couldn&apos;t be found.</p>
-        <Link href="/browse" className="mt-4 text-sm text-[#0EA5E9] hover:underline">← Back to browse</Link>
+        <Link href="/browse" className="mt-4 text-sm text-[var(--brand-client)] hover:underline">← Back to browse</Link>
       </div>
     );
   }
@@ -191,7 +191,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         c.skills.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {c.skills.slice(0, 3).map((s) => (
-              <span key={s} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/15">
+              <span key={s} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
                 {s}
               </span>
             ))}
@@ -218,7 +218,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
             <div />
             {cols.map((c) => (
               <div key={c.id} className="px-5 py-5 border-l border-gray-50 text-center">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-[#0EA5E9] to-violet-600 flex items-center justify-center mx-auto mb-2">
+                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-[var(--brand-client)] to-violet-600 flex items-center justify-center mx-auto mb-2">
                   {c.image ? (
                     <Image src={c.image} alt={c.displayName} width={56} height={56} className="object-cover w-full h-full" />
                   ) : (
@@ -268,7 +268,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                 {c.cheapestPackageId ? (
                   <Link
                     href={`/checkout/${c.cheapestPackageId}`}
-                    className="flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-[#0EA5E9] hover:bg-[#3d34a0] transition-colors"
+                    className="flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] transition-colors"
                   >
                     Book now
                   </Link>

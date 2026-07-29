@@ -40,7 +40,7 @@ export function ProfileHeader({
     <div className="flex flex-col sm:flex-row gap-6 items-start">
       <Avatar className="w-24 h-24 shrink-0">
         <AvatarImage src={image ?? undefined} alt={displayedName} />
-        <AvatarFallback className="text-2xl font-bold bg-[#0EA5E9] text-white">{initials}</AvatarFallback>
+        <AvatarFallback className="text-2xl font-bold bg-[var(--brand-client)] text-white">{initials}</AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">

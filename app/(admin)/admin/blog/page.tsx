@@ -37,7 +37,7 @@ export default async function AdminBlogPage() {
         <Link
           href="/admin/blog/new"
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ background: "#0EA5E9" }}
+          style={{ background: "var(--brand-client)" }}
         >
           <Plus className="w-4 h-4" />
           New post
@@ -52,7 +52,7 @@ export default async function AdminBlogPage() {
           <Link
             href="/admin/blog/new"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-            style={{ background: "#0EA5E9" }}
+            style={{ background: "var(--brand-client)" }}
           >
             <Plus className="w-4 h-4" /> Write a post
           </Link>
@@ -101,14 +101,14 @@ export default async function AdminBlogPage() {
                         <Link
                           href={`/blog/${post.slug}`}
                           target="_blank"
-                          className="text-xs text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] transition-colors"
+                          className="text-xs text-gray-400 dark:text-gray-500 hover:text-[var(--brand-client)] transition-colors"
                         >
                           View →
                         </Link>
                       )}
                       <Link
                         href={`/admin/blog/${post.id}/edit`}
-                        className="text-xs font-semibold text-[#0EA5E9] hover:underline"
+                        className="text-xs font-semibold text-[var(--brand-client)] hover:underline"
                       >
                         Edit
                       </Link>

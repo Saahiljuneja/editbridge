@@ -66,7 +66,7 @@ export function OrderReferences({
         {!readonly && (
           <button
             onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-[#0EA5E9] hover:text-sky-700 border border-[#0EA5E9]/30 px-3 py-1.5 rounded-lg hover:bg-sky-50 transition-colors">
+            className="flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-client)] hover:text-sky-700 border border-[var(--brand-client)]/30 px-3 py-1.5 rounded-lg hover:bg-sky-50 transition-colors">
             <Plus className="w-3.5 h-3.5" /> Add link
           </button>
         )}
@@ -74,7 +74,7 @@ export function OrderReferences({
 
       {/* Add form */}
       {open && (
-        <div className="rounded-lg border border-dashed border-[#0EA5E9]/40 bg-sky-50/40 p-4 space-y-3">
+        <div className="rounded-lg border border-dashed border-[var(--brand-client)]/40 bg-sky-50/40 p-4 space-y-3">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">URL</label>
             <input
@@ -82,7 +82,7 @@ export function OrderReferences({
               onChange={(e) => setUrl(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addRef()}
               placeholder="https://youtube.com/watch?v=… or https://pinterest.com/…"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20"
             />
           </div>
           <div>
@@ -92,13 +92,13 @@ export function OrderReferences({
               onChange={(e) => setNote(e.target.value)}
               placeholder="e.g. Colour grade style I like"
               maxLength={200}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20"
             />
           </div>
           <div className="flex gap-2">
             <button onClick={addRef} disabled={saving || !url.trim()}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-40"
-              style={{ background: "#0EA5E9" }}>
+              style={{ background: "var(--brand-client)" }}>
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
               Add
             </button>
@@ -129,7 +129,7 @@ export function OrderReferences({
                 <Link2 className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <a href={r.url} target="_blank" rel="noopener noreferrer"
-                    className="text-sm font-medium text-[#0EA5E9] hover:underline truncate block">
+                    className="text-sm font-medium text-[var(--brand-client)] hover:underline truncate block">
                     {hostname || r.url}
                   </a>
                   {r.note && <p className="text-xs text-muted-foreground mt-0.5">{r.note}</p>}

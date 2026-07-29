@@ -64,7 +64,7 @@ export function FindEditorResultsClient() {
       <div className="px-8 py-6">
         <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <div>
-            <p className="text-xs font-bold text-[#0EA5E9] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <p className="text-xs font-bold text-[var(--brand-client)] uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> Your matches
             </p>
             <h1 className="text-2xl font-bold text-gray-900">
@@ -84,7 +84,7 @@ export function FindEditorResultsClient() {
             <p className="text-gray-500 mb-4">
               We couldn't find an editor in this category just yet.
             </p>
-            <Link href="/browse" className={cn(buttonVariants(), "bg-[#0EA5E9]")}>
+            <Link href="/browse" className={cn(buttonVariants(), "bg-[var(--brand-client)]")}>
               Browse all editors
             </Link>
           </div>
@@ -92,8 +92,8 @@ export function FindEditorResultsClient() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
             {matches.map((m) => (
               <div key={m.id} className="flex flex-col gap-2.5">
-                <div className="rounded-xl bg-[#0EA5E9]/6 border border-[#0EA5E9]/15 px-3.5 py-2.5">
-                  <p className="text-xs text-[#0EA5E9] font-medium leading-relaxed">{m.matchReason}</p>
+                <div className="rounded-xl bg-[var(--brand-client)]/6 border border-[var(--brand-client)]/15 px-3.5 py-2.5">
+                  <p className="text-xs text-[var(--brand-client)] font-medium leading-relaxed">{m.matchReason}</p>
                 </div>
                 <EditorCard
                   id={m.id}
@@ -126,7 +126,7 @@ export function FindEditorResultsClient() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6 border-t border-gray-200">
           <Link
             href={`/editors/${categorySlug}`}
-            className="flex items-center gap-1.5 text-sm font-semibold text-[#0EA5E9] hover:underline"
+            className="flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-client)] hover:underline"
           >
             See all {categoryName.toLowerCase()} <ArrowRight className="w-3.5 h-3.5" />
           </Link>

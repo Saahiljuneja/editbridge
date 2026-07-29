@@ -163,7 +163,7 @@ export default async function AdminOrderDetailPage({
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Editor earns</span>
-              <span className="text-[#0F6E56] font-semibold">{formatCurrency(order.totalAmount - order.commissionAmount)}</span>
+              <span className="text-[var(--brand-teal)] font-semibold">{formatCurrency(order.totalAmount - order.commissionAmount)}</span>
             </div>
             {order.deadline && (
               <div className="flex justify-between pt-2 border-t border-border">

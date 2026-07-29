@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { messages, orders } from "@/lib/db/schema";
-import { and, eq, asc } from "drizzle-orm";
+import { and, eq, asc, ne } from "drizzle-orm";
 
 export async function GET(
   _request: NextRequest,
@@ -29,6 +29,19 @@ export async function GET(
 
   if (!isClient && !isEditor && !isStaff) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (!isStaff) {
+    await db
+      .update(messages)
+      .set({ isRead: true })
+      .where(
+        and(
+          eq(messages.orderId, orderId),
+          ne(messages.senderId, userId),
+          eq(messages.isRead, false)
+        )
+      );
   }
 
   const rows = await db

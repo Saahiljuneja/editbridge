@@ -22,7 +22,7 @@ const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; bg: 
   kyc_approved:         { icon: CheckCircle2,  color: "text-green-600",  bg: "bg-green-50" },
   kyc_rejected:         { icon: AlertCircle,   color: "text-red-600",    bg: "bg-red-50" },
   dispute_opened:       { icon: AlertCircle,   color: "text-red-600",    bg: "bg-red-50" },
-  broadcast:            { icon: Megaphone,     color: "text-[#0EA5E9]",  bg: "bg-[#0EA5E9]/10" },
+  broadcast:            { icon: Megaphone,     color: "text-[var(--brand-client)]",  bg: "bg-[var(--brand-client)]/10" },
   announcement:         { icon: Info,          color: "text-blue-600",   bg: "bg-blue-50" },
 };
 
@@ -51,8 +51,8 @@ export default async function EditorNotificationsPage() {
           </div>
           <div className="flex items-center gap-3">
             {unreadCount > 0 && <MarkAllReadButton />}
-            <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
-              <Bell className="w-4 h-4 text-[#0EA5E9]" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
+              <Bell className="w-4 h-4 text-[var(--brand-client)]" />
             </div>
           </div>
         </div>
@@ -61,8 +61,8 @@ export default async function EditorNotificationsPage() {
       <div className="px-8 py-6 ">
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
-              <Bell className="w-7 h-7 text-[#0EA5E9]" />
+            <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4">
+              <Bell className="w-7 h-7 text-[var(--brand-client)]" />
             </div>
             <p className="font-semibold text-gray-800">No notifications yet</p>
             <p className="text-sm text-gray-400 mt-1">We'll notify you about orders, messages, and reviews.</p>
@@ -77,7 +77,7 @@ export default async function EditorNotificationsPage() {
                   key={n.id}
                   className={cn(
                     "flex items-start gap-4 px-5 py-4 border-b border-gray-50 last:border-0 transition-colors",
-                    !n.isRead ? "bg-[#0EA5E9]/[0.02]" : "bg-white"
+                    !n.isRead ? "bg-[var(--brand-client)]/[0.02]" : "bg-white"
                   )}
                 >
                   <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5", cfg.bg)}>
@@ -88,13 +88,13 @@ export default async function EditorNotificationsPage() {
                       <p className={cn("text-sm leading-snug", !n.isRead ? "font-semibold text-gray-900" : "font-medium text-gray-700")}>
                         {n.title}
                       </p>
-                      {!n.isRead && <span className="w-2 h-2 rounded-full bg-[#0EA5E9] shrink-0 mt-1.5" />}
+                      {!n.isRead && <span className="w-2 h-2 rounded-full bg-[var(--brand-client)] shrink-0 mt-1.5" />}
                     </div>
                     {n.body && <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{n.body}</p>}
                     <div className="flex items-center gap-3 mt-1.5">
                       <span className="text-[10px] text-gray-400">{formatDateTime(n.createdAt)}</span>
                       {n.link && (
-                        <Link href={n.link} className="text-[10px] font-semibold text-[#0EA5E9] hover:underline">
+                        <Link href={n.link} className="text-[10px] font-semibold text-[var(--brand-client)] hover:underline">
                           View →
                         </Link>
                       )}

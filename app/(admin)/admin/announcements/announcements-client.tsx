@@ -124,7 +124,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-medium hover:bg-[#3d34a0] transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-editor-hover)] transition-colors"
         >
           <Plus className="w-4 h-4" />
           New announcement
@@ -142,7 +142,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Scheduled maintenance on Sunday"
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               />
             </div>
             <div className="sm:col-span-2">
@@ -153,7 +153,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Describe the notice in detail…"
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 resize-none"
               />
             </div>
             <div>
@@ -161,7 +161,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               >
                 <option value="info">Info</option>
                 <option value="warning">Warning</option>
@@ -174,7 +174,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               />
               <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Leave blank to publish immediately</p>
             </div>
@@ -184,7 +184,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                 type="datetime-local"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
               />
             </div>
           </div>
@@ -192,7 +192,7 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 rounded-lg bg-[#0EA5E9] text-white text-sm font-medium hover:bg-[#3d34a0] disabled:opacity-50 transition-colors"
+              className="px-4 py-2 rounded-lg bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-editor-hover)] disabled:opacity-50 transition-colors"
             >
               {submitting ? (scheduledAt ? "Scheduling…" : "Publishing…") : (scheduledAt ? "Schedule" : "Publish")}
             </button>
@@ -232,17 +232,17 @@ export function AnnouncementsClient({ initialRows }: { initialRows: Announcement
                     <input
                       value={editTitle}
                       onChange={e => setEditTitle(e.target.value)}
-                      className="w-full rounded-xl border border-white/80 bg-white/70 px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20"
+                      className="w-full rounded-xl border border-white/80 bg-white/70 px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20"
                     />
                     <textarea
                       rows={3}
                       value={editBody}
                       onChange={e => setEditBody(e.target.value)}
-                      className="w-full rounded-xl border border-white/80 bg-white/70 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20"
+                      className="w-full rounded-xl border border-white/80 bg-white/70 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20"
                     />
                     <div className="flex gap-2">
                       <button onClick={handleEdit} disabled={saving}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0EA5E9] text-white text-xs font-semibold disabled:opacity-50">
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--brand-client)] text-white text-xs font-semibold disabled:opacity-50">
                         <Check className="w-3.5 h-3.5" /> {saving ? "Saving…" : "Save"}
                       </button>
                       <button onClick={() => setEditId(null)}

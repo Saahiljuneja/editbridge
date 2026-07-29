@@ -103,8 +103,8 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
             error
               ? "border-red-400 bg-red-50 text-red-600"
               : d
-                ? "border-[#0EA5E9] bg-[#0EA5E9]/5 text-[#0EA5E9] shadow-sm shadow-[#0EA5E9]/10"
-                : "border-gray-200 bg-white text-gray-900 focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/15",
+                ? "border-[var(--brand-client)] bg-[var(--brand-client)]/5 text-[var(--brand-client)] shadow-sm shadow-[var(--brand-client)]/10"
+                : "border-gray-200 bg-white text-gray-900 focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/15",
             disabled && "opacity-50 cursor-not-allowed"
           )}
         />

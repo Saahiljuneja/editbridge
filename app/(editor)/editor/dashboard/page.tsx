@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -13,20 +13,22 @@ import { calcLevel, getLevelPerks, LEVELS } from "@/lib/rewards";
 import type { Level } from "@/lib/rewards";
 import { formatCurrency, displayNameFromFull, formatDate, formatDateTime } from "@/lib/utils";
 import {
-  ShoppingBag, AlertCircle, Clock, CheckCircle,
+  ShoppingBag, AlertCircle, Clock, CheckCircle2,
   Star, ArrowRight, Zap, IndianRupee,
   Package, MessageSquare, AlertTriangle, RefreshCw,
   TrendingUp, ImageIcon, BadgeCheck, Share2, CircleDot,
-  HelpCircle, Film,
+  HelpCircle, Film, Banknote,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { AutoPauseBanner } from "./auto-pause-banner";
 import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 import { AvailabilityToggle } from "@/components/editor/availability-toggle";
+import nextDynamic from "next/dynamic";
 
-const COLOR = "#0EA5E9";
+const EditorDashboardCharts = nextDynamic(
+  () => import("./dashboard-charts").then((m) => m.EditorDashboardCharts)
+);
 
 export default async function EditorDashboardPage() {
   const session = await auth();
@@ -39,12 +41,17 @@ export default async function EditorDashboardPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
-          <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-7 h-7 text-blue-600" />
+          <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-7 h-7 text-[#0EA5E9]" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">Complete your setup</h2>
-          <p className="text-sm text-gray-500 mb-6">Your editor profile isn&apos;t set up yet. Complete KYC to start accepting orders.</p>
-          <Link href="/editor/kyc" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white" style={{ background: COLOR }}>
+          <p className="text-sm text-gray-500 mb-6">
+            Your editor profile isn&apos;t set up yet. Complete KYC to start accepting orders.
+          </p>
+          <Link
+            href="/editor/kyc"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+          >
             Complete setup <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -71,6 +78,7 @@ export default async function EditorDashboardPage() {
       completionRate: editors.completionRate, avgResponseTime: editors.avgResponseTime,
       createdAt: editors.createdAt, kycStatus: editors.kycStatus, kycApprovedAt: editors.kycApprovedAt,
       isAvailable: editors.isAvailable, displayName: editors.displayName,
+      niche: editors.niche,
     }).from(editors).where(eq(editors.id, editorId)).limit(1).then(r => r[0]),
 
     db.select({
@@ -144,22 +152,67 @@ export default async function EditorDashboardPage() {
       )),
   ]);
 
-  const totalEarnings   = earningsRow?.total     ?? 0;
-  const monthEarnings   = monthEarningsRow?.total ?? 0;
-  const unreadMessages  = unreadCountRow?.count   ?? 0;
-  const avgRating       = ratingRow?.avg ? Number(ratingRow.avg) : null;
-  const totalReviews    = ratingRow?.count        ?? 0;
-  const openDisputes    = openDisputeCount?.count ?? 0;
-  const staleQuestions  = unansweredQuestionCount?.count ?? 0;
-  const isAvailable     = editorRow?.isAvailable  ?? true;
-  const pkgCount        = activePackages.filter(p => p.isActive).length;
-  const pendingPayout   = pendingPayoutRow?.total ?? 0;
-  const portCount       = portfolioRows.length;
+  const [monthlyEarnings, activeOrdersBreakdown, responseTimeData, clientRepeatData] = await Promise.all([
+    db.execute<{ month: string; earnings: number }>(sql`
+      SELECT TO_CHAR(DATE_TRUNC('month', updated_at), 'Mon YY') AS month,
+        COALESCE(SUM(total_amount - commission_amount), 0)::int AS earnings
+      FROM orders
+      WHERE editor_id = ${editorId}::uuid AND status = 'completed'
+        AND updated_at >= NOW() - INTERVAL '6 months'
+      GROUP BY DATE_TRUNC('month', updated_at)
+      ORDER BY DATE_TRUNC('month', updated_at)
+    `),
+    db.execute<{ status: string; count: number }>(sql`
+      SELECT status, COUNT(*)::int AS count FROM orders
+      WHERE editor_id = ${editorId}::uuid
+        AND status IN ('pending', 'in_progress', 'delivered', 'revision_requested')
+      GROUP BY status
+    `),
+    db.execute<{ name: string; value: number }>(sql`
+      SELECT 'My Avg'::text AS name, COALESCE(${editors.avgResponseTime}, 0)::int AS value
+      FROM editors WHERE id = ${editorId}::uuid
+      UNION ALL
+      SELECT 'Category Avg'::text AS name, COALESCE(AVG(avg_response_time), 0)::int AS value
+      FROM editors WHERE niche = ${editorRow?.niche ?? ""} AND id != ${editorId}::uuid
+    `),
+    db.execute<{ client_type: string; client_count: number }>(sql`
+      SELECT CASE WHEN client_order_count >= 2 THEN 'Repeat' ELSE 'New' END AS client_type,
+        COUNT(DISTINCT client_id)::int AS client_count
+      FROM (
+        SELECT client_id, COUNT(*) AS client_order_count FROM orders
+        WHERE editor_id = ${editorId}::uuid GROUP BY client_id
+      ) sub GROUP BY client_type
+    `),
+  ]);
+
+  const myResponseTime = responseTimeData.rows[0]?.value ?? 0;
+  let categoryResponseTime = responseTimeData.rows[1]?.value ?? 0;
+  if (!categoryResponseTime) {
+    const globalAvgResult = await db.execute<{ avg: number }>(sql`
+      SELECT COALESCE(AVG(avg_response_time), 0)::int AS avg FROM editors WHERE id != ${editorId}::uuid
+    `);
+    categoryResponseTime = globalAvgResult.rows[0]?.avg ?? 0;
+  }
+  const finalResponseTimeData = [
+    { name: "My Avg", value: myResponseTime },
+    { name: "Category Avg", value: categoryResponseTime },
+  ];
+
+  const totalEarnings  = earningsRow?.total     ?? 0;
+  const monthEarnings  = monthEarningsRow?.total ?? 0;
+  const unreadMessages = unreadCountRow?.count   ?? 0;
+  const avgRating      = ratingRow?.avg ? Number(ratingRow.avg) : null;
+  const totalReviews   = ratingRow?.count        ?? 0;
+  const openDisputes   = openDisputeCount?.count ?? 0;
+  const staleQuestions = unansweredQuestionCount?.count ?? 0;
+  const isAvailable    = editorRow?.isAvailable  ?? true;
+  const pkgCount       = activePackages.filter(p => p.isActive).length;
+  const pendingPayout  = pendingPayoutRow?.total ?? 0;
+  const portCount      = portfolioRows.length;
 
   const needsAction = activeOrders.filter(o => o.status === "revision_requested" || o.status === "pending");
   const inProgress  = activeOrders.filter(o => o.status !== "revision_requested" && o.status !== "pending");
 
-  // XP / level
   const xpTotal   = xpRow?.total ?? 0;
   const xpLevel   = (xpRow?.level ?? "bronze") as Level;
   const levelMeta = LEVELS.find(l => l.name === xpLevel)!;
@@ -167,51 +220,110 @@ export default async function EditorDashboardPage() {
   const xpPct     = nextLevel
     ? Math.min(100, ((xpTotal - levelMeta.min) / (nextLevel.min - levelMeta.min)) * 100)
     : 100;
-  const weekOrders   = weekOrdersRow?.c ?? 0;
-  const expiringAmt  = expiringCredits.reduce((s, c) => s + c.amount, 0);
-  const earliestExp  = expiringCredits.length
+  const weekOrders  = weekOrdersRow?.c ?? 0;
+  const expiringAmt = expiringCredits.reduce((s, c) => s + c.amount, 0);
+  const earliestExp = expiringCredits.length
     ? expiringCredits.reduce((a, b) => (a.expiresAt! < b.expiresAt! ? a : b)).expiresAt
     : null;
 
   const LEVEL_COLORS: Record<Level, string> = {
     bronze: "#D97706", silver: "#6B7280", gold: "#CA8A04", platinum: "#4F46E5",
+    diamond: "#0891B2", master: "#9333EA", legend: "#DC2626",
   };
   const LEVEL_EMOJIS: Record<Level, string> = {
     bronze: "🥉", silver: "🥈", gold: "🥇", platinum: "💎",
+    diamond: "💠", master: "👑", legend: "🔥",
   };
   const xpColor = LEVEL_COLORS[xpLevel];
-  const RING_R = 28; const RING_C = +(2 * Math.PI * RING_R).toFixed(2);
+  const RING_R = 28;
+  const RING_C = +(2 * Math.PI * RING_R).toFixed(2);
 
   const STATUS_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
-    pending:            { label: "Pending",         dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600"    },
-    in_progress:        { label: "In Progress",     dot: "bg-blue-500",   badge: "bg-blue-100 text-blue-700"    },
-    delivered:          { label: "Delivered",       dot: "bg-blue-500",   badge: "bg-blue-100 text-blue-700" },
-    revision_requested: { label: "Revision",        dot: "bg-amber-500",  badge: "bg-amber-100 text-amber-700"  },
+    pending:            { label: "Pending",     dot: "bg-gray-400",    badge: "bg-gray-100 text-gray-600"   },
+    in_progress:        { label: "In Progress", dot: "bg-[#0EA5E9]",   badge: "bg-sky-100 text-sky-700"     },
+    delivered:          { label: "Delivered",   dot: "bg-[#0EA5E9]",   badge: "bg-sky-100 text-sky-700"     },
+    revision_requested: { label: "Revision",    dot: "bg-amber-500",   badge: "bg-amber-100 text-amber-700" },
   };
 
-  const profileHref = `/editor/${editorId}`;
-  const kycApproved = editorRow?.kycStatus === "approved";
+  const profileHref  = `/editor/${editorId}`;
+  const kycApproved  = editorRow?.kycStatus === "approved";
+  const greeting     = now.getHours() < 12 ? "morning" : now.getHours() < 17 ? "afternoon" : "evening";
+
+  const KPI_CARDS = [
+    {
+      label: "This Month", value: formatCurrency(monthEarnings),
+      sub: `${formatCurrency(totalEarnings)} lifetime`,
+      icon: IndianRupee, topBorder: "border-t-2 border-emerald-500",
+      iconBg: "bg-emerald-50", iconCls: "text-emerald-600", numCls: "text-gray-900",
+    },
+    {
+      label: "Active Orders", value: String(activeOrders.length),
+      sub: needsAction.length > 0 ? `${needsAction.length} need action` : "All on track",
+      icon: ShoppingBag, topBorder: "border-t-2 border-[#0EA5E9]",
+      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]", numCls: "text-[#0EA5E9]",
+    },
+    {
+      label: "Pending Payout", value: formatCurrency(pendingPayout),
+      sub: "From active orders",
+      icon: Banknote, topBorder: "border-t-2 border-amber-400",
+      iconBg: "bg-amber-50", iconCls: "text-amber-600", numCls: "text-gray-900",
+    },
+    {
+      label: "Avg Rating", value: avgRating ? `${avgRating} ★` : "—",
+      sub: `${totalReviews} review${totalReviews !== 1 ? "s" : ""}`,
+      icon: Star, topBorder: "border-t-2 border-amber-300",
+      iconBg: "bg-amber-50", iconCls: "text-amber-500", numCls: "text-gray-900",
+    },
+  ];
+
+  const PERF_CARDS = [
+    {
+      icon: Clock, label: "Avg Response",
+      value: editorRow?.avgResponseTime
+        ? editorRow.avgResponseTime < 60 ? `${editorRow.avgResponseTime}m` : `${Math.round(editorRow.avgResponseTime / 60)}h`
+        : "—",
+      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]",
+    },
+    {
+      icon: CheckCircle2, label: "Completion",
+      value: editorRow?.completionRate != null ? `${editorRow.completionRate}%` : "—",
+      iconBg: "bg-emerald-50", iconCls: "text-emerald-600",
+    },
+    {
+      icon: ShoppingBag, label: "Completed",
+      value: String(editorRow?.totalOrders ?? 0),
+      iconBg: "bg-amber-50", iconCls: "text-amber-600",
+    },
+    {
+      icon: ImageIcon, label: "Portfolio",
+      value: String(portCount),
+      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#F0F9FF]">
+    <div className="min-h-screen bg-gray-50">
 
-      {/* ── Top bar ──────────────────────────────────────────────────────── */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-100">
-        <div className="px-8 py-6 ">
+        <div className="max-w-5xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between gap-4">
-
-            {/* Left: avatar + greeting */}
+            {/* Avatar + greeting */}
             <div className="flex items-center gap-4">
               {session.user.image ? (
-                <Image src={session.user.image} alt="" width={44} height={44}
-                  className="rounded-xl object-cover shrink-0" style={{ outline: `2px solid ${COLOR}30` }} />
+                <img
+                  src={session.user.image} alt="" width={44} height={44}
+                  className="w-11 h-11 rounded-xl object-cover shrink-0 ring-2 ring-[#0EA5E9]/20"
+                />
               ) : (
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-lg" style={{ background: COLOR }}>
+                <div className="w-11 h-11 rounded-xl bg-[#0EA5E9] flex items-center justify-center shrink-0 text-white font-bold text-lg">
                   {(session.user.name ?? "E")[0].toUpperCase()}
                 </div>
               )}
               <div>
-                <h1 className="text-lg font-bold text-gray-900 leading-tight">Good {now.getHours() < 12 ? "morning" : now.getHours() < 17 ? "afternoon" : "evening"}, {firstName}</h1>
+                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                  Good {greeting}, {firstName}
+                </h1>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className={cn(
                     "inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full",
@@ -221,7 +333,7 @@ export default async function EditorDashboardPage() {
                     {isAvailable ? "Available" : "Paused"}
                   </span>
                   {kycApproved && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0EA5E9]">
                       <BadgeCheck className="w-3.5 h-3.5" /> Verified
                     </span>
                   )}
@@ -233,75 +345,81 @@ export default async function EditorDashboardPage() {
             <div className="hidden sm:flex items-center gap-4">
               <div className="text-right">
                 <p className="text-xs text-gray-400">This month</p>
-                <p className="text-xl font-bold text-gray-900">{formatCurrency(monthEarnings)}</p>
+                <p className="text-xl font-bold text-gray-900 tabular-nums">{formatCurrency(monthEarnings)}</p>
               </div>
-              <Link href={profileHref}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:border-blue-300 hover:text-blue-700 transition-colors">
+              <Link
+                href={profileHref}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9] transition-colors"
+              >
                 <Share2 className="w-3.5 h-3.5" /> Public profile
               </Link>
             </div>
           </div>
 
-          {/* Banners */}
-          {editorRow?.kycStatus === "pending" && (
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
-              <Clock className="w-4 h-4 text-amber-500 shrink-0" />
-              <p className="text-sm text-amber-800 flex-1">Complete KYC verification to start receiving orders.</p>
-              <Link href="/editor/kyc" className="text-xs font-bold text-amber-700 hover:text-amber-900 whitespace-nowrap">Complete KYC →</Link>
-            </div>
-          )}
-          {editorRow?.kycStatus === "rejected" && (
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
-              <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-              <p className="text-sm text-red-800 flex-1">Your KYC was rejected. Re-submit with a valid government ID.</p>
-              <Link href="/editor/kyc" className="text-xs font-bold text-red-700 whitespace-nowrap">Re-submit →</Link>
-            </div>
-          )}
-          {kycApproved && editorRow?.kycApprovedAt && (() => {
-            const approvedAt = new Date(editorRow.kycApprovedAt);
-            const expiryDate = new Date(approvedAt.getTime() + 365 * 24 * 60 * 60 * 1000);
-            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-            const showExpiryWarning = daysUntilExpiry <= 60;
-            return showExpiryWarning ? (
-              <div className="mt-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
-                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+          {/* Status banners */}
+          <div className="space-y-3 mt-4">
+            {editorRow?.kycStatus === "pending" && (
+              <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                <Clock className="w-4 h-4 text-amber-500 shrink-0" />
+                <p className="text-sm text-amber-800 flex-1">Complete KYC verification to start receiving orders.</p>
+                <Link href="/editor/kyc" className="text-xs font-bold text-amber-700 hover:text-amber-900 whitespace-nowrap">
+                  Complete KYC →
+                </Link>
+              </div>
+            )}
+            {editorRow?.kycStatus === "rejected" && (
+              <div className="flex items-center gap-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+                <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                <p className="text-sm text-red-800 flex-1">Your KYC was rejected. Re-submit with a valid government ID.</p>
+                <Link href="/editor/kyc" className="text-xs font-bold text-red-700 whitespace-nowrap">Re-submit →</Link>
+              </div>
+            )}
+            {kycApproved && editorRow?.kycApprovedAt && (() => {
+              const approvedAt = new Date(editorRow.kycApprovedAt);
+              const expiryDate = new Date(approvedAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+              const daysLeft = Math.ceil((expiryDate.getTime() - Date.now()) / 86_400_000);
+              return daysLeft <= 60 ? (
+                <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                  <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                  <p className="text-sm text-amber-800 flex-1">
+                    KYC expires in <strong>{daysLeft} day{daysLeft !== 1 ? "s" : ""}</strong> ({formatDate(expiryDate)}).
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <p className="text-xs text-gray-500">
+                    KYC verified {formatDate(approvedAt)} · valid until {formatDate(expiryDate)}
+                  </p>
+                </div>
+              );
+            })()}
+            {kycApproved && activeOrders.length === 0 && totalEarnings === 0 && (
+              <div className="flex items-center gap-3 rounded-xl bg-sky-50 border border-sky-200 px-4 py-3">
+                <CheckCircle2 className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                <p className="text-sm text-sky-800 flex-1">Your profile is live! Share it to start receiving orders.</p>
+                <Link href={profileHref} className="text-xs font-bold text-[#0EA5E9] whitespace-nowrap">
+                  Share profile →
+                </Link>
+              </div>
+            )}
+            {expiringAmt > 0 && earliestExp && (
+              <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                <Zap className="w-4 h-4 text-amber-500 shrink-0" />
                 <p className="text-sm text-amber-800 flex-1">
-                  Your KYC verification expires in <strong>{daysUntilExpiry} day{daysUntilExpiry !== 1 ? "s" : ""}</strong> ({formatDate(expiryDate)}). Stay active to avoid re-verification.
+                  <strong>₹{(expiringAmt / 100).toFixed(0)} in credits</strong> expire on{" "}
+                  {new Date(earliestExp).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} — use them on your next order.
                 </p>
+                <Link href="/editor/rewards" className="text-xs font-bold text-amber-700 whitespace-nowrap">View →</Link>
               </div>
-            ) : (
-              <div className="mt-4 flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
-                <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
-                <p className="text-xs text-gray-500">
-                  KYC verified on {formatDate(approvedAt)} · valid until {formatDate(expiryDate)}
-                </p>
-              </div>
-            );
-          })()}
-          {kycApproved && activeOrders.length === 0 && totalEarnings === 0 && (
-            <div className="mt-4 flex items-center gap-3 rounded-xl border px-4 py-3" style={{ background: `${COLOR}08`, borderColor: `${COLOR}25` }}>
-              <CheckCircle className="w-4 h-4 shrink-0" style={{ color: COLOR }} />
-              <p className="text-sm text-gray-700 flex-1">Your profile is live! Share it to start receiving orders.</p>
-              <Link href={profileHref} className="text-xs font-bold whitespace-nowrap" style={{ color: COLOR }}>Share profile →</Link>
-            </div>
-          )}
-          {/* Credits expiry warning */}
-          {expiringAmt > 0 && earliestExp && (
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
-              <Zap className="w-4 h-4 text-amber-500 shrink-0" />
-              <p className="text-sm text-amber-800 flex-1">
-                <strong>₹{(expiringAmt / 100).toFixed(0)} in credits</strong> expire on{" "}
-                {new Date(earliestExp).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} — use them on your next order.
-              </p>
-              <Link href="/editor/rewards" className="text-xs font-bold text-amber-700 whitespace-nowrap">View →</Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-5">
+      <div className="max-w-5xl mx-auto px-6 py-6 space-y-5">
 
-        {/* Auto-pause banner */}
+        {/* Auto-pause */}
         {activeOrders.length >= 3 && kycApproved && isAvailable && (
           <AutoPauseBanner activeCount={activeOrders.length} />
         )}
@@ -314,14 +432,16 @@ export default async function EditorDashboardPage() {
               <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-red-900">{openDisputes} open dispute{openDisputes !== 1 ? "s" : ""} need{openDisputes === 1 ? "s" : ""} your response</p>
+              <p className="text-sm font-semibold text-red-900">
+                {openDisputes} open dispute{openDisputes !== 1 ? "s" : ""} need{openDisputes === 1 ? "s" : ""} your response
+              </p>
               <p className="text-xs text-red-600 mt-0.5">Respond promptly to help resolve these orders.</p>
             </div>
             <ArrowRight className="w-4 h-4 text-red-400 group-hover:text-red-600 shrink-0 transition-colors" />
           </Link>
         )}
 
-        {/* Unanswered pre-order questions alert */}
+        {/* Stale questions */}
         {staleQuestions > 0 && (
           <Link href="/editor/questions"
             className="flex items-center gap-4 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 hover:bg-amber-100 transition-colors group">
@@ -329,7 +449,9 @@ export default async function EditorDashboardPage() {
               <HelpCircle className="w-4 h-4 text-amber-600" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-amber-900">{staleQuestions} unanswered question{staleQuestions !== 1 ? "s" : ""} from potential clients</p>
+              <p className="text-sm font-semibold text-amber-900">
+                {staleQuestions} unanswered question{staleQuestions !== 1 ? "s" : ""} from potential clients
+              </p>
               <p className="text-xs text-amber-600 mt-0.5">Asked over 6 hours ago — quick replies win more orders.</p>
             </div>
             <ArrowRight className="w-4 h-4 text-amber-400 group-hover:text-amber-600 shrink-0 transition-colors" />
@@ -342,7 +464,9 @@ export default async function EditorDashboardPage() {
             <div className="flex items-center gap-2 px-5 py-3 border-b border-amber-100">
               <RefreshCw className="w-4 h-4 text-amber-600" />
               <p className="text-sm font-semibold text-amber-900">Needs attention</p>
-              <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-800">{needsAction.length}</span>
+              <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-800">
+                {needsAction.length}
+              </span>
             </div>
             <div className="divide-y divide-amber-100">
               {needsAction.map(order => (
@@ -365,46 +489,39 @@ export default async function EditorDashboardPage() {
           </div>
         )}
 
-        {/* ── KPI row ─────────────────────────────────────────────────────── */}
+        {/* KPI cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { label: "This Month",     value: formatCurrency(monthEarnings), sub: `${formatCurrency(totalEarnings)} lifetime`, icon: IndianRupee, color: COLOR },
-            { label: "Active Orders",  value: String(activeOrders.length),   sub: needsAction.length > 0 ? `${needsAction.length} need action` : "All on track", icon: ShoppingBag, color: "#0EA5E9" },
-            { label: "Pending Payout", value: formatCurrency(pendingPayout), sub: "From active orders",            icon: TrendingUp,  color: "#D97706" },
-            { label: "Avg Rating",     value: avgRating ? `${avgRating} ★` : "—", sub: `${totalReviews} review${totalReviews !== 1 ? "s" : ""}`, icon: Star, color: "#F59E0B" },
-          ].map(({ label, value, sub, icon: Icon, color }) => (
-            <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          {KPI_CARDS.map(({ label, value, sub, icon: Icon, topBorder, iconBg, iconCls, numCls }) => (
+            <div key={label} className={cn("bg-white rounded-2xl border border-gray-100 p-5 shadow-sm", topBorder)}>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs font-medium text-gray-400">{label}</p>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}15` }}>
-                  <Icon className="w-4 h-4" style={{ color }} />
+                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", iconBg)}>
+                  <Icon className={cn("w-4 h-4", iconCls)} />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900 leading-none mb-1.5">{value}</p>
-              <p className="text-xs text-gray-400">{sub}</p>
+              <p className={cn("text-2xl font-bold leading-none mb-1.5 tabular-nums", numCls)}>{value}</p>
+              <p className={cn(
+                "text-xs",
+                label === "Active Orders" && needsAction.length > 0 ? "text-amber-600 font-medium" : "text-gray-400"
+              )}>{sub}</p>
             </div>
           ))}
         </div>
 
-        {/* ── XP + Streak widget ──────────────────────────────────────────── */}
-        <Link href="/editor/rewards" className="block bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-gray-200 transition-colors">
+        {/* XP widget */}
+        <Link href="/editor/rewards"
+          className="block bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-gray-200 transition-colors">
           <div className="flex items-center gap-4">
-            {/* Mini ring */}
             <div className="relative w-14 h-14 shrink-0">
               <svg viewBox="0 0 64 64" className="w-full h-full" style={{ transform: "rotate(-90deg)" }}>
-                <circle cx="32" cy="32" r={RING_R} fill="none" stroke="currentColor"
-                  strokeWidth="5" className="text-gray-100" />
-                <circle cx="32" cy="32" r={RING_R} fill="none"
-                  stroke={xpColor} strokeWidth="5" strokeLinecap="round"
-                  strokeDasharray={RING_C}
-                  strokeDashoffset={RING_C * (1 - xpPct / 100)} />
+                <circle cx="32" cy="32" r={RING_R} fill="none" stroke="currentColor" strokeWidth="5" className="text-gray-100" />
+                <circle cx="32" cy="32" r={RING_R} fill="none" stroke={xpColor} strokeWidth="5" strokeLinecap="round"
+                  strokeDasharray={RING_C} strokeDashoffset={RING_C * (1 - xpPct / 100)} />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center text-xl">
                 {LEVEL_EMOJIS[xpLevel]}
               </div>
             </div>
-
-            {/* XP info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-lg font-bold text-gray-900 tabular-nums">{xpTotal.toLocaleString()}</span>
@@ -422,23 +539,27 @@ export default async function EditorDashboardPage() {
                 <p className="text-xs font-semibold mt-0.5" style={{ color: xpColor }}>Max level reached 🎉</p>
               )}
             </div>
-
-            {/* Streak */}
             <div className="hidden sm:flex flex-col items-center gap-0.5 shrink-0 border-l border-gray-100 pl-4">
               <span className="text-2xl">{weekOrders > 0 ? "🔥" : "💤"}</span>
               <p className="text-sm font-bold text-gray-900 tabular-nums">{weekOrders}/5</p>
               <p className="text-[10px] text-gray-400">this week</p>
             </div>
-
             <ArrowRight className="w-4 h-4 text-gray-300 shrink-0" />
           </div>
         </Link>
 
-        {/* ── Main grid ───────────────────────────────────────────────────── */}
+        {/* Main grid */}
         <div className="grid lg:grid-cols-3 gap-5">
 
-          {/* Left: orders + reviews */}
+          {/* Left: charts + orders + perf + reviews */}
           <div className="lg:col-span-2 space-y-5">
+
+            <EditorDashboardCharts
+              earningsData={monthlyEarnings.rows.map(r => ({ month: String(r.month), earnings: Number(r.earnings) }))}
+              activeOrderData={activeOrdersBreakdown.rows.map(r => ({ status: String(r.status), count: Number(r.count) }))}
+              responseTimeData={finalResponseTimeData}
+              clientRepeatData={clientRepeatData.rows.map(r => ({ client_type: String(r.client_type), client_count: Number(r.client_count) }))}
+            />
 
             {/* Active orders */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -446,28 +567,28 @@ export default async function EditorDashboardPage() {
                 <div className="flex items-center gap-2">
                   <h2 className="font-semibold text-gray-900 text-sm">Active Orders</h2>
                   {activeOrders.length > 0 && (
-                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: COLOR }}>
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-[#0EA5E9] text-white">
                       {activeOrders.length}
                     </span>
                   )}
                 </div>
-                <Link href="/editor/orders" className="text-xs font-medium flex items-center gap-1 hover:underline" style={{ color: COLOR }}>
+                <Link href="/editor/orders"
+                  className="text-xs font-medium flex items-center gap-1 text-[#0EA5E9] hover:underline">
                   View all <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
 
               {activeOrders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${COLOR}10` }}>
-                    <ShoppingBag className="w-5 h-5" style={{ color: COLOR }} />
+                  <div className="w-12 h-12 rounded-2xl bg-sky-50 flex items-center justify-center mb-3">
+                    <ShoppingBag className="w-5 h-5 text-[#0EA5E9]" />
                   </div>
                   <p className="font-medium text-gray-700 text-sm">No active orders</p>
                   <p className="text-xs text-gray-400 mt-1 max-w-xs">
                     {kycApproved ? "Share your profile link to start receiving orders." : "Complete KYC to start receiving orders."}
                   </p>
                   <Link href={kycApproved ? profileHref : "/editor/kyc"}
-                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white"
-                    style={{ background: COLOR }}>
+                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors">
                     {kycApproved ? "View public profile" : "Complete KYC"} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -482,7 +603,9 @@ export default async function EditorDashboardPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate mb-0.5">{order.packageTitle}</p>
                           <div className="flex items-center gap-2">
-                            <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-full", s.badge)}>{s.label}</span>
+                            <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-full", s.badge)}>
+                              {s.label}
+                            </span>
                             <span className="text-xs text-gray-400">{displayNameFromFull(order.clientName ?? "Client")}</span>
                             {order.deadline && (
                               <>
@@ -493,7 +616,9 @@ export default async function EditorDashboardPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-sm font-bold text-gray-900">{formatCurrency(order.totalAmount - order.commissionAmount)}</span>
+                          <span className="text-sm font-bold text-gray-900 tabular-nums">
+                            {formatCurrency(order.totalAmount - order.commissionAmount)}
+                          </span>
                           <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 transition-colors" />
                         </div>
                       </Link>
@@ -505,18 +630,13 @@ export default async function EditorDashboardPage() {
 
             {/* Performance row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { icon: Clock,     label: "Avg Response", value: editorRow?.avgResponseTime ? editorRow.avgResponseTime < 60 ? `${editorRow.avgResponseTime}m` : `${Math.round(editorRow.avgResponseTime / 60)}h` : "—", color: "#0EA5E9" },
-                { icon: CheckCircle, label: "Completion",  value: editorRow?.completionRate != null ? `${editorRow.completionRate}%` : "—", color: COLOR },
-                { icon: ShoppingBag, label: "Completed",   value: String(editorRow?.totalOrders ?? 0), color: "#D97706" },
-                { icon: ImageIcon,   label: "Portfolio",   value: String(portCount), color: COLOR },
-              ].map(({ icon: Icon, label, value, color }) => (
+              {PERF_CARDS.map(({ icon: Icon, label, value, iconBg, iconCls }) => (
                 <div key={label} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 shadow-sm">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}12` }}>
-                    <Icon className="w-4 h-4" style={{ color }} />
+                  <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", iconBg)}>
+                    <Icon className={cn("w-4 h-4", iconCls)} />
                   </div>
                   <div>
-                    <p className="text-base font-bold text-gray-900 leading-none mb-0.5">{value}</p>
+                    <p className="text-base font-bold text-gray-900 leading-none mb-0.5 tabular-nums">{value}</p>
                     <p className="text-[11px] text-gray-400">{label}</p>
                   </div>
                 </div>
@@ -559,33 +679,39 @@ export default async function EditorDashboardPage() {
             )}
           </div>
 
-          {/* ── Right sidebar ─────────────────────────────────────────────── */}
+          {/* Sidebar */}
           <div className="space-y-4">
 
-            {/* Availability */}
             <AvailabilityToggle initial={isAvailable} kycApproved={kycApproved} />
 
             {/* Earnings */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-white rounded-2xl border border-gray-100 border-t-2 border-t-emerald-500 shadow-sm p-5">
               <p className="font-semibold text-gray-900 text-sm mb-4">Earnings</p>
               <div className="space-y-3">
-                {[
-                  { dot: COLOR,     label: "This month", value: formatCurrency(monthEarnings), bold: false },
-                  { dot: "#D97706", label: "Pending",    value: formatCurrency(pendingPayout), bold: true, valueColor: "#D97706" },
-                  { dot: "#9CA3AF", label: "All-time",   value: formatCurrency(totalEarnings), bold: false },
-                ].map(({ dot, label, value, bold, valueColor }) => (
-                  <div key={label} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dot }} />
-                      <span className="text-xs text-gray-500">{label}</span>
-                    </div>
-                    <span className={cn("text-sm font-bold", bold ? "" : "text-gray-900")} style={valueColor ? { color: valueColor } : {}}>
-                      {value}
-                    </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#0EA5E9] shrink-0" />
+                    <span className="text-xs text-gray-500">This month</span>
                   </div>
-                ))}
+                  <span className="text-sm font-bold text-gray-900 tabular-nums">{formatCurrency(monthEarnings)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                    <span className="text-xs text-gray-500">Pending</span>
+                  </div>
+                  <span className="text-sm font-bold text-amber-600 tabular-nums">{formatCurrency(pendingPayout)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-300 shrink-0" />
+                    <span className="text-xs text-gray-500">All-time</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900 tabular-nums">{formatCurrency(totalEarnings)}</span>
+                </div>
               </div>
-              <Link href="/editor/payouts" className="mt-4 flex items-center justify-between text-xs font-semibold hover:underline" style={{ color: COLOR }}>
+              <Link href="/editor/payouts"
+                className="mt-4 flex items-center justify-between text-xs font-semibold text-[#0EA5E9] hover:underline">
                 View payouts <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -605,8 +731,8 @@ export default async function EditorDashboardPage() {
                 ].map(({ href, icon: Icon, label, sub }) => (
                   <Link key={href} href={href}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${COLOR}10` }}>
-                      <Icon className="w-4 h-4" style={{ color: COLOR }} />
+                    <div className="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+                      <Icon className="w-4 h-4 text-[#0EA5E9]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-800">{label}</p>

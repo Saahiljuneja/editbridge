@@ -21,9 +21,9 @@ export function ProfileScoreCard({ score, maxScore, items, variant = "full" }: P
     return (
       <Link
         href="/editor/profile"
-        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-600 hover:border-[#0EA5E9]/30 hover:text-[#0EA5E9] transition-colors shadow-sm"
+        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-xs font-semibold text-gray-600 hover:border-[var(--brand-client)]/30 hover:text-[var(--brand-client)] transition-colors shadow-sm"
       >
-        <Sparkles className="w-3.5 h-3.5 text-[#0EA5E9]" />
+        <Sparkles className="w-3.5 h-3.5 text-[var(--brand-client)]" />
         Profile score: {pct}%
       </Link>
     );
@@ -32,7 +32,7 @@ export function ProfileScoreCard({ score, maxScore, items, variant = "full" }: P
   const incomplete = items.filter((i) => !i.completed);
   const complete = items.filter((i) => i.completed);
 
-  const barColor = pct >= 70 ? "#10B981" : pct >= 40 ? "#0EA5E9" : "#F59E0B";
+  const barColor = pct >= 70 ? "#10B981" : pct >= 40 ? "var(--brand-client)" : "#F59E0B";
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
@@ -73,7 +73,7 @@ export function ProfileScoreCard({ score, maxScore, items, variant = "full" }: P
             <span className="w-4 h-4 rounded-full bg-red-50 border border-red-100 flex items-center justify-center shrink-0">
               <X className="w-2.5 h-2.5 text-red-400" strokeWidth={3} />
             </span>
-            <span className="flex-1 text-xs text-gray-700 font-medium group-hover:text-[#0EA5E9] transition-colors">{item.label}</span>
+            <span className="flex-1 text-xs text-gray-700 font-medium group-hover:text-[var(--brand-client)] transition-colors">{item.label}</span>
             <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full whitespace-nowrap">
               +{item.points}%
             </span>

@@ -144,7 +144,7 @@ export default function EditorSignupPage() {
         <label className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200 cursor-pointer">
           <input
             type="checkbox"
-            className="mt-0.5 accent-[#0EA5E9]"
+            className="mt-0.5 accent-[var(--brand-client)]"
             checked={kycAcknowledged}
             onChange={(e) => { setKycAcknowledged(e.target.checked); setErrors((p) => ({ ...p, kyc: "" })); }}
           />
@@ -154,7 +154,7 @@ export default function EditorSignupPage() {
         </label>
         {errors.kyc && <p className="text-xs text-red-500">{errors.kyc}</p>}
 
-        <Button type="submit" className="w-full bg-[#0EA5E9] hover:bg-[#3b31a0]" disabled={loading}>
+        <Button type="submit" className="w-full bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]" disabled={loading}>
           {loading ? "Creating account…" : "Create editor account"}
         </Button>
 
@@ -168,7 +168,7 @@ export default function EditorSignupPage() {
 
       <p className="mt-6 text-center text-sm text-gray-500">
         Already have an account?{" "}
-        <Link href="/login" className="text-[#0EA5E9] font-medium hover:underline">Sign in</Link>
+        <Link href="/login" className="text-[var(--brand-client)] font-medium hover:underline">Sign in</Link>
       </p>
     </>
   );

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -24,18 +24,18 @@ const publicLinks = [
 ];
 
 const clientLinks = [
-  { href: "/dashboard",       label: "Dashboard" },
+  { href: "/client/dashboard",       label: "Dashboard" },
   { href: "/feed",            label: "Feed" },
-  { href: "/browse",          label: "Browse Editors" },
+  { href: "/client/browse",          label: "Browse Editors" },
   { href: "/find-editor",     label: "Find an Editor", flag: "find_editor_quiz" as const },
-  { href: "/orders",          label: "My Orders" },
-  { href: "/messages",        label: "Messages" },
-  { href: "/saved",            label: "Saved Editors" },
-  { href: "/saved-portfolio",  label: "Saved Portfolio" },
-  { href: "/analytics",       label: "Analytics" },
-  { href: "/notifications",   label: "Notifications" },
-  { href: "/settings",        label: "Settings" },
-  { href: "/help",            label: "Help & FAQ" },
+  { href: "/client/orders",          label: "My Orders" },
+  { href: "/client/messages",        label: "Messages" },
+  { href: "/client/saved",            label: "Saved Editors" },
+  { href: "/client/saved-portfolio",  label: "Saved Portfolio" },
+  { href: "/client/analytics",       label: "Analytics" },
+  { href: "/client/notifications",   label: "Notifications" },
+  { href: "/client/settings",        label: "Settings" },
+  { href: "/client/help",            label: "Help & FAQ" },
 ];
 
 const editorLinks = [
@@ -111,11 +111,11 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <Link href="/" onClick={onClose} className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
               <span className="text-white font-extrabold text-xs">E</span>
             </div>
             <span className="text-lg font-extrabold text-gray-900">
-              Edit<span className="text-[#0EA5E9]">Bridge</span>
+              Edit<span className="text-[var(--brand-client)]">Bridge</span>
             </span>
           </Link>
           <button onClick={onClose} className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
@@ -126,7 +126,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         {/* User strip (when signed in) */}
         {session && (
           <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0EA5E9] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+            <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
               {session.user?.image
                 // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
@@ -137,7 +137,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               <p className="text-sm font-semibold text-gray-900 truncate">{session.user?.name}</p>
               <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
             </div>
-            <span className="shrink-0 text-[10px] font-bold text-[#0EA5E9] bg-[#0EA5E9]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">
+            <span className="shrink-0 text-[10px] font-bold text-[var(--brand-client)] bg-[var(--brand-client)]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">
               {roleLabel}
             </span>
           </div>
@@ -146,7 +146,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
           {links.map(({ href, label }) => {
-            const active = href === "/dashboard" || href === "/editor/dashboard" || href === "/admin/dashboard"
+            const active = href === "/client/dashboard" || href === "/editor/dashboard" || href === "/admin/dashboard"
               ? pathname === href
               : pathname.startsWith(href);
             return (
@@ -157,7 +157,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 className={cn(
                   "flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                   active
-                    ? "bg-[#0EA5E9]/10 text-[#0EA5E9]"
+                    ? "bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
                     : "text-gray-700 hover:bg-gray-100"
                 )}
               >
@@ -183,7 +183,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               <Link
                 href="/signup/editor"
                 onClick={onClose}
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[#0EA5E9] border border-[#0EA5E9]/25 bg-[#0EA5E9]/5 hover:bg-[#0EA5E9]/10 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[var(--brand-client)] border border-[var(--brand-client)]/25 bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors"
               >
                 <Sparkles className="w-4 h-4" />
                 Become an Editor
@@ -199,7 +199,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 <Link
                   href="/signup"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#0EA5E9] text-white hover:bg-[#3d34a0] transition-colors text-center"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-[var(--brand-client)] text-white hover:bg-[var(--brand-editor-hover)] transition-colors text-center"
                 >
                   Sign up
                 </Link>

@@ -95,7 +95,7 @@ export function RevenueClient({ payouts }: { payouts: Payout[] }) {
         <div className="flex items-center gap-3 mb-3">
           <button onClick={toggleAll} className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
             {selected.size === pending.length && pending.length > 0
-              ? <CheckSquare className="w-4 h-4 text-[#0EA5E9]" />
+              ? <CheckSquare className="w-4 h-4 text-[var(--brand-client)]" />
               : <Square className="w-4 h-4" />}
             {selected.size === pending.length && pending.length > 0 ? "Deselect all" : "Select all pending"}
           </button>
@@ -130,7 +130,7 @@ export function RevenueClient({ payouts }: { payouts: Payout[] }) {
                   {row.status === "pending" && (
                     <button onClick={() => toggle(row.id)} className="flex items-center justify-center">
                       {selected.has(row.id)
-                        ? <CheckSquare className="w-4 h-4 text-[#0EA5E9]" />
+                        ? <CheckSquare className="w-4 h-4 text-[var(--brand-client)]" />
                         : <Square className="w-4 h-4 text-gray-300 dark:text-gray-600" />}
                     </button>
                   )}

@@ -77,7 +77,7 @@ export function OrderTimeline({ status, timestamps, approvedExtensionDays }: Ord
         {/* Filled connector line */}
         {current > 0 && (
           <div
-            className="absolute top-4 h-0.5 bg-[#0EA5E9] transition-all duration-500"
+            className="absolute top-4 h-0.5 bg-[var(--brand-client)] transition-all duration-500"
             style={{
               left: "16px",
               width: `calc(${(current / (STEPS.length - 1)) * 100}% - 32px)`,
@@ -104,14 +104,14 @@ export function OrderTimeline({ status, timestamps, approvedExtensionDays }: Ord
               {/* Circle */}
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all bg-white",
-                done  ? "bg-[#0EA5E9] border-[#0EA5E9]" :
-                active ? "border-[#0EA5E9]" :
+                done  ? "bg-[var(--brand-client)] border-[var(--brand-client)]" :
+                active ? "border-[var(--brand-client)]" :
                         "border-gray-200"
               )}>
                 {done
                   ? <CheckCircle2 className="w-4 h-4 text-white" />
                   : active
-                  ? <div className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9]" />
+                  ? <div className="w-2.5 h-2.5 rounded-full bg-[var(--brand-client)]" />
                   : <div className="w-2.5 h-2.5 rounded-full bg-gray-200" />
                 }
               </div>
@@ -119,7 +119,7 @@ export function OrderTimeline({ status, timestamps, approvedExtensionDays }: Ord
               {/* Label */}
               <span className={cn(
                 "text-[11px] font-semibold leading-tight text-center",
-                done ? "text-gray-700" : active ? "text-[#0EA5E9]" : "text-gray-400"
+                done ? "text-gray-700" : active ? "text-[var(--brand-client)]" : "text-gray-400"
               )}>
                 {step.label}
                 {status === "revision_requested" && step.key === "in_progress" && (

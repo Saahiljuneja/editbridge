@@ -19,7 +19,7 @@ const STYLES = `
     -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
   }
   .ch-brand-text {
-    background: linear-gradient(135deg, #0EA5E9 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, var(--brand-client) 0%, var(--brand-editor) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text; transform: translateZ(0);
   }
@@ -52,7 +52,7 @@ const STYLES = `
       inset 0 1px 1px rgba(255,255,255,0.18);
   }
   .ch-btn-primary {
-    background: linear-gradient(180deg, #0EA5E9 0%, #0284C7 100%);
+    background: linear-gradient(180deg, var(--brand-client) 0%, #0284C7 100%);
     box-shadow: 0 0 0 1px rgba(14,165,233,0.3), 0 12px 24px -4px rgba(14,165,233,0.45),
       inset 0 1px 1px rgba(255,255,255,0.3);
     transition: all 0.3s cubic-bezier(0.25,1,0.5,1); color: white;
@@ -73,7 +73,7 @@ const STYLES = `
 `;
 
 const MOCK_EDITORS = [
-  { initials: "AM", name: "Arjun M.", role: "YouTube Long-form", rating: 4.9, price: "₹3,500", col: "#7c3aed", orders: 42 },
+  { initials: "AM", name: "Arjun M.", role: "YouTube Long-form", rating: 4.9, price: "₹3,500", col: "var(--brand-editor)", orders: 42 },
   { initials: "PS", name: "Priya S.", role: "Thumbnails & Design", rating: 5.0, price: "₹1,200", col: "#059669", orders: 28 },
   { initials: "RK", name: "Rahul K.", role: "Reels & Short-form", rating: 4.8, price: "₹2,000", col: "#ea580c", orders: 35 },
 ];
@@ -192,7 +192,7 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
 
       {/* Background taglines */}
       <div className="ch-tag-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-full px-4 pointer-events-none">
-        <p className="ch-tag1 text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.4em] mb-7">EditBridge</p>
+        <p className="ch-tag1 text-[11px] font-black text-[var(--brand-client)] uppercase tracking-[0.4em] mb-7">EditBridge</p>
         <h1 className="ch-tag1 text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-3 text-gray-900">
           Find your perfect
         </h1>
@@ -214,7 +214,7 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
 
           {/* CTA — inside card, above content, appears in phase 6 */}
           <div className="ch-cta absolute inset-0 z-[60] flex flex-col items-center justify-center text-center px-6 pointer-events-auto">
-            <p className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.4em] mb-7">Ready to get started?</p>
+            <p className="text-[11px] font-black text-[var(--brand-client)] uppercase tracking-[0.4em] mb-7">Ready to get started?</p>
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight text-white leading-tight">
               Your next video.<br />
               <span className="ch-cta-silver">Professionally edited.</span>
@@ -237,10 +237,10 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
             {/* LEFT */}
             <div className="ch-left-col hidden lg:flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-7">
-                <div className="w-6 h-6 rounded-lg bg-[#0EA5E9] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
                   <ShieldCheck className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="text-[11px] font-black text-[#0EA5E9] uppercase tracking-[0.28em]">EditBridge</span>
+                <span className="text-[11px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">EditBridge</span>
               </div>
               <h3 className="text-white text-3xl lg:text-[2.4rem] font-black leading-tight mb-3">
                 India&apos;s #1<br />Video Editing<br />Marketplace
@@ -279,12 +279,12 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                       <Search className="w-3.5 h-3.5 text-gray-500 shrink-0" />
                       <span className="text-xs text-gray-500">YouTube video editor...</span>
                     </div>
-                    <div className="bg-[#0EA5E9] rounded-xl px-4 py-2.5 text-xs font-bold text-white shrink-0">Search</div>
+                    <div className="bg-[var(--brand-client)] rounded-xl px-4 py-2.5 text-xs font-bold text-white shrink-0">Search</div>
                   </div>
                   <div className="flex gap-2 mb-4">
                     {["All", "YouTube", "Reels", "Thumbnails"].map((f, i) => (
                       <span key={f}
-                        className={`text-[10px] font-semibold px-3 py-1 rounded-full shrink-0 ${i === 0 ? "bg-[#0EA5E9] text-white" : "text-gray-400 border border-white/[0.08]"}`}
+                        className={`text-[10px] font-semibold px-3 py-1 rounded-full shrink-0 ${i === 0 ? "bg-[var(--brand-client)] text-white" : "text-gray-400 border border-white/[0.08]"}`}
                         style={i !== 0 ? { background: "rgba(255,255,255,0.04)" } : {}}>
                         {f}
                       </span>
@@ -300,7 +300,7 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
                             <p className="text-xs font-bold text-white truncate">{e.name}</p>
-                            <span className="text-[8px] text-[#0EA5E9] border border-[#0EA5E9]/25 rounded-full px-1.5 py-0.5 shrink-0"
+                            <span className="text-[8px] text-[var(--brand-client)] border border-[var(--brand-client)]/25 rounded-full px-1.5 py-0.5 shrink-0"
                               style={{ background: "rgba(14,165,233,0.1)" }}>KYC</span>
                           </div>
                           <p className="text-[10px] text-gray-500 truncate">{e.role}</p>
@@ -319,7 +319,7 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
               <div className="ch-badge ch-glass absolute -top-5 -left-5 lg:-left-10 rounded-xl p-3 flex items-center gap-3 z-30">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                   style={{ background: "rgba(14,165,233,0.18)", border: "1px solid rgba(14,165,233,0.3)" }}>
-                  <ShieldCheck className="w-4 h-4 text-[#0EA5E9]" />
+                  <ShieldCheck className="w-4 h-4 text-[var(--brand-client)]" />
                 </div>
                 <div>
                   <p className="text-white text-xs font-bold leading-tight">KYC Verified</p>
@@ -346,7 +346,7 @@ export function CinematicHero({ editorCount = 100, completedOrders = 0, availabl
               <div className="space-y-3">
                 {["KYC-verified identity", "Escrow payment", "Dispute protection", "Revisions included", "Starting ₹299"].map(text => (
                   <p key={text} className="text-xs text-gray-400 font-medium flex items-center justify-end gap-2">
-                    <span className="text-[#0EA5E9] font-black text-sm">✓</span> {text}
+                    <span className="text-[var(--brand-client)] font-black text-sm">✓</span> {text}
                   </p>
                 ))}
               </div>

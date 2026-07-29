@@ -150,7 +150,7 @@ export default function AdminBroadcastPage() {
       {/* Compose */}
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center gap-2">
-          <Megaphone className="w-4 h-4 text-[#0EA5E9]" />
+          <Megaphone className="w-4 h-4 text-[var(--brand-client)]" />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white text-sm">Send notification</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Delivered as an in-app notification to all matched users.</p>
@@ -162,29 +162,29 @@ export default function AdminBroadcastPage() {
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input required value={title} onChange={e => setTitle(e.target.value)}
                 placeholder="e.g. Platform update available"
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30" />
             </div>
             <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Message</label>
               <textarea required rows={3} value={body} onChange={e => setBody(e.target.value)}
                 placeholder="Your message to users…"
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30 resize-none" />
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30 resize-none" />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Target audience</label>
               <select value={targetRole} onChange={e => setTargetRole(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30">
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30">
                 {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Link (optional)</label>
               <input value={link} onChange={e => setLink(e.target.value)} placeholder="/editor/dashboard"
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30" />
             </div>
           </div>
           <button type="submit" disabled={sending}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0EA5E9] text-white text-sm font-semibold hover:bg-[#3d34a0] disabled:opacity-50 transition-colors">
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-editor-hover)] disabled:opacity-50 transition-colors">
             <Send className="w-4 h-4" />
             {sending ? "Sending…" : "Send notification"}
           </button>
@@ -213,14 +213,14 @@ export default function AdminBroadcastPage() {
                   /* Edit form */
                   <div className="space-y-3">
                     <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                      className="w-full rounded-xl border border-[#0EA5E9]/30 px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20" />
+                      className="w-full rounded-xl border border-[var(--brand-client)]/30 px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20" />
                     <textarea rows={3} value={editBody} onChange={e => setEditBody(e.target.value)}
-                      className="w-full rounded-xl border border-[#0EA5E9]/30 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20" />
+                      className="w-full rounded-xl border border-[var(--brand-client)]/30 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20" />
                     <input value={editLink} onChange={e => setEditLink(e.target.value)} placeholder="Link (optional)"
-                      className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20" />
+                      className="w-full rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20" />
                     <div className="flex gap-2">
                       <button onClick={handleEdit} disabled={saving}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0EA5E9] text-white text-xs font-semibold disabled:opacity-50">
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--brand-client)] text-white text-xs font-semibold disabled:opacity-50">
                         <Check className="w-3.5 h-3.5" /> {saving ? "Saving…" : "Save changes"}
                       </button>
                       <button onClick={() => setEditId(null)}
@@ -251,7 +251,7 @@ export default function AdminBroadcastPage() {
 
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => startEdit(b)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:border-[#0EA5E9]/30 hover:text-[#0EA5E9] transition-colors">
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:border-[var(--brand-client)]/30 hover:text-[var(--brand-client)] transition-colors">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       {deleteId === b.id ? (
@@ -288,7 +288,7 @@ export default function AdminBroadcastPage() {
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Month</label>
             <select value={reportMonth} onChange={e => setReportMonth(Number(e.target.value))}
-              className="rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30">
+              className="rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30">
               {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
             </select>
           </div>
@@ -296,7 +296,7 @@ export default function AdminBroadcastPage() {
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Year</label>
             <input type="number" value={reportYear} onChange={e => setReportYear(Number(e.target.value))}
               min={2024} max={now.getFullYear()}
-              className="w-24 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30" />
+              className="w-24 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30" />
           </div>
           <a href={`/api/admin/export/report?year=${reportYear}&month=${reportMonth}`}
             className={cn(

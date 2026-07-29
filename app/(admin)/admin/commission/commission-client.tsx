@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -39,7 +39,7 @@ export function CommissionClient({ settings: initial }: { settings: Record<strin
 
   async function save() {
     const commPct = Number(settings.commission_rate_pct);
-    if (commPct < 0 || commPct > 50) { toast.error("Commission must be 0â€"50%"); return; }
+    if (commPct < 0 || commPct > 50) { toast.error("Commission must be 0-50%"); return; }
     const tdsPct = Number(settings.tds_rate_pct);
     if (![0, 10, 20].includes(tdsPct)) { toast.error("TDS must be 0, 10, or 20%"); return; }
 
@@ -106,7 +106,7 @@ export function CommissionClient({ settings: initial }: { settings: Record<strin
         <p className="font-semibold text-gray-900 dark:text-white text-sm mb-2">Per-editor overrides</p>
         <p className="text-sm text-gray-400 dark:text-gray-500">
           Custom commission rates for individual editors can be set on the editor&apos;s profile page under{" "}
-          <a href="/admin/users?role=editor" className="text-[#0EA5E9] hover:underline font-medium">Users &rarr; Editors</a>.
+          <a href="/admin/users?role=editor" className="text-[var(--brand-client)] hover:underline font-medium">Users &rarr; Editors</a>.
           The override there takes precedence over this global rate.
         </p>
       </div>

@@ -96,7 +96,7 @@ export function FilterPanel() {
           <SlidersHorizontal className="w-4 h-4 text-gray-500" />
           <span className="text-sm font-semibold text-gray-700">Filters</span>
           {activeCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-[#0EA5E9] text-white text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-[var(--brand-client)] text-white text-[10px] font-bold flex items-center justify-center">
               {activeCount}
             </span>
           )}
@@ -113,7 +113,7 @@ export function FilterPanel() {
         <select
           value={get("sort")}
           onChange={(e) => update("sort", e.target.value)}
-          className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 text-gray-700"
+          className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 text-gray-700"
         >
           <option value="">Most Popular</option>
           {SORT_OPTIONS.map((o) => (
@@ -136,8 +136,8 @@ export function FilterPanel() {
                 className={cn(
                   "px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors",
                   active
-                    ? "bg-[#0EA5E9] text-white border-[#0EA5E9]"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9]"
+                    ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)]"
                 )}
               >
                 {n.label}
@@ -161,8 +161,8 @@ export function FilterPanel() {
                 className={cn(
                   "px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors",
                   active
-                    ? "bg-[#0EA5E9] text-white border-[#0EA5E9]"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9]"
+                    ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)]"
                 )}
               >
                 {e.label}
@@ -184,7 +184,7 @@ export function FilterPanel() {
             onChange={(e) => setMinPrice(e.target.value)}
             onBlur={commitBudget}
             onKeyDown={(e) => e.key === "Enter" && commitBudget()}
-            className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-300"
+            className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 placeholder:text-gray-300"
           />
           <span className="text-gray-300 text-xs shrink-0">—</span>
           <input
@@ -194,7 +194,7 @@ export function FilterPanel() {
             onChange={(e) => setMaxPrice(e.target.value)}
             onBlur={commitBudget}
             onKeyDown={(e) => e.key === "Enter" && commitBudget()}
-            className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-300"
+            className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 placeholder:text-gray-300"
           />
         </div>
         <p className="text-[10px] text-gray-400 mt-1.5">Press Enter or click away to apply</p>
@@ -214,8 +214,8 @@ export function FilterPanel() {
                 className={cn(
                   "px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors",
                   active
-                    ? "bg-[#0EA5E9] text-white border-[#0EA5E9]"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9]"
+                    ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)]"
                 )}
               >
                 {d.label}
@@ -239,7 +239,7 @@ export function FilterPanel() {
                 className={cn(
                   "w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition-colors",
                   active
-                    ? "bg-[#0EA5E9]/8 border-[#0EA5E9]/30 text-[#0EA5E9]"
+                    ? "bg-[var(--brand-client)]/8 border-[var(--brand-client)]/30 text-[var(--brand-client)]"
                     : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                 )}
               >

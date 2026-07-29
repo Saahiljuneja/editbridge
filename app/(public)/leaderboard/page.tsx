@@ -19,7 +19,10 @@ const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; ic
   bronze:   { label: "Bronze",   color: "text-amber-700",  bg: "bg-amber-100",   icon: Medal   },
   silver:   { label: "Silver",   color: "text-slate-500",  bg: "bg-slate-100",   icon: Medal   },
   gold:     { label: "Gold",     color: "text-yellow-600", bg: "bg-yellow-100",  icon: Crown   },
-  platinum: { label: "Platinum", color: "text-purple-600", bg: "bg-purple-100",  icon: Zap     },
+  platinum: { label: "Platinum", color: "text-indigo-600", bg: "bg-indigo-100",  icon: Zap     },
+  diamond:  { label: "Diamond",  color: "text-cyan-600",   bg: "bg-cyan-100",    icon: Zap     },
+  master:   { label: "Master",   color: "text-purple-600", bg: "bg-purple-100",  icon: Crown   },
+  legend:   { label: "Legend",   color: "text-orange-700", bg: "bg-orange-100",  icon: Crown   },
 };
 
 // Rank score: 60% completion weight + 40% rating weight, bonus for high volume
@@ -111,7 +114,7 @@ export default async function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#1a1060] via-[#2d1b8e] to-[#0EA5E9] pt-16 pb-20 px-4">
+      <div className="bg-gradient-to-br from-[#1a1060] via-[#2d1b8e] to-[var(--brand-client)] pt-16 pb-20 px-4">
         <div className="px-8 py-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/80 text-xs font-medium mb-6">
             <Trophy className="w-3.5 h-3.5 text-yellow-300" />
@@ -182,7 +185,7 @@ export default async function LeaderboardPage() {
                       {ed.image ? (
                         <Image src={ed.image} alt={displayName(ed)} width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#7c6ff7] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--brand-client)] to-[#7c6ff7] flex items-center justify-center">
                           <span className="text-sm font-bold text-white">{displayName(ed)[0]?.toUpperCase()}</span>
                         </div>
                       )}
@@ -194,7 +197,7 @@ export default async function LeaderboardPage() {
 
                     {/* Name + title + niches */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 group-hover:text-[#0EA5E9] transition-colors truncate">
+                      <p className="text-sm font-semibold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors truncate">
                         {displayName(ed)}
                       </p>
                       {ed.title && <p className="text-xs text-gray-500 truncate">{ed.title}</p>}
@@ -312,7 +315,7 @@ function PodiumCard({
             />
           ) : (
             <div className={cn(
-              "rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#7c6ff7] flex items-center justify-center",
+              "rounded-full bg-gradient-to-br from-[var(--brand-client)] to-[#7c6ff7] flex items-center justify-center",
               rank === 1 ? "w-20 h-20" : "w-16 h-16"
             )}>
               <span className={cn("font-bold text-white", rank === 1 ? "text-2xl" : "text-xl")}>
@@ -328,7 +331,7 @@ function PodiumCard({
         </div>
 
         {/* Name */}
-        <p className={cn("font-bold text-gray-900 group-hover:text-[#0EA5E9] transition-colors mb-0.5", rank === 1 ? "text-base" : "text-sm")}>
+        <p className={cn("font-bold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors mb-0.5", rank === 1 ? "text-base" : "text-sm")}>
           {displayName}
         </p>
         {editor.title && <p className="text-xs text-gray-500 mb-2 truncate">{editor.title}</p>}

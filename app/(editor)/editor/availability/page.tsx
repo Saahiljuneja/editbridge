@@ -29,8 +29,8 @@ export default async function EditorAvailabilityPage() {
             <h1 className="text-xl font-bold text-gray-900">Availability</h1>
             <p className="text-sm text-gray-400 mt-0.5">Control whether clients can place new orders</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
-            <CalendarClock className="w-4 h-4 text-[#0EA5E9]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
+            <CalendarClock className="w-4 h-4 text-[var(--brand-client)]" />
           </div>
         </div>
       </div>

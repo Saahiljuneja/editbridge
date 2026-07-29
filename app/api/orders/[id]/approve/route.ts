@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { orders, payouts, editors, users, packages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notifyOrderCompleted, notifyInvoiceReady } from "@/lib/notifications";
-import { onEditorOrderCompleted, getAvailableCredits, consumeCredits } from "@/lib/rewards";
+import { onEditorOrderCompleted, onClientOrderCompleted, onRepeatClientPair, getAvailableCredits, consumeCredits } from "@/lib/rewards";
+import { maybeTriggerReferralReward } from "@/lib/referrals";
 import { createOrderEvent } from "@/lib/order-events";
 import { computeTdsForEditor } from "@/lib/tds";
 
@@ -99,6 +100,9 @@ export async function POST(
     const deliveredBeforeDeadline = order.deadline ? new Date() < new Date(order.deadline) : false;
     onEditorOrderCompleted(editor.userId, order.editorId, id, deliveredBeforeDeadline).catch(() => {});
   }
+  onClientOrderCompleted(order.clientId, id).catch(() => {});
+  onRepeatClientPair(order.clientId, order.editorId).catch(() => {});
+  maybeTriggerReferralReward(order.clientId, id).catch(() => {});
 
   // Notify editor of approval + scheduled payout date; also send invoice to both parties
   if (editor?.userId && pkg) {

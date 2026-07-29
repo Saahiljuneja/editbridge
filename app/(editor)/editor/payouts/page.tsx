@@ -138,11 +138,11 @@ export default async function EditorPayoutsPage() {
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-medium text-gray-500">This Month</p>
-              <div className="w-8 h-8 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-[#0EA5E9]" />
+              <div className="w-8 h-8 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-[var(--brand-client)]" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-[#0EA5E9]">{formatCurrency(thisMonth)}</p>
+            <p className="text-2xl font-bold text-[var(--brand-client)]">{formatCurrency(thisMonth)}</p>
             <p className="text-xs text-gray-400 mt-1">{now.toLocaleString("en-IN", { month: "long", year: "numeric" })}</p>
           </div>
         </div>
@@ -167,10 +167,10 @@ export default async function EditorPayoutsPage() {
         )}
 
         {/* Commission + TDS info */}
-        <div className="rounded-2xl border border-[#0EA5E9]/15 bg-[#0EA5E9]/5 px-5 py-4 space-y-1">
-          <p className="text-sm text-[#0EA5E9] font-medium">Platform commission: 15% · 7-day payout window</p>
-          <p className="text-xs text-[#0EA5E9]/70">Net payout = order amount − 15% commission − TDS (if applicable). Payment is initiated 7 days after client approves.</p>
-          <p className="text-xs text-[#0EA5E9]/60">TDS (Section 194J) is deducted at 10% once your annual earnings exceed ₹30,000. You can claim this as tax credit when filing your ITR.</p>
+        <div className="rounded-2xl border border-[var(--brand-client)]/15 bg-[var(--brand-client)]/5 px-5 py-4 space-y-1">
+          <p className="text-sm text-[var(--brand-client)] font-medium">Platform commission: 15% · 7-day payout window</p>
+          <p className="text-xs text-[var(--brand-client)]/70">Net payout = order amount − 15% commission − TDS (if applicable). Payment is initiated 7 days after client approves.</p>
+          <p className="text-xs text-[var(--brand-client)]/60">TDS (Section 194J) is deducted at 10% once your annual earnings exceed ₹30,000. You can claim this as tax credit when filing your ITR.</p>
         </div>
 
         {/* TDS summary banner — shown only once TDS has been deducted this FY */}
@@ -228,7 +228,7 @@ export default async function EditorPayoutsPage() {
                   return (
                     <tr key={row.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition-colors">
                       <td className="px-5 py-3.5">
-                        <Link href={`/editor/orders/${row.orderId}`} className="font-medium text-gray-900 hover:text-[#0EA5E9] hover:underline truncate max-w-[200px] block">
+                        <Link href={`/editor/orders/${row.orderId}`} className="font-medium text-gray-900 hover:text-[var(--brand-client)] hover:underline truncate max-w-[200px] block">
                           {row.packageTitle}
                         </Link>
                         {row.razorpayTransferId && (
@@ -247,7 +247,7 @@ export default async function EditorPayoutsPage() {
                           <span className="text-gray-300">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3.5 text-right tabular-nums font-bold text-[#0EA5E9]">
+                      <td className="px-4 py-3.5 text-right tabular-nums font-bold text-[var(--brand-client)]">
                         {formatCurrency(row.netAmount)}
                         {(row.bonusCredits ?? 0) > 0 && (
                           <span className="block text-[10px] text-amber-600 font-medium">

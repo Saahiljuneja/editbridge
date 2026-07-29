@@ -98,8 +98,8 @@ export default async function EditorClientsPage() {
             <h1 className="text-xl font-bold text-gray-900">Client Directory</h1>
             <p className="text-sm text-gray-400 mt-0.5">All clients who have worked with you</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
-            <Users className="w-4 h-4 text-[#0EA5E9]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
+            <Users className="w-4 h-4 text-[var(--brand-client)]" />
           </div>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default async function EditorClientsPage() {
           </div>
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Repeat Clients</p>
-            <p className="text-2xl font-bold text-[#0EA5E9] mt-1">{repeatClients}</p>
+            <p className="text-2xl font-bold text-[var(--brand-client)] mt-1">{repeatClients}</p>
             <p className="text-xs text-gray-400 mt-0.5">
               {totalClients > 0 ? Math.round((repeatClients / totalClients) * 100) : 0}% retention
             </p>
@@ -122,8 +122,8 @@ export default async function EditorClientsPage() {
 
         {clients.length === 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
-              <Users className="w-7 h-7 text-[#0EA5E9]" />
+            <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4">
+              <Users className="w-7 h-7 text-[var(--brand-client)]" />
             </div>
             <p className="font-semibold text-gray-800">No clients yet</p>
             <p className="text-sm text-gray-400 mt-1">Clients who place orders will appear here.</p>
@@ -165,12 +165,12 @@ export default async function EditorClientsPage() {
                       <span className="text-xs text-gray-600 font-medium">{client.orderCount} order{client.orderCount !== 1 ? "s" : ""}</span>
                     </div>
                     {client.completedCount > 0 && (
-                      <p className="text-xs font-semibold text-[#0EA5E9]">
+                      <p className="text-xs font-semibold text-[var(--brand-client)]">
                         ₹{((client.totalSpent) / 100).toLocaleString("en-IN")} earned
                       </p>
                     )}
                     {client.orderCount > 1 && (
-                      <span className="text-[10px] bg-[#0EA5E9]/10 text-[#0EA5E9] font-medium px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] bg-[var(--brand-client)]/10 text-[var(--brand-client)] font-medium px-2 py-0.5 rounded-full">
                         Repeat client
                       </span>
                     )}

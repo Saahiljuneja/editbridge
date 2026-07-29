@@ -46,29 +46,47 @@ interface CreditTx {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; border: string; bar: string; hex: string }> = {
-  bronze:   { label: "Bronze",   color: "text-amber-700",  bg: "bg-amber-50",   border: "border-amber-200",  bar: "bg-amber-500",   hex: "#B45309" },
-  silver:   { label: "Silver",   color: "text-slate-600",  bg: "bg-slate-100",  border: "border-slate-200",  bar: "bg-slate-400",   hex: "#475569" },
-  gold:     { label: "Gold",     color: "text-yellow-600", bg: "bg-yellow-50",  border: "border-yellow-200", bar: "bg-yellow-500",  hex: "#D97706" },
-  platinum: { label: "Platinum", color: "text-purple-700", bg: "bg-purple-50",  border: "border-purple-200", bar: "bg-purple-500",  hex: "#7C3AED" },
+  bronze:   { label: "Bronze",   color: "text-amber-700",   bg: "bg-amber-50",    border: "border-amber-200",   bar: "bg-amber-500",    hex: "#B45309" },
+  silver:   { label: "Silver",   color: "text-slate-600",   bg: "bg-slate-100",   border: "border-slate-200",   bar: "bg-slate-400",    hex: "#475569" },
+  gold:     { label: "Gold",     color: "text-yellow-600",  bg: "bg-yellow-50",   border: "border-yellow-200",  bar: "bg-yellow-500",   hex: "#D97706" },
+  platinum: { label: "Platinum", color: "text-indigo-700",  bg: "bg-indigo-50",   border: "border-indigo-200",  bar: "bg-indigo-500",   hex: "#4F46E5" },
+  diamond:  { label: "Diamond",  color: "text-cyan-700",    bg: "bg-cyan-50",     border: "border-cyan-200",    bar: "bg-cyan-500",     hex: "#0891B2" },
+  master:   { label: "Master",   color: "text-purple-700",  bg: "bg-purple-50",   border: "border-purple-200",  bar: "bg-purple-500",   hex: "#9333EA" },
+  legend:   { label: "Legend",   color: "text-orange-700",  bg: "bg-orange-50",   border: "border-orange-200",  bar: "bg-orange-500",   hex: "#DC2626" },
 };
 
-const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000 };
-const LEVEL_MAX:   Record<Level, number> = { bronze: 500, silver: 2000, gold: 5000, platinum: Infinity };
+const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000, diamond: 10000, master: 25000, legend: 50000 };
+const LEVEL_MAX:   Record<Level, number> = { bronze: 500, silver: 2000, gold: 5000, platinum: 10000, diamond: 25000, master: 50000, legend: Infinity };
 
 const LEVEL_PERKS: Record<Level, { title: string; perks: string[] }> = {
-  bronze:   { title: "Bronze",   perks: ["Up to 3 packages", "Standard visibility"] },
-  silver:   { title: "Silver",   perks: ["Up to 4 packages", "Silver badge on profile"] },
-  gold:     { title: "Gold",     perks: ["Up to 5 packages", "Featured in browse results", "Gold badge on profile"] },
-  platinum: { title: "Platinum", perks: ["Up to 5 packages", "Top placement in browse", "Priority support", "Custom profile banner"] },
+  bronze:   { title: "Bronze",   perks: ["Standard visibility"] },
+  silver:   { title: "Silver",   perks: ["Silver badge", "2% editor discount"] },
+  gold:     { title: "Gold",     perks: ["Featured in browse", "5% editor discount"] },
+  platinum: { title: "Platinum", perks: ["Top placement", "Custom banner", "10% discount"] },
+  diamond:  { title: "Diamond",  perks: ["Diamond placement", "Priority support", "15% discount"] },
+  master:   { title: "Master",   perks: ["Master badge", "Top-10 spotlight", "20% discount"] },
+  legend:   { title: "Legend",   perks: ["Top-3 spotlight", "25% discount", "Account manager"] },
 };
 
 const XP_REASON_LABELS: Record<string, string> = {
-  order_completed:   "Order completed",
-  early_delivery:    "Early delivery bonus",
-  five_star_review:  "5-star review received",
-  profile_completed: "Profile completed",
-  order_placed:      "Order placed",
-  review_left:       "Review left",
+  order_completed:           "Order completed",
+  order_placed:              "Order completed",   // legacy reason string
+  early_delivery:            "Early delivery bonus",
+  five_star_review:          "5-star review received",
+  review_received:           "Positive review received",
+  profile_completed:         "Profile completed",
+  review_left:               "Review left",
+  repeat_client_bonus:       "Repeat client bonus",
+  portfolio_added:           "Portfolio item added",
+  qa_answered:               "Answered client question",
+  order_streak_5:            "5-order win streak",
+  login_streak_7:            "7-day login streak",
+  late_delivery_penalty:     "Late delivery",
+  order_cancelled_penalty:   "Order cancelled",
+  spam_portfolio_penalty:    "Spam portfolio",
+  fake_review_penalty:       "Fake review",
+  chargeback_fraud_penalty:  "Chargeback fraud",
+  abusive_behavior_penalty:  "Abusive behaviour",
 };
 
 const ALL_BADGES: Record<string, { label: string; emoji: string; desc: string }> = {
@@ -113,7 +131,7 @@ function LevelCard({ data }: { data: RewardsData }) {
   const start = LEVEL_START[data.level];
   const max   = LEVEL_MAX[data.level];
   const progress = max === Infinity ? 100 : Math.min(100, ((data.xp - start) / (max - start)) * 100);
-  const levels: Level[] = ["bronze", "silver", "gold", "platinum"];
+  const levels: Level[] = ["bronze", "silver", "gold", "platinum", "diamond", "master", "legend"];
 
   return (
     <div className={cn("rounded-2xl border p-6", cfg.bg, cfg.border)}>
@@ -143,38 +161,40 @@ function LevelCard({ data }: { data: RewardsData }) {
       )}
 
       {/* Level track */}
-      <div className="flex items-center gap-1 mt-5">
-        {levels.map((l, i) => {
-          const c = LEVEL_CONFIG[l];
-          const isActive = l === data.level;
-          const isPast = levels.indexOf(data.level) > i;
-          return (
-            <div key={l} className="flex items-center flex-1">
-              <div className={cn(
-                "flex-1 rounded-full px-2 py-1 text-center text-[10px] font-bold transition-all",
-                isActive ? cn(c.bg, c.color, "ring-2", c.border, "shadow-sm") :
-                isPast   ? "bg-gray-100 text-gray-400 line-through" :
-                           "bg-gray-50 text-gray-300"
-              )}>
-                {c.label}
+      <div className="overflow-x-auto mt-5 pb-0.5">
+        <div className="flex items-center gap-1 min-w-max">
+          {levels.map((l, i) => {
+            const c = LEVEL_CONFIG[l];
+            const isActive = l === data.level;
+            const isPast = levels.indexOf(data.level) > i;
+            return (
+              <div key={l} className="flex items-center">
+                <div className={cn(
+                  "rounded-full px-2.5 py-1 text-center text-[10px] font-bold transition-all whitespace-nowrap",
+                  isActive ? cn(c.bg, c.color, "ring-2", c.border, "shadow-sm") :
+                  isPast   ? "bg-gray-100 text-gray-400 line-through" :
+                             "bg-gray-50 text-gray-300"
+                )}>
+                  {c.label}
+                </div>
+                {i < 6 && <ChevronRight className="w-3 h-3 text-gray-300 shrink-0 mx-0.5" />}
               </div>
-              {i < 3 && <ChevronRight className="w-3 h-3 text-gray-300 shrink-0" />}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
 
 function PerksCard({ level }: { level: Level }) {
-  const levels: Level[] = ["bronze", "silver", "gold", "platinum"];
+  const levels: Level[] = ["bronze", "silver", "gold", "platinum", "diamond", "master", "legend"];
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5">
       <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
         <Zap className="w-4 h-4 text-yellow-500" /> Level perks
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         {levels.map((l) => {
           const cfg = LEVEL_CONFIG[l];
           const perkDef = LEVEL_PERKS[l];
@@ -277,7 +297,9 @@ function HistoryPanel({ xpHistory, creditHistory }: { xpHistory: XpTx[]; creditH
                     <p className="text-xs text-gray-400">{timeAgo(tx.createdAt)}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-yellow-600">+{tx.amount} XP</span>
+                <span className={cn("text-sm font-bold", tx.amount < 0 ? "text-red-600" : "text-yellow-600")}>
+                  {tx.amount < 0 ? tx.amount : `+${tx.amount}`} XP
+                </span>
               </div>
             ))
           )
@@ -375,6 +397,30 @@ export function RewardsPage() {
 
       {/* Badges grid */}
       <BadgesGrid data={data} />
+
+      {/* How to earn XP */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-5">
+        <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <Zap className="w-4 h-4 text-yellow-500" /> How to earn XP
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {[
+            { emoji: "🎬", label: "Order completed",      xp: "+20 XP",  note: "Earned when delivery is approved" },
+            { emoji: "✍️", label: "Leave a review",       xp: "+20 XP",  note: "1 per order · only after payment released" },
+            { emoji: "🤝", label: "Repeat client bonus",  xp: "+30 XP",  note: "3rd completed order with same editor" },
+            { emoji: "📅", label: "7-day login streak",   xp: "+25 XP",  note: "Log in 7 days in a row · also for editors" },
+          ].map(({ emoji, label, xp, note }) => (
+            <div key={label} className="rounded-xl border border-gray-100 bg-gray-50/50 p-4 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{emoji}</span>
+                <p className="text-xs font-semibold text-gray-800 leading-snug">{label}</p>
+              </div>
+              <p className="text-[10px] text-gray-400 leading-snug">{note}</p>
+              <span className="text-sm font-black text-[var(--brand-client)]">{xp}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* History */}
       <div>

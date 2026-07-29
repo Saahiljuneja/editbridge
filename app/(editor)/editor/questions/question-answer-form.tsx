@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const COLOR = "#0EA5E9";
+const COLOR = "var(--brand-client)";
 
 export function QuestionAnswerForm({ questionId }: { questionId: string }) {
   const router = useRouter();

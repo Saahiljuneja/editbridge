@@ -17,14 +17,12 @@ export default async function ClientLayout({
   if (role === "admin" || role?.startsWith("staff_")) redirect("/admin/dashboard");
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <ClientSidebar
-          userName={session.user.name ?? ""}
-          userImage={session.user.image ?? null}
-        />
-        <main className="flex-1 min-w-0">{children}</main>
-      </div>
+    <div className="h-screen overflow-hidden flex">
+      <ClientSidebar
+        userName={session.user.name ?? ""}
+        userImage={session.user.image ?? null}
+      />
+      <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">{children}</main>
       <PushPermissionPrompt />
     </div>
   );

@@ -9,6 +9,7 @@ import { assertPermission } from "@/lib/rbac";
 import { logAction } from "@/lib/audit";
 import { z } from "zod";
 import type { UserRole } from "@/types";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 const schema = z.object({
   action: z.enum(["approve", "reject", "expire"]),
@@ -69,6 +70,7 @@ export async function PATCH(
       entityId: id,
       metadata: { editorId: application.editorId },
     });
+    revalidatePublicPagesCache();
     return NextResponse.json({ success: true });
   }
 
@@ -145,5 +147,6 @@ export async function PATCH(
     metadata: { editorId: application.editorId, rejectionReason: rejectionReason ?? null },
   });
 
+  revalidatePublicPagesCache();
   return NextResponse.json({ success: true });
 }

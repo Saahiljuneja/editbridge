@@ -31,7 +31,7 @@ export function PageHero({
   badge,
   title,
   subtitle,
-  accentColor = "#0EA5E9",
+  accentColor = "var(--brand-client)",
 }: {
   badge: string;
   title: string;

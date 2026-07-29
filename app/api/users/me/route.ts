@@ -6,6 +6,7 @@ import { onEditorProfileUpdated } from "@/lib/rewards";
 import { deleteFile } from "@/lib/r2";
 import { getEmbedUrl } from "@/lib/portfolio-media";
 import { eq, and, inArray } from "drizzle-orm";
+import { revalidatePublicPagesCache } from "@/lib/revalidate";
 
 function keyFromUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -103,9 +104,9 @@ export async function PATCH(request: NextRequest) {
       (f?.question && hasContactInfo(f.question)) || (f?.answer && hasContactInfo(f.answer))))
       return NextResponse.json({ error: "FAQ questions and answers cannot contain contact information." }, { status: 422 });
 
-    // Featured video must be a real YouTube/Vimeo URL, not arbitrary text.
+    // Featured video must be a real YouTube, Vimeo, or Google Drive URL, not arbitrary text.
     if (featuredVideoUrl && !getEmbedUrl(String(featuredVideoUrl)))
-      return NextResponse.json({ error: "Featured video must be a valid YouTube or Vimeo URL." }, { status: 422 });
+      return NextResponse.json({ error: "Featured video must be a valid YouTube, Vimeo, or Google Drive URL." }, { status: 422 });
 
     const editorUpdates: Record<string, unknown> = { updatedAt: new Date() };
     if (bio !== undefined) editorUpdates.bio = bio || null;
@@ -161,6 +162,7 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
+  revalidatePublicPagesCache();
   return NextResponse.json({ success: true });
 }
 

@@ -15,11 +15,29 @@ const DASHBOARD: Record<string, string> = {
   staff_moderation: "/admin/dashboard",
 };
 
-export async function GET(req: NextRequest) {
-  const token = req.nextUrl.searchParams.get("token");
+export async function POST(req: NextRequest) {
+  const contentType = req.headers.get("content-type") || "";
+  let token = "";
+  if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
+    const formData = await req.formData();
+    token = formData.get("token") as string;
+  } else {
+    const body = await req.json().catch(() => ({}));
+    token = body.token;
+  }
+
   if (!token) return NextResponse.json({ error: "Missing token" }, { status: 400 });
 
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    console.error(
+      "[impersonate-switch] Security configuration error: AUTH_SECRET / NEXTAUTH_SECRET is empty or not set."
+    );
+    return NextResponse.json(
+      { error: "Server misconfiguration: Authentication secret not configured" },
+      { status: 500 }
+    );
+  }
 
   // Validate signature
   const parts = token.split(".");

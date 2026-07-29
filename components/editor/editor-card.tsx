@@ -152,7 +152,7 @@ export function EditorCard({
         {niches.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
             {niches.slice(0, 2).map((n) => (
-              <span key={n} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/15">
+              <span key={n} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
                 {n}
               </span>
             ))}
@@ -165,7 +165,7 @@ export function EditorCard({
         {/* Skills */}
         <div className="flex flex-wrap gap-1 mb-3">
           {skills.slice(0, 3).map((skill) => (
-            <span key={skill} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#0EA5E9]/8 text-[#0EA5E9] border border-[#0EA5E9]/15">
+            <span key={skill} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
               {skill}
             </span>
           ))}
@@ -212,7 +212,7 @@ export function EditorCard({
           <Link
             href={`/editor/${id}`}
             className="px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors"
-            style={{ background: "#0EA5E9" }}
+            style={{ background: "var(--brand-client)" }}
           >
             View Profile
           </Link>

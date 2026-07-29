@@ -3,9 +3,13 @@ import * as React from "react";
 export function VerifyEmailTemplate({
   name,
   verifyUrl,
+  platformName = "EditBridge",
+  emailHeaderColor = "#07050f",
 }: {
   name: string;
   verifyUrl: string;
+  platformName?: string;
+  emailHeaderColor?: string;
 }) {
   return (
     <html>
@@ -20,9 +24,9 @@ export function VerifyEmailTemplate({
               <table width="100%" cellPadding={0} cellSpacing={0} style={{ maxWidth: 520, backgroundColor: "#ffffff", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
                 {/* Header */}
                 <tr>
-                  <td style={{ backgroundColor: "#07050f", padding: "32px 40px" }}>
+                  <td style={{ backgroundColor: emailHeaderColor, padding: "32px 40px" }}>
                     <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#ffffff", letterSpacing: "-0.5px" }}>
-                      Edit<span style={{ color: "#8B7FE8" }}>Bridge</span>
+                      {platformName}
                     </p>
                   </td>
                 </tr>
@@ -70,7 +74,7 @@ export function VerifyEmailTemplate({
                 <tr>
                   <td style={{ backgroundColor: "#f9fafb", padding: "20px 40px", borderTop: "1px solid #f3f4f6" }}>
                     <p style={{ margin: 0, fontSize: 11, color: "#d1d5db", textAlign: "center" }}>
-                      EditBridge · India&apos;s video editing marketplace
+                      {platformName} · India&apos;s video editing marketplace
                     </p>
                   </td>
                 </tr>

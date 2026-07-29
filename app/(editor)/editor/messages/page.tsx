@@ -1,22 +1,22 @@
-﻿import { auth } from "@/lib/auth";
+export const dynamic = "force-dynamic";
+
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { MessageSquare, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { db } from "@/lib/db";
 import { orders, packages, users, messages } from "@/lib/db/schema";
 import { eq, desc, sql, ne, and } from "drizzle-orm";
 import { displayNameFromFull, formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
-  pending:            { label: "Pending",    color: "text-zinc-500",   dot: "bg-zinc-300" },
-  in_progress:        { label: "Active",     color: "text-blue-600",   dot: "bg-blue-400" },
-  delivered:          { label: "Delivered",  color: "text-blue-600",   dot: "bg-blue-400" },
-  revision_requested: { label: "Revision",   color: "text-amber-600",  dot: "bg-amber-400" },
-  completed:          { label: "Completed",  color: "text-green-600",  dot: "bg-green-400" },
-  cancelled:          { label: "Cancelled",  color: "text-red-500",    dot: "bg-red-400" },
+const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
+  pending:            { label: "Pending",    dot: "bg-gray-400"    },
+  in_progress:        { label: "Active",     dot: "bg-[#0EA5E9]"   },
+  delivered:          { label: "Delivered",  dot: "bg-violet-500"  },
+  revision_requested: { label: "Revision",   dot: "bg-amber-500"   },
+  completed:          { label: "Completed",  dot: "bg-emerald-500" },
+  cancelled:          { label: "Cancelled",  dot: "bg-gray-300"    },
 };
 
 export default async function EditorMessagesPage() {
@@ -43,7 +43,6 @@ export default async function EditorMessagesPage() {
     .orderBy(desc(orders.updatedAt))
     .limit(50);
 
-  // For each order, fetch last message + unread count
   const orderIds = rows.map(r => r.orderId);
 
   let lastMessages: { orderId: string; content: string; senderId: string; createdAt: Date }[] = [];
@@ -73,6 +72,7 @@ export default async function EditorMessagesPage() {
     if (!lastMsgByOrder.has(msg.orderId)) lastMsgByOrder.set(msg.orderId, msg);
   }
   const unreadByOrder = new Map(unreadCounts.map(r => [r.orderId, r.count]));
+  const totalUnread = unreadCounts.reduce((s, r) => s + r.count, 0);
 
   const active  = rows.filter(r => !["completed", "cancelled"].includes(r.status));
   const archive = rows.filter(r =>  ["completed", "cancelled"].includes(r.status));
@@ -82,23 +82,32 @@ export default async function EditorMessagesPage() {
     const lastMsg = lastMsgByOrder.get(row.orderId);
     const unread  = unreadByOrder.get(row.orderId) ?? 0;
     const isMine  = lastMsg?.senderId === userId;
+    const name    = displayNameFromFull(row.clientName);
+    const initials = (row.clientName ?? "").split(" ").filter(Boolean).map((w: string) => w[0]).slice(0, 2).join("").toUpperCase() || "C";
 
     return (
       <Link
         href={`/editor/messages/${row.orderId}`}
-        className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors"
+        className={cn("flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors", unread > 0 && "bg-sky-50/40")}
       >
-        <div className={cn(
-          "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
-          unread > 0 ? "bg-[#0EA5E9] text-white" : "bg-[#0EA5E9]/10 text-[#0EA5E9]"
-        )}>
-          {displayNameFromFull(row.clientName ?? "C").slice(0, 1).toUpperCase()}
+        <div className="relative shrink-0">
+          <div className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold",
+            unread > 0 ? "bg-[#0EA5E9] text-white" : "bg-[#0EA5E9]/10 text-[#0EA5E9]"
+          )}>
+            {initials}
+          </div>
+          {unread > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#0EA5E9] border-2 border-white text-white text-[9px] font-bold flex items-center justify-center">
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-0.5">
             <p className={cn("text-sm truncate", unread > 0 ? "font-semibold text-gray-900" : "font-medium text-gray-800")}>
-              {displayNameFromFull(row.clientName ?? "Client")}
+              {name}
             </p>
             <span className="text-[10px] text-gray-400 shrink-0 whitespace-nowrap">
               {lastMsg ? formatDate(lastMsg.createdAt) : formatDate(row.updatedAt)}
@@ -123,7 +132,7 @@ export default async function EditorMessagesPage() {
           ) : (
             <span className="w-2 h-2" />
           )}
-          <span className={cn("flex items-center gap-1 text-[10px] font-medium", cfg.color)}>
+          <span className="flex items-center gap-1 text-[10px] font-medium text-gray-400">
             <span className={cn("w-1.5 h-1.5 rounded-full", cfg.dot)} />
             {cfg.label}
           </span>
@@ -134,12 +143,14 @@ export default async function EditorMessagesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6 flex items-center justify-between">
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-3xl mx-auto px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Messages</h1>
             <p className="text-sm text-gray-400 mt-0.5">
-              {rows.length === 0 ? "No conversations yet" : `${rows.length} conversation${rows.length !== 1 ? "s" : ""}`}
+              {rows.length === 0
+                ? "No conversations yet"
+                : `${rows.length} conversation${rows.length !== 1 ? "s" : ""}${totalUnread > 0 ? ` · ${totalUnread} unread` : ""}`}
             </p>
           </div>
           <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
@@ -148,9 +159,9 @@ export default async function EditorMessagesPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-5">
+      <div className="max-w-3xl mx-auto px-6 py-6 space-y-5">
         {rows.length === 0 ? (
-          <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
               <MessageSquare className="w-7 h-7 text-[#0EA5E9]" />
             </div>
@@ -161,9 +172,11 @@ export default async function EditorMessagesPage() {
           <>
             {active.length > 0 && (
               <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-                <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+                <div className="px-5 py-3 border-b border-gray-50 flex items-center justify-between">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active</p>
-                  <span className="text-xs font-medium text-[#0EA5E9] bg-[#0EA5E9]/10 px-2 py-0.5 rounded-full">{active.length}</span>
+                  <span className="text-xs font-medium text-[#0EA5E9] bg-[#0EA5E9]/10 px-2 py-0.5 rounded-full">
+                    {active.length}
+                  </span>
                 </div>
                 <div className="divide-y divide-gray-50">
                   {active.map(row => <ConversationRow key={row.orderId} row={row} />)}
@@ -173,8 +186,8 @@ export default async function EditorMessagesPage() {
 
             {archive.length > 0 && (
               <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-                <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Completed & Closed</p>
+                <div className="px-5 py-3 border-b border-gray-50 flex items-center justify-between">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Completed &amp; Closed</p>
                   <span className="text-xs text-gray-400">{archive.length}</span>
                 </div>
                 <div className="divide-y divide-gray-50">

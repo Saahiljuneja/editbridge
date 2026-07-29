@@ -37,14 +37,14 @@ export function CategoryBrowseSection() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div>
-            <p className="text-xs font-bold text-[#0EA5E9] uppercase tracking-widest mb-2">Browse by category</p>
+            <p className="text-xs font-bold text-[var(--brand-client)] uppercase tracking-widest mb-2">Browse by category</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
               Find an editor for<br className="hidden sm:block" /> exactly what you make
             </h2>
           </div>
           <Link
             href="/browse"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0EA5E9] hover:underline shrink-0"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-client)] hover:underline shrink-0"
           >
             All editors <ArrowRight className="w-4 h-4" />
           </Link>

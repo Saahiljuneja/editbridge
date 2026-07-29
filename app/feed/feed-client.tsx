@@ -769,7 +769,7 @@ function ReelCard({
         {!isOwnItem && (
           <Link
             href={`/editor/${item.editorId}`}
-            className="inline-flex items-center gap-2 bg-[#0EA5E9] hover:bg-sky-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-xs font-bold px-4 py-2 rounded-full transition-colors shadow-lg"
           >
             Hire {item.editorDisplayName.split(" ")[0]} →
           </Link>
@@ -1310,7 +1310,7 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
         {!currentUserId && (
           <div className="mt-auto pt-4">
             <Link href="/login"
-              className="block text-center text-xs bg-sky-500 text-white px-3 py-2 rounded-xl font-semibold hover:bg-sky-600 transition-colors">
+              className="block text-center text-xs bg-sky-500 text-white px-3 py-2 rounded-xl font-semibold hover:bg-[var(--brand-client-hover)] transition-colors">
               Sign in
             </Link>
           </div>
@@ -1346,7 +1346,7 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
                 </button>
               </div>
               {!currentUserId && (
-                <Link href="/login" className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-full font-semibold hover:bg-sky-600 transition-colors">
+                <Link href="/login" className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-full font-semibold hover:bg-[var(--brand-client-hover)] transition-colors">
                   Sign in
                 </Link>
               )}
@@ -1376,7 +1376,7 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
           <div className="absolute top-24 md:top-4 inset-x-0 z-30 flex justify-center pointer-events-none">
             <button
               onClick={handleShowNewItems}
-              className="pointer-events-auto flex items-center gap-2 bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl hover:bg-sky-600 transition-colors animate-bounce"
+              className="pointer-events-auto flex items-center gap-2 bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl hover:bg-[var(--brand-client-hover)] transition-colors animate-bounce"
             >
               <RefreshCw className="w-3.5 h-3.5" /> New items available
             </button>

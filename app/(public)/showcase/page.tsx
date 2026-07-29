@@ -63,7 +63,7 @@ export default async function ShowcasePage() {
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
         <div className="px-8 py-6 text-center">
-          <p className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#7C3AED] uppercase mb-3">
+          <p className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[var(--brand-editor)] uppercase mb-3">
             <Sparkles className="w-3.5 h-3.5" /> Showcase
           </p>
           <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-3">
@@ -87,7 +87,7 @@ export default async function ShowcasePage() {
             <Link
               href="/browse"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: "#0EA5E9" }}
+              style={{ background: "var(--brand-client)" }}
             >
               Browse editors <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -118,7 +118,7 @@ export default async function ShowcasePage() {
                       href={`/editor/${item.editorId}`}
                       className="flex items-center gap-2.5 mt-auto pt-3 border-t border-gray-50 group"
                     >
-                      <div className="w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-[#0EA5E9] to-[#6c63d4] flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-[var(--brand-client)] to-[#6c63d4] flex items-center justify-center shrink-0">
                         {item.editorImage ? (
                           <Image src={item.editorImage} alt={displayName} width={32} height={32} className="object-cover w-full h-full" />
                         ) : (
@@ -126,10 +126,10 @@ export default async function ShowcasePage() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[#0EA5E9] transition-colors">{displayName}</p>
+                        <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[var(--brand-client)] transition-colors">{displayName}</p>
                         {item.editorTitle && <p className="text-[10px] text-gray-400 truncate">{item.editorTitle}</p>}
                       </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#0EA5E9] transition-colors shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[var(--brand-client)] transition-colors shrink-0" />
                     </Link>
                   </div>
                 </div>
@@ -144,12 +144,12 @@ export default async function ShowcasePage() {
         <div className="px-8 py-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-xs font-bold tracking-wider text-[#0EA5E9] uppercase mb-1 flex items-center gap-1.5">
+              <p className="text-xs font-bold tracking-wider text-[var(--brand-client)] uppercase mb-1 flex items-center gap-1.5">
                 <Film className="w-3.5 h-3.5" /> From the Feed
               </p>
               <h2 className="text-xl font-black text-gray-900">Top portfolio picks</h2>
             </div>
-            <Link href="/feed" className="text-sm font-semibold text-[#0EA5E9] hover:underline flex items-center gap-1">
+            <Link href="/feed" className="text-sm font-semibold text-[var(--brand-client)] hover:underline flex items-center gap-1">
               View all <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

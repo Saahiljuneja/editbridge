@@ -124,7 +124,7 @@ export default async function AdminOrdersPage({
             placeholder="Search by client, editor, or package title..."
             className="flex-1 a-input rounded-xl px-3 py-2"
           />
-          <button type="submit" className="px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-sm font-medium hover:bg-sky-600 transition-colors">
+          <button type="submit" className="px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-client-hover)] transition-colors">
             Search
           </button>
           {(q || hasAdvancedFilter) && (
@@ -151,7 +151,7 @@ export default async function AdminOrdersPage({
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
               (status ?? "") === tab.value
-                ? "bg-[#0EA5E9] text-white"
+                ? "bg-[var(--brand-client)] text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             )}>
             {tab.label}
