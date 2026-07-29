@@ -105,34 +105,28 @@ export function TopFilterBar() {
   const ratingActive = get("min_rating");
   const budgetActive = !!(get("min_price") || get("max_price"));
 
+  const nicheLabel = NICHES.find(n => n.value === get("niche") && n.value)?.label;
+
   return (
     <div ref={barRef} className="bg-white border-b border-gray-100 sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center gap-3 py-2.5">
+        <div className="flex items-center gap-2 py-2.5">
 
-          {/* Niche pills — scrollable */}
-          <div
-            className="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0 py-0.5"
-            style={{ scrollbarWidth: "none" }}
+          {/* Category dropdown */}
+          <DropBtn
+            id="niche"
+            label={nicheLabel ?? "Category"}
+            active={!!nicheLabel}
+            open={open === "niche"}
+            onToggle={() => setOpen(open === "niche" ? null : "niche")}
+            panelWidth="w-56"
           >
-            {NICHES.map((n) => {
-              const active = get("niche") === n.value;
-              return (
-                <button
-                  key={n.value}
-                  onClick={() => update("niche", n.value)}
-                  className={cn(
-                    "shrink-0 h-8 px-3.5 rounded-full text-[13px] font-medium border transition-colors whitespace-nowrap",
-                    active
-                      ? "bg-[var(--brand-client)] text-white border-transparent"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)]"
-                  )}
-                >
-                  {n.label}
-                </button>
-              );
-            })}
-          </div>
+            {NICHES.map((n) => (
+              <DropItem key={n.value} selected={get("niche") === n.value} onClick={() => update("niche", n.value)}>
+                {n.label || "All categories"}
+              </DropItem>
+            ))}
+          </DropBtn>
 
           <div className="h-6 w-px bg-gray-200 shrink-0" />
 
