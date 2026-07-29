@@ -138,7 +138,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
   }, [prefersReduced]);
 
   return (
-    <section ref={heroRef} className="relative min-h-screen bg-[#080E1A] overflow-hidden flex flex-col">
+    <section ref={heroRef} className="relative h-[100dvh] min-h-[640px] bg-[#080E1A] overflow-hidden flex flex-col">
 
       {/* Film-cut flash on page load */}
       <motion.div className="absolute inset-0 bg-black z-50 pointer-events-none"
