@@ -181,6 +181,11 @@ export default async function AdminDisputeDetailPage({
           <Badge className={cn("text-xs border-0 font-semibold px-2.5 py-1", isOpen ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700")}>
             {isOpen ? "🔴 Open" : "✅ Resolved"}
           </Badge>
+          {isOpen && (
+            <Badge className={cn("text-xs border-0 font-semibold px-2.5 py-1", dispute.evidenceText && dispute.evidenceText.trim().length > 0 ? "bg-sky-100 text-sky-700" : "bg-amber-100 text-amber-700")}>
+              {dispute.evidenceText && dispute.evidenceText.trim().length > 0 ? "Ready for Review" : "Awaiting Editor"}
+            </Badge>
+          )}
           <Link
             href={`/admin/orders/${dispute.orderId}`}
             className="text-xs font-medium text-[var(--brand-client)] hover:underline underline-offset-2 flex items-center gap-1"
@@ -191,6 +196,20 @@ export default async function AdminDisputeDetailPage({
       </div>
 
       <div className="max-w-screen-xl mx-auto px-6 py-8">
+        {/* Warning Banner */}
+        {isOpen && !editorRow?.razorpayAccountId && (
+          <div className="mb-6 p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 text-xs flex items-start gap-2.5 shadow-sm">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Payout Restriction Warning</p>
+              <p className="mt-0.5 text-amber-700">
+                The editor has not completed their payment registration yet (no Razorpay bank account linked).
+                If you resolve this dispute in the editor's favor ("Release Payment"), payouts will remain stuck until they link their account.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-1">

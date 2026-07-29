@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, ShoppingBag } from "lucide-react";
@@ -77,7 +77,7 @@ export default async function DisputesPage() {
                 return (
                   <Link
                     key={d.id}
-                    href={`/disputes/${d.id}`}
+                    href={`/client/disputes/${d.id}`}
                     className="flex items-start gap-4 px-6 py-4 hover:bg-gray-50 transition-colors group"
                   >
                     <div className="flex-1 min-w-0">

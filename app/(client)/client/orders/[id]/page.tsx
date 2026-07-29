@@ -497,7 +497,7 @@ export default async function ClientOrderDetailPage({
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
                 <span>A dispute is open for this order.</span>
                 <Link
-                  href={`/disputes/${openDispute.id}`}
+                  href={`/client/disputes/${openDispute.id}`}
                   className="underline underline-offset-2 font-medium"
                 >
                   View dispute
