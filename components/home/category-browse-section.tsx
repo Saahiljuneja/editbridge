@@ -33,7 +33,7 @@ export function CategoryBrowseSection() {
     .filter((c): c is NonNullable<typeof c> => !!c);
 
   return (
-    <section className="bg-white py-28 px-6">
+    <section className="bg-white py-12 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div>

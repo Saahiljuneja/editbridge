@@ -541,7 +541,7 @@ export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPai
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="bg-white py-16 md:py-24 px-6 overflow-hidden">
+    <section ref={ref} className="bg-white py-10 md:py-16 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -635,7 +635,7 @@ export function AnimatedActivity({ feedItems }: { feedItems?: ActivityItem[] }) 
   }, [prefersReduced, hasRealData, base]);
 
   return (
-    <section ref={sectionRef} className="bg-white py-14 md:py-24 px-6 overflow-hidden">
+    <section ref={sectionRef} className="bg-white py-10 md:py-16 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left — text */}
@@ -918,7 +918,7 @@ export function AnimatedHowItWorks() {
   useEffect(() => scrollYProgress.on("change", v => setActive(Math.min(STEPS.length - 1, Math.floor(v * STEPS.length)))), [scrollYProgress]);
 
   return (
-    <section ref={sectionRef} className="relative bg-[#06040f] py-14 md:py-28 px-6 overflow-hidden">
+    <section ref={sectionRef} className="relative bg-[#06040f] py-10 md:py-16 px-6 overflow-hidden">
       {/* Grid */}
       <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage:`linear-gradient(rgba(255,255,255,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.6) 1px,transparent 1px)`,backgroundSize:"48px 48px"}} />
       {/* Glow blobs */}
@@ -928,7 +928,7 @@ export function AnimatedHowItWorks() {
       <div className="relative z-10 max-w-7xl mx-auto">
 
         {/* Header */}
-        <Reveal className="mb-20">
+        <Reveal className="mb-10">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-8 bg-[#7c6ff7]"/>
             <span className="text-[10px] font-black text-[#7c6ff7] uppercase tracking-[0.28em]">How it works</span>
@@ -1130,7 +1130,7 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
       });
 
   return (
-    <section className="bg-white py-14 md:py-28 px-6">
+    <section className="bg-white py-10 md:py-16 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-end justify-between mb-10 flex-wrap gap-6">
@@ -1328,7 +1328,7 @@ export function BeforeAfterSection() {
   }
 
   return (
-    <section ref={sectionRef} className="bg-gray-950 py-14 md:py-28 px-6 overflow-hidden relative">
+    <section ref={sectionRef} className="bg-gray-950 py-10 md:py-16 px-6 overflow-hidden relative">
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
       <div className="relative max-w-6xl mx-auto">
         <Reveal className="text-center mb-10">
@@ -1597,9 +1597,9 @@ const WHY_FEATURES = [
 
 export function AnimatedWhySection() {
   return (
-    <section className="bg-white py-14 md:py-28 px-6 overflow-hidden relative">
+    <section className="bg-white py-10 md:py-16 px-6 overflow-hidden relative">
       <div className="relative max-w-6xl mx-auto">
-        <Reveal className="text-center mb-14">
+        <Reveal className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-5"><div className="h-px w-10 bg-[var(--brand-client)]"/><span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Why EditBridge</span><div className="h-px w-10 bg-[var(--brand-client)]"/></div>
           <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-[1.0]">Everything you need.<br /><span className="text-gray-300">Built into one platform.</span></h2>
         </Reveal>
@@ -1684,7 +1684,7 @@ export function AnimatedAbout() {
     ABOUT_ORDER_ROWS.forEach((_, i) => setTimeout(() => setRevealedCount(i), 300 + i * 220));
   }, [cardInView]);
   return (
-    <section className="bg-[#06040f] py-14 md:py-28 px-6 overflow-hidden relative">
+    <section className="bg-[#06040f] py-10 md:py-16 px-6 overflow-hidden relative">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div animate={{ x:["0%","14%","0%"],y:["0%","8%","0%"] }} transition={{ duration:20,repeat:Infinity,ease:"easeInOut" }}
           className="absolute -top-1/3 -right-1/4 w-[700px] h-[600px] rounded-full opacity-25" style={{background:"radial-gradient(ellipse,#0EA5E9,transparent 65%)"}}/>
@@ -1810,7 +1810,7 @@ function ReviewCard({ quote, author, role, initials, col, rating }: typeof REVIE
 export function AnimatedScrollingReviews() {
   const prefersReduced = useReducedMotion();
   return (
-    <section className="bg-gray-50 py-12 md:py-20 overflow-hidden">
+    <section className="bg-gray-50 py-8 md:py-14 overflow-hidden">
       <Reveal className="text-center mb-12 px-6">
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="h-px w-10 bg-[var(--brand-client)]" />
@@ -1867,7 +1867,7 @@ export function AnimatedTestimonials() {
   }, [go, prefersReduced]);
   const q = QUOTES[cur];
   return (
-    <section className="bg-white py-14 md:py-28 px-6">
+    <section className="bg-white py-10 md:py-16 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-4 mb-16"><div className="h-px w-10 bg-[var(--brand-client)]"/><span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">What creators say</span></div>
         <div className="relative min-h-[240px]">
@@ -1963,7 +1963,7 @@ export function ShowcasePreviewSection({ items }: { items: ShowcaseItem[] }) {
   ];
 
   return (
-    <section className="bg-gray-950 py-12 md:py-24 px-6">
+    <section className="bg-gray-950 py-8 md:py-14 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
           <Reveal>
@@ -2118,7 +2118,7 @@ export function ComparisonSection() {
   ];
 
   return (
-    <section className="relative bg-[#060A14] py-14 md:py-28 px-6 overflow-hidden">
+    <section className="relative bg-[#060A14] py-10 md:py-16 px-6 overflow-hidden">
       {/* ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-sky-500/[0.04] rounded-full blur-3xl" />
@@ -2379,9 +2379,9 @@ const PRICING_TIERS = [
 
 export function PricingPreviewSection() {
   return (
-    <section className="bg-white py-12 md:py-24 px-6">
+    <section className="bg-white py-8 md:py-14 px-6">
       <div className="max-w-5xl mx-auto">
-        <Reveal className="text-center mb-14">
+        <Reveal className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4"><div className="h-px w-10 bg-gray-200"/><span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.28em]">Transparent pricing</span><div className="h-px w-10 bg-gray-200"/></div>
           <h2 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight leading-none mb-4">
             Know what you pay.<br /><span className="text-gray-200">Before you book.</span>
@@ -2444,7 +2444,7 @@ export function PricingPreviewSection() {
 ════════════════════════════════════════════════════════════════════════════ */
 export function ForEditorsSection() {
   return (
-    <section className="bg-gray-950 py-12 md:py-24 px-6 overflow-hidden">
+    <section className="bg-gray-950 py-8 md:py-14 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border border-white/[0.06]">
         {/* Client side */}
         <Reveal from="left">
@@ -2530,9 +2530,9 @@ export function EditorEarningsCalculator() {
   ];
 
   return (
-    <section className="bg-gray-950 py-12 md:py-24 px-6 overflow-hidden">
+    <section className="bg-gray-950 py-8 md:py-14 px-6 overflow-hidden">
       <div className="max-w-4xl mx-auto">
-        <Reveal className="text-center mb-14">
+        <Reveal className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-10" style={{ background: "rgba(124,58,237,0.4)" }} />
             <span className="text-[10px] font-black text-[var(--brand-editor)] uppercase tracking-[0.28em]">For editors</span>
@@ -2644,7 +2644,7 @@ export function BlogPreviewSection({ posts }: { posts: BlogPost[] }) {
   };
 
   return (
-    <section className="bg-gray-50 py-12 md:py-24 px-6">
+    <section className="bg-gray-50 py-8 md:py-14 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-12 flex-wrap gap-6">
           <Reveal>
@@ -2712,7 +2712,7 @@ const FAQ_ITEMS = [
 export function AnimatedFAQ() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section className="bg-gray-50 py-12 md:py-24 px-6">
+    <section className="bg-gray-50 py-8 md:py-14 px-6">
       <div className="max-w-3xl mx-auto">
         <Reveal className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-5">
@@ -2825,7 +2825,7 @@ export function StickyCtaBar() {
 
 export function AnimatedCTA() {
   return (
-    <section className="relative overflow-hidden bg-[var(--brand-client)] py-16 md:py-32 px-6">
+    <section className="relative overflow-hidden bg-[var(--brand-client)] py-10 md:py-16 px-6">
       <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage:"radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)",backgroundSize:"28px 28px"}}/>
       <svg className="absolute inset-0 w-full h-full opacity-[0.06] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <filter id="cta-grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
@@ -3075,11 +3075,11 @@ const ESCROW_STEPS = [
 
 export function EscrowFlowSection() {
   return (
-    <section className="bg-[#06040f] py-20 px-6 overflow-hidden">
+    <section className="bg-[#06040f] py-10 px-6 overflow-hidden">
       {/* Subtle grid */}
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.7) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.7) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
       <div className="max-w-6xl mx-auto relative z-10">
-        <Reveal className="text-center mb-14">
+        <Reveal className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-[var(--brand-client)]/10 border border-[var(--brand-client)]/20 rounded-full px-4 py-1.5 mb-5">
             <Lock className="w-3 h-3 text-[var(--brand-client)]" />
             <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.2em]">How your money is protected</span>
@@ -3150,7 +3150,7 @@ const GALLERY_ITEMS = [
 
 export function WorkGallerySection() {
   return (
-    <section className="bg-gray-50 py-20 px-6">
+    <section className="bg-gray-50 py-10 px-6">
       <div className="max-w-6xl mx-auto">
         <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
