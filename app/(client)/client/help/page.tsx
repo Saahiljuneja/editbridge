@@ -1,85 +1,162 @@
-﻿import { HelpCircle } from "lucide-react";
-import { getPlatformSettings } from "@/lib/platform-settings";
-
 export const dynamic = "force-dynamic";
 
-const faqs = [
-  {
-    q: "How does EditBridge work?",
-    a: "Browse verified editors, choose a package, and pay securely. Your payment is protected and only released to the editor after you approve the delivered work. Once approved, the editor receives their payout minus a 15% platform fee.",
-  },
-  {
-    q: "How do I place an order?",
-    a: 'Find an editor on the Browse page, review their packages, and click "Book Now". Complete checkout with Razorpay. You\'ll receive an order confirmation and can track progress from My Orders.',
-  },
-  {
-    q: "Is my payment secure?",
-    a: "Yes. Payments are processed by Razorpay and held securely until you approve the delivery. Your payment is fully protected â€” you are never charged if you don't approve the work.",
-  },
-  {
-    q: "What happens if I need revisions?",
-    a: "Each package includes a set number of revisions. You can request a revision from the order page. The editor will re-deliver within their stated delivery time.",
-  },
-  {
-    q: "What if I'm unhappy with the work?",
-    a: "If revisions don't resolve your issue, you can open a dispute from the order page. Our support team reviews all disputes and may issue a full or partial refund.",
-  },
-  {
-    q: "How do I communicate with my editor?",
-    a: "Every order includes a private chat channel accessible from the order detail page or the Messages section. All communication must stay on-platform.",
-  },
-  {
-    q: "Can I cancel an order?",
-    a: "Orders can be cancelled before the editor starts work. Once work has begun, cancellation is subject to dispute resolution. Contact support if you're unsure.",
-  },
-  {
-    q: "How long does delivery take?",
-    a: "Delivery time depends on the package you selected. You can see the delivery days on each package card. Editors are required to deliver within that timeframe.",
-  },
-  {
-    q: "Are editors verified?",
-    a: "Yes. Every editor on EditBridge has been identity-verified through our KYC process and reviewed by our team before their profile goes live.",
-  },
-  {
-    q: "How do I contact support?",
-    a: "Use the dispute flow on the order page for issues related to an active order. For general enquiries, email our support team.",
-  },
-];
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { helpCategories, helpArticles } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
+import Link from "next/link";
+import {
+  IndianRupee, ShoppingBag, AlertTriangle, UserCheck,
+  Shield, HelpCircle, ArrowRight, ExternalLink, Search,
+} from "lucide-react";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
-export default async function HelpPage() {
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  IndianRupee, ShoppingBag, AlertTriangle, UserCheck, Shield, HelpCircle,
+};
+
+export default async function ClientHelpPage() {
+  const session = await auth();
+  if (!session) redirect("/login");
+
   const { supportEmail } = await getPlatformSettings();
+
+  const [categories, recentArticles] = await Promise.all([
+    db
+      .select({
+        id: helpCategories.id,
+        name: helpCategories.name,
+        slug: helpCategories.slug,
+        description: helpCategories.description,
+        icon: helpCategories.icon,
+      })
+      .from(helpCategories)
+      .orderBy(helpCategories.sortOrder),
+
+    db
+      .select({
+        id: helpArticles.id,
+        title: helpArticles.title,
+        slug: helpArticles.slug,
+        readTime: helpArticles.readTime,
+        categorySlug: helpCategories.slug,
+        categoryName: helpCategories.name,
+      })
+      .from(helpArticles)
+      .innerJoin(helpCategories, eq(helpCategories.id, helpArticles.categoryId))
+      .where(eq(helpArticles.isPublished, true))
+      .orderBy(desc(helpArticles.viewCount))
+      .limit(6),
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-100">
         <div className="px-8 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Help & FAQ</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Answers to common questions about using EditBridge</p>
+            <h1 className="text-xl font-bold text-gray-900">Help Center</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Policies, guides, and platform documentation</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
-            <HelpCircle className="w-4 h-4 text-[var(--brand-client)]" />
-          </div>
+          <Link
+            href="/help"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-client)] border border-[var(--brand-client)]/20 rounded-xl px-4 py-2 hover:bg-[var(--brand-client)]/5 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" /> Full Help Center
+          </Link>
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-3">
-        {faqs.map((item, i) => (
-          <div key={i} className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
-            <p className="font-semibold text-gray-900 text-sm mb-2">{item.q}</p>
-            <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
-          </div>
-        ))}
+      <div className="px-8 py-6 space-y-6">
+        {/* Quick search redirect */}
+        <Link
+          href="/help"
+          className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-4 hover:border-[var(--brand-client)]/30 hover:shadow-sm transition-all group"
+        >
+          <Search className="w-5 h-5 text-gray-400 group-hover:text-[var(--brand-client)] transition-colors" />
+          <span className="text-sm text-gray-400 group-hover:text-gray-600 transition-colors">
+            Search policies and articles...
+          </span>
+        </Link>
 
-        <div className="rounded-2xl border border-[var(--brand-client)]/15 bg-[var(--brand-client)]/5 p-5">
-          <p className="text-sm font-semibold text-[var(--brand-client)] mb-1">Still need help?</p>
-          <p className="text-sm text-gray-600">
-            Email us at{" "}
-            <a href={`mailto:${supportEmail}`} className="underline text-[var(--brand-client)] font-medium">
-              {supportEmail}
-            </a>{" "}
-            and we&apos;ll get back to you within 24 hours.
-          </p>
+        {/* Categories */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Browse by Topic</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categories.map((cat) => {
+              const IconComponent = cat.icon ? (ICON_MAP[cat.icon] ?? HelpCircle) : HelpCircle;
+              return (
+                <Link
+                  key={cat.id}
+                  href={`/help/${cat.slug}`}
+                  target="_blank"
+                  className="bg-white border border-gray-100 rounded-2xl p-5 hover:border-[var(--brand-client)]/30 hover:shadow-md transition-all group flex flex-col gap-3"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/8 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <IconComponent className="w-4.5 h-4.5 text-[var(--brand-client)]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors mb-0.5">
+                      {cat.name}
+                    </p>
+                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{cat.description}</p>
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-[var(--brand-client)] mt-auto">
+                    View articles <ArrowRight className="w-3 h-3" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Popular articles */}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Popular Policies</p>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
+            {recentArticles.map((art) => (
+              <Link
+                key={art.id}
+                href={`/help/article/${art.slug}`}
+                target="_blank"
+                className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors group"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors truncate">
+                    {art.title}
+                  </p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{art.categoryName}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[10px] text-gray-400">{art.readTime}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[var(--brand-client)] transition-colors" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Contact */}
+        <div className="rounded-2xl border border-[var(--brand-client)]/15 bg-[var(--brand-client)]/5 p-5 flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <p className="text-sm font-semibold text-[var(--brand-client)] mb-0.5">Still need help?</p>
+            <p className="text-xs text-gray-600">
+              Email our support team at{" "}
+              <a href={`mailto:${supportEmail}`} className="underline font-medium">
+                {supportEmail}
+              </a>{" "}
+              and we'll respond within 24 hours.
+            </p>
+          </div>
+          <a
+            href={`mailto:${supportEmail}`}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2.5 rounded-xl transition-colors shrink-0"
+            style={{ background: "var(--brand-client)" }}
+          >
+            Contact Support <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
       </div>
     </div>

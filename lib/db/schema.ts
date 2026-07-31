@@ -642,7 +642,36 @@ export const blogPosts = pgTable("blog_posts", {
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+// ─── Help Center ──────────────────────────────────────────────────────────────
+
+export const helpCategories = pgTable("help_categories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon", { length: 100 }).default("HelpCircle"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+});
+
+export const helpArticles = pgTable("help_articles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  categoryId: uuid("category_id").references(() => helpCategories.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  excerpt: text("excerpt"),
+  content: text("content").notNull(),
+  isPublished: boolean("is_published").default(false),
+  readTime: varchar("read_time", { length: 50 }).default("3 min read"),
+  viewCount: integer("view_count").default(0),
+  helpfulVotes: integer("helpful_votes").default(0),
+  unhelpfulVotes: integer("unhelpful_votes").default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+});
+
 // ─── Rewards ──────────────────────────────────────────────────────────────────
+
 
 export const userPoints = pgTable("user_points", {
   id: uuid("id").defaultRandom().primaryKey(),
