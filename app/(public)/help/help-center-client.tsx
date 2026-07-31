@@ -203,7 +203,7 @@ export function HelpCenterClient({
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + ci * 0.04, duration: 0.5 }}
-                  whileHover={{ y: -3, shadow: "0 10px 25px rgba(0,0,0,0.06)" }}
+                  whileHover={{ y: -3 }}
                   className="bg-white border border-gray-150/70 rounded-2xl p-6 transition-all duration-200 group flex flex-col justify-between"
                 >
                   <div>
