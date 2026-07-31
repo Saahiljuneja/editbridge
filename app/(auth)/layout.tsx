@@ -127,16 +127,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
 
-        {/* Mobile logo */}
-        <Link href="/" className="lg:hidden mb-8 flex items-center gap-2.5 relative z-10">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
-            <span className="text-white font-black text-sm">E</span>
-          </div>
-          <span className="text-xl font-black text-white tracking-tight">
-            Edit<span className="text-sky-400">Bridge</span>
-          </span>
-        </Link>
-
         {/* Glass card */}
         <div className="w-full max-w-[420px] relative z-10 rounded-3xl px-8 py-8"
           style={{
