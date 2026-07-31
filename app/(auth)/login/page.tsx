@@ -31,18 +31,20 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    // Pre-flight: check email status before hitting NextAuth.
+    // NextAuth v5 doesn't forward custom thrown error messages to the client
+    // (they're all swallowed as generic "CredentialsSignin"), so we detect
+    // unverified / google-only accounts here first.
+    try {
+      const pre = await fetch("/api/auth/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const preData = await pre.json();
 
-    if (result?.error) {
-      // Check error code — NextAuth v5 passes it but outside the typed SignInResponse
-      const code = (result as unknown as { code?: string }).code;
-      const isUnverified = code === "email_not_verified" || result.error?.startsWith("EmailNotVerified");
-      if (isUnverified) {
-        // Resend a fresh OTP and send them to the verify page
+      if (preData.status === "unverified") {
+        // Resend OTP and redirect to verify page
         await fetch("/api/auth/resend-verification", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -50,9 +52,27 @@ function LoginForm() {
         }).catch(() => {});
         toast.info("A new verification code has been sent to your email.");
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);
-      } else {
-        toast.error("Invalid email or password. If you signed up with Google, use the Google button above.");
+        setLoading(false);
+        return;
       }
+
+      if (preData.status === "google_only") {
+        toast.error("This account uses Google Sign-In. Please click 'Continue with Google' above.");
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // If pre-check fails (network error etc.), fall through to signIn normally
+    }
+
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      toast.error("Invalid email or password.");
       setLoading(false);
       return;
     }
@@ -68,6 +88,7 @@ function LoginForm() {
       router.push(callbackUrl);
     }
   }
+
 
   async function handleResendVerification(emailAddr: string) {
     try {

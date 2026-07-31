@@ -87,6 +87,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             twoFactorPending: user.twoFactorEnabled === true,
           };
         } catch (err) {
+          // Re-throw EmailNotVerified so NextAuth can surface it as an error code
+          // instead of treating it as a generic null return (wrong password).
+          if (err instanceof Error && err.message.startsWith("EmailNotVerified:")) {
+            throw err;
+          }
           console.error("[auth] authorize error:", err);
           return null;
         }
