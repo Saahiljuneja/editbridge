@@ -1,19 +1,26 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react"; // kept for Google OAuth
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { signupSchema } from "@/lib/validations";
 import { toast } from "sonner";
-import { PasswordInput, allRulesPassed } from "@/components/ui/password-input";
+import { allRulesPassed } from "@/components/ui/password-input";
+import { Eye, EyeOff, ArrowRight, Loader2, ShieldCheck, Check, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const RULES = [
+  { label: "At least 1 lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+  { label: "At least 1 uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+  { label: "At least 1 number",           test: (p: string) => /[0-9]/.test(p) },
+  { label: "At least 1 special character",test: (p: string) => /[^a-zA-Z0-9]/.test(p) },
+  { label: "At least 8 characters",       test: (p: string) => p.length >= 8 },
+];
 
 function GoogleIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24">
+    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -29,6 +36,8 @@ export default function EditorSignupPage() {
   const [kycAcknowledged, setKycAcknowledged] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -61,7 +70,6 @@ export default function EditorSignupPage() {
 
     setLoading(true);
 
-    // Create account
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -75,21 +83,29 @@ export default function EditorSignupPage() {
       return;
     }
 
-    // Store credentials so verify page can auto sign-in after OTP
     sessionStorage.setItem("eb_pending_signin", JSON.stringify({ email: form.email, password: form.password }));
-
     router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
   }
 
-  return (
-    <>
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Become an editor</h1>
-      <p className="text-sm text-gray-500 mb-6">Start earning by offering your editing services</p>
+  const inputClass = "w-full h-[52px] rounded-2xl px-4 text-[15px] text-white placeholder-white/25 outline-none transition-all focus:ring-2 focus:ring-sky-400/40"
+  const inputStyle = { background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)" }
+  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)"; }
+  const onBlur  = (e: React.FocusEvent<HTMLInputElement>) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }
 
-      <Button
+  return (
+    <div className="w-full">
+      <div className="mb-7">
+        <h1 className="text-[1.9rem] font-black text-white tracking-tight leading-none mb-2">
+          Become an editor
+        </h1>
+        <p className="text-[14px] text-white/40">
+          Start earning by offering your editing skills
+        </p>
+      </div>
+
+      {/* Google */}
+      <button
         type="button"
-        variant="outline"
-        className="w-full mb-4 gap-2"
         onClick={async () => {
           if (!kycAcknowledged) {
             setErrors({ kyc: "Please acknowledge the KYC requirement first." });
@@ -104,72 +120,149 @@ export default function EditorSignupPage() {
           signIn("google", { callbackUrl: "/editor/dashboard" });
         }}
         disabled={googleLoading}
+        className="w-full flex items-center justify-center gap-3 h-[52px] rounded-2xl text-[14px] font-semibold text-white/80 transition-all active:scale-[0.99] disabled:opacity-50 mb-4"
+        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
+        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.11)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
       >
-        <GoogleIcon />
+        {googleLoading ? <Loader2 className="w-4 h-4 animate-spin text-white/50" /> : <GoogleIcon />}
         {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </Button>
+      </button>
 
-      <div className="relative mb-4">
+      {/* Divider */}
+      <div className="relative mb-5">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-white/8" />
         </div>
-        <div className="relative flex justify-center text-xs text-gray-400">
-          <span className="bg-white px-2">or sign up with email</span>
+        <div className="relative flex justify-center">
+          <span className="px-3 text-[11px] font-semibold text-white/20 uppercase tracking-widest">
+            or email
+          </span>
         </div>
       </div>
 
+      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Name */}
         <div className="space-y-1.5">
-          <Label htmlFor="name">Full name</Label>
-          <Input id="name" name="name" placeholder="Rahul Kumar" value={form.name} onChange={handleChange} autoComplete="name" />
-          {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+          <label htmlFor="name" className="block text-[13px] font-semibold text-white/50">Full name</label>
+          <input id="name" name="name" placeholder="Rahul Kumar" value={form.name} onChange={handleChange}
+            autoComplete="name" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+          {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
         </div>
 
+        {/* Email */}
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handleChange} autoComplete="email" />
-          {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+          <label htmlFor="email" className="block text-[13px] font-semibold text-white/50">Email address</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handleChange}
+            autoComplete="email" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+          {errors.email && <p className="text-xs text-red-400">{errors.email}</p>}
         </div>
 
+        {/* Password */}
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
-          <PasswordInput id="password" name="password" value={form.password} onChange={handleChange} autoComplete="new-password" showRules error={errors.password} />
+          <label htmlFor="password" className="block text-[13px] font-semibold text-white/50">Password</label>
+          <div className="relative">
+            <input id="password" name="password" type={showPassword ? "text" : "password"}
+              placeholder="••••••••" value={form.password} onChange={handleChange}
+              autoComplete="new-password" className={cn(inputClass, "pr-12")}
+              style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+            <button type="button" onClick={() => setShowPassword(v => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}>
+              {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+            </button>
+          </div>
+          {errors.password && <p className="text-xs text-red-400">{errors.password}</p>}
+          {form.password.length > 0 && (
+            <ul className="space-y-1.5 pt-1">
+              {RULES.map(({ label, test }) => {
+                const passed = test(form.password);
+                return (
+                  <li key={label} className="flex items-center gap-2">
+                    <Check className={cn("w-3.5 h-3.5 shrink-0", passed ? "text-sky-400" : "text-white/20")} />
+                    <span className={cn("text-xs", passed ? "text-sky-400" : "text-white/35")}>{label}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
+        {/* Confirm password */}
         <div className="space-y-1.5">
-          <Label htmlFor="confirmPassword">Confirm password</Label>
-          <PasswordInput id="confirmPassword" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} autoComplete="new-password" error={errors.confirmPassword} />
+          <label htmlFor="confirmPassword" className="block text-[13px] font-semibold text-white/50">Confirm password</label>
+          <div className="relative">
+            <input id="confirmPassword" name="confirmPassword" type={showConfirm ? "text" : "password"}
+              placeholder="••••••••" value={form.confirmPassword} onChange={handleChange}
+              autoComplete="new-password" className={cn(inputClass, "pr-12")}
+              style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+            <button type="button" onClick={() => setShowConfirm(v => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+              aria-label={showConfirm ? "Hide password" : "Show password"}>
+              {showConfirm ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+            </button>
+          </div>
+          {errors.confirmPassword && <p className="text-xs text-red-400">{errors.confirmPassword}</p>}
         </div>
 
-        <label className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200 cursor-pointer">
+        {/* KYC acknowledgement */}
+        <label
+          className="flex items-start gap-3 p-4 rounded-2xl cursor-pointer transition-all"
+          style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.22)" }}
+        >
           <input
             type="checkbox"
-            className="mt-0.5 accent-[var(--brand-client)]"
+            className="mt-0.5 w-4 h-4 accent-sky-400 shrink-0"
             checked={kycAcknowledged}
             onChange={(e) => { setKycAcknowledged(e.target.checked); setErrors((p) => ({ ...p, kyc: "" })); }}
           />
-          <span className="text-sm text-amber-900">
-            I understand that identity verification (KYC) is required before I can accept orders.
-          </span>
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
+            <span className="text-[13px] text-amber-300/80 leading-relaxed">
+              I understand that identity verification (KYC) is required before I can accept orders.
+            </span>
+          </div>
         </label>
-        {errors.kyc && <p className="text-xs text-red-500">{errors.kyc}</p>}
+        {errors.kyc && <p className="text-xs text-red-400">{errors.kyc}</p>}
 
-        <Button type="submit" className="w-full bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]" disabled={loading}>
-          {loading ? "Creating account…" : "Create editor account"}
-        </Button>
-
-        <p className="text-xs text-center text-gray-400 leading-relaxed">
-          By creating an account you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-gray-600">Terms of Service</Link>
-          {" "}and{" "}
-          <Link href="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>.
-        </p>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className={cn(
+            "w-full h-[52px] rounded-2xl text-[15px] font-bold text-white mt-1",
+            "flex items-center justify-center gap-2 transition-all active:scale-[0.99]",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
+          )}
+          style={{
+            background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)",
+            boxShadow: "0 4px 32px rgba(14,165,233,0.40), inset 0 1px 0 rgba(255,255,255,0.15)",
+          }}
+        >
+          {loading
+            ? <Loader2 className="w-5 h-5 animate-spin" />
+            : <><span>Create editor account</span><ArrowRight className="w-4 h-4" /></>
+          }
+        </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
-        Already have an account?{" "}
-        <Link href="/login" className="text-[var(--brand-client)] font-medium hover:underline">Sign in</Link>
-      </p>
-    </>
+      {/* Trust badge */}
+      <div className="flex items-center justify-center gap-1.5 mt-4">
+        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/70 shrink-0" />
+        <span className="text-[12px] text-white/25 font-medium">256-bit SSL · Your data is always safe</span>
+      </div>
+
+      {/* Sign-in link */}
+      <div className="mt-6 pt-5 border-t border-white/8 text-center">
+        <p className="text-[14px] text-white/35">
+          Already have an account?{" "}
+          <Link href="/login" className="font-bold text-white/80 hover:text-sky-400 transition-colors">
+            Sign in →
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
