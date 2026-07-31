@@ -116,14 +116,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white overflow-y-auto relative">
-        {/* Subtle top-left accent */}
-        <div className="pointer-events-none absolute top-0 right-0 w-80 h-80 bg-sky-50 rounded-full blur-3xl opacity-60" />
-        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-violet-50 rounded-full blur-3xl opacity-40" />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 overflow-y-auto relative" style={{ background: "linear-gradient(135deg, #f0f7ff 0%, #faf5ff 50%, #f0f9ff 100%)" }}>
+        {/* Ambient blobs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-96 h-96 bg-sky-200/40 rounded-full blur-[80px]" />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-violet-200/30 rounded-full blur-[80px]" />
+        </div>
 
         {/* Mobile logo */}
-        <Link href="/" className="lg:hidden mb-10 flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center">
+        <Link href="/" className="lg:hidden mb-8 flex items-center gap-2.5 relative z-10">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center shadow-md shadow-sky-500/20">
             <span className="text-white font-black text-sm">E</span>
           </div>
           <span className="text-xl font-black text-gray-900 tracking-tight">
@@ -131,14 +133,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </span>
         </Link>
 
-        <div className="w-full max-w-md relative z-10">
+        {/* Card */}
+        <div className="w-full max-w-[420px] relative z-10 bg-white rounded-3xl shadow-[0_8px_48px_rgba(0,0,0,0.08)] border border-white/80 px-8 py-8">
           {children}
 
-          <p className="mt-8 text-xs text-gray-400 text-center leading-relaxed">
+          <p className="mt-6 text-[12px] text-gray-300 text-center leading-relaxed">
             By continuing you agree to our{" "}
-            <Link href="/terms" className="text-gray-500 underline underline-offset-2 hover:text-gray-700 transition-colors">Terms of Service</Link>{" "}
+            <Link href="/terms" className="text-gray-400 underline underline-offset-2 hover:text-gray-600 transition-colors">Terms</Link>{" "}
             and{" "}
-            <Link href="/privacy" className="text-gray-500 underline underline-offset-2 hover:text-gray-700 transition-colors">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-gray-400 underline underline-offset-2 hover:text-gray-600 transition-colors">Privacy Policy</Link>.
           </p>
         </div>
       </div>
