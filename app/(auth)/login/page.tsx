@@ -57,7 +57,7 @@ function LoginForm() {
         return;
       }
     } catch {
-      // fall through to signIn on pre-check failure
+      // fall through
     }
 
     const result = await signIn("credentials", { email, password, redirect: false });
@@ -84,16 +84,18 @@ function LoginForm() {
     await signIn("google", { callbackUrl });
   }
 
+  const inputClass = "w-full h-[52px] rounded-2xl px-4 text-[15px] text-white placeholder-white/25 outline-none transition-all focus:ring-2 focus:ring-sky-400/40"
+
   return (
     <div className="w-full">
 
       {/* Heading */}
       <div className="mb-7">
-        <h1 className="text-[2rem] font-black text-gray-900 tracking-tight leading-none mb-2">
+        <h1 className="text-[1.9rem] font-black text-white tracking-tight leading-none mb-2">
           Welcome back
         </h1>
-        <p className="text-[15px] text-gray-400">
-          Sign in to your <span className="text-gray-600 font-medium">EditBridge</span> account
+        <p className="text-[14px] text-white/40">
+          Sign in to your <span className="text-white/65 font-medium">EditBridge</span> account
         </p>
       </div>
 
@@ -102,20 +104,28 @@ function LoginForm() {
         type="button"
         onClick={handleGoogle}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 h-[52px] rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 text-[15px] font-semibold text-gray-700 transition-all shadow-sm hover:shadow-md active:scale-[0.99] disabled:opacity-60 mb-4"
+        className="w-full flex items-center justify-center gap-3 h-[52px] rounded-2xl text-[14px] font-semibold text-white/80 transition-all active:scale-[0.99] disabled:opacity-50 mb-4"
+        style={{
+          background: "rgba(255,255,255,0.07)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          backdropFilter: "blur(8px)",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.11)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
       >
-        {googleLoading ? <Loader2 className="w-4 h-4 animate-spin text-gray-400" /> : <GoogleIcon />}
+        {googleLoading ? <Loader2 className="w-4 h-4 animate-spin text-white/50" /> : <GoogleIcon />}
         {googleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
       {/* Divider */}
-      <div className="relative mb-4">
+      <div className="relative mb-5">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-100" />
+          <div className="w-full border-t border-white/8" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white px-3 text-xs font-semibold text-gray-300 uppercase tracking-widest">
-            or continue with email
+          <span className="px-3 text-[11px] font-semibold text-white/20 uppercase tracking-widest"
+            style={{ background: "transparent" }}>
+            or email
           </span>
         </div>
       </div>
@@ -125,7 +135,7 @@ function LoginForm() {
 
         {/* Email */}
         <div className="space-y-1.5">
-          <label htmlFor="email" className="block text-[13px] font-semibold text-gray-600">
+          <label htmlFor="email" className="block text-[13px] font-semibold text-white/50">
             Email address
           </label>
           <input
@@ -133,23 +143,26 @@ function LoginForm() {
             type="email"
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className="w-full h-[52px] rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-[15px] text-gray-900 placeholder-gray-300 outline-none transition-all focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-50"
+            className={inputClass}
+            style={{
+              background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(255,255,255,0.10)",
+            }}
+            onFocus={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)"; }}
+            onBlur={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }}
           />
         </div>
 
         {/* Password */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="block text-[13px] font-semibold text-gray-600">
+            <label htmlFor="password" className="block text-[13px] font-semibold text-white/50">
               Password
             </label>
-            <Link
-              href="/forgot-password"
-              className="text-[13px] font-semibold text-sky-500 hover:text-sky-600 transition-colors"
-            >
+            <Link href="/forgot-password" className="text-[13px] font-semibold text-sky-400 hover:text-sky-300 transition-colors">
               Forgot password?
             </Link>
           </div>
@@ -159,15 +172,21 @@ function LoginForm() {
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full h-[52px] rounded-xl border border-gray-200 bg-gray-50/50 px-4 pr-12 text-[15px] text-gray-900 placeholder-gray-300 outline-none transition-all focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-50"
+              className={cn(inputClass, "pr-12")}
+              style={{
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.10)",
+              }}
+              onFocus={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)"; }}
+              onBlur={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }}
             />
             <button
               type="button"
               onClick={() => setShowPassword(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
@@ -180,12 +199,14 @@ function LoginForm() {
           type="submit"
           disabled={loading}
           className={cn(
-            "w-full h-[52px] rounded-xl text-[15px] font-bold text-white transition-all",
-            "flex items-center justify-center gap-2",
-            "bg-[#0EA5E9] hover:bg-sky-500 active:scale-[0.99]",
-            "shadow-[0_4px_24px_rgba(14,165,233,0.35)] hover:shadow-[0_4px_32px_rgba(14,165,233,0.45)]",
-            "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
+            "w-full h-[52px] rounded-2xl text-[15px] font-bold text-white mt-1",
+            "flex items-center justify-center gap-2 transition-all active:scale-[0.99]",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
+          style={{
+            background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)",
+            boxShadow: "0 4px 32px rgba(14,165,233,0.40), inset 0 1px 0 rgba(255,255,255,0.15)",
+          }}
         >
           {loading
             ? <Loader2 className="w-5 h-5 animate-spin" />
@@ -195,21 +216,20 @@ function LoginForm() {
       </form>
 
       {/* Trust badge */}
-      <div className="flex items-center justify-center gap-1.5 mt-5">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-        <span className="text-[12px] text-gray-400 font-medium">256-bit SSL · Your data is always safe</span>
+      <div className="flex items-center justify-center gap-1.5 mt-4">
+        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/70 shrink-0" />
+        <span className="text-[12px] text-white/25 font-medium">256-bit SSL · Your data is always safe</span>
       </div>
 
-      {/* Sign up */}
-      <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-        <p className="text-[14px] text-gray-400">
+      {/* Divider + sign up */}
+      <div className="mt-6 pt-5 border-t border-white/8 text-center">
+        <p className="text-[14px] text-white/35">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-bold text-gray-900 hover:text-sky-500 transition-colors">
+          <Link href="/signup" className="font-bold text-white/80 hover:text-sky-400 transition-colors">
             Create one free →
           </Link>
         </p>
       </div>
-
     </div>
   );
 }

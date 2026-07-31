@@ -115,33 +115,44 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </p>
       </div>
 
-      {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 overflow-y-auto relative" style={{ background: "linear-gradient(135deg, #f0f7ff 0%, #faf5ff 50%, #f0f9ff 100%)" }}>
-        {/* Ambient blobs */}
+      {/* Right panel — glassmorphism */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 overflow-y-auto relative bg-[#080E1A]">
+        {/* Vivid color blobs behind the glass */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-96 h-96 bg-sky-200/40 rounded-full blur-[80px]" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-violet-200/30 rounded-full blur-[80px]" />
+          <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-sky-500/25 blur-[100px]" />
+          <div className="absolute -bottom-32 -left-32 w-[450px] h-[450px] rounded-full bg-violet-600/25 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-indigo-500/15 blur-[80px]" />
         </div>
+        {/* Dot grid */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
 
         {/* Mobile logo */}
         <Link href="/" className="lg:hidden mb-8 flex items-center gap-2.5 relative z-10">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center shadow-md shadow-sky-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
             <span className="text-white font-black text-sm">E</span>
           </div>
-          <span className="text-xl font-black text-gray-900 tracking-tight">
-            Edit<span className="text-sky-500">Bridge</span>
+          <span className="text-xl font-black text-white tracking-tight">
+            Edit<span className="text-sky-400">Bridge</span>
           </span>
         </Link>
 
-        {/* Card */}
-        <div className="w-full max-w-[420px] relative z-10 bg-white rounded-3xl shadow-[0_8px_48px_rgba(0,0,0,0.08)] border border-white/80 px-8 py-8">
+        {/* Glass card */}
+        <div className="w-full max-w-[420px] relative z-10 rounded-3xl px-8 py-8"
+          style={{
+            background: "rgba(255,255,255,0.05)",
+            backdropFilter: "blur(32px)",
+            WebkitBackdropFilter: "blur(32px)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            boxShadow: "0 24px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+          }}>
           {children}
 
-          <p className="mt-6 text-[12px] text-gray-300 text-center leading-relaxed">
+          <p className="mt-6 text-[12px] text-white/20 text-center leading-relaxed">
             By continuing you agree to our{" "}
-            <Link href="/terms" className="text-gray-400 underline underline-offset-2 hover:text-gray-600 transition-colors">Terms</Link>{" "}
+            <Link href="/terms" className="text-white/35 underline underline-offset-2 hover:text-white/60 transition-colors">Terms</Link>{" "}
             and{" "}
-            <Link href="/privacy" className="text-gray-400 underline underline-offset-2 hover:text-gray-600 transition-colors">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-white/35 underline underline-offset-2 hover:text-white/60 transition-colors">Privacy Policy</Link>.
           </p>
         </div>
       </div>
