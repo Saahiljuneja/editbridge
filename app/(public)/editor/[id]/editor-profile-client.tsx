@@ -425,8 +425,9 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   // Portfolio category filter states
-  const categories = ["All", ...Array.from(new Set(editor.portfolioItems.map(item => item.category).filter(Boolean)))];
+  const categories = ["All", ...Array.from(new Set(editor.portfolioItems.map(item => item.category).filter(Boolean) as string[]))];
   const [selectedCategory, setSelectedCategory] = useState("All");
+
 
   // Mobile Sticky Bar state
   const [showStickyBar, setShowStickyBar] = useState(false);
