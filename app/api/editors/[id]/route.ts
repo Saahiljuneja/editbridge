@@ -35,7 +35,6 @@ export async function GET(
         featuredVideoUrl: editors.featuredVideoUrl,
         languages: editors.languages,
         workStyleTags: editors.workStyleTags,
-        faqs: editors.faqs,
         previousClients: editors.previousClients,
         completionRate: editors.completionRate,
         totalOrders: editors.totalOrders,

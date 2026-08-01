@@ -70,7 +70,6 @@ interface EditorProfile {
   featuredVideoUrl: string | null;
   languages: string | null;
   workStyleTags: string | null;
-  faqs: string | null;
   previousClients: string | null;
   completionRate: number | null;
   totalOrders: number;
@@ -398,7 +397,6 @@ export default function EditorPublicProfile() {
   const [editor, setEditor] = useState<EditorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [bioExpanded, setBioExpanded] = useState(false);
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -433,7 +431,6 @@ export default function EditorPublicProfile() {
   );
 
   const displayName = editor.displayName || displayNameFromFull(editor.name);
-  const faqs: { question: string; answer: string }[] = editor.faqs ? JSON.parse(editor.faqs) : [];
   const workStyleTags: string[] = editor.workStyleTags ? JSON.parse(editor.workStyleTags) : [];
   const languages: { language: string; level: string }[] = editor.languages ? JSON.parse(editor.languages) : [];
   const bioLong = (editor.bio?.length ?? 0) > 300;
@@ -584,31 +581,6 @@ export default function EditorPublicProfile() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {editor.packages.map(pkg => (
                     <PackageCard key={pkg.id} pkg={pkg} editorId={editor.id} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* FAQs */}
-            {faqs.length > 0 && (
-              <section>
-                <h2 className="text-base font-semibold text-gray-900 mb-3">FAQ</h2>
-                <div className="space-y-2">
-                  {faqs.map((faq, i) => (
-                    <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                        className="w-full flex items-center justify-between px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
-                      >
-                        {faq.question}
-                        {faqOpen === i ? <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
-                      </button>
-                      {faqOpen === i && (
-                        <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
-                          {faq.answer}
-                        </div>
-                      )}
-                    </div>
                   ))}
                 </div>
               </section>

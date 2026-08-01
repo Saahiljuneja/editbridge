@@ -37,7 +37,7 @@ export async function PATCH(request: NextRequest) {
   const {
     name, image, bio, isAvailable, skills: skillList, tools: toolList,
     displayName, title, languages,
-    niches, experienceLevel, yearsOfExperience, workStyleTags, turnaround, faqs,
+    niches, experienceLevel, yearsOfExperience, workStyleTags, turnaround,
     maxActiveOrders, featuredVideoUrl, previousClients, location,
   } = body;
 
@@ -100,10 +100,6 @@ export async function PATCH(request: NextRequest) {
     }
     if (Array.isArray(turnaround) && turnaround.some((t: { type?: string }) => t?.type && hasContactInfo(t.type)))
       return NextResponse.json({ error: "Turnaround time labels cannot contain contact information." }, { status: 422 });
-    if (Array.isArray(faqs) && faqs.some((f: { question?: string; answer?: string }) =>
-      (f?.question && hasContactInfo(f.question)) || (f?.answer && hasContactInfo(f.answer))))
-      return NextResponse.json({ error: "FAQ questions and answers cannot contain contact information." }, { status: 422 });
-
     // Featured video must be a real YouTube, Vimeo, or Google Drive URL, not arbitrary text.
     if (featuredVideoUrl && !getEmbedUrl(String(featuredVideoUrl)))
       return NextResponse.json({ error: "Featured video must be a valid YouTube, Vimeo, or Google Drive URL." }, { status: 422 });
@@ -118,7 +114,6 @@ export async function PATCH(request: NextRequest) {
     if (yearsOfExperience !== undefined) editorUpdates.yearsOfExperience = yearsOfExperience || null;
     if (workStyleTags !== undefined) editorUpdates.workStyleTags = workStyleTags?.length ? JSON.stringify(workStyleTags) : null;
     if (turnaround !== undefined) editorUpdates.turnaround = turnaround?.length ? JSON.stringify(turnaround) : null;
-    if (faqs !== undefined) editorUpdates.faqs = faqs?.length ? JSON.stringify(faqs) : null;
     if (isAvailable !== undefined) editorUpdates.isAvailable = isAvailable;
     if (maxActiveOrders !== undefined) editorUpdates.maxActiveOrders = maxActiveOrders ?? null;
     if (previousClients !== undefined) editorUpdates.previousClients = previousClients || null;

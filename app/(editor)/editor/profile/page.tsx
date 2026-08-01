@@ -33,7 +33,6 @@ export default async function ProfilePage() {
       yearsOfExperience: editors.yearsOfExperience,
       workStyleTags: editors.workStyleTags,
       turnaround: editors.turnaround,
-      faqs: editors.faqs,
       isAvailable: editors.isAvailable,
       vacationUntil: editors.vacationUntil,
       location: editors.location,
@@ -103,7 +102,6 @@ export default async function ProfilePage() {
       initialYearsOfExperience={editor?.yearsOfExperience ?? null}
       initialWorkStyleTags={parseJson(editor?.workStyleTags, [])}
       initialTurnaround={parseJson(editor?.turnaround, [])}
-      initialFaqs={parseJson(editor?.faqs, [])}
       initialSkills={skillRows.map((s) => s.name)}
       initialTools={toolRows.map((t) => t.name)}
       initialIsAvailable={editor?.isAvailable ?? true}

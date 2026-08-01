@@ -18,7 +18,7 @@ import {
   CheckCircle, Camera, Eye, Share2,
   Save, TrendingUp, Star,
   MapPin, MessageCircle, Plus, X, ChevronDown,
-  Briefcase, Clock, Zap, HelpCircle,
+  Briefcase, Clock, Zap,
   Layers, BookOpen, Video, Sliders, PauseCircle,
   Film, Play, Image as ImageIcon, Lightbulb,
 } from "lucide-react";
@@ -32,7 +32,6 @@ import { hasContactInfo } from "@/lib/contact-info";
 
 interface Language { language: string; level: string; }
 interface TurnaroundItem { type: string; days: number; }
-interface FaqItem { question: string; answer: string; }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -64,16 +63,6 @@ const EXPERIENCE_LEVELS = [
   { value: "expert",       label: "Expert",       desc: "Deep specialization"           },
 ];
 
-const FAQ_SUGGESTIONS = [
-  "What file formats do you accept?",
-  "Do you provide revision rounds?",
-  "Can I see samples of your previous work?",
-  "What software do you edit with?",
-  "Do you add music and sound effects?",
-  "How do you handle feedback and changes?",
-  "What is your typical turnaround time?",
-  "Do you offer rush delivery?",
-];
 
 const LANGUAGE_LEVELS = ["Basic", "Conversational", "Fluent", "Native/Bilingual"];
 const COMMON_LANGUAGES = [
@@ -126,7 +115,6 @@ interface Props {
   initialYearsOfExperience: number | null;
   initialWorkStyleTags: string[];
   initialTurnaround: TurnaroundItem[];
-  initialFaqs: FaqItem[];
   initialSkills: string[];
   initialTools: string[];
   initialIsAvailable: boolean;
@@ -155,7 +143,7 @@ export function ProfileClient({
   userName, userImage, userEmail,
   initialBio, initialDisplayName, initialTitle, initialLanguages,
   initialNiches, initialExperienceLevel, initialYearsOfExperience,
-  initialWorkStyleTags, initialTurnaround, initialFaqs,
+  initialWorkStyleTags, initialTurnaround,
   initialSkills, initialTools, initialIsAvailable, initialVacationUntil,
   initialLocation, initialPreviousClients, initialMaxActiveOrders, initialCoverImage, initialFeaturedVideoUrl,
   initialPortfolio, kycStatus,
@@ -180,7 +168,6 @@ export function ProfileClient({
   const [yearsOfExperience, setYearsOfExperience] = useState<number | null>(initialYearsOfExperience);
   const [workStyleTags, setWorkStyleTags] = useState<string[]>(initialWorkStyleTags);
   const [turnaround, setTurnaround] = useState<TurnaroundItem[]>(initialTurnaround);
-  const [faqs, setFaqs] = useState<FaqItem[]>(initialFaqs);
   const [editorSkills, setEditorSkills] = useState(initialSkills);
   const [editorTools, setEditorTools] = useState(initialTools);
   const [isAvailable, setIsAvailable] = useState(initialIsAvailable);
@@ -357,17 +344,11 @@ export function ProfileClient({
         setSaving(false);
         return;
       }
-      if (faqsHaveContact) {
-        toast.error("FAQ questions and answers cannot contain contact information.");
-        setSaving(false);
-        return;
-      }
       if (featuredVideoInvalid) {
         toast.error("Featured video must be a valid YouTube, Vimeo, or Google Drive URL.");
         setSaving(false);
         return;
       }
-      const cleanedFaqs = faqs.filter(f => f.question.trim() && f.answer.trim());
       const res = await fetch("/api/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -381,7 +362,6 @@ export function ProfileClient({
           yearsOfExperience,
           workStyleTags: workStyleTags.length > 0 ? workStyleTags : null,
           turnaround: turnaround.length > 0 ? turnaround : null,
-          faqs: cleanedFaqs.length > 0 ? cleanedFaqs : null,
           skills: editorSkills,
           tools: editorTools,
           isAvailable,
@@ -446,7 +426,6 @@ export function ProfileClient({
   const customNicheHasContact = hasContactInfo(customNicheInput);
   const customWorkStyleHasContact = hasContactInfo(customWorkStyleInput);
   const turnaroundHasContact = turnaround.some(t => hasContactInfo(t.type));
-  const faqsHaveContact = faqs.some(f => hasContactInfo(f.question) || hasContactInfo(f.answer));
 
   // ── Featured video preview/validation ──
   const featuredVideoEmbedUrl = featuredVideoUrl.trim() ? getEmbedUrl(featuredVideoUrl.trim()) : null;
@@ -935,75 +914,6 @@ export function ProfileClient({
                       ) : (
                         <p className="text-xs text-red-500 mt-1.5">Not a valid YouTube, Vimeo, or Google Drive URL — it won&apos;t be saved.</p>
                       )
-                    )}
-                  </Section>
-                </div>
-
-                {/* FAQ */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <Section
-                    icon={HelpCircle}
-                    title="FAQ"
-                    description="Answer common questions upfront — shown on your public profile."
-                    action={
-                      <button onClick={() => setFaqs([...faqs, { question: "", answer: "" }])} className="flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] px-2.5 py-1.5 rounded-lg bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors">
-                        <Plus className="w-3 h-3" /> Add
-                      </button>
-                    }
-                  >
-                    {(() => {
-                      const usedQuestions = new Set(faqs.map(f => f.question));
-                      const available = FAQ_SUGGESTIONS.filter(q => !usedQuestions.has(q));
-                      return available.length > 0 ? (
-                        <div className="mb-4">
-                          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Quick add</p>
-                          <div className="flex flex-wrap gap-2">
-                            {available.map((q) => (
-                              <button key={q} onClick={() => setFaqs([...faqs, { question: q, answer: "" }])} className="px-3 py-1.5 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-500 hover:border-[var(--brand-client)] hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 transition-all">
-                                + {q}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ) : null;
-                    })()}
-                    {faqs.length === 0 ? (
-                      <div className="rounded-xl border-2 border-dashed border-gray-200 py-6 text-center">
-                        <p className="text-sm text-gray-400">Pick a suggestion above or add a custom question.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {faqs.map((faq, i) => {
-                          const qInvalid = hasContactInfo(faq.question);
-                          const aInvalid = hasContactInfo(faq.answer);
-                          return (
-                            <div key={i} className="rounded-xl border border-gray-200 p-4 space-y-2.5 bg-gray-50/50">
-                              <div className="flex items-center gap-2">
-                                <input
-                                  value={faq.question}
-                                  onChange={(e) => { const u = [...faqs]; u[i] = { ...u[i], question: e.target.value }; setFaqs(u); }}
-                                  placeholder="Question" maxLength={150}
-                                  className={cn(
-                                    "flex-1 px-3 py-2 rounded-lg border text-sm bg-white outline-none transition-all",
-                                    qInvalid ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[var(--brand-client)]"
-                                  )}
-                                />
-                                <button onClick={() => setFaqs(faqs.filter((_, idx) => idx !== i))} className="text-gray-300 hover:text-red-400 transition-colors p-1"><X className="w-4 h-4" /></button>
-                              </div>
-                              <textarea
-                                value={faq.answer}
-                                onChange={(e) => { const u = [...faqs]; u[i] = { ...u[i], answer: e.target.value }; setFaqs(u); }}
-                                placeholder="Answer" rows={2} maxLength={500}
-                                className={cn(
-                                  "w-full px-3 py-2 rounded-lg border text-sm bg-white outline-none resize-none transition-all",
-                                  aInvalid ? "border-red-300 focus:border-red-400" : "border-gray-200 focus:border-[var(--brand-client)]"
-                                )}
-                              />
-                              {(qInvalid || aInvalid) && <p className="text-xs text-red-500">Contact info not allowed here.</p>}
-                            </div>
-                          );
-                        })}
-                      </div>
                     )}
                   </Section>
                 </div>
