@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { editors, users, packages, skills, tools, portfolioItems, reviews } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { editors, users, packages, skills, tools, portfolioItems, reviews, savedEditors, profileEvents } from "@/lib/db/schema";
+
+
+
+import { and, eq, sql } from "drizzle-orm";
 import { displayNameFromFull } from "@/lib/utils";
 import { auth } from "@/lib/auth";
 import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
@@ -54,6 +57,37 @@ async function getEditorProfileData(id: string) {
   if (!editorRows[0]) return null;
   const editor = editorRows[0];
 
+  // Log profile view event if viewer is not the editor themselves or staff
+  const isSelf = session?.user?.role === "editor" && session.user.editorId === id;
+  const isStaff = session?.user?.role && ["admin", "staff_kyc", "staff_support", "staff_dispute", "staff_moderation"].includes(session.user.role);
+  if (!isSelf && !isStaff) {
+    db.insert(profileEvents)
+      .values({
+        editorId: id,
+        eventType: "profile_view",
+        viewerId: session?.user?.userId || null,
+      })
+      .catch(() => {});
+  }
+
+  // Get total view count from events
+  const [viewCountRow] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(profileEvents)
+    .where(and(eq(profileEvents.editorId, id), eq(profileEvents.eventType, "profile_view")));
+  const viewCount = (viewCountRow?.count ?? 0) + (!isSelf && !isStaff ? 1 : 0);
+
+  // Check bookmark status
+  let isBookmarked = false;
+  if (session?.user?.userId) {
+    const [saved] = await db
+      .select({ id: savedEditors.id })
+      .from(savedEditors)
+      .where(and(eq(savedEditors.clientId, session.user.userId), eq(savedEditors.editorId, id)))
+      .limit(1);
+    isBookmarked = !!saved;
+  }
+
   const [packageRows, skillRows, toolRows, portfolioRows, reviewRows] = await Promise.all([
     db
       .select()
@@ -84,6 +118,17 @@ async function getEditorProfileData(id: string) {
     reviewRows.length > 0
       ? Math.round((reviewRows.reduce((sum, r) => sum + r.rating, 0) / reviewRows.length) * 10) / 10
       : null;
+
+  // Calculate rating breakdown percentages (5★ down to 1★)
+  const totalReviews = reviewRows.length;
+  const ratingCounts = [0, 0, 0, 0, 0];
+  reviewRows.forEach((r) => {
+    const star = Math.min(Math.max(r.rating, 1), 5);
+    ratingCounts[5 - star]++;
+  });
+  const ratingDistribution = ratingCounts.map((c) =>
+    totalReviews > 0 ? Math.round((c / totalReviews) * 100) : 0
+  );
 
   const r2Base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
   const portfolioItemsOut = portfolioRows.map((p) => ({
@@ -120,6 +165,9 @@ async function getEditorProfileData(id: string) {
     reviews: reviewsOut,
     avgRating,
     reviewCount: reviewRows.length,
+    viewCount,
+    isBookmarked,
+    ratingDistribution,
   };
 }
 

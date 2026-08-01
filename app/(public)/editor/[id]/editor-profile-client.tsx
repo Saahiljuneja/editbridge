@@ -5,7 +5,8 @@ import Link from "next/link";
 import {
   MapPin, Star, CheckCircle2, Clock, TrendingUp, Zap,
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MessageSquare, Play,
-  BadgeCheck, Globe, Briefcase, Award, X, ArrowLeftRight
+  BadgeCheck, Globe, Briefcase, Award, X, ArrowLeftRight,
+  Eye, Share2, Bookmark
 } from "lucide-react";
 import { displayNameFromFull } from "@/lib/utils";
 import { getThumbnailUrl, getVideoSource } from "@/lib/portfolio-media";
@@ -13,6 +14,7 @@ import { PortfolioVideoPlayer } from "@/components/public/portfolio-video-player
 import { RequestQuoteButton } from "@/components/client/request-quote-button";
 import { PackageClickLink } from "@/components/editor/package-click-link";
 import { FRAME_STYLES, type FrameKey } from "@/lib/xp-shop-config";
+import { toast } from "sonner";
 
 interface Package {
   id: string;
@@ -84,8 +86,10 @@ interface EditorProfile {
   avgRating: number | null;
   reviewCount: number;
   activeFrame: string | null;
+  viewCount?: number;
+  isBookmarked?: boolean;
+  ratingDistribution?: number[];
 }
-
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -269,8 +273,11 @@ function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (ind
               <span className="absolute top-1.5 right-1.5 bg-amber-400 rounded-full w-2 h-2" />
             )}
             {item.orderId && (
-              <span className="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[9px] font-bold text-indigo-700 flex items-center gap-0.5">
+              <span className="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[9px] font-bold text-indigo-700 flex items-center gap-0.5 cursor-help group/vtooltip">
                 <BadgeCheck className="w-2.5 h-2.5" />Verified
+                <div className="absolute top-full left-0 mt-1 w-44 hidden group-hover/vtooltip:block bg-gray-900 text-white text-[9px] rounded p-2 leading-normal shadow-md z-30 font-medium normal-case">
+                  Verified Order: This video was created for an actual completed order on EditBridge.
+                </div>
               </span>
             )}
             {item.beforeUrl && (
@@ -413,6 +420,29 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  // Bookmarking wishlist states
+  const [bookmarked, setBookmarked] = useState(editor.isBookmarked ?? false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+  // Portfolio category filter states
+  const categories = ["All", ...Array.from(new Set(editor.portfolioItems.map(item => item.category).filter(Boolean)))];
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // Mobile Sticky Bar state
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (window.scrollY > 300) {
+        setShowStickyBar(true);
+      } else {
+        setShowStickyBar(false);
+      }
+    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const displayName = editor.displayName || displayNameFromFull(editor.name);
   const workStyleTags: string[] = editor.workStyleTags ? JSON.parse(editor.workStyleTags) : [];
   
@@ -430,6 +460,36 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
   const languages: { language: string; level: string }[] = editor.languages ? JSON.parse(editor.languages) : [];
   const bioLong = (editor.bio?.length ?? 0) > 300;
   const expLabel = editor.experienceLevel === "entry" ? "Entry level" : editor.experienceLevel === "intermediate" ? "Intermediate" : editor.experienceLevel === "expert" ? "Expert" : null;
+
+  async function handleBookmarkToggle() {
+    if (bookmarkLoading) return;
+    setBookmarkLoading(true);
+    try {
+      const res = await fetch("/api/saved-editors", {
+        method: bookmarked ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ editorId: editor.id }),
+      });
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+      if (res.ok) {
+        const nextState = !bookmarked;
+        setBookmarked(nextState);
+        toast.success(nextState ? "Saved to wishlist!" : "Removed from wishlist");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    } finally {
+      setBookmarkLoading(false);
+    }
+  }
+
+  const filteredPortfolio = selectedCategory === "All"
+    ? editor.portfolioItems
+    : editor.portfolioItems.filter(item => item.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -458,7 +518,12 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
               <Avatar src={editor.image} name={displayName} size={96} activeFrame={editor.activeFrame} />
             </div>
             {editor.kycStatus === "approved" && (
-              <BadgeCheck className="absolute bottom-1 right-1 w-6 h-6 text-indigo-600 fill-white drop-shadow-sm" />
+              <div className="absolute bottom-1 right-1 group/tooltip z-10">
+                <BadgeCheck className="w-6 h-6 text-indigo-600 fill-white drop-shadow-sm cursor-help" />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 hidden group-hover/tooltip:block bg-gray-900 text-white text-[10px] rounded-lg p-2.5 text-center leading-relaxed shadow-md z-30 font-medium normal-case">
+                  KYC Verified: Government ID and bank details of this editor are verified by EditBridge.
+                </div>
+              </div>
             )}
           </div>
           {/* Action buttons */}
@@ -484,6 +549,32 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
             >
               <MessageSquare className="w-4 h-4 text-gray-500" />Message
             </Link>
+            
+            {/* Bookmark button */}
+            <button
+              onClick={handleBookmarkToggle}
+              disabled={bookmarkLoading}
+              className={`inline-flex items-center justify-center border p-2.5 rounded-xl transition-colors shadow-sm ${
+                bookmarked
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
+                  : "bg-white border-gray-250 hover:bg-gray-50 text-gray-700"
+              }`}
+              title={bookmarked ? "Remove from wishlist" : "Save to wishlist"}
+            >
+              <Bookmark className={`w-4 h-4 ${bookmarked ? "fill-indigo-600 text-indigo-600" : "text-gray-500"}`} />
+            </button>
+
+            {/* Share button */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success("Profile link copied!");
+              }}
+              className="inline-flex items-center justify-center bg-white border border-gray-250 hover:bg-gray-50 text-gray-700 p-2.5 rounded-xl transition-colors shadow-sm"
+              title="Share profile"
+            >
+              <Share2 className="w-4 h-4 text-gray-500" />
+            </button>
           </div>
         </div>
 
@@ -548,7 +639,7 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
                   {editor.bio}
                 </p>
                 {bioLong && (
-                  <button onClick={() => setBioExpanded(e => !e)} className="text-xs font-semibold text-indigo-600 mt-2 hover:text-indigo-850 flex items-center gap-0.5">
+                  <button onClick={() => setBioExpanded(e => !e)} className="text-xs font-semibold text-indigo-600 mt-2 hover:text-indigo-855 flex items-center gap-0.5">
                     {bioExpanded ? <><ChevronUp className="w-3.5 h-3.5" />Show less</> : <><ChevronDown className="w-3.5 h-3.5" />Read more</>}
                   </button>
                 )}
@@ -612,7 +703,27 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
             {editor.portfolioItems.length > 0 && (
               <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
                 <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Portfolio</h2>
-                <PortfolioGrid items={editor.portfolioItems} onOpen={setLightboxIndex} />
+                
+                {/* Category Filter tabs */}
+                {categories.length > 2 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-4 scrollbar-none">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`text-xs font-semibold px-3.5 py-2 rounded-lg border transition-all shrink-0 ${
+                          selectedCategory === cat
+                            ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
+                            : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                <PortfolioGrid items={filteredPortfolio} onOpen={setLightboxIndex} />
               </section>
             )}
 
@@ -636,6 +747,32 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
                     Reviews ({editor.reviewCount})
                   </h2>
                 </div>
+
+                {/* Rating Breakdown Graph */}
+                {editor.reviewCount > 0 && editor.ratingDistribution && (
+                  <div className="bg-gray-50 border border-gray-150 rounded-2xl p-5 mb-6 flex flex-col gap-2.5 shadow-inner">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rating Breakdown</p>
+                    <div className="space-y-2">
+                      {[5, 4, 3, 2, 1].map((stars, idx) => {
+                        const pct = editor.ratingDistribution ? (editor.ratingDistribution[idx] ?? 0) : 0;
+                        return (
+                          <div key={stars} className="flex items-center gap-3 text-xs">
+                            <span className="w-8 font-semibold text-gray-600 flex items-center gap-0.5 shrink-0">
+                              {stars}★
+                            </span>
+                            <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="w-8 text-right font-bold text-gray-400 shrink-0">
+                              {pct}%
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   {editor.reviews.slice(0, 6).map(r => <ReviewCard key={r.id} review={r} />)}
                 </div>
@@ -676,13 +813,27 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
                     <span className="text-sm text-gray-600 flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-amber-500" />Avg response
                     </span>
-                    <span className="text-sm font-bold text-gray-900">
+                    <span className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full ${
+                        editor.avgResponseTime < 60 ? "bg-emerald-500" :
+                        editor.avgResponseTime < 240 ? "bg-amber-400" :
+                        "bg-red-500"
+                      }`} />
                       {editor.avgResponseTime < 60
                         ? `${editor.avgResponseTime}m`
                         : `${Math.round(editor.avgResponseTime / 60)}h`}
                     </span>
                   </div>
                 )}
+                {/* Profile View Counter */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-sky-500" />Profile views
+                  </span>
+                  <span className="text-sm font-bold text-gray-900">
+                    {editor.viewCount?.toLocaleString() ?? 0}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -761,7 +912,7 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
 
       {lightboxIndex !== null && (
         <PortfolioLightbox
-          items={editor.portfolioItems}
+          items={filteredPortfolio}
           index={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onNavigate={setLightboxIndex}
@@ -769,6 +920,40 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
           editorVerified={editor.kycStatus === "approved"}
         />
       )}
+
+      {/* Mobile Sticky CTA Bar */}
+      <div className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-250 px-4 py-3.5 shadow-2xl flex items-center justify-between gap-4 lg:hidden transition-all duration-300 transform ${
+        showStickyBar ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
+      }`}>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Avatar src={editor.image} name={displayName} size={40} activeFrame={editor.activeFrame} />
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-gray-900 truncate">{displayName}</p>
+            {editor.packages.length > 0 && (
+              <p className="text-[10px] font-semibold text-gray-500">
+                Starting from {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="shrink-0 flex items-center gap-2">
+          {editor.isAvailable ? (
+            <Link
+              href={`/client/orders/new?editorId=${editor.id}`}
+              className="bg-[#0EA5E9] hover:bg-sky-600 text-white text-xs font-bold px-4.5 py-2.5 rounded-xl transition-colors shadow-sm"
+            >
+              Hire me
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="bg-gray-100 text-gray-400 text-xs font-bold px-4.5 py-2.5 rounded-xl cursor-not-allowed border border-gray-200"
+            >
+              Unavailable
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
