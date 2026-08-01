@@ -1,85 +1,178 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, Star } from "lucide-react";
+import { db } from "@/lib/db";
+import { editors, users, reviews } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
+import { displayNameFromFull } from "@/lib/utils";
+import { auth } from "@/lib/auth";
 
-export const metadata: Metadata = {
-  title: "Disclaimer — EditBridge",
-  description: "Disclaimer of warranties and limitation of liability for EditBridge.",
-};
+export const dynamic = "force-dynamic";
 
-const SECTIONS = [
-  {
-    num: "1",
-    title: "Platform as Marketplace",
-    body: `EditBridge is a marketplace that connects clients with independent video editors. EditBridge itself does not produce, edit, or deliver any video content. All editing services are provided by independent editors who are solely responsible for the quality and timeliness of their work.`,
-  },
-  {
-    num: "2",
-    title: "No Warranty on Editor Work",
-    body: `EditBridge makes no warranties, express or implied, regarding the quality, accuracy, fitness for purpose, or completeness of any work delivered by editors on the platform. Client satisfaction depends on the editor's skills, the clarity of the brief provided, and the revision process. EditBridge recommends reviewing editor portfolios, ratings, and reviews before placing an order.`,
-  },
-  {
-    num: "3",
-    title: "No Warranty on Platform Availability",
-    body: `EditBridge is provided "as is" and "as available." We do not guarantee that the platform will be available at all times, error-free, or free from interruptions. We may perform maintenance, upgrades, or experience downtime outside our control. We are not liable for any loss arising from platform unavailability.`,
-  },
-  {
-    num: "4",
-    title: "Limitation of Liability",
-    body: `To the maximum extent permitted by applicable law, EditBridge, its directors, employees, and affiliates shall not be liable for any indirect, incidental, consequential, or punitive damages arising from your use of the platform or any services obtained through it — including but not limited to loss of revenue, loss of data, or dissatisfaction with editor deliverables. EditBridge's total aggregate liability to any user for any claim arising from the use of the platform shall not exceed the total amount paid by that user through the platform in the 3 months preceding the claim.`,
-  },
-  {
-    num: "5",
-    title: "Third-Party Links and Services",
-    body: `The platform may contain links to third-party websites or integrate with third-party services (e.g., Razorpay for payments). EditBridge is not responsible for the content, privacy practices, or terms of any third-party service. Use of third-party services is at your own risk.`,
-  },
-  {
-    num: "6",
-    title: "Copyright and Intellectual Property",
-    body: `Upon full payment and order completion, intellectual property in the delivered work transfers to the client, unless otherwise agreed in writing between the client and editor. EditBridge does not claim any ownership over editor deliverables. Editors are responsible for ensuring their work does not infringe on third-party copyrights (e.g., music, stock footage).`,
-  },
-  {
-    num: "7",
-    title: "Accuracy of Information",
-    body: `EditBridge endeavours to keep information on the platform accurate and up to date but does not guarantee the accuracy, completeness, or timeliness of any content, including editor profiles, package descriptions, and pricing. Editors are responsible for maintaining accurate profiles.`,
-  },
-  {
-    num: "8",
-    title: "Governing Law",
-    body: `This disclaimer and any disputes arising from it are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts of Delhi, India.`,
-  },
-];
+async function getEditorReviewsData(id: string) {
+  const session = await auth();
+  const isOwnProfile = session?.user?.role === "editor" && session.user.editorId === id;
 
-export default function DisclaimerPage() {
+  const [editor] = await db
+    .select({
+      id: editors.id,
+      userId: editors.userId,
+      displayName: editors.displayName,
+      name: users.name,
+      image: users.image,
+      kycStatus: editors.kycStatus,
+    })
+    .from(editors)
+    .innerJoin(users, eq(editors.userId, users.id))
+    .where(
+      isOwnProfile
+        ? eq(editors.id, id)
+        : and(eq(editors.id, id), eq(editors.kycStatus, "approved"))
+    )
+    .limit(1);
+
+  if (!editor) return null;
+
+  const reviewRows = await db
+    .select({
+      id: reviews.id,
+      rating: reviews.rating,
+      text: reviews.text,
+      replyText: reviews.replyText,
+      createdAt: reviews.createdAt,
+      reviewerName: users.name,
+      reviewerImage: users.image,
+    })
+    .from(reviews)
+    .innerJoin(users, eq(reviews.reviewerId, users.id))
+    .where(and(eq(reviews.revieweeId, editor.userId), eq(reviews.role, "client")))
+    .orderBy(reviews.createdAt);
+
+  const avgRating =
+    reviewRows.length > 0
+      ? Math.round((reviewRows.reduce((sum, r) => sum + r.rating, 0) / reviewRows.length) * 10) / 10
+      : null;
+
+  return {
+    editor,
+    reviews: reviewRows.map(r => ({
+      ...r,
+      reviewerName: displayNameFromFull(r.reviewerName),
+    })),
+    avgRating,
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getEditorReviewsData(id);
+  if (!data) {
+    return {
+      title: "Reviews Not Found — EditBridge",
+    };
+  }
+  const name = data.editor.displayName || displayNameFromFull(data.editor.name);
+  return {
+    title: `Client Reviews for ${name} | EditBridge`,
+    description: `Read all client reviews and ratings for video editor ${name} on EditBridge.`,
+  };
+}
+
+export default async function EditorReviewsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const data = await getEditorReviewsData(id);
+
+  if (!data) notFound();
+
+  const name = data.editor.displayName || displayNameFromFull(data.editor.name);
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-[#07050f] px-4 py-16">
-        <div className="px-8 py-6">
-          <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Legal</p>
-          <h1 className="text-3xl font-extrabold text-white mb-3">Disclaimer</h1>
-          <p className="text-white/40 text-sm">Last updated: June 2025</p>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="bg-white border-b border-gray-150 py-8">
+        <div className="max-w-3xl mx-auto px-6">
+          <Link
+            href={`/editor/${id}`}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-gray-600 mb-4 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to profile
+          </Link>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+            Client Reviews for {name}
+          </h1>
+          {data.avgRating && (
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-4 h-4 ${star <= Math.round(data.avgRating!) ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-gray-700 font-bold">
+                {data.avgRating} <span className="text-gray-400 font-normal">({data.reviews.length} reviews)</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-8 py-6 space-y-10">
-        {SECTIONS.map((s) => (
-          <section key={s.num}>
-            <h2 className="text-base font-bold text-gray-900 mb-2">
-              {s.num}. {s.title}
-            </h2>
-            <p className="text-sm text-gray-500 leading-relaxed">{s.body}</p>
-          </section>
-        ))}
-
-        {/* Footer links */}
-        <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-400">
-          <Link href="/terms" className="hover:text-[var(--brand-client)]">Terms of Service</Link>
-          <Link href="/privacy" className="hover:text-[var(--brand-client)]">Privacy Policy</Link>
-          <Link href="/refund" className="hover:text-[var(--brand-client)]">Refund Policy</Link>
-          <Link href="/contact" className="hover:text-[var(--brand-client)]">Contact Us</Link>
-        </div>
-      </div>
+      <main className="max-w-3xl mx-auto px-6 py-8">
+        {data.reviews.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-gray-150 p-12 text-center shadow-sm">
+            <Star className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+            <p className="text-gray-500 font-semibold">No reviews yet for this editor.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {data.reviews.map((review) => (
+              <div key={review.id} className="bg-white border border-gray-150/70 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  {review.reviewerImage ? (
+                    <img src={review.reviewerImage} alt={review.reviewerName} className="w-9 h-9 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                      {review.reviewerName.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate">{review.reviewerName}</p>
+                    <p className="text-[11px] text-gray-400">{new Date(review.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}</p>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-3.5 h-3.5 ${star <= review.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {review.text && (
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                    {review.text}
+                  </p>
+                )}
+                {review.replyText && (
+                  <div className="bg-gray-50 rounded-xl p-3.5 text-xs text-gray-600 border-l-2 border-indigo-200">
+                    <p className="font-bold text-gray-800 mb-0.5">Editor replied:</p>
+                    {review.replyText}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   );
 }
