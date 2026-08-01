@@ -217,40 +217,42 @@ export function PackagesManager({
     <div className="space-y-5">
       {/* Stats bar */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200">
-            <span className="text-xs text-gray-500">Services</span>
-            <span className="text-xs font-bold text-gray-800">{totalCreated}</span>
+        <div className="flex items-center divide-x divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-2.5">
+            <span className="text-xs font-medium text-gray-400">Services</span>
+            <span className="text-sm font-bold text-gray-900">{totalCreated}</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-xs text-emerald-700 font-medium">{activeCount} active</span>
+          <div className="flex items-center gap-1.5 px-4 py-2.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
+            <span className="text-xs text-gray-400">active</span>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200">
-            <span className="text-xs text-gray-500">Categories</span>
-            <span className="text-xs font-bold text-gray-800">{setKeys.length}</span>
+          <div className="flex items-center gap-2 px-4 py-2.5">
+            <span className="text-xs font-medium text-gray-400">Sets</span>
+            <span className="text-sm font-bold text-gray-900">{setKeys.length}</span>
           </div>
           <div className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium",
-            totalCreated >= maxPackages
-              ? "bg-red-50 border-red-200 text-red-700"
-              : totalCreated >= maxPackages - 1
-              ? "bg-amber-50 border-amber-200 text-amber-700"
-              : "bg-violet-50 border-violet-200 text-violet-700"
+            "flex items-center gap-1.5 px-4 py-2.5",
+            totalCreated >= maxPackages ? "bg-red-50/70" : ""
           )}>
-            <span className="text-inherit opacity-70">Slots</span>
-            <span className="font-bold">{totalCreated}/{maxPackages}</span>
+            <span className="text-xs font-medium text-gray-400">Slots</span>
+            <span className={cn(
+              "text-sm font-bold",
+              totalCreated >= maxPackages ? "text-red-600"
+                : totalCreated >= maxPackages - 1 ? "text-amber-600"
+                : "text-violet-700"
+            )}>{totalCreated}/{maxPackages}</span>
             {totalCreated >= maxPackages && (
-              <span className="text-[10px] font-semibold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize">{level} limit</span>
+              <span className="text-[10px] font-semibold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize">{level}</span>
             )}
           </div>
         </div>
         <button
           onClick={() => setShowPicker((v) => !v)}
-          className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-colors shadow-sm"
+          className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
-          Add category set
+          New service set
         </button>
       </div>
 
@@ -335,7 +337,7 @@ export function PackagesManager({
             <button
               onClick={addSet}
               disabled={!canAdd}
-              className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-editor-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Create set <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -378,11 +380,11 @@ export function PackagesManager({
             {/* Set header */}
             <div className="flex items-center justify-between px-5 py-4 bg-white border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${catMeta.color}18` }}>
-                  <div className="w-3 h-3 rounded-full" style={{ background: catMeta.color }} />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${catMeta.color}15` }}>
+                  <div className="w-3.5 h-3.5 rounded-full" style={{ background: catMeta.color }} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-sm font-semibold text-gray-900">{catMeta.label}</span>
                     {fmtMeta && (
                       <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full", fmtMeta.badge)}>
@@ -390,7 +392,15 @@ export function PackagesManager({
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-gray-400">{pkgs.length} service{pkgs.length !== 1 ? "s" : ""}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">{pkgs.length} service{pkgs.length !== 1 ? "s" : ""}</span>
+                    {pkgs.length > 0 && (
+                      <>
+                        <span className="text-gray-200">·</span>
+                        <span className="text-xs font-medium text-emerald-500">{pkgs.filter(p => p.isActive).length} active</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -416,53 +426,21 @@ export function PackagesManager({
                   const isThisEditing = isEditingHere && editingPkg?.id === pkg.id;
                   return (
                     <div key={pkg.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+                      {/* Main content */}
                       <div className="px-4 pt-4 pb-3">
-                        {/* Title row */}
-                        <div className="flex items-start justify-between gap-3">
+                        {/* Title + Price */}
+                        <div className="flex items-start justify-between gap-3 mb-3">
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <span className={cn(
-                                "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full",
-                                pkg.isActive ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-                              )}>
-                                <span className={cn("w-1.5 h-1.5 rounded-full", pkg.isActive ? "bg-emerald-500" : "bg-amber-400")} />
-                                {pkg.isActive ? "Active" : "Paused"}
-                              </span>
-                            </div>
-                            <p className="text-sm font-semibold text-gray-900 leading-snug">{pkg.title}</p>
+                            <p className="text-[15px] font-semibold text-gray-900 leading-snug">{pkg.title}</p>
                             <p className="text-xs text-gray-400 mt-0.5 line-clamp-2 leading-relaxed">{pkg.description}</p>
                           </div>
-                          <div className="flex flex-col items-end gap-2.5 shrink-0">
-                            <p className="text-xl font-bold text-gray-900">{formatCurrency(pkg.price)}</p>
-                            <div className="flex items-center gap-1.5">
-                              <Switch checked={pkg.isActive} onCheckedChange={() => toggleActive(pkg)} className="scale-75" />
-                              <button
-                                onClick={() => openForm(key, pkg)}
-                                className={cn(
-                                  "p-1.5 rounded-lg border transition-colors",
-                                  isThisEditing
-                                    ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
-                                    : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600 hover:bg-gray-50"
-                                )}
-                                title="Edit"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={() => deletePackage(pkg)}
-                                className="p-1.5 rounded-lg border border-red-100 text-red-400 hover:bg-red-50 hover:border-red-200 transition-colors"
-                                title="Delete"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
+                          <p className="text-2xl font-black text-gray-900 shrink-0 leading-none">{formatCurrency(pkg.price)}</p>
                         </div>
 
                         {/* Spec chips */}
-                        <div className="flex flex-wrap gap-1.5 mt-3">
-                          <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
-                            <Clock className="w-3 h-3 text-gray-400" /> {pkg.deliveryDays}d delivery
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-lg">
+                            <Clock className="w-3 h-3" /> {pkg.deliveryDays}d delivery
                           </span>
                           <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
                             <RefreshCw className="w-3 h-3 text-gray-400" /> {pkg.revisionCount === -1 ? "Unlimited" : pkg.revisionCount} revision{pkg.revisionCount !== 1 ? "s" : ""}
@@ -473,17 +451,17 @@ export function PackagesManager({
                             </span>
                           )}
                           {pkg.videoLengthLimit && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                            <span className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
                               {pkg.videoLengthLimit}
                             </span>
                           )}
                           {pkg.resolution && (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded-lg uppercase">
+                            <span className="text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded-lg uppercase tracking-wide">
                               {pkg.resolution}
                             </span>
                           )}
                           {pkg.maxRawFootage && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                            <span className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
                               Raw: {pkg.maxRawFootage}
                             </span>
                           )}
@@ -527,6 +505,40 @@ export function PackagesManager({
                         )}
                       </div>
 
+                      {/* Footer action bar */}
+                      <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-100 bg-gray-50/60">
+                        <div className="flex items-center gap-2">
+                          <Switch checked={pkg.isActive} onCheckedChange={() => toggleActive(pkg)} className="scale-[0.8]" />
+                          <span className={cn(
+                            "text-xs font-semibold",
+                            pkg.isActive ? "text-emerald-600" : "text-amber-600"
+                          )}>
+                            {pkg.isActive ? "Active" : "Paused"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => openForm(key, pkg)}
+                            className={cn(
+                              "flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors",
+                              isThisEditing
+                                ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
+                                : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
+                            )}
+                            title="Edit"
+                          >
+                            <Pencil className="w-3 h-3" /> Edit
+                          </button>
+                          <button
+                            onClick={() => deletePackage(pkg)}
+                            className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
                       {/* Inline edit form */}
                       {isThisEditing && (
                         <div className="border-t border-gray-100 p-5 bg-[var(--brand-client)]/[0.02]">
@@ -566,7 +578,7 @@ export function PackagesManager({
                     onClick={() => openForm(key, null)}
                     className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-3.5 text-sm font-semibold text-gray-400 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/[0.02] transition-all"
                   >
-                    <Plus className="w-4 h-4" /> Add service
+                    <Plus className="w-4 h-4" /> Add a service to this set
                   </button>
                 )}
               </div>

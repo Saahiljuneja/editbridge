@@ -1,4 +1,4 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { editors, packages, userPoints } from "@/lib/db/schema";
@@ -34,20 +34,21 @@ export default async function PackagesPage() {
   }
 
   return (
-    <div className="px-8 py-6 ">
-      <h1 className="text-2xl font-bold mb-1">Services</h1>
-      <p className="text-muted-foreground mb-8">
-        List the video editing services you offer. Group them by category and format to help clients find the right fit.
+    <div className="px-8 py-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-1">Services</h1>
+      <p className="text-sm text-muted-foreground mb-6">
+        List the editing services you offer. Group by category and format so clients find the right fit.
       </p>
 
       {/* Reward discount notice */}
-      <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 mb-8 text-sm text-amber-800">
+      <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 mb-8">
         <Info className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
-        <p>
-          <span className="font-semibold">Heads up:</span> Clients with Member Rewards may receive a discount (up to 10%) on your package price.
-          This comes from your package amount â€” your final payout will reflect the discounted price minus the 15% platform fee.
-          You&apos;ll always see a full breakdown on each order.
-        </p>
+        <div>
+          <p className="text-sm font-semibold text-amber-800 mb-0.5">Member Rewards discount</p>
+          <p className="text-xs text-amber-700 leading-relaxed">
+            Clients with Member Rewards may receive up to 10% off your listed price. Your payout reflects the discounted price minus the 15% platform fee &mdash; you&apos;ll see a full breakdown on each order.
+          </p>
+        </div>
       </div>
 
       <PackagesManager
