@@ -18,7 +18,14 @@ export const FEATURE_FLAG_REGISTRY = {
     portal: "public",
     defaultEnabled: true,
   },
+  editor_membership_pricing: {
+    label: "Editor Membership Tiers",
+    description: "Display the 4-tier editor portal membership subscription plans on the pricing page.",
+    portal: "public",
+    defaultEnabled: false,
+  },
 } as const;
+
 
 export type FeatureFlagKey = keyof typeof FEATURE_FLAG_REGISTRY;
 
