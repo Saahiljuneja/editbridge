@@ -76,15 +76,16 @@ interface EditorProfile {
   kycStatus: string;
   isAvailable: boolean;
   createdAt: string;
-  packages: Package[];
+  packages: any[];
   skills: string[];
   tools: string[];
   portfolioItems: PortfolioItem[];
-  reviews: Review[];
+  reviews: any[];
   avgRating: number | null;
   reviewCount: number;
   activeFrame: string | null;
 }
+
 
 function Stars({ rating }: { rating: number }) {
   return (

@@ -189,7 +189,7 @@ export default async function EditorPublicProfilePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <EditorProfileClient editor={editor} />
+      <EditorProfileClient editor={editor as any} />
     </>
   );
 }
