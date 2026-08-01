@@ -6,9 +6,10 @@ export default function EditorProfileLoading() {
       
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Avatar Profile Info Skeleton */}
-        <div className="flex items-end gap-4 -mt-12 sm:-mt-14 mb-8">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 animate-pulse ring-4 ring-white shrink-0" />
+        <div className="flex items-end gap-4 pb-1 pt-4 sm:pt-6 mb-8">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 animate-pulse ring-4 ring-white shrink-0 -mt-16 sm:-mt-20 z-10" />
           <div className="pb-1 space-y-2.5 flex-1 min-w-0">
+
             <div className="h-7 w-48 bg-gray-200 rounded-lg animate-pulse" />
             <div className="h-4 w-64 bg-gray-150 rounded-lg animate-pulse" />
             <div className="flex gap-2 mt-2">

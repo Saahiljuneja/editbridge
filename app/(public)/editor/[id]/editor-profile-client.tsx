@@ -527,11 +527,12 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Avatar row */}
-        <div className="flex items-end justify-between -mt-12 sm:-mt-14 pb-1">
-          <div className="relative shrink-0">
+        <div className="flex items-end justify-between pb-1 pt-4 sm:pt-6">
+          <div className="relative shrink-0 -mt-16 sm:-mt-20 z-10">
             <div className="ring-4 ring-white rounded-full shadow-lg overflow-hidden bg-white">
               <Avatar src={editor.image} name={displayName} size={96} activeFrame={editor.activeFrame} />
             </div>
+
             {editor.kycStatus === "approved" && (
               <div className="absolute bottom-1 right-1 group/tooltip z-10">
                 <BadgeCheck className="w-6 h-6 text-indigo-600 fill-white drop-shadow-sm cursor-help" />
