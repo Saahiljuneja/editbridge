@@ -78,7 +78,10 @@ interface EditorProfile {
   kycStatus: string;
   isAvailable: boolean;
   createdAt: string;
+  kycApprovedAt?: string | null;
   packages: any[];
+
+
   skills: string[];
   tools: string[];
   portfolioItems: PortfolioItem[];
@@ -121,10 +124,17 @@ function Avatar({ src, name, size = 80, activeFrame }: { src: string | null; nam
   );
 }
 
-function PackageCard({ pkg, editorId, isAvailable }: { pkg: Package; editorId: string; isAvailable: boolean }) {
+function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Package; editorId: string; isAvailable: boolean; isHighlighted?: boolean }) {
   const price = (pkg.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
   return (
-    <div className="border border-gray-200 rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md hover:border-gray-300 transition-all bg-white">
+    <div className={`relative border rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-all bg-white ${
+      isHighlighted ? "border-indigo-500 ring-2 ring-indigo-500/10 shadow-sm" : "border-gray-200 hover:border-gray-300"
+    }`}>
+      {isHighlighted && (
+        <span className="absolute -top-2.5 right-4 bg-indigo-600 text-white text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
+          Most Popular
+        </span>
+      )}
       {pkg.tier && (
         <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">{pkg.tier}</span>
       )}
@@ -169,7 +179,9 @@ function PackageCard({ pkg, editorId, isAvailable }: { pkg: Package; editorId: s
         <PackageClickLink
           href={`/client/orders/new?editorId=${editorId}&packageId=${pkg.id}`}
           packageId={pkg.id}
-          className="mt-auto block w-full text-center bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
+          className={`mt-auto block w-full text-center text-sm font-semibold py-2.5 rounded-xl transition-colors ${
+            isHighlighted ? "bg-indigo-600 hover:bg-indigo-700 text-white" : "bg-gray-900 hover:bg-gray-800 text-white"
+          }`}
         >
           Hire for {price}
         </PackageClickLink>
@@ -184,6 +196,7 @@ function PackageCard({ pkg, editorId, isAvailable }: { pkg: Package; editorId: s
     </div>
   );
 }
+
 
 function ReviewCard({ review }: { review: Review }) {
   const [expanded, setExpanded] = useState(false);
@@ -416,9 +429,10 @@ function PortfolioLightbox({ items, index, onClose, onNavigate, editorName, edit
   );
 }
 
-export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
+export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProfile; isLoggedIn: boolean }) {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
 
   // Bookmarking wishlist states
   const [bookmarked, setBookmarked] = useState(editor.isBookmarked ?? false);
@@ -495,7 +509,7 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Cover */}
-      <div className="h-44 sm:h-56 w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-800 border-b border-gray-200">
+      <div className="h-56 sm:h-64 w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-800 border-b border-gray-200">
         {editor.coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={editor.coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
@@ -546,10 +560,17 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
             )}
             <Link
               href={`/client/messages?editorId=${editor.id}`}
-              className="inline-flex items-center gap-1.5 bg-white border border-gray-250 hover:bg-gray-50 text-gray-700 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              onClick={(e) => {
+                if (!isLoggedIn) {
+                  e.preventDefault();
+                  window.location.href = `/login?callbackUrl=${encodeURIComponent(`/client/messages?editorId=${editor.id}`)}`;
+                }
+              }}
+              className="inline-flex items-center gap-1.5 bg-white border border-gray-250 hover:bg-gray-50 text-gray-707 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
             >
               <MessageSquare className="w-4 h-4 text-gray-500" />Message
             </Link>
+
             
             {/* Bookmark button */}
             <button
@@ -701,44 +722,63 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
             )}
 
             {/* Portfolio */}
-            {editor.portfolioItems.length > 0 && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Portfolio</h2>
-                
-                {/* Category Filter tabs */}
-                {categories.length > 2 && (
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-4 scrollbar-none">
-                    {categories.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`text-xs font-semibold px-3.5 py-2 rounded-lg border transition-all shrink-0 ${
-                          selectedCategory === cat
-                            ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
-                            : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                
-                <PortfolioGrid items={filteredPortfolio} onOpen={setLightboxIndex} />
-              </section>
-            )}
+            <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
+              <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Portfolio</h2>
+              {editor.portfolioItems.length === 0 ? (
+                <div className="border border-dashed border-gray-250 rounded-xl p-8 text-center text-gray-400 font-medium">
+                  No portfolio items uploaded yet.
+                </div>
+              ) : (
+                <>
+                  {/* Category Filter tabs */}
+                  {categories.length > 2 && (
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-4 scrollbar-none">
+                      {categories.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setSelectedCategory(cat)}
+                          className={`text-xs font-semibold px-3.5 py-2 rounded-lg border transition-all shrink-0 ${
+                            selectedCategory === cat
+                              ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
+                              : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <PortfolioGrid items={filteredPortfolio} onOpen={setLightboxIndex} />
+                </>
+              )}
+            </section>
 
             {/* Packages */}
-            {editor.packages.length > 0 && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Packages</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {editor.packages.map(pkg => (
-                    <PackageCard key={pkg.id} pkg={pkg} editorId={editor.id} isAvailable={editor.isAvailable} />
-                  ))}
+            <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
+              <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Packages</h2>
+              {editor.packages.length === 0 ? (
+                <div className="border border-dashed border-gray-250 rounded-xl p-8 text-center text-gray-400 font-medium">
+                  No preset packages configured yet. Request a custom quote below.
                 </div>
-              </section>
-            )}
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {editor.packages.map((pkg, index) => {
+                    // Highlight the standard/middle tier in visual hierarchy
+                    const isHighlighted = editor.packages.length > 1 && index === Math.floor(editor.packages.length / 2);
+                    return (
+                      <PackageCard
+                        key={pkg.id}
+                        pkg={pkg}
+                        editorId={editor.id}
+                        isAvailable={editor.isAvailable}
+                        isHighlighted={isHighlighted}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+
 
             {/* Reviews */}
             {editor.reviews.length > 0 && (
@@ -867,9 +907,10 @@ export function EditorProfileClient({ editor }: { editor: EditorProfile }) {
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
                   <span className="text-sm text-gray-700">
-                    Member since {new Date(editor.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
+                    Member since {new Date(editor.kycApprovedAt || editor.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
                   </span>
                 </div>
+
               </div>
             </div>
 

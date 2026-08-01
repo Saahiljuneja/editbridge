@@ -43,9 +43,11 @@ async function getEditorProfileData(id: string) {
       kycStatus: editors.kycStatus,
       isAvailable: editors.isAvailable,
       createdAt: editors.createdAt,
+      kycApprovedAt: editors.kycApprovedAt,
       activeFrame: editors.activeFrame,
     })
     .from(editors)
+
     .innerJoin(users, eq(editors.userId, users.id))
     .where(
       isOwnProfile
@@ -158,7 +160,9 @@ async function getEditorProfileData(id: string) {
   return {
     ...editor,
     createdAt: editor.createdAt.toISOString(),
+    kycApprovedAt: editor.kycApprovedAt?.toISOString() || null,
     packages: packageRows,
+
     skills: skillRows.map((s) => s.name),
     tools: toolRows.map((t) => t.name),
     portfolioItems: portfolioItemsOut,
@@ -231,13 +235,16 @@ export default async function EditorPublicProfilePage({
     }
   };
 
+  const session = await auth();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <EditorProfileClient editor={editor as any} />
+      <EditorProfileClient editor={editor as any} isLoggedIn={!!session} />
     </>
   );
+
 }
