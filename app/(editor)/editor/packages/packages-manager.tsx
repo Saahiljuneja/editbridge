@@ -217,39 +217,44 @@ export function PackagesManager({
     <div className="space-y-5">
       {/* Stats bar */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center divide-x divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-2.5">
-            <span className="text-xs font-medium text-gray-400">Services</span>
-            <span className="text-sm font-bold text-gray-900">{totalCreated}</span>
+        <div className="flex items-stretch divide-x divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="flex flex-col items-center px-7 py-4">
+            <span className="text-3xl font-black text-gray-900 leading-none">{totalCreated}</span>
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Services</span>
           </div>
-          <div className="flex items-center gap-1.5 px-4 py-2.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
-            <span className="text-xs text-gray-400">active</span>
+          <div className="flex flex-col items-center px-7 py-4">
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-3xl font-black text-emerald-600 leading-none">{activeCount}</span>
+            </div>
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Active</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2.5">
-            <span className="text-xs font-medium text-gray-400">Sets</span>
-            <span className="text-sm font-bold text-gray-900">{setKeys.length}</span>
+          <div className="flex flex-col items-center px-7 py-4">
+            <span className="text-3xl font-black text-gray-900 leading-none">{setKeys.length}</span>
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Sets</span>
           </div>
-          <div className={cn(
-            "flex items-center gap-1.5 px-4 py-2.5",
-            totalCreated >= maxPackages ? "bg-red-50/70" : ""
-          )}>
-            <span className="text-xs font-medium text-gray-400">Slots</span>
-            <span className={cn(
-              "text-sm font-bold",
-              totalCreated >= maxPackages ? "text-red-600"
-                : totalCreated >= maxPackages - 1 ? "text-amber-600"
-                : "text-violet-700"
-            )}>{totalCreated}/{maxPackages}</span>
-            {totalCreated >= maxPackages && (
-              <span className="text-[10px] font-semibold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize">{level}</span>
-            )}
+          <div className={cn("flex flex-col items-center px-7 py-4", totalCreated >= maxPackages ? "bg-red-50/50" : "")}>
+            <span className="leading-none">
+              <span className={cn(
+                "text-3xl font-black",
+                totalCreated >= maxPackages ? "text-red-600"
+                  : totalCreated >= maxPackages - 1 ? "text-amber-500"
+                  : "text-violet-600"
+              )}>{totalCreated}</span>
+              <span className="text-xl font-bold text-gray-300">/{maxPackages}</span>
+            </span>
+            <div className="flex items-center gap-1 mt-1.5">
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">Slots</span>
+              {totalCreated >= maxPackages && (
+                <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize ml-1">{level}</span>
+              )}
+            </div>
           </div>
         </div>
         <button
           onClick={() => setShowPicker((v) => !v)}
-          className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-colors shadow-sm"
+          className="flex items-center gap-2 text-sm font-bold px-5 py-3.5 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-all active:scale-[0.98]"
+          style={{ boxShadow: "0 4px 16px rgba(14,165,233,0.30)" }}
         >
           <Plus className="w-4 h-4" />
           New service set
@@ -347,18 +352,61 @@ export function PackagesManager({
 
       {/* Empty state */}
       {setKeys.length === 0 && !showPicker && (
-        <div className="rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mx-auto mb-4">
-            <Video className="w-7 h-7 text-[var(--brand-client)]" />
+        <div className="rounded-2xl border border-gray-200 bg-gradient-to-b from-gray-50/70 to-white overflow-hidden">
+          <div className="py-16 px-8 text-center">
+            {/* Icon */}
+            <div
+              className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
+              style={{
+                background: "linear-gradient(135deg, rgba(14,165,233,0.15) 0%, rgba(14,165,233,0.05) 100%)",
+                boxShadow: "0 12px 40px rgba(14,165,233,0.15), inset 0 1px 0 rgba(255,255,255,0.6)",
+              }}
+            >
+              <Video className="w-12 h-12 text-[var(--brand-client)]" />
+            </div>
+
+            {/* Copy */}
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No services listed yet</h3>
+            <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed mb-8">
+              Create service sets so clients know exactly what you offer &mdash; with pricing, deliverables, and your turnaround time.
+            </p>
+
+            {/* Feature trio */}
+            <div className="flex items-center justify-center gap-6 mb-10">
+              {["Set your own price", "Show deliverables", "Attract more clients"].map((f) => (
+                <div key={f} className="flex items-center gap-1.5">
+                  <span
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-white"
+                    style={{ background: "var(--brand-client)" }}
+                  >
+                    ✓
+                  </span>
+                  <span className="text-xs font-medium text-gray-500">{f}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <button
+              onClick={() => setShowPicker(true)}
+              className="inline-flex items-center gap-2.5 text-sm font-bold px-7 py-3.5 rounded-xl text-white transition-all active:scale-[0.98]"
+              style={{
+                background: "var(--brand-client)",
+                boxShadow: "0 6px 24px rgba(14,165,233,0.35)",
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              Add your first service set
+            </button>
           </div>
-          <p className="text-base font-semibold text-gray-700 mb-1">No services yet</p>
-          <p className="text-sm text-gray-400 mb-5">Start by adding a category set, then list your services inside it.</p>
-          <button
-            onClick={() => setShowPicker(true)}
-            className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Add your first category set
-          </button>
+
+          {/* Bottom hint strip */}
+          <div className="border-t border-gray-100 bg-white px-6 py-3 flex items-center justify-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+            <p className="text-xs text-gray-400">
+              You can create up to <span className="font-semibold text-gray-600">{maxPackages} services</span> on your current plan. <span className="text-violet-600 font-semibold">Upgrade</span> to unlock more slots.
+            </p>
+          </div>
         </div>
       )}
 
