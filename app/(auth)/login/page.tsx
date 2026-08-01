@@ -31,11 +31,19 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
+    // Read directly from the DOM to capture browser-autofilled values.
+    // Autofill often populates the visible input without firing React's onChange,
+    // so React state can be stale ("") even though the field looks filled.
+    const emailEl = document.getElementById("email") as HTMLInputElement | null;
+    const passwordEl = document.getElementById("password") as HTMLInputElement | null;
+    const emailVal = (emailEl?.value?.trim() || email).toLowerCase().trim();
+    const passwordVal = passwordEl?.value || password;
+
     try {
       const pre = await fetch("/api/auth/check-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: emailVal }),
       });
       const preData = await pre.json();
 
@@ -43,10 +51,10 @@ function LoginForm() {
         await fetch("/api/auth/resend-verification", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email: emailVal }),
         }).catch(() => {});
         toast.info("A new verification code has been sent to your email.");
-        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        router.push(`/verify-email?email=${encodeURIComponent(emailVal)}`);
         setLoading(false);
         return;
       }
@@ -60,7 +68,7 @@ function LoginForm() {
       // fall through
     }
 
-    const result = await signIn("credentials", { email, password, redirect: false });
+    const result = await signIn("credentials", { email: emailVal, password: passwordVal, redirect: false });
 
     if (result?.error) {
       toast.error("Invalid email or password.");
