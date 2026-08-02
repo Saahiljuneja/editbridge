@@ -36,17 +36,17 @@ function StepBadge({ n, done }: { n: number; done: boolean }) {
 export function KycForm({ isResubmission = false }: { isResubmission?: boolean }) {
   const router = useRouter();
 
-  // Step 1 â€” PAN
-  const [panNumber, setPanNumber]       = useState("");
-  const [panDocKey, setPanDocKey]       = useState("");
+  // Step 1 — PAN
+  const [panNumber, setPanNumber]       = useState(“”);
+  const [panDocKey, setPanDocKey]       = useState(“”);
 
-  // Step 2 â€” Identity document
+  // Step 2 — Identity document
   const [documentType, setDocumentType] = useState<DocumentType>("aadhaar");
   const [documentNumber, setDocumentNumber] = useState("");
   const [documentKey, setDocumentKey]   = useState("");
   const [documentBackKey, setDocumentBackKey] = useState("");
 
-  // Step 3 â€” Selfie
+  // Step 3 — Selfie
   const [selfieKey, setSelfieKey]       = useState("");
 
   const [submitting, setSubmitting]     = useState(false);
@@ -164,7 +164,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                 label="Drop PAN card here or click to browse"
                 maxSizeMb={10}
               />
-              {panDocKey && <p className="text-sm text-green-600 font-medium">âœ“ PAN card uploaded</p>}
+              {panDocKey && <p className="text-sm text-green-600 font-medium">✓ PAN card uploaded</p>}
             </div>
           </div>
         </div>
@@ -251,10 +251,10 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                 label="Drop front here or click to browse"
                 maxSizeMb={10}
               />
-              {documentKey && <p className="text-sm text-green-600 font-medium">âœ“ Front uploaded</p>}
+              {documentKey && <p className=”text-sm text-green-600 font-medium”>✓ Front uploaded</p>}
             </div>
 
-            {/* Back â€” Aadhaar only */}
+            {/* Back — Aadhaar only */}
             {needsBack && (
               <div className="space-y-2">
                 <Label>Back side <span className="text-destructive">*</span></Label>
@@ -267,7 +267,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                   label="Drop back here or click to browse"
                   maxSizeMb={10}
                 />
-                {documentBackKey && <p className="text-sm text-green-600 font-medium">âœ“ Back uploaded</p>}
+                {documentBackKey && <p className="text-sm text-green-600 font-medium">✓ Back uploaded</p>}
               </div>
             )}
           </div>
@@ -287,9 +287,9 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
 
           <div className="ml-8 space-y-2">
             <ul className="text-xs text-gray-500 list-disc ml-4 space-y-0.5">
-              <li>Hold the document next to your face â€” both must be in the same photo</li>
+              <li>Hold the document next to your face — both must be in the same photo</li>
               <li>Your face must be clearly visible and unobstructed</li>
-              <li>Good lighting â€” no dark or backlit photos</li>
+              <li>Good lighting — no dark or backlit photos</li>
               <li>No screenshots or printouts of photos</li>
             </ul>
             <UploadZone
@@ -300,7 +300,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
               label="Drop selfie here or click to browse"
               maxSizeMb={10}
             />
-            {selfieKey && <p className="text-sm text-green-600 font-medium mt-2">âœ“ Selfie uploaded</p>}
+            {selfieKey && <p className="text-sm text-green-600 font-medium mt-2">✓ Selfie uploaded</p>}
           </div>
         </div>
 
@@ -309,24 +309,24 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
           <p className="font-semibold mb-1.5">Before you submit</p>
           <ul className="list-disc ml-4 space-y-1 text-xs">
             <li>All four corners of every document must be clearly visible.</li>
-            <li>Names and ID numbers must be readable â€” no blurry or cropped images.</li>
+            <li>Names and ID numbers must be readable — no blurry or cropped images.</li>
             <li>Your PAN number is stored securely and used only for TDS compliance.</li>
-            <li>Your application will be reviewed within 1â€“2 business days.</li>
+            <li>Your application will be reviewed within 1–2 business days.</li>
           </ul>
         </div>
 
         {/* Progress indicator */}
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <span className={cn("font-medium", panValid ? "text-green-600" : "text-gray-400")}>
-            {panValid ? "âœ“" : "â—‹"} PAN
+            {panValid ? “✓” : “○”} PAN
           </span>
-          <span className="text-gray-300">Â·</span>
-          <span className={cn("font-medium", idValid ? "text-green-600" : "text-gray-400")}>
-            {idValid ? "âœ“" : "â—‹"} Identity
+          <span className=”text-gray-300”>·</span>
+          <span className={cn(“font-medium”, idValid ? “text-green-600” : “text-gray-400”)}>
+            {idValid ? “✓” : “○”} Identity
           </span>
-          <span className="text-gray-300">Â·</span>
-          <span className={cn("font-medium", selfieValid ? "text-green-600" : "text-gray-400")}>
-            {selfieValid ? "âœ“" : "â—‹"} Selfie
+          <span className=”text-gray-300”>·</span>
+          <span className={cn(“font-medium”, selfieValid ? “text-green-600” : “text-gray-400”)}>
+            {selfieValid ? “✓” : “○”} Selfie
           </span>
         </div>
 
@@ -339,7 +339,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
             (!canSubmit || submitting) && "opacity-50 cursor-not-allowed"
           )}
         >
-          {submitting ? "Submittingâ€¦" : "Submit KYC"}
+          {submitting ? "Submitting…" : "Submit KYC"}
         </button>
       </form>
     </div>

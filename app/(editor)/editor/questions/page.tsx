@@ -89,7 +89,7 @@ export default async function EditorQuestionsPage() {
                 {q.answer ? (
                   <div className="rounded-xl border px-4 py-3 text-sm" style={{ borderColor: `${COLOR}30`, background: `${COLOR}08` }}>
                     <p className="font-semibold mb-0.5" style={{ color: COLOR }}>
-                      Your reply Â· {q.answeredAt ? formatDateTime(q.answeredAt) : ""}
+                      Your reply · {q.answeredAt ? formatDateTime(q.answeredAt) : ""}
                     </p>
                     <p className="text-gray-600">{q.answer}</p>
                   </div>

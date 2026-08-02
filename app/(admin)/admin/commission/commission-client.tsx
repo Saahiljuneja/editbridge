@@ -66,7 +66,7 @@ export function CommissionClient({ settings: initial }: { settings: Record<strin
         <button onClick={save} disabled={saving}
           className="flex items-center gap-2 bg-gray-900 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-gray-700 transition-colors disabled:opacity-50">
           <Save className="w-4 h-4" />
-          {saving ? "Savingâ€¦" : "Save changes"}
+          {saving ? "Saving…" : "Save changes"}
         </button>
       </div>
 

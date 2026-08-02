@@ -48,7 +48,7 @@ export default async function EditorAnalyticsPage() {
     db.select({ v: count() }).from(reviews).where(and(eq(reviews.revieweeId, session.user.userId!), eq(reviews.role, "client"))).then(r => r[0].v),
   ]);
 
-  // Monthly earnings â€” last 6 months
+  // Monthly earnings — last 6 months
   const monthlyEarnings = await db.execute<{ month: string; earnings: number; orders: number }>(sql`
     SELECT
       TO_CHAR(DATE_TRUNC('month', updated_at), 'Mon YY') AS month,
@@ -155,7 +155,7 @@ export default async function EditorAnalyticsPage() {
             },
             {
               label: "Avg Rating",
-              value: avgRatingRow ? `${avgRatingRow} â˜…` : "â€”",
+              value: avgRatingRow ? `${avgRatingRow} ★` : “—“,
               sub: `${reviewCountRow} review${reviewCountRow !== 1 ? "s" : ""}`,
               subColor: "text-gray-400",
               icon: Star, bg: "bg-blue-50", color: "text-blue-600",

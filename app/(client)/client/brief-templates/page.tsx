@@ -137,7 +137,7 @@ export default function BriefTemplatesPage() {
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder="Describe the project, style, references, deliverablesâ€¦"
+                placeholder="Describe the project, style, references, deliverables…"
                 rows={5}
                 maxLength={2000}
                 className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50"
@@ -151,7 +151,7 @@ export default function BriefTemplatesPage() {
                 className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-1.5"
                 style={{ background: "var(--brand-client)" }}
               >
-                {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Savingâ€¦</> : "Save template"}
+                {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</> : "Save template"}
               </button>
               <button
                 onClick={() => { setAdding(false); setName(""); setContent(""); }}

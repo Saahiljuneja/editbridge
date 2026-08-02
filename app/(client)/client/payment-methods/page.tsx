@@ -127,7 +127,7 @@ export default async function PaymentMethodsPage() {
           <ul className="space-y-2 text-sm text-gray-600 list-disc list-inside leading-relaxed">
             <li>Pending orders cancelled before acceptance receive a <strong>full refund</strong>.</li>
             <li>Orders cancelled after the editor has started work are handled on a case-by-case basis via dispute.</li>
-            <li>Refunds are processed to the original payment method within 5â€“7 business days.</li>
+            <li>Refunds are processed to the original payment method within 5–7 business days.</li>
           </ul>
         </div>
       </div>

@@ -186,7 +186,7 @@ export default async function AdminPaymentsPage() {
                       <td className="px-5 py-3.5">
                         {payout.scheduledPayoutAt ? (
                           <span className={cn("text-xs font-medium", isPastDue ? "text-red-600 font-bold" : "text-amber-600")}>
-                            {isPastDue ? "Overdue Â· " : ""}{formatDate(payout.scheduledPayoutAt)}
+                            {isPastDue ? "Overdue · " : ""}{formatDate(payout.scheduledPayoutAt)}
                           </span>
                         ) : (
                           <span className="text-gray-300 text-xs">Not scheduled</span>
