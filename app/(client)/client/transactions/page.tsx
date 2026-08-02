@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -45,18 +45,16 @@ export default async function TransactionsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6">
-          <h1 className="text-xl font-bold text-gray-900">Transaction History</h1>
-          <p className="text-sm text-gray-400 mt-0.5">All payments and orders on your account</p>
-        </div>
+        <h1 className="text-xl font-bold text-gray-900">Transaction History</h1>
+        <p className="text-sm text-gray-400 mt-0.5">All payments and orders on your account</p>
       </div>
 
-      <div className="px-8 py-6 space-y-5">
+      <div className="px-6 py-6 space-y-5">
         <div className="grid grid-cols-3 gap-4">
           {[
             { label: "Total spent", value: formatCurrency(totalSpent), icon: IndianRupee, color: "var(--brand-client)" },
             { label: "Orders placed", value: String(txns.filter((t) => t.status !== "cancelled").length), icon: ShoppingBag, color: "var(--brand-editor)" },
-            { label: "Avg per order", value: avgOrder ? formatCurrency(avgOrder) : "â€”", icon: TrendingUp, color: "#059669" },
+            { label: "Avg per order", value: avgOrder ? formatCurrency(avgOrder) : "—", icon: TrendingUp, color: "#059669" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-2">

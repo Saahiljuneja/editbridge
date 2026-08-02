@@ -37,8 +37,8 @@ export default async function ClientNotificationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6 flex items-center justify-between">
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Notifications</h1>
             <p className="text-sm text-gray-400 mt-0.5">{unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}</p>
@@ -52,7 +52,7 @@ export default async function ClientNotificationsPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 ">
+      <div className="px-6 py-6">
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4">

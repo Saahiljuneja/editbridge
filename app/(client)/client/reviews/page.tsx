@@ -39,8 +39,8 @@ export default async function ClientReviewsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6 flex items-center justify-between">
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">My Reviews</h1>
             <p className="text-sm text-gray-400 mt-0.5">Reviews you&apos;ve left for editors</p>
@@ -51,7 +51,7 @@ export default async function ClientReviewsPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-5">
+      <div className="px-6 py-6 space-y-5">
         {rows.length > 0 && (
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5 text-center">

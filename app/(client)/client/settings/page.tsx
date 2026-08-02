@@ -221,8 +221,8 @@ export default function ClientSettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6 flex items-center justify-between">
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Account Settings</h1>
             <p className="text-sm text-gray-400 mt-0.5">Manage your profile and security</p>
@@ -233,7 +233,7 @@ export default function ClientSettingsPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-4">
+      <div className="px-6 py-6 space-y-4 max-w-3xl mx-auto">
         {/* Email verification banner */}
         {session && !session.user.isEmailVerified && (
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200">

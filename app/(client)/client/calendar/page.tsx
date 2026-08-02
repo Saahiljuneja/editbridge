@@ -37,12 +37,10 @@ export default async function CalendarPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6">
-          <h1 className="text-xl font-bold text-gray-900">Order Calendar</h1>
-          <p className="text-sm text-gray-400 mt-0.5">All your order deadlines at a glance</p>
-        </div>
+        <h1 className="text-xl font-bold text-gray-900">Order Calendar</h1>
+        <p className="text-sm text-gray-400 mt-0.5">All your order deadlines at a glance</p>
       </div>
-      <div className="px-8 py-6 ">
+      <div className="px-6 py-6">
         <CalendarClient
           orders={activeOrders.map((o) => ({
             id: o.id,

@@ -39,8 +39,8 @@ export default function EditorReferralsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6 flex items-center gap-3">
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-6 py-5 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[var(--brand-editor)]/10 flex items-center justify-center">
             <Gift className="w-5 h-5 text-[var(--brand-editor)]" />
           </div>
@@ -51,7 +51,7 @@ export default function EditorReferralsPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-6">
+      <div className="px-6 py-6 space-y-6">
 
         {/* How it works */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

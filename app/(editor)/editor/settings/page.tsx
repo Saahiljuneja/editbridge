@@ -1200,37 +1200,33 @@ export default function EditorSettingsPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6">
-          <h1 className="text-xl font-bold text-gray-900">Account Settings</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Manage your profile, security, and preferences</p>
-        </div>
+        <h1 className="text-xl font-bold text-gray-900">Account Settings</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Manage your profile, security, and preferences</p>
       </div>
 
       {/* Tab navigation */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="px-8 py-6 px-6">
-          <div className="flex">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                  activeTab === tab.id
-                    ? "border-[var(--brand-client)] text-[var(--brand-client)]"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200"
-                )}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        <div className="px-6 flex overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "flex items-center gap-2 px-4 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap shrink-0",
+                activeTab === tab.id
+                  ? "border-[var(--brand-client)] text-[var(--brand-client)]"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200"
+              )}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Content */}
-      <div className="px-8 py-6 ">
+      <div className="px-6 py-6 max-w-3xl mx-auto">
         {/* Email verification banner */}
         {session && !session.user.isEmailVerified && (
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200 mb-5">

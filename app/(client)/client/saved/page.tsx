@@ -87,16 +87,14 @@ export default async function SavedEditorsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Heart className="w-5 h-5 text-red-500 fill-red-500" />
-            <h1 className="text-xl font-bold text-gray-900">Saved editors ({rows.length})</h1>
-          </div>
-          <p className="text-sm text-gray-400">Your favourite editors, saved for quick access.</p>
+        <div className="flex items-center gap-2 mb-1">
+          <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+          <h1 className="text-xl font-bold text-gray-900">Saved editors ({rows.length})</h1>
         </div>
+        <p className="text-sm text-gray-400">Your favourite editors, saved for quick access.</p>
       </div>
 
-      <div className="px-8 py-6 ">
+      <div className="px-6 py-6">
         {rows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">

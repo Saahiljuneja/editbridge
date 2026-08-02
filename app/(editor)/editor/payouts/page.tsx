@@ -87,13 +87,11 @@ export default async function EditorPayoutsPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Top bar */}
       <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6">
-          <h1 className="text-xl font-bold text-gray-900">Payouts</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Track your earnings and settlement history</p>
-        </div>
+        <h1 className="text-xl font-bold text-gray-900">Payouts</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Track your earnings and settlement history</p>
       </div>
 
-      <div className="px-8 py-6 space-y-6">
+      <div className="px-6 py-6 space-y-6">
 
         {/* 2FA nudge — editors with a linked bank account should secure their payout */}
         {show2faNudge && (

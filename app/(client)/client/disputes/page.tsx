@@ -39,8 +39,8 @@ export default async function DisputesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6 flex items-center justify-between">
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">My Disputes</h1>
             <p className="text-sm text-gray-400 mt-0.5">
@@ -53,7 +53,7 @@ export default async function DisputesPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 ">
+      <div className="px-6 py-6">
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mb-4">
@@ -62,7 +62,7 @@ export default async function DisputesPage() {
             <p className="font-semibold text-gray-800">No disputes</p>
             <p className="text-sm text-gray-400 mt-1 mb-5">You haven&apos;t opened any disputes. We hope things are going smoothly!</p>
             <Link
-              href="/orders"
+              href="/client/orders"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
               style={{ background: "var(--brand-client)" }}
             >
@@ -90,11 +90,11 @@ export default async function DisputesPage() {
                       <p className="text-xs text-gray-500 line-clamp-1 mb-1">{d.reason}</p>
                       <div className="flex items-center gap-2 text-[10px] text-gray-400">
                         <span>Order #{d.orderId.slice(0, 8)}</span>
-                        <span>Â·</span>
+                        <span>·</span>
                         <span>{formatDate(d.createdAt)}</span>
                         {d.resolutionType && (
                           <>
-                            <span>Â·</span>
+                            <span>·</span>
                             <span className="capitalize">{d.resolutionType}</span>
                           </>
                         )}

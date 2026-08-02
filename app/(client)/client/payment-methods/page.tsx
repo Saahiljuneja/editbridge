@@ -34,13 +34,11 @@ export default async function PaymentMethodsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="px-8 py-6">
-          <h1 className="text-xl font-bold text-gray-900">Payment Methods</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Manage how you pay on EditBridge</p>
-        </div>
+        <h1 className="text-xl font-bold text-gray-900">Payment Methods</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Manage how you pay on EditBridge</p>
       </div>
 
-      <div className="px-8 py-6 space-y-5">
+      <div className="px-6 py-6 space-y-5">
         {/* Info banner */}
         <div className="rounded-2xl bg-blue-50 border border-blue-100 p-5 flex gap-4">
           <Shield className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
