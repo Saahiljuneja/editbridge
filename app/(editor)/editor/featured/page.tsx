@@ -29,19 +29,19 @@ export default async function EditorFeaturedPage() {
   const featureEnabled = await isFeatureEnabled("featured_placement");
 
   return (
-    <div className=”min-h-screen bg-gray-50”>
-      <div className=”bg-white border-b border-gray-100”>
-        <div className=”px-6 py-5 flex items-center gap-3”>
-          <div className=”w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0”>
-            <Star className=”w-4 h-4 text-amber-500 fill-amber-400” />
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-6 py-5 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+            <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
           </div>
           <div>
-            <h1 className=”text-xl font-bold text-gray-900”>Featured Placement</h1>
-            <p className=”text-sm text-gray-400 mt-0.5”>Appear at the top of search results and get more visibility</p>
+            <h1 className="text-xl font-bold text-gray-900">Featured Placement</h1>
+            <p className="text-sm text-gray-400 mt-0.5">Appear at the top of search results and get more visibility</p>
           </div>
         </div>
       </div>
-      <div className=”px-6 py-6”>
+      <div className="px-6 py-6">
 
         <div className="rounded-xl bg-white border border-gray-200 p-4 space-y-1.5 text-sm text-gray-600 mb-6">
           <p className="font-medium text-gray-700">Featured placement includes:</p>

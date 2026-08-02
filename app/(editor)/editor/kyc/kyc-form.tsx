@@ -37,8 +37,8 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
   const router = useRouter();
 
   // Step 1 — PAN
-  const [panNumber, setPanNumber]       = useState(“”);
-  const [panDocKey, setPanDocKey]       = useState(“”);
+  const [panNumber, setPanNumber]       = useState("");
+  const [panDocKey, setPanDocKey]       = useState("");
 
   // Step 2 — Identity document
   const [documentType, setDocumentType] = useState<DocumentType>("aadhaar");
@@ -120,7 +120,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-10">
 
-        {/* â”€â”€ Step 1: PAN Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â"€â"€ Step 1: PAN Card â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€ */}
         <div className="space-y-4">
           <div className="flex items-center gap-2.5">
             <StepBadge n={1} done={panValid} />
@@ -171,7 +171,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
 
         <div className="border-t border-gray-100" />
 
-        {/* â”€â”€ Step 2: Identity Document â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â"€â"€ Step 2: Identity Document â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€ */}
         <div className="space-y-4">
           <div className="flex items-center gap-2.5">
             <StepBadge n={2} done={idValid} />
@@ -251,7 +251,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
                 label="Drop front here or click to browse"
                 maxSizeMb={10}
               />
-              {documentKey && <p className=”text-sm text-green-600 font-medium”>✓ Front uploaded</p>}
+              {documentKey && <p className="text-sm text-green-600 font-medium">✓ Front uploaded</p>}
             </div>
 
             {/* Back — Aadhaar only */}
@@ -275,7 +275,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
 
         <div className="border-t border-gray-100" />
 
-        {/* â”€â”€ Step 3: Selfie â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â"€â"€ Step 3: Selfie â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€ */}
         <div className="space-y-4">
           <div className="flex items-center gap-2.5">
             <StepBadge n={3} done={selfieValid} />
@@ -318,15 +318,15 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
         {/* Progress indicator */}
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <span className={cn("font-medium", panValid ? "text-green-600" : "text-gray-400")}>
-            {panValid ? “✓” : “○”} PAN
+            {panValid ? "✓" : "○"} PAN
           </span>
-          <span className=”text-gray-300”>·</span>
-          <span className={cn(“font-medium”, idValid ? “text-green-600” : “text-gray-400”)}>
-            {idValid ? “✓” : “○”} Identity
+          <span className="text-gray-300">·</span>
+          <span className={cn("font-medium", idValid ? "text-green-600" : "text-gray-400")}>
+            {idValid ? "✓" : "○"} Identity
           </span>
-          <span className=”text-gray-300”>·</span>
-          <span className={cn(“font-medium”, selfieValid ? “text-green-600” : “text-gray-400”)}>
-            {selfieValid ? “✓” : “○”} Selfie
+          <span className="text-gray-300">·</span>
+          <span className={cn("font-medium", selfieValid ? "text-green-600" : "text-gray-400")}>
+            {selfieValid ? "✓" : "○"} Selfie
           </span>
         </div>
 

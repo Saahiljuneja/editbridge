@@ -63,11 +63,11 @@ export default async function PaymentMethodsPage() {
           </div>
           <div className="divide-y divide-gray-50">
             {[
-              { label: "Credit / Debit Cards", desc: "Visa, Mastercard, RuPay, Amex", icon: "ðŸ’³" },
-              { label: "UPI", desc: "GPay, PhonePe, Paytm, BHIM, and all UPI apps", icon: "ðŸ‡®ðŸ‡³" },
-              { label: "Net Banking", desc: "All major Indian banks", icon: "ðŸ¦" },
-              { label: "Wallets", desc: "Paytm, Mobikwik, Freecharge", icon: "ðŸ‘›" },
-              { label: "EMI", desc: "Credit card EMI via Razorpay", icon: "ðŸ“…" },
+              { label: "Credit / Debit Cards", desc: "Visa, Mastercard, RuPay, Amex", icon: "💳" },
+              { label: "UPI", desc: "GPay, PhonePe, Paytm, BHIM, and all UPI apps", icon: "🇮🇳" },
+              { label: "Net Banking", desc: "All major Indian banks", icon: "🏦" },
+              { label: "Wallets", desc: "Paytm, Mobikwik, Freecharge", icon: "👛" },
+              { label: "EMI", desc: "Credit card EMI via Razorpay", icon: "📅" },
             ].map(({ label, desc, icon }) => (
               <div key={label} className="flex items-center gap-4 px-6 py-4">
                 <span className="text-xl">{icon}</span>
@@ -95,7 +95,7 @@ export default async function PaymentMethodsPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <p className="font-semibold text-gray-900 text-sm">Recent payments</p>
               <Link href="/transactions" className="text-xs font-semibold text-[var(--brand-client)] hover:underline">
-                View all â†’
+                View all →
               </Link>
             </div>
             <div className="divide-y divide-gray-50">

@@ -155,7 +155,7 @@ export default async function EditorAnalyticsPage() {
             },
             {
               label: "Avg Rating",
-              value: avgRatingRow ? `${avgRatingRow} ★` : “—“,
+              value: avgRatingRow ? `${avgRatingRow} ★` : "N/A",
               sub: `${reviewCountRow} review${reviewCountRow !== 1 ? "s" : ""}`,
               subColor: "text-gray-400",
               icon: Star, bg: "bg-blue-50", color: "text-blue-600",
