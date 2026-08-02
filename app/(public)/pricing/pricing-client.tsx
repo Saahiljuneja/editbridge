@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle, ArrowRight, Lock, ShieldCheck,
-  IndianRupee, Zap, ArrowDown, Award, Star, StarHalf, ShieldAlert
+  IndianRupee, Zap, ArrowDown
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -136,7 +136,7 @@ const FAQ = [
   { q: "When is the editor's commission deducted?",
     a: "Only when the order is completed and the client approves the delivery. If an order is cancelled before delivery begins, no commission is charged." },
   { q: "Are there any other fees for editors?",
-    a: "None by default. If the membership plans feature is enabled, editors can optionally upgrade to a paid tier (Starter, Pro, Agency) to reduce platform commission down to as low as 3%, get verified badges, and unlock unlimited portfolios." },
+    a: "None. No monthly subscription, no listing fee, no withdrawal fee. You keep 85% of every completed order, always." },
   { q: "What counts as a completed order?",
     a: "An order is completed when the client clicks 'Approve delivery', or after 7 days of inaction following delivery (auto-approval)." },
   { q: "What about GST?",
@@ -243,78 +243,6 @@ function PricingFAQ() {
   );
 }
 
-/* ══════════════════════════════════════════════
-   MEMBERSHIP PLAN STRUCTURE (4 TIERS)
-   ══════════════════════════════════════════════ */
-const MEMBERSHIP_PLANS = [
-  {
-    name: "Hobby",
-    price: 0,
-    commission: 15,
-    tagline: "Perfect for testing the platform waters.",
-    features: [
-      "Keep 85% of order payouts",
-      "Up to 3 portfolio item uploads",
-      "Standard search listing index",
-      "Basic page views analytics dashboard",
-      "Standard email support",
-    ],
-    cta: "Start Free",
-    accent: "#64748b",
-  },
-  {
-    name: "Starter",
-    price: 499,
-    commission: 10,
-    tagline: "Level up your freelance presence.",
-    features: [
-      "Keep 90% of order payouts",
-      "Up to 10 portfolio item uploads",
-      "Bronze verified platform badge",
-      "24-hour priority payouts approval",
-      "1 active profile search boost token",
-      "Priority email support",
-    ],
-    cta: "Go Starter",
-    accent: "#38bdf8",
-  },
-  {
-    name: "Pro",
-    price: 1499,
-    commission: 5,
-    tagline: "Designed for professional video editors.",
-    features: [
-      "Keep 95% of order payouts",
-      "Unlimited portfolio item uploads",
-      "Silver premium verified badge",
-      "Instant checkout payouts transfer",
-      "Top search placement boost card",
-      "3 concurrent active search boosts",
-      "24/7 priority discord support",
-    ],
-    cta: "Go Pro",
-    accent: "#7c6ff7",
-    isPopular: true,
-  },
-  {
-    name: "Agency",
-    price: 3999,
-    commission: 3,
-    tagline: "Ultimate tier for high-volume studios.",
-    features: [
-      "Keep 97% of order payouts",
-      "Unlimited portfolio item uploads",
-      "Gold agency verified badge",
-      "Featured Agency listing cards in search",
-      "6 concurrent active search boosts",
-      "Dedicated success manager seat",
-      "Managed invoice matching & client support",
-    ],
-    cta: "Go Agency",
-    accent: "#fbbf24",
-  },
-];
-
 export function PricingClient({ isPricingTiersEnabled }: { isPricingTiersEnabled: boolean }) {
   return (
     <div className="flex flex-col">
@@ -342,7 +270,7 @@ export function PricingClient({ isPricingTiersEnabled }: { isPricingTiersEnabled
             </Reveal>
             <Reveal delay={0.1}>
               <p className="text-white/35 text-lg leading-relaxed mb-10 max-w-md">
-                Clients pay a small 4% processing fee. Editors keep 85% of every order on our Free plan. No hidden charges.
+                Clients pay a small 4% processing fee. Editors keep 85% of every order. No hidden charges.
               </p>
             </Reveal>
 
@@ -368,92 +296,6 @@ export function PricingClient({ isPricingTiersEnabled }: { isPricingTiersEnabled
           </Reveal>
         </div>
       </section>
-
-      {/* Editor Membership Tiers (4 Columns) - Controlled by Feature Flag */}
-      {isPricingTiersEnabled && (
-        <section className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white overflow-hidden border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4">
-            <Reveal className="text-center mb-16">
-              <div className="flex items-center justify-center gap-3 mb-5">
-                <div className="h-px w-8 bg-indigo-200" />
-                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.28em]">Premium Memberships</span>
-                <div className="h-px w-8 bg-indigo-200" />
-              </div>
-              <h2 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight leading-none mb-4">
-                Editor Membership Plans.
-              </h2>
-              <p className="text-sm text-gray-500 max-w-xl mx-auto mt-2 leading-relaxed">
-                Scale your video editing business on EditBridge. Lower commissions, get priority payouts, and unlock premium badges to standout.
-              </p>
-            </Reveal>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-              {MEMBERSHIP_PLANS.map((plan, i) => (
-                <Reveal key={plan.name} delay={i * 0.08}>
-                  <div
-                    className={cn(
-                      "relative rounded-3xl p-6 h-full flex flex-col transition-all duration-350 border bg-white",
-                      plan.isPopular
-                        ? "border-indigo-500 ring-4 ring-indigo-500/10 shadow-[0_20px_50px_rgba(124,111,247,0.12)] scale-[1.03] lg:scale-[1.04]"
-                        : "border-gray-200 hover:border-gray-300 hover:shadow-md shadow-sm"
-                    )}
-                  >
-                    {plan.isPopular && (
-                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm">
-                        Most Popular
-                      </span>
-                    )}
-
-                    <div className="mb-4">
-                      <span
-                        className="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full"
-                        style={{ color: plan.accent, background: `${plan.accent}15` }}
-                      >
-                        {plan.name}
-                      </span>
-                      <div className="mt-5 flex items-baseline gap-1">
-                        <span className="text-4xl font-black text-gray-900 leading-none">₹{plan.price.toLocaleString("en-IN")}</span>
-                        <span className="text-xs text-gray-400 font-semibold">/mo</span>
-                      </div>
-                      <p className="text-xs text-gray-400 leading-relaxed font-medium mt-2">{plan.tagline}</p>
-                    </div>
-
-                    <div className="border-t border-gray-100 my-4" />
-
-                    <div className="mb-5 py-2.5 px-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase">Commission</span>
-                      <span className="text-xs font-black text-gray-800 bg-white border border-gray-150 px-2 py-0.5 rounded-lg shadow-sm">
-                        {plan.commission}% platform cut
-                      </span>
-                    </div>
-
-                    <div className="space-y-3 flex-1 mb-8">
-                      {plan.features.map((feat) => (
-                        <div key={feat} className="flex items-start gap-2 text-xs">
-                          <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                          <span className="text-gray-600 leading-normal font-medium">{feat}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <Link
-                      href="/login?callbackUrl=/editor/settings"
-                      className={cn(
-                        "w-full text-center py-3 rounded-2xl text-xs font-bold transition-all shadow-sm block mt-auto",
-                        plan.isPopular
-                          ? "bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-indigo-600/10"
-                          : "bg-gray-900 hover:bg-gray-800 text-white"
-                      )}
-                    >
-                      {plan.cta}
-                    </Link>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* What You Get */}
       <section className="py-24 px-6 bg-white border-b border-gray-100">

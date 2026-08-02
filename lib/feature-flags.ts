@@ -20,8 +20,8 @@ export const FEATURE_FLAG_REGISTRY = {
   },
   editor_membership_pricing: {
     label: "Editor Membership Tiers",
-    description: "Display the 4-tier editor portal membership subscription plans on the pricing page.",
-    portal: "public",
+    description: "Display the 4-tier editor portal membership subscription plans in the editor dashboard settings.",
+    portal: "editor",
     defaultEnabled: false,
   },
 } as const;

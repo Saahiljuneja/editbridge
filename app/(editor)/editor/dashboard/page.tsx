@@ -105,7 +105,15 @@ export default async function EditorDashboardPage() {
 
     db.select({ count: sql<number>`COUNT(*)::int` })
       .from(messages).innerJoin(orders, eq(messages.orderId, orders.id))
-      .where(and(eq(orders.editorId, editorId), ne(messages.senderId, session.user.userId!), sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`, eq(messages.isBlocked, false)))
+      .where(
+        and(
+          eq(orders.editorId, editorId),
+          ne(messages.senderId, session.user.userId!),
+          eq(messages.isRead, false),
+          sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`,
+          eq(messages.isBlocked, false)
+        )
+      )
       .then(r => r[0]),
 
     db.select({ avg: sql<number>`ROUND(AVG(${reviews.rating})::numeric, 1)`, count: sql<number>`COUNT(*)::int` })

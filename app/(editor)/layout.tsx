@@ -41,8 +41,9 @@ export default async function EditorLayout({
     }
   }
 
-  const [featuredPlacementEnabled, xpRow] = await Promise.all([
+  const [featuredPlacementEnabled, editorMembershipPricingEnabled, xpRow] = await Promise.all([
     isFeatureEnabled("featured_placement"),
+    isFeatureEnabled("editor_membership_pricing"),
     session.user.userId
       ? db.select({ total: userPoints.total }).from(userPoints).where(eq(userPoints.userId, session.user.userId)).limit(1).then(r => r[0])
       : Promise.resolve(null),
@@ -55,6 +56,7 @@ export default async function EditorLayout({
       <div className="h-screen overflow-hidden flex">
         <EditorSidebar
           featuredPlacementEnabled={featuredPlacementEnabled}
+          editorMembershipPricingEnabled={editorMembershipPricingEnabled}
           userName={session.user.name ?? ""}
           userImage={session.user.image ?? null}
           xpLevel={xpLevel}

@@ -670,18 +670,54 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             )}
 
             {/* Notable Clients & Brands */}
-            {editor.previousClients && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 tracking-tight mb-3">Notable Clients & Brands</h2>
-                <div className="flex flex-wrap gap-2">
-                  {editor.previousClients.split(",").map(c => c.trim()).filter(Boolean).map(c => (
-                    <span key={c} className="text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-150 rounded-xl px-3 py-1.5 shadow-sm">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )}
+            {(() => {
+              const clientsList = editor.previousClients
+                ? editor.previousClients.split(",").map(c => c.trim()).filter(Boolean)
+                : [];
+              if (clientsList.length === 0) return null;
+              return (
+                <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm overflow-hidden">
+                  <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Notable Clients & Brands</h2>
+                  <div className="relative w-full overflow-hidden">
+                    {/* Fade gradients */}
+                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+                    
+                    <div className="flex w-full overflow-hidden">
+                      <div className="animate-marquee flex gap-4 py-1">
+                        {clientsList.map((c, idx) => (
+                          <div
+                            key={`orig-${c}-${idx}`}
+                            className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50/50 hover:bg-indigo-50/30 hover:text-indigo-600 border border-gray-100 hover:border-indigo-150 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                          >
+                            <span className="text-indigo-400">⚡</span>
+                            {c}
+                          </div>
+                        ))}
+                        {clientsList.map((c, idx) => (
+                          <div
+                            key={`clone1-${c}-${idx}`}
+                            className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50/50 hover:bg-indigo-50/30 hover:text-indigo-600 border border-gray-100 hover:border-indigo-150 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                          >
+                            <span className="text-indigo-400">⚡</span>
+                            {c}
+                          </div>
+                        ))}
+                        {clientsList.map((c, idx) => (
+                          <div
+                            key={`clone2-${c}-${idx}`}
+                            className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50/50 hover:bg-indigo-50/30 hover:text-indigo-600 border border-gray-100 hover:border-indigo-150 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                          >
+                            <span className="text-indigo-400">⚡</span>
+                            {c}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* Skills & Tools */}
             {(editor.skills.length > 0 || editor.tools.length > 0 || workStyleTags.length > 0) && (

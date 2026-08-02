@@ -57,7 +57,15 @@ export default async function ClientDashboardPage() {
 
     db.select({ count: sql<number>`COUNT(*)::int` })
       .from(messages).innerJoin(orders, eq(messages.orderId, orders.id))
-      .where(and(eq(orders.clientId, userId), ne(messages.senderId, userId), sql`${orders.status} NOT IN ('completed','cancelled')`, eq(messages.isBlocked, false)))
+      .where(
+        and(
+          eq(orders.clientId, userId),
+          ne(messages.senderId, userId),
+          eq(messages.isRead, false),
+          sql`${orders.status} NOT IN ('completed','cancelled')`,
+          eq(messages.isBlocked, false)
+        )
+      )
       .then(r => r[0]),
 
     db.select({ count: sql<number>`COUNT(*)::int` })
