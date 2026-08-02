@@ -37,7 +37,7 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
     items: [
       { href: "/editor/profile",         label: "My Profile",    icon: User },
       { href: "/editor/saved-portfolio", label: "Saved",         icon: Bookmark },
-      { href: "/editor/packages",        label: "Packages",      icon: Package },
+      { href: "/editor/packages",        label: "Services",      icon: Package },
       { href: "/editor/reviews",         label: "Reviews",       icon: Star },
       { href: "/editor/clients",         label: "Clients",       icon: Users },
     ],
@@ -47,6 +47,7 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
     items: [
       { href: "/editor/analytics",       label: "Analytics",     icon: BarChart2 },
       { href: "/editor/featured",        label: "Featured",      icon: Sparkles, flag: "featuredPlacementEnabled" },
+      { href: "/editor/membership",      label: "Membership",    icon: DollarSign, flag: "editorMembershipPricingEnabled" },
       { href: "/editor/rewards",         label: "Rewards & XP",  icon: Zap },
       { href: "/editor/xp-shop",         label: "XP Shop",       icon: Sparkles },
       { href: "/editor/referrals",       label: "Refer & Earn",  icon: Gift },
@@ -223,12 +224,12 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
 
       {/* Header */}
       <div className="px-4 pt-5 pb-4 shrink-0">
-        <p className="text-[10.5px] font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT + "99" }}>Editor Workspace</p>
-        <p className="text-[17px] font-bold text-white tracking-tight leading-tight">All Pages</p>
+        <p className="text-[10.5px] font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT + "99" }}>Editor Portal</p>
+        <p className="text-[17px] font-bold text-white tracking-tight leading-tight">{activePanel ?? "Navigation"}</p>
         {activeItemLabel && (
           <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full mt-2"
             style={{ background: ACCENT + "20", color: ACCENT }}>
-            ↳ {activeItemLabel}
+            {activeItemLabel}
           </span>
         )}
       </div>
@@ -259,12 +260,6 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
 
       {/* Quick actions */}
       <div className="shrink-0 border-t border-white/[0.06] px-3 pt-2.5 pb-1">
-        <Link href="/editor/settings"
-          className={cn("flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium transition-colors mb-0.5",
-            pathname.startsWith("/editor/settings") ? "text-white bg-white/[0.07]" : "text-white/45 hover:text-white hover:bg-white/[0.05]")}>
-          <Settings className="w-3.5 h-3.5 shrink-0" />
-          Settings
-        </Link>
         <Link href="/"
           className="flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium text-white/45 hover:text-white hover:bg-white/[0.05] transition-colors mb-0.5">
           <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
@@ -491,6 +486,7 @@ function MobileDrawer({ pathname, counts, flags, onClose }: {
 
 interface EditorSidebarProps {
   featuredPlacementEnabled?: boolean;
+  editorMembershipPricingEnabled?: boolean;
   userName?: string;
   userImage?: string | null;
   xpLevel?: string;
@@ -500,6 +496,7 @@ interface EditorSidebarProps {
 
 export function EditorSidebar({
   featuredPlacementEnabled = true,
+  editorMembershipPricingEnabled = false,
   userName: propUserName = "",
   userImage: propUserImage = null,
   xpLevel = "bronze",
@@ -518,7 +515,7 @@ export function EditorSidebar({
   const transitioning  = useRef(false);
   const progressTimer  = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const flags    = { featuredPlacementEnabled };
+  const flags    = { featuredPlacementEnabled, editorMembershipPricingEnabled };
   const initials = userName.split(" ").filter(Boolean).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "E";
 
   // Init panel

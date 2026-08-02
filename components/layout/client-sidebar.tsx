@@ -20,51 +20,41 @@ const BG     = "#030C12";
 
 const NAV_GROUPS = [
   {
-    label: "Discover", icon: Search,
+    label: "Home", icon: LayoutDashboard,
     items: [
       { href: "/client/dashboard",       label: "Dashboard",       icon: LayoutDashboard, badgeKey: null },
-      { href: "/client/browse",          label: "Browse Editors",  icon: Search,          badgeKey: null },
+      { href: "/browse",                 label: "Browse Editors",  icon: Search,          badgeKey: null },
+      { href: "/client/saved",           label: "Saved Editors",   icon: Heart,           badgeKey: "saved" as const },
     ],
   },
   {
     label: "Orders", icon: ShoppingBag,
     items: [
       { href: "/client/orders",          label: "My Orders",       icon: ShoppingBag,     badgeKey: null },
-      { href: "/client/calendar",        label: "Calendar",        icon: CalendarDays,    badgeKey: null },
-      { href: "/client/quotes",          label: "Quote Requests",  icon: MessageSquare,   badgeKey: null },
       { href: "/client/messages",        label: "Messages",        icon: MessageSquare,   badgeKey: "unread" as const },
+      { href: "/client/quotes",          label: "Quote Requests",  icon: MessageSquare,   badgeKey: null },
+      { href: "/client/calendar",        label: "Calendar",        icon: CalendarDays,    badgeKey: null },
       { href: "/client/disputes",        label: "Disputes",        icon: AlertTriangle,   badgeKey: null },
-    ],
-  },
-  {
-    label: "Library", icon: Bookmark,
-    items: [
-      { href: "/client/saved",           label: "Saved Editors",   icon: Heart,           badgeKey: "saved" as const },
-      { href: "/client/saved-portfolio", label: "Saved Portfolio", icon: Bookmark,        badgeKey: null },
-      { href: "/client/brief-templates", label: "Brief Templates", icon: FileText,        badgeKey: null },
     ],
   },
   {
     label: "Rewards", icon: Zap,
     items: [
-      { href: "/client/referrals",       label: "Refer & Earn",    icon: Gift,            badgeKey: null },
       { href: "/client/rewards",         label: "Rewards & XP",    icon: Zap,             badgeKey: null },
       { href: "/client/xp-store",        label: "XP Store",        icon: Store,           badgeKey: null },
-      { href: "/client/reviews",         label: "My Reviews",      icon: Star,            badgeKey: null },
-      { href: "/client/analytics",       label: "Analytics",       icon: BarChart2,       badgeKey: null },
-    ],
-  },
-  {
-    label: "Finance", icon: IndianRupee,
-    items: [
-      { href: "/client/transactions",    label: "Transactions",    icon: IndianRupee,     badgeKey: null },
-      { href: "/client/payment-methods", label: "Payment Methods", icon: CreditCard,      badgeKey: null },
+      { href: "/client/referrals",       label: "Refer & Earn",    icon: Gift,            badgeKey: null },
     ],
   },
   {
     label: "Account", icon: Settings,
     items: [
       { href: "/client/profile",         label: "My Profile",      icon: User,            badgeKey: null },
+      { href: "/client/reviews",         label: "My Reviews",      icon: Star,            badgeKey: null },
+      { href: "/client/analytics",       label: "Analytics",       icon: BarChart2,       badgeKey: null },
+      { href: "/client/transactions",    label: "Transactions",    icon: IndianRupee,     badgeKey: null },
+      { href: "/client/payment-methods", label: "Payment Methods", icon: CreditCard,      badgeKey: null },
+      { href: "/client/saved-portfolio", label: "Saved Portfolio", icon: Bookmark,        badgeKey: null },
+      { href: "/client/brief-templates", label: "Brief Templates", icon: FileText,        badgeKey: null },
       { href: "/client/notifications",   label: "Notifications",   icon: Bell,            badgeKey: null },
       { href: "/client/settings",        label: "Settings",        icon: Settings,        badgeKey: null },
       { href: "/client/help",            label: "Help & FAQ",      icon: HelpCircle,      badgeKey: null },
@@ -225,12 +215,12 @@ function Panel({ pathname, counts, onNavigate, userName, userImage, initials, ac
 
       {/* Header */}
       <div className="px-4 pt-5 pb-4 shrink-0">
-        <p className="text-[10.5px] font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT + "99" }}>Client Workspace</p>
-        <p className="text-[17px] font-bold text-white tracking-tight leading-tight">All Pages</p>
+        <p className="text-[10.5px] font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT + "99" }}>Client Portal</p>
+        <p className="text-[17px] font-bold text-white tracking-tight leading-tight">{activePanel ?? "Navigation"}</p>
         {activeItemLabel && (
           <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full mt-2"
             style={{ background: ACCENT + "20", color: ACCENT }}>
-            ↳ {activeItemLabel}
+            {activeItemLabel}
           </span>
         )}
       </div>
@@ -257,12 +247,6 @@ function Panel({ pathname, counts, onNavigate, userName, userImage, initials, ac
 
       {/* Quick actions */}
       <div className="shrink-0 border-t border-white/[0.06] px-3 pt-2.5 pb-1">
-        <Link href="/client/settings"
-          className={cn("flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium transition-colors mb-0.5",
-            pathname.startsWith("/client/settings") ? "text-white bg-white/[0.07]" : "text-white/45 hover:text-white hover:bg-white/[0.05]")}>
-          <Settings className="w-3.5 h-3.5 shrink-0" />
-          Settings
-        </Link>
         <Link href="/"
           className="flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium text-white/45 hover:text-white hover:bg-white/[0.05] transition-colors mb-0.5">
           <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
@@ -450,7 +434,7 @@ function MobileDrawer({ pathname, counts, onClose }: {
       </div>
 
       <div className="px-4 py-3 border-t border-white/[0.06] shrink-0">
-        <Link href="/settings" onClick={onClose}
+        <Link href="/client/settings" onClick={onClose}
           className="flex items-center gap-2.5 text-[13px] text-white/60 hover:text-white transition-colors py-2">
           <Settings className="w-4 h-4" /> Settings
         </Link>
