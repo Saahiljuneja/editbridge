@@ -188,7 +188,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
   const PORTFOLIO_STEPS = [5, 8, 12, 20];
 
   return (
-    <div className="px-8 py-6 space-y-8 max-w-4xl mx-auto">
+    <div className="px-6 py-6 space-y-8 max-w-4xl mx-auto">
 
       {/* Toast */}
       {toast && (

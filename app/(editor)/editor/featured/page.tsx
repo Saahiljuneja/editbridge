@@ -29,32 +29,36 @@ export default async function EditorFeaturedPage() {
   const featureEnabled = await isFeatureEnabled("featured_placement");
 
   return (
-    <div className="px-8 py-6 ">
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center">
-          <Star className="w-5 h-5 text-amber-500 fill-amber-400" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Featured placement</h1>
-          <p className="text-sm text-gray-400">Get seen first â€” appear at the top of search results.</p>
+    <div className=”min-h-screen bg-gray-50”>
+      <div className=”bg-white border-b border-gray-100”>
+        <div className=”px-6 py-5 flex items-center gap-3”>
+          <div className=”w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0”>
+            <Star className=”w-4 h-4 text-amber-500 fill-amber-400” />
+          </div>
+          <div>
+            <h1 className=”text-xl font-bold text-gray-900”>Featured Placement</h1>
+            <p className=”text-sm text-gray-400 mt-0.5”>Appear at the top of search results and get more visibility</p>
+          </div>
         </div>
       </div>
+      <div className=”px-6 py-6”>
 
-      <div className="mt-6 rounded-xl bg-gray-50 border border-gray-200 p-4 space-y-1.5 text-sm text-gray-600">
-        <p>Featured placement includes:</p>
-        <ul className="list-disc list-inside space-y-0.5 text-gray-500">
-          <li>Top-of-search position on the browse page</li>
-          <li>A subtle &quot;Featured&quot; badge on your profile card</li>
-          <li>Priority in editor recommendations</li>
-        </ul>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 space-y-1.5 text-sm text-gray-600 mb-6">
+          <p className="font-medium text-gray-700">Featured placement includes:</p>
+          <ul className="list-disc list-inside space-y-0.5 text-gray-500">
+            <li>Top-of-search position on the browse page</li>
+            <li>A &quot;Featured&quot; badge on your profile card</li>
+            <li>Priority in editor recommendations</li>
+          </ul>
+        </div>
+
+        <FeaturedPurchase
+          isCurrentlyFeatured={isCurrentlyFeatured}
+          daysRemaining={daysRemaining}
+          featuredUntil={isCurrentlyFeatured ? editor!.featuredUntil!.toISOString() : null}
+          featureEnabled={featureEnabled}
+        />
       </div>
-
-      <FeaturedPurchase
-        isCurrentlyFeatured={isCurrentlyFeatured}
-        daysRemaining={daysRemaining}
-        featuredUntil={isCurrentlyFeatured ? editor!.featuredUntil!.toISOString() : null}
-        featureEnabled={featureEnabled}
-      />
     </div>
   );
 }
