@@ -32,7 +32,7 @@ export default async function KycPendingPage() {
   const isRejected = application.status === "rejected";
 
   return (
-    <div className="px-8 py-6 text-center">
+    <div className="px-6 py-10 text-center max-w-xl mx-auto">
       <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${isRejected ? "bg-red-100" : "bg-amber-100"}`}>
         {isRejected
           ? <XCircle className="w-10 h-10 text-red-500" />
@@ -48,7 +48,7 @@ export default async function KycPendingPage() {
           Submission #{application.submissionNumber}
         </p>
       )}
-      <p className="text-muted-foreground mb-8 px-8 py-6">
+      <p className="text-muted-foreground mb-8 px-4">
         {isRejected
           ? "Your KYC application was not approved. Please review the reason below and resubmit with the correct documents."
           : "Your KYC application has been submitted. Our team will review it within 1–2 business days and send you an email with the decision."

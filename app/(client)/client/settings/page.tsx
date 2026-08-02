@@ -191,8 +191,8 @@ export default function ClientSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="px-8 py-6 space-y-4">
+      <div className="min-h-screen bg-gray-50">
+        <div className="px-6 py-6 space-y-4 max-w-3xl mx-auto">
           {[1, 2].map(i => <div key={i} className="h-32 bg-white rounded-2xl border border-gray-100 animate-pulse" />)}
         </div>
       </div>

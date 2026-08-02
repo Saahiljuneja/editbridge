@@ -110,7 +110,7 @@ export function KycForm({ isResubmission = false }: { isResubmission?: boolean }
   }
 
   return (
-    <div className="px-8 py-6 ">
+    <div className="px-6 py-6">
       <PageHeader
         title={isResubmission ? "Resubmit KYC" : "Identity Verification"}
         subtitle={isResubmission

@@ -25,7 +25,7 @@ export default function KycPage() {
 
   if (!ready) {
     return (
-      <div className="px-8 py-6 animate-pulse">
+      <div className="px-6 py-6 animate-pulse">
         <div className="h-7 w-48 bg-gray-200 rounded-lg mb-2" />
         <div className="h-4 w-72 bg-gray-100 rounded mb-10" />
         <div className="space-y-8">

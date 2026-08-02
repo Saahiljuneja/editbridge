@@ -34,7 +34,7 @@ export default async function PackagesPage() {
   }
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-6 py-8">
       {/* Page header */}
       <div className="flex items-start gap-4 mb-8">
         <div
