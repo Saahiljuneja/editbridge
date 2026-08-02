@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { messages, orders, packages, users } from "@/lib/db/schema";
@@ -51,17 +51,17 @@ export default async function AdminChatPage() {
         subtitle="Monitor all conversations and flagged messages"
       />
 
-      {/* â"€â"€ All Conversations â"€â"€ */}
+      {/* ── All Conversations ── */}
       <section>
         <div className="mb-4">
           <h2 className="text-base font-bold text-gray-900 dark:text-white">All Conversations</h2>
-          <p className="text-sm text-gray-400 dark:text-gray-500">Every order chat â€" click to read the full thread.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Every order chat — click to read the full thread.</p>
         </div>
 
         <ConversationsTable orderId={undefined} />
       </section>
 
-      {/* â"€â"€ Flagged Messages â"€â"€ */}
+      {/* ── Flagged Messages ── */}
       <section>
         <div className="mb-4">
           <h2 className="text-base font-bold text-gray-900 dark:text-white">Flagged Messages</h2>
@@ -70,7 +70,7 @@ export default async function AdminChatPage() {
 
         <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
           Users get <strong>3 warnings</strong> before messages are hard-blocked and hashed.
-          Blocked content is stored as a SHA-256 hash â€" unreadable to everyone.
+          Blocked content is stored as a SHA-256 hash — unreadable to everyone.
         </div>
 
         {flaggedMessages.length === 0 ? (
@@ -116,7 +116,7 @@ export default async function AdminChatPage() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate">
                       {row.isBlocked ? (
-                        <span className="text-gray-400 italic">[content hashed â€" unreadable]</span>
+                        <span className="text-gray-400 italic">[content hashed — unreadable]</span>
                       ) : (
                         row.content
                       )}

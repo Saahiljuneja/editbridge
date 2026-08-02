@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ export function FeatureFlagsClient({ initial }: { initial: Flag[] }) {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Feature Flags</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          Kill switches for features shipped after this page â€" turning one off takes effect immediately, platform-wide.
+          Kill switches for features shipped after this page — turning one off takes effect immediately, platform-wide.
         </p>
       </div>
 
@@ -94,7 +94,7 @@ export function FeatureFlagsClient({ initial }: { initial: Flag[] }) {
       <div className="flex items-start gap-2.5 mt-6 text-xs text-gray-400 dark:text-gray-500">
         <ToggleLeft className="w-4 h-4 shrink-0 mt-0.5" />
         <p>
-          New flags appear here automatically as they&apos;re registered in code â€" no migration needed to add one.
+          New flags appear here automatically as they&apos;re registered in code — no migration needed to add one.
         </p>
       </div>
     </div>

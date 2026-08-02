@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { orders, packages, users, editors } from "@/lib/db/schema";
@@ -220,7 +220,7 @@ export default async function AdminOrdersPage({
         return (
           <div className="flex items-center justify-between mt-4 text-sm">
             <p className="text-gray-400 dark:text-gray-500">
-              Page {page} of {totalPages} &middot; showing {offset + 1}â€"{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
+              Page {page} of {totalPages} &middot; showing {offset + 1}–{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
             </p>
             <div className="flex gap-2">
               {page > 1 && (

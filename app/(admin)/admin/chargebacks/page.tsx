@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AlertCircle, CheckCircle, Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
@@ -73,7 +73,7 @@ export default async function AdminChargebacksPage() {
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
           <p className="text-sm font-semibold text-gray-900 dark:text-white">Chargeback Cases</p>
-          <span className="text-xs text-gray-400 dark:text-gray-500 italic">Sample data â€" connect webhook to populate</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 italic">Sample data — connect webhook to populate</span>
         </div>
         <div className="divide-y divide-gray-50 dark:divide-gray-800">
           {MOCK_CHARGEBACKS.map(cb => (
@@ -82,7 +82,7 @@ export default async function AdminChargebacksPage() {
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">{cb.paymentId}</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">{cb.reason}</p>
               </div>
-              <p className="text-sm font-bold text-gray-900 dark:text-white shrink-0">â‚¹{(cb.amount / 100).toFixed(2)}</p>
+              <p className="text-sm font-bold text-gray-900 dark:text-white shrink-0">₹{(cb.amount / 100).toFixed(2)}</p>
               <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{cb.raisedAt}</p>
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${STATUS_STYLES[cb.status]}`}>
                 {cb.status.charAt(0).toUpperCase() + cb.status.slice(1)}

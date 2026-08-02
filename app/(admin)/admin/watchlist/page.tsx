@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -19,7 +19,7 @@ export default async function AdminWatchlistPage() {
           <div>
             <h1 className="text-xl font-bold text-gray-900">Editor Watch List</h1>
             <p className="text-sm text-gray-400 mt-0.5">
-              Editors auto-flagged for low performance â€" cancellations, completion rate, or disputes
+              Editors auto-flagged for low performance — cancellations, completion rate, or disputes
             </p>
           </div>
           <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center">

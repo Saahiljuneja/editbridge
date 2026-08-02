@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { users, auditLogs } from "@/lib/db/schema";
@@ -14,7 +14,7 @@ export default async function AdminAbusePage() {
   if (!session || session.user.role !== "admin") redirect("/admin/dashboard");
 
   // Users who signed up more than once with the same email domain pattern (rough heuristic)
-  // Real IP dedup needs IP stored at signup â€" this uses email domain clustering as a proxy
+  // Real IP dedup needs IP stored at signup — this uses email domain clustering as a proxy
   const [suspendedCount, recentSuspensions, multiAccountCandidates] = await Promise.all([
     db.select({ value: count() }).from(users).where(sql`${users.isActive} = false`).then(r => r[0].value),
 
