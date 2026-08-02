@@ -35,22 +35,24 @@ export default async function EditorQuestionsPage() {
   const pending = questions.filter((q) => !q.answer);
 
   return (
-    <div className="px-8 py-6 ">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Pre-order Q&amp;A</h1>
-        <p className="text-sm text-gray-400 mt-1">
-          Clients ask questions before ordering. Reply within 24 hours â€” your answers also show publicly on your profile.
-        </p>
-        {pending.length > 0 && (
-          <div
-            className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold"
-            style={{ background: `${COLOR}12`, color: COLOR }}
-          >
-            {pending.length} awaiting your reply
+    <div className=”min-h-screen bg-gray-50”>
+      <div className=”bg-white border-b border-gray-100”>
+        <div className=”px-6 py-5 flex items-center justify-between”>
+          <div>
+            <h1 className=”text-xl font-bold text-gray-900”>Pre-order Q&amp;A</h1>
+            <p className=”text-sm text-gray-400 mt-0.5”>
+              Client questions from your profile. Reply within 24 hours — answers also show on your public profile.
+            </p>
           </div>
-        )}
+          {pending.length > 0 && (
+            <span className=”inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200”>
+              <Clock className=”w-3.5 h-3.5” />
+              {pending.length} awaiting reply
+            </span>
+          )}
+        </div>
       </div>
-
+      <div className=”px-6 py-6”>
       {questions.length === 0 ? (
         <div className="text-center py-20 rounded-2xl border border-dashed border-gray-200">
           <HelpCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
@@ -99,6 +101,7 @@ export default async function EditorQuestionsPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

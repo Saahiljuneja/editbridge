@@ -142,7 +142,7 @@ export function ClientRewardsClient() {
   }, []);
 
   if (loading) return (
-    <div className="px-8 py-6 space-y-6">
+    <div className="px-6 py-6 space-y-6">
       <div className="h-8 w-32 rounded-xl bg-gray-100 animate-pulse" />
       <div className="h-56 rounded-2xl bg-gray-100 animate-pulse" />
       <div className="h-24 rounded-2xl bg-gray-100 animate-pulse" />
@@ -162,12 +162,12 @@ export function ClientRewardsClient() {
   const now = new Date();
 
   return (
-    <div className="px-8 py-6 space-y-6 max-w-5xl mx-auto">
+    <div className="px-6 py-6 space-y-6 max-w-5xl mx-auto">
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">Client Workspace</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">Client Portal</p>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight leading-none">Rewards Dashboard</h1>
         </div>
         <div className="flex items-center gap-2">

@@ -188,7 +188,7 @@ export function EditorRewardsClient() {
   }, []);
 
   if (loading) return (
-    <div className="px-8 py-6 space-y-6">
+    <div className="px-6 py-6 space-y-6">
       <div className="h-8 w-32 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
       <div className="h-56 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
       <div className="h-24 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
@@ -197,7 +197,7 @@ export function EditorRewardsClient() {
   );
 
   if (!data) return (
-    <div className="px-8 py-6 text-center text-sm text-gray-400">
+    <div className="px-6 py-6 text-center text-sm text-gray-400">
       <Zap className="w-8 h-8 mx-auto mb-3 opacity-20 animate-bounce" />
       Failed to load rewards.
     </div>
@@ -213,12 +213,12 @@ export function EditorRewardsClient() {
   const now = new Date();
 
   return (
-    <div className="px-8 py-6 space-y-6 max-w-5xl mx-auto">
+    <div className="px-6 py-6 space-y-6 max-w-5xl mx-auto">
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-0.5">Editor Workspace</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-0.5">Editor Portal</p>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-none">Rewards Dashboard</h1>
         </div>
         <div className="flex items-center gap-2">

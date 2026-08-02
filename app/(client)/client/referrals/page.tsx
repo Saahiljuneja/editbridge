@@ -51,7 +51,7 @@ export default function ReferralsPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-6">
+      <div className="px-6 py-6 space-y-6">
 
         {/* How it works */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

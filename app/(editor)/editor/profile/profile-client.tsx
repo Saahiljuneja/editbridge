@@ -462,8 +462,8 @@ export function ProfileClient({
       )}
 
       {/* ── Top bar ── */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-6 py-3.5">
-        <div className="px-8 py-6 flex items-center justify-between">
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-100">
+        <div className="px-6 py-3.5 flex items-center justify-between">
           <div>
             <h1 className="text-base font-bold text-gray-900">My Profile</h1>
             <p className="text-xs text-gray-400">Manage how clients see you on EditBridge</p>
@@ -495,7 +495,7 @@ export function ProfileClient({
         </div>
       </div>
 
-      <div className="px-8 py-6 ">
+      <div className="px-6 py-6">
         <div className="grid lg:grid-cols-[1fr_280px] gap-5 items-start">
 
           {/* ── Left (main content) ── */}

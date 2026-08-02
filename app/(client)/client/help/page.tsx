@@ -54,7 +54,7 @@ export default async function ClientHelpPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-100">
-        <div className="px-8 py-6 flex items-center justify-between">
+        <div className="px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Help Center</h1>
             <p className="text-sm text-gray-400 mt-0.5">Policies, guides, and platform documentation</p>
@@ -69,7 +69,7 @@ export default async function ClientHelpPage() {
         </div>
       </div>
 
-      <div className="px-8 py-6 space-y-6">
+      <div className="px-6 py-6 space-y-6">
         {/* Quick search redirect */}
         <Link
           href="/help"
