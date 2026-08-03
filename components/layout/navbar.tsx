@@ -178,7 +178,7 @@ export function Navbar({
       )}
 
       {/* ── Main navbar ── */}
-      <nav className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
+      <nav className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-[0_1px_8px_rgba(0,0,0,0.06)]">
 
         {/* ── Row 1: Logo + Search + Right actions ── */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -204,14 +204,13 @@ export function Navbar({
             </Link>
 
             {/* ── Search bar (desktop) ── */}
-            <form onSubmit={handleSearch} className="hidden md:flex flex-1 items-center gap-2 mx-4">
-              <div className="flex-1 flex items-center gap-2.5 rounded-xl border border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-[var(--brand-client)] focus-within:ring-2 focus-within:ring-[var(--brand-client)]/20 transition-all">
-                <Search className="w-4 h-4 text-gray-400 shrink-0" />
+            <form onSubmit={handleSearch} className="hidden md:flex flex-1 items-center mx-4">
+              <div className="flex-1 flex items-center gap-2.5 rounded-l-xl border border-r-0 border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-gray-400 transition-all">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search video editors, reels, YouTube, wedding..."
+                  placeholder="What service are you looking for today?"
                   className="flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
                 />
                 {searchQuery && (
@@ -227,9 +226,10 @@ export function Navbar({
               </div>
               <button
                 type="submit"
-                className="px-4 py-2.5 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-sky-600 transition-colors shrink-0"
+                className="px-4 py-[11px] rounded-r-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors shrink-0 border border-gray-900"
+                aria-label="Search"
               >
-                Search
+                <Search className="w-4 h-4" />
               </button>
             </form>
 
@@ -337,9 +337,9 @@ export function Navbar({
         </div>
 
         {/* ── Row 2: Category strip + Nav links (desktop only) ── */}
-        <div className="hidden md:block border-t border-gray-100">
+        <div className="hidden md:block border-t border-gray-200">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+            <div className="flex items-center">
 
               {/* Page nav links */}
               {navLinks.map(({ href, label, icon: Icon }) => (
