@@ -606,10 +606,10 @@ export function Navbar({
 
         {/* ── Row 2: in-app nav (desktop, hides on scroll-down) ── */}
         <div className={cn(
-          "hidden md:block overflow-hidden transition-[max-height,opacity,border-width] duration-300 ease-in-out",
+          "hidden md:block transition-[max-height,opacity,border-width] duration-300 ease-in-out",
           row2Visible
             ? "max-h-[44px] opacity-100 border-t border-gray-200"
-            : "max-h-0 opacity-0 border-t-0"
+            : "max-h-0 opacity-0 border-t-0 pointer-events-none"
         )}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center gap-1">
