@@ -8,7 +8,7 @@ import {
   Menu, X, ChevronDown, LayoutDashboard,
   Settings, LogOut, HelpCircle,
   BookOpen, Mail, Users, ArrowRight, Sparkles,
-  BarChart2, Trophy, Film, Search, Info, Tag,
+  BarChart2, Trophy, Film, Search, Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -26,7 +26,6 @@ const NAV_LINKS = [
 // Resources dropdown: informational + discovery
 const RESOURCES = [
   { href: "/how-it-works", icon: Info,       label: "How It Works",    desc: "How EditBridge works"             },
-  { href: "/pricing",      icon: Tag,        label: "Pricing",         desc: "Transparent, no surprises"        },
   { href: "/about",        icon: Users,      label: "About us",        desc: "Our story and mission"            },
   { href: "/blog",         icon: BookOpen,   label: "Blog",            desc: "Guides and creator tips"          },
   { href: "/showcase",     icon: Film,       label: "Showcase",        desc: "Hand-picked editor work"          },

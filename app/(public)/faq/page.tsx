@@ -357,7 +357,7 @@ export default function FAQPage() {
               {[
                 { icon: Star,        label: "Browse editors",  sub: "Find your perfect editor",   href: "/browse",        accent: "#7c6ff7" },
                 { icon: Clock,       label: "How it works",    sub: "The full process explained",  href: "/how-it-works",  accent: "#34d399" },
-                { icon: ShieldCheck, label: "Pricing & fees",  sub: "Transparent, no surprises",   href: "/pricing",       accent: "#fbbf24" },
+                { icon: ShieldCheck, label: "How it works",   sub: "The full process explained",  href: "/how-it-works",  accent: "#fbbf24" },
               ].map(({ icon: Icon, label, sub, href, accent }) => (
                 <Link key={href} href={href}
                   className="flex items-center gap-4 p-5 rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all group">

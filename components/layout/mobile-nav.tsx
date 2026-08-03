@@ -17,7 +17,6 @@ const publicLinks = [
   { href: "/browse",        label: "Browse Editors" },
   { href: "/find-editor",   label: "Find an Editor", flag: "find_editor_quiz" as const },
   { href: "/how-it-works",  label: "How It Works" },
-  { href: "/pricing",       label: "Pricing" },
   { href: "/showcase",      label: "Showcase" },
   { href: "/about",         label: "About Us" },
   { href: "/contact",       label: "Contact & Support" },

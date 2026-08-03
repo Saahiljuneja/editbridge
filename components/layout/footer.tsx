@@ -11,12 +11,10 @@ const LINKS = {
   "For Clients": [
     { label: "Browse editors",   href: "/browse" },
     { label: "How it works",    href: "/how-it-works" },
-    { label: "Pricing",         href: "/pricing" },
   ],
   "For Editors": [
     { label: "Join as editor",  href: "/signup/editor" },
     { label: "KYC verification",href: "/how-it-works" },
-    { label: "Editor pricing",  href: "/pricing" },
   ],
   "Company": [
     { label: "About us",        href: "/about" },

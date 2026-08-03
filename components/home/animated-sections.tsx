@@ -2336,10 +2336,10 @@ export function PricingPreviewSection() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/pricing"
+                <Link href="/browse"
                   className="inline-flex items-center justify-center gap-1.5 text-sm font-bold py-3 rounded-xl transition-all"
                   style={tier.popular ? { background: tier.col, color: "white", boxShadow: `0 8px 24px ${tier.col}40` } : { border: `1px solid ${tier.col}30`, color: tier.col }}>
-                  See all packages <ArrowRight className="w-3.5 h-3.5" />
+                  Browse editors <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </Reveal>
@@ -2906,9 +2906,6 @@ export function PriceAnchorSection() {
             </Link>
           ))}
         </div>
-        <Link href="/pricing" className="text-xs text-[var(--brand-client)] font-semibold hover:underline shrink-0 whitespace-nowrap">
-          All pricing →
-        </Link>
       </div>
     </section>
   );
