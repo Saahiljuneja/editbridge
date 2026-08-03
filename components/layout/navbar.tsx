@@ -8,31 +8,33 @@ import {
   Menu, X, ChevronDown, LayoutDashboard,
   Settings, LogOut, HelpCircle,
   BookOpen, Mail, Users, ArrowRight, Sparkles,
-  BarChart2, Trophy, Film, Search,
+  BarChart2, Trophy, Film, Search, Info, Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { NotificationBell } from "@/components/layout/notification-bell";
 
 /* ── data ── */
+
+// Row 2: pure in-app navigation only
 const NAV_LINKS = [
-  { href: "/browse",       label: "Browse Editors" },
-  { href: "/feed",         label: "Feed" },
-  { href: "/find-editor",  label: "Match Me", icon: Sparkles, flag: "find_editor_quiz" as const },
-  { href: "/how-it-works", label: "How It Works"   },
-  { href: "/pricing",      label: "Pricing"         },
+  { href: "/browse",      label: "Browse Editors" },
+  { href: "/feed",        label: "Feed" },
+  { href: "/find-editor", label: "Match Me", icon: Sparkles, flag: "find_editor_quiz" as const },
 ];
 
+// Resources dropdown: informational + discovery
 const RESOURCES = [
-  { href: "/about",       icon: Users,      label: "About us",         desc: "Our story and mission"            },
-  { href: "/blog",        icon: BookOpen,   label: "Blog",             desc: "Guides and creator tips"          },
-  { href: "/showcase",    icon: Film,       label: "Showcase",         desc: "Hand-picked editor work"          },
-  { href: "/leaderboard", icon: Trophy,     label: "Top 100 Editors",  desc: "Best-rated editors on EditBridge" },
-  { href: "/faq",         icon: HelpCircle, label: "FAQ",              desc: "Common questions answered"        },
-  { href: "/contact",     icon: Mail,       label: "Contact",          desc: "Support and enquiries"            },
-  { href: "/compare",     icon: BarChart2,  label: "Compare",          desc: "Side-by-side editor comparison"   },
+  { href: "/how-it-works", icon: Info,       label: "How It Works",    desc: "How EditBridge works"             },
+  { href: "/pricing",      icon: Tag,        label: "Pricing",         desc: "Transparent, no surprises"        },
+  { href: "/about",        icon: Users,      label: "About us",        desc: "Our story and mission"            },
+  { href: "/blog",         icon: BookOpen,   label: "Blog",            desc: "Guides and creator tips"          },
+  { href: "/showcase",     icon: Film,       label: "Showcase",        desc: "Hand-picked editor work"          },
+  { href: "/leaderboard",  icon: Trophy,     label: "Top 100 Editors", desc: "Best-rated editors on EditBridge" },
+  { href: "/faq",          icon: HelpCircle, label: "FAQ",             desc: "Common questions answered"        },
+  { href: "/contact",      icon: Mail,       label: "Contact",         desc: "Support and enquiries"            },
+  { href: "/compare",      icon: BarChart2,  label: "Compare",         desc: "Side-by-side editor comparison"   },
 ];
-
 
 const POPULAR_SEARCHES = [
   "YouTube Editing",
@@ -65,7 +67,7 @@ export function Navbar({
 } = {}) {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const router = useRouter();
+  const router   = useRouter();
 
   const [mobileOpen,           setMobileOpen]           = useState(false);
   const [moreOpen,             setMoreOpen]             = useState(false);
@@ -73,15 +75,21 @@ export function Navbar({
   const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
   const [searchQuery,          setSearchQuery]          = useState("");
   const [searchFocused,        setSearchFocused]        = useState(false);
+  const [highlightedIdx,       setHighlightedIdx]       = useState(-1);
   const [row2Visible,          setRow2Visible]          = useState(true);
-  const lastScrollY  = useRef(0);
-  const blurTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const lastScrollY        = useRef(0);
+  const blurTimer          = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchInputRef     = useRef<HTMLInputElement>(null);
+  const suggestionRefs     = useRef<(HTMLButtonElement | null)[]>([]);
+  const userMenuRef        = useRef<HTMLDivElement>(null);
+  const userMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
   type AnnouncementBar = { id: string; title: string; body: string; type: string };
-  const [announcements, setAnnouncements] = useState<AnnouncementBar[]>([]);
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [announcements,  setAnnouncements]  = useState<AnnouncementBar[]>([]);
+  const [dismissedIds,   setDismissedIds]   = useState<Set<string>>(new Set());
   const [announcementIdx, setAnnouncementIdx] = useState(0);
-  const [flags, setFlags] = useState<Record<string, boolean>>({});
+  const [flags,          setFlags]          = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     function fetchAnnouncements() {
@@ -102,10 +110,10 @@ export function Navbar({
       .catch(() => {});
   }, []);
 
-  const navLinks = NAV_LINKS.filter((l) => !("flag" in l) || flags[(l as { flag: string }).flag] !== false);
+  const navLinks = NAV_LINKS.filter(l => !("flag" in l) || flags[(l as { flag: string }).flag] !== false);
 
   const visibleAnnouncements = announcements.filter(a => !dismissedIds.has(a.id));
-  const currentAnnouncement = visibleAnnouncements[announcementIdx] ?? null;
+  const currentAnnouncement  = visibleAnnouncements[announcementIdx] ?? null;
 
   function dismissAnnouncement(id: string) {
     setDismissedIds(prev => new Set(prev).add(id));
@@ -115,15 +123,18 @@ export function Navbar({
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     const q = searchQuery.trim();
+    setSearchFocused(false);
+    setHighlightedIdx(-1);
     router.push(q ? `/browse?q=${encodeURIComponent(q)}` : "/browse");
   }
 
-  /* close dropdowns on route change */
+  /* close everything on route change */
   useEffect(() => {
     setMoreOpen(false);
     setUserOpen(false);
     setMobileOpen(false);
     setSearchFocused(false);
+    setHighlightedIdx(-1);
   }, [pathname]);
 
   /* hide row 2 on scroll-down, restore on scroll-up / at top */
@@ -143,35 +154,130 @@ export function Navbar({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* [fix #1] close Resources when row 2 collapses — prevents overflow-hidden clipping */
+  useEffect(() => {
+    if (!row2Visible) setMoreOpen(false);
+  }, [row2Visible]);
+
   /* cleanup blur timer */
   useEffect(() => () => { if (blurTimer.current) clearTimeout(blurTimer.current); }, []);
+
+  /* [fix #2] reset highlighted suggestion when query changes */
+  useEffect(() => { setHighlightedIdx(-1); }, [searchQuery]);
+
+  /* [fix #8] user menu keyboard trap — Escape closes, Tab cycles within */
+  useEffect(() => {
+    if (!userOpen) return;
+    const firstItem = userMenuRef.current?.querySelector<HTMLElement>("a, button");
+    firstItem?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setUserOpen(false);
+        userMenuTriggerRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusables = Array.from(
+        userMenuRef.current?.querySelectorAll<HTMLElement>("a, button") ?? []
+      ).filter(el => !el.hasAttribute("disabled"));
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last  = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [userOpen]);
 
   function handleSearchFocus() {
     if (blurTimer.current) clearTimeout(blurTimer.current);
     setSearchFocused(true);
   }
   function handleSearchBlur() {
-    blurTimer.current = setTimeout(() => setSearchFocused(false), 150);
+    blurTimer.current = setTimeout(() => {
+      setSearchFocused(false);
+      setHighlightedIdx(-1);
+    }, 150);
   }
   function handleSuggestionClick(label: string) {
     setSearchQuery(label);
     setSearchFocused(false);
+    setHighlightedIdx(-1);
     router.push(`/browse?q=${encodeURIComponent(label)}`);
   }
 
-  const suggestions = searchQuery.trim()
+  /* [fix #2] keyboard navigation: ArrowDown/Up/Escape in the autocomplete */
+  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!showDropdown) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setSearchFocused(false);
+      setHighlightedIdx(-1);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = Math.min(highlightedIdx + 1, suggestionCount - 1);
+      setHighlightedIdx(next);
+      suggestionRefs.current[next]?.focus();
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIdx(-1);
+    }
+  }
+
+  function handleSuggestionKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setSearchFocused(false);
+      setHighlightedIdx(-1);
+      searchInputRef.current?.focus();
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = Math.min(idx + 1, suggestionCount - 1);
+      setHighlightedIdx(next);
+      suggestionRefs.current[next]?.focus();
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (idx === 0) {
+        setHighlightedIdx(-1);
+        searchInputRef.current?.focus();
+      } else {
+        setHighlightedIdx(idx - 1);
+        suggestionRefs.current[idx - 1]?.focus();
+      }
+    }
+  }
+
+  // [fix #6] cap to 5 items
+  const allSuggestions   = searchQuery.trim()
     ? POPULAR_SEARCHES.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
     : POPULAR_SEARCHES;
-  const showDropdown = searchFocused;
+  const shownSuggestions = allSuggestions.slice(0, 5);
+  // when no matches we show a fallback "Search for X" — treat as 1 suggestion for keyboard nav
+  const suggestionCount  = shownSuggestions.length > 0 ? shownSuggestions.length : (searchQuery.trim() ? 1 : 0);
+  const showDropdown     = searchFocused;
 
   const initials = session?.user?.name
     ? session.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
     : "?";
 
   const dashboardHref =
-    session?.user?.role === "editor"          ? "/editor/dashboard"
+    session?.user?.role === "editor"        ? "/editor/dashboard"
     : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_")
-                                              ? "/admin/dashboard"
+                                            ? "/admin/dashboard"
     : "/client/dashboard";
 
   const roleLabel = ROLE_LABELS[session?.user?.role ?? ""] ?? "Member";
@@ -179,7 +285,7 @@ export function Navbar({
 
   return (
     <>
-      {/* ── Theme banner (platform settings) ── */}
+      {/* ── Theme banner ── */}
       {themeBannerEnabled && themeBannerText && !themeBannerDismissed && (
         <div className="relative px-4 py-2.5 text-center" style={{ background: themeBannerBg }}>
           <p className="text-xs sm:text-sm font-medium pr-8" style={{ color: themeBannerTextColor }}>
@@ -187,7 +293,7 @@ export function Navbar({
           </p>
           <button
             onClick={() => setThemeBannerDismissed(true)}
-            aria-label="Dismiss"
+            aria-label="Dismiss banner"
             className="absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100 transition-opacity"
             style={{ color: themeBannerTextColor }}
           >
@@ -196,7 +302,7 @@ export function Navbar({
         </div>
       )}
 
-      {/* ── Announcement bar (DB-driven) ── */}
+      {/* ── Announcement bar ── */}
       {currentAnnouncement && (
         <div className={cn(
           "relative px-4 py-2.5 text-center",
@@ -205,9 +311,9 @@ export function Navbar({
           : "bg-gradient-to-r from-[var(--brand-client)] to-[#7c6ff7]"
         )}>
           <p className="text-xs sm:text-sm text-white font-medium pr-8">
-            {currentAnnouncement.type === "warning" && "⚠️ "}
+            {currentAnnouncement.type === "warning"     && "⚠️ "}
             {currentAnnouncement.type === "maintenance" && "🔧 "}
-            {currentAnnouncement.type === "info" && "📢 "}
+            {currentAnnouncement.type === "info"        && "📢 "}
             <span className="font-bold">{currentAnnouncement.title}</span>
             {currentAnnouncement.body && (
               <span className="font-normal opacity-90"> — {currentAnnouncement.body}</span>
@@ -216,6 +322,7 @@ export function Navbar({
           {visibleAnnouncements.length > 1 && (
             <button
               onClick={() => setAnnouncementIdx(i => (i + 1) % visibleAnnouncements.length)}
+              aria-label={`Announcement ${announcementIdx + 1} of ${visibleAnnouncements.length} — click for next`}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-xs font-bold transition-colors"
             >
               {announcementIdx + 1}/{visibleAnnouncements.length} ›
@@ -223,7 +330,7 @@ export function Navbar({
           )}
           <button
             onClick={() => dismissAnnouncement(currentAnnouncement.id)}
-            aria-label="Dismiss"
+            aria-label="Dismiss announcement"
             className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
@@ -232,14 +339,16 @@ export function Navbar({
       )}
 
       {/* ── Main navbar ── */}
-      <nav className={cn(
-        "sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 transition-shadow duration-300",
-        row2Visible
-          ? "shadow-[0_1px_8px_rgba(0,0,0,0.06)]"
-          : "shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
-      )}>
-
-        {/* ── Row 1: Logo + Search + Right actions ── */}
+      <nav
+        aria-label="Main navigation"
+        className={cn(
+          "sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 transition-shadow duration-300",
+          row2Visible
+            ? "shadow-[0_1px_8px_rgba(0,0,0,0.06)]"
+            : "shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
+        )}
+      >
+        {/* ── Row 1 ── */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3" style={{ height: 64 }}>
 
@@ -254,31 +363,39 @@ export function Navbar({
                     <span className="text-white font-black text-sm">E</span>
                   </div>
                   <span className="text-[1.15rem] font-black tracking-tight text-gray-900">
-                    {platformName
-                      ? platformName
-                      : <>Edit<span className="text-[var(--brand-client)]">Bridge</span></>}
+                    {platformName ?? <>Edit<span className="text-[var(--brand-client)]">Bridge</span></>}
                   </span>
                 </>
               )}
             </Link>
 
-            {/* ── Search bar (desktop) ── */}
+            {/* ── Search (desktop) ── */}
             <div className="hidden md:flex flex-1 items-center mx-4 relative">
-              <form onSubmit={handleSearch} className="w-full flex items-center">
+              {/* [fix #4] role="search" + aria-label on the form */}
+              <form onSubmit={handleSearch} className="w-full flex items-center" role="search" aria-label="Search editors">
                 <div className="flex-1 flex items-center gap-2.5 rounded-l-xl border border-r-0 border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-gray-400 transition-all">
                   <input
+                    ref={searchInputRef}
                     type="text"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     onFocus={handleSearchFocus}
                     onBlur={handleSearchBlur}
-                    placeholder="What service are you looking for today?"
+                    onKeyDown={handleSearchKeyDown}
+                    // [fix #7] shorter placeholder
+                    placeholder="Search editors, niches, styles..."
+                    // [fix #4] ARIA combobox attributes
+                    aria-autocomplete="list"
+                    aria-expanded={showDropdown}
+                    aria-haspopup="listbox"
+                    aria-controls={showDropdown ? "search-suggestions" : undefined}
+                    aria-activedescendant={highlightedIdx >= 0 ? `suggestion-${highlightedIdx}` : undefined}
                     className="flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
                   />
                   {searchQuery && (
                     <button
                       type="button"
-                      onClick={() => setSearchQuery("")}
+                      onClick={() => { setSearchQuery(""); searchInputRef.current?.focus(); }}
                       className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
                       aria-label="Clear search"
                     >
@@ -297,33 +414,62 @@ export function Navbar({
 
               {/* ── Autocomplete dropdown ── */}
               {showDropdown && (
-                <div className="absolute left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.12)] z-50 overflow-hidden">
+                <div
+                  id="search-suggestions"
+                  role="listbox"
+                  aria-label="Search suggestions"
+                  className="absolute left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.12)] z-50 overflow-hidden"
+                >
                   <div className="px-4 py-2.5 border-b border-gray-100">
                     <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
                       {searchQuery.trim() ? "Suggestions" : "Popular searches"}
                     </p>
                   </div>
                   <div className="py-1">
-                    {suggestions.length > 0 ? suggestions.map((label) => (
+                    {shownSuggestions.length > 0 ? shownSuggestions.map((label, idx) => (
                       <button
                         key={label}
+                        id={`suggestion-${idx}`}
+                        role="option"
+                        aria-selected={highlightedIdx === idx}
+                        ref={el => { suggestionRefs.current[idx] = el; }}
                         type="button"
                         onMouseDown={() => handleSuggestionClick(label)}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                        onFocus={() => { if (blurTimer.current) clearTimeout(blurTimer.current); setHighlightedIdx(idx); }}
+                        onBlur={handleSearchBlur}
+                        onKeyDown={e => handleSuggestionKeyDown(e, idx)}
+                        className={cn(
+                          "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors text-left focus:outline-none",
+                          highlightedIdx === idx
+                            ? "bg-[var(--brand-client)]/5 text-[var(--brand-client)]"
+                            : "text-gray-700 hover:bg-gray-50"
+                        )}
                       >
-                        <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <Search className={cn("w-3.5 h-3.5 shrink-0 transition-colors", highlightedIdx === idx ? "text-[var(--brand-client)]" : "text-gray-400")} />
                         {label}
                       </button>
-                    )) : (
+                    )) : searchQuery.trim() ? (
                       <button
+                        id="suggestion-0"
+                        role="option"
+                        aria-selected={highlightedIdx === 0}
+                        ref={el => { suggestionRefs.current[0] = el; }}
                         type="button"
                         onMouseDown={() => handleSuggestionClick(searchQuery)}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                        onFocus={() => { if (blurTimer.current) clearTimeout(blurTimer.current); setHighlightedIdx(0); }}
+                        onBlur={handleSearchBlur}
+                        onKeyDown={e => handleSuggestionKeyDown(e, 0)}
+                        className={cn(
+                          "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors text-left focus:outline-none",
+                          highlightedIdx === 0
+                            ? "bg-[var(--brand-client)]/5 text-[var(--brand-client)]"
+                            : "text-gray-700 hover:bg-gray-50"
+                        )}
                       >
-                        <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <Search className={cn("w-3.5 h-3.5 shrink-0", highlightedIdx === 0 ? "text-[var(--brand-client)]" : "text-gray-400")} />
                         Search for &ldquo;{searchQuery}&rdquo;
                       </button>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               )}
@@ -349,8 +495,13 @@ export function Navbar({
 
                   {/* User menu */}
                   <div className="relative">
-                    <button onClick={() => setUserOpen(o => !o)}
-                      className="flex items-center gap-2 px-2 py-1.5 rounded-xl border transition-all border-gray-200 bg-gray-50 hover:bg-gray-100">
+                    <button
+                      ref={userMenuTriggerRef}
+                      onClick={() => setUserOpen(o => !o)}
+                      aria-expanded={userOpen}
+                      aria-haspopup="true"
+                      className="flex items-center gap-2 px-2 py-1.5 rounded-xl border transition-all border-gray-200 bg-gray-50 hover:bg-gray-100"
+                    >
                       <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
                         {session.user?.image
                           // eslint-disable-next-line @next/next/no-img-element
@@ -361,9 +512,7 @@ export function Navbar({
                         <p className="text-xs font-semibold truncate leading-none text-gray-800">
                           {session.user?.name?.split(" ")[0]}
                         </p>
-                        <p className="text-[10px] leading-none mt-0.5 text-gray-400">
-                          {roleLabel}
-                        </p>
+                        <p className="text-[10px] leading-none mt-0.5 text-gray-400">{roleLabel}</p>
                       </div>
                       <ChevronDown className={cn("w-3.5 h-3.5 shrink-0 transition-all text-gray-400", userOpen && "rotate-180")} />
                     </button>
@@ -371,7 +520,11 @@ export function Navbar({
                     {userOpen && (
                       <>
                         <div className="fixed inset-0 z-10" onClick={() => setUserOpen(false)} />
-                        <div className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden">
+                        <div
+                          ref={userMenuRef}
+                          role="menu"
+                          className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden"
+                        >
                           <div className="px-4 py-4 border-b border-gray-100">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-[var(--brand-client)] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
@@ -390,14 +543,27 @@ export function Navbar({
                             </div>
                           </div>
                           <div className="p-1.5">
-                            <DropItem href={dashboardHref} icon={LayoutDashboard} label="Dashboard" />
-                            <DropItem href={session?.user?.role === "editor" ? "/editor/settings" : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_") ? "/admin/settings" : "/settings"} icon={Settings} label="Settings" />
+                            <DropItem
+                              href={dashboardHref}
+                              icon={LayoutDashboard}
+                              label="Dashboard"
+                            />
+                            <DropItem
+                              href={
+                                session?.user?.role === "editor" ? "/editor/settings"
+                                : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_") ? "/admin/settings"
+                                : "/settings"
+                              }
+                              icon={Settings}
+                              label="Settings"
+                            />
                             <DropItem href="/faq" icon={HelpCircle} label="Help & FAQ" />
                           </div>
                           <div className="border-t border-gray-100 p-1.5">
                             <button
                               onClick={() => { setUserOpen(false); signOut({ callbackUrl: "/" }); }}
-                              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-colors font-medium">
+                              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-colors font-medium"
+                            >
                               <LogOut className="w-4 h-4 shrink-0" />
                               Sign out
                             </button>
@@ -418,6 +584,11 @@ export function Navbar({
                     Get started
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
+                  {/* [fix #3] mobile-visible compact CTA */}
+                  <Link href="/signup"
+                    className="sm:hidden px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[var(--brand-client)] hover:bg-sky-600 transition-colors">
+                    Sign up
+                  </Link>
                 </>
               )}
 
@@ -425,14 +596,15 @@ export function Navbar({
               <button
                 className="md:hidden p-2 rounded-xl transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
                 onClick={() => setMobileOpen(true)}
-                aria-label="Open menu">
+                aria-label="Open menu"
+              >
                 <Menu className="h-5 w-5" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* ── Row 2: Nav links (desktop only, hides on scroll-down) ── */}
+        {/* ── Row 2: in-app nav (desktop, hides on scroll-down) ── */}
         <div className={cn(
           "hidden md:block overflow-hidden transition-[max-height,opacity,border-width] duration-300 ease-in-out",
           row2Visible
@@ -442,7 +614,6 @@ export function Navbar({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">
 
-              {/* Page nav links */}
               {navLinks.map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}
@@ -463,6 +634,8 @@ export function Navbar({
               <div className="relative shrink-0">
                 <button
                   onClick={() => setMoreOpen(o => !o)}
+                  aria-expanded={moreOpen}
+                  aria-haspopup="true"
                   className={cn(
                     "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm border-b-[3px] transition-colors",
                     moreOpen
@@ -506,7 +679,6 @@ export function Navbar({
                 )}
               </div>
 
-
             </div>
           </div>
         </div>
@@ -520,8 +692,11 @@ export function Navbar({
 
 function DropItem({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
   return (
-    <Link href={href}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors font-medium group">
+    <Link
+      href={href}
+      role="menuitem"
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors font-medium group"
+    >
       <Icon className="w-4 h-4 text-gray-400 group-hover:text-gray-600 shrink-0 transition-colors" />
       {label}
     </Link>
