@@ -16,9 +16,9 @@ import { NotificationBell } from "@/components/layout/notification-bell";
 
 /* ── data ── */
 const NAV_LINKS = [
-  { href: "/feed",         label: "Feed" },
   { href: "/browse",       label: "Browse Editors" },
-  { href: "/find-editor",  label: "Find an Editor", flag: "find_editor_quiz" as const },
+  { href: "/feed",         label: "Feed" },
+  { href: "/find-editor",  label: "Match Me", icon: Sparkles, flag: "find_editor_quiz" as const },
   { href: "/how-it-works", label: "How It Works"   },
   { href: "/pricing",      label: "Pricing"         },
 ];
@@ -342,17 +342,18 @@ export function Navbar({
             <div className="flex items-center overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
 
               {/* Page nav links */}
-              {navLinks.map(({ href, label }) => (
+              {navLinks.map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
                   className={cn(
-                    "whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition-colors shrink-0",
+                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition-colors shrink-0",
                     isActive(href)
                       ? "border-[var(--brand-client)] text-[var(--brand-client)]"
                       : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
                   )}
                 >
+                  {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
                   {label}
                 </Link>
               ))}
@@ -403,6 +404,17 @@ export function Navbar({
                   </>
                 )}
               </div>
+
+              {/* Become an Editor CTA — hidden for logged-in editors */}
+              {session?.user?.role !== "editor" && (
+                <Link
+                  href="/signup/editor"
+                  className="ml-auto shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#7c6ff7] border border-[#7c6ff7]/30 bg-[#7c6ff7]/5 hover:bg-[#7c6ff7]/10 hover:border-[#7c6ff7]/50 transition-colors whitespace-nowrap"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  Become an Editor
+                </Link>
+              )}
 
             </div>
           </div>
