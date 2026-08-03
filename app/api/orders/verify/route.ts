@@ -7,6 +7,7 @@ import { verifySignature } from "@/lib/razorpay";
 import { notifyOrderPlacedClient, notifyOrderPlacedEditor, createInAppNotification, editorWantsNotif } from "@/lib/notifications";
 import { consumeCredits } from "@/lib/rewards";
 import { getPlatformSettings } from "@/lib/platform-settings";
+import { getEditorCommissionRate } from "@/lib/membership";
 import { generateBriefText } from "@/lib/brief";
 import { createOrderEvent } from "@/lib/order-events";
 import { z } from "zod";
@@ -108,7 +109,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "This editor is not accepting new orders at this time" }, { status: 403 });
   }
 
-  const { commissionRatePct, processingFeePct } = await getPlatformSettings();
+  const { processingFeePct } = await getPlatformSettings();
+  const commissionRatePct = await getEditorCommissionRate(editor.id);
 
   const addons = briefData.customAddons;
   let addOnsCost = 0;

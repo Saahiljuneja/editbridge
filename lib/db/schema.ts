@@ -188,6 +188,8 @@ export const editors = pgTable("editors", {
   featuredVideoUrl: text("featured_video_url"),
   isFeatured: boolean("is_featured").notNull().default(false),
   featuredUntil: timestamp("featured_until", { mode: "date" }),
+  membershipTier: text("membership_tier").notNull().default("hobby"), // hobby | starter | pro | agency
+  membershipExpiresAt: timestamp("membership_expires_at", { mode: "date" }),
   razorpayAccountId: text("razorpay_account_id"),
   bankAccountName: text("bank_account_name"),
   bankAccountNumber: text("bank_account_number"),
@@ -873,6 +875,20 @@ export const featuredPayments = pgTable("featured_payments", {
   razorpayPaymentId: text("razorpay_payment_id").notNull(),
   featuredFrom: timestamp("featured_from", { mode: "date" }).notNull(),
   featuredUntil: timestamp("featured_until", { mode: "date" }).notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+// ─── Membership payments (paid editor membership tier passes) ──────────────────
+
+export const membershipPayments = pgTable("membership_payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  editorId: uuid("editor_id").notNull().references(() => editors.id, { onDelete: "cascade" }),
+  tier: text("tier").notNull(), // starter | pro | agency
+  amountPaid: integer("amount_paid").notNull(), // paise
+  razorpayOrderId: text("razorpay_order_id").notNull(),
+  razorpayPaymentId: text("razorpay_payment_id"),
+  status: text("status").notNull().default("pending"), // pending | completed | failed
+  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 

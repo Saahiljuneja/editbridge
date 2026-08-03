@@ -7,6 +7,7 @@ import { verifySignature } from "@/lib/razorpay";
 import { createInAppNotification, notifyOrderPlacedEditor, editorWantsNotif } from "@/lib/notifications";
 import { consumeCredits } from "@/lib/rewards";
 import { getPlatformSettings } from "@/lib/platform-settings";
+import { getEditorCommissionRate } from "@/lib/membership";
 import { z } from "zod";
 
 const schema = z.object({
@@ -48,7 +49,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!quote || quote.status !== "offered" || !quote.offeredPrice)
     return NextResponse.json({ error: "Invalid quote state" }, { status: 409 });
 
-  const { commissionRatePct, processingFeePct } = await getPlatformSettings();
+  const { processingFeePct } = await getPlatformSettings();
+  const commissionRatePct = await getEditorCommissionRate(quote.editorId);
   const PROCESSING_FEE = Math.round(quote.offeredPrice * (processingFeePct / 100));
   const commissionAmount = Math.round(quote.offeredPrice * (commissionRatePct / 100));
   const totalAmount = quote.offeredPrice + PROCESSING_FEE;

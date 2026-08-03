@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, Award, Info } from "lucide-react";
+import { CheckCircle, Award, Info, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -79,10 +79,50 @@ const MEMBERSHIP_PLANS = [
   },
 ];
 
+function loadRazorpay(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window !== "undefined" && (window as any).Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnabled: boolean }) {
   const [currentTier, setCurrentTier] = useState<string>("hobby");
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
   const [isUpgrading, setIsUpgrading] = useState<boolean>(false);
   const [upgradeTarget, setUpgradeTarget] = useState<typeof MEMBERSHIP_PLANS[0] | null>(null);
+
+  useEffect(() => {
+    if (isPricingTiersEnabled) {
+      fetchMembership();
+    } else {
+      setLoading(false);
+    }
+  }, [isPricingTiersEnabled]);
+
+  async function fetchMembership() {
+    try {
+      const res = await fetch("/api/editor/membership");
+      if (res.ok) {
+        const data = await res.json();
+        setCurrentTier(data.membershipTier || "hobby");
+        setExpiresAt(data.membershipExpiresAt || null);
+      }
+    } catch (err) {
+      console.error("Failed to fetch membership:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (!isPricingTiersEnabled) {
     return (
@@ -102,6 +142,15 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
     );
   }
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mb-4" />
+        <p className="text-sm text-gray-500">Loading your membership plan...</p>
+      </div>
+    );
+  }
+
   const activePlanDetails = MEMBERSHIP_PLANS.find(p => p.id === currentTier) || MEMBERSHIP_PLANS[0];
 
   function handleUpgradeClick(plan: typeof MEMBERSHIP_PLANS[0]) {
@@ -109,16 +158,97 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
       toast.info(`You are already subscribed to the ${plan.name} plan.`);
       return;
     }
+    if (plan.price === 0) {
+      toast.info("Your active premium membership plan will revert to the Hobby plan upon expiry.");
+      return;
+    }
     setUpgradeTarget(plan);
     setIsUpgrading(true);
   }
 
-  function confirmUpgrade() {
+  async function confirmUpgrade() {
     if (!upgradeTarget) return;
     setIsUpgrading(false);
-    setCurrentTier(upgradeTarget.id);
-    toast.success(`Success! You have upgraded to the ${upgradeTarget.name} tier. Platform commission is now ${upgradeTarget.commission}%.`);
-    setUpgradeTarget(null);
+    setIsProcessingPayment(true);
+
+    try {
+      const checkoutRes = await fetch("/api/editor/membership/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: upgradeTarget.id }),
+      });
+
+      if (!checkoutRes.ok) {
+        const errData = await checkoutRes.json().catch(() => ({}));
+        toast.error(errData.error ?? "Failed to initiate payment. Please try again.");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const { orderId, amount, currency, key } = await checkoutRes.json();
+
+      const scriptLoaded = await loadRazorpay();
+      if (!scriptLoaded) {
+        toast.error("Failed to load Razorpay SDK. Please refresh the page and try again.");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const options = {
+        key,
+        amount,
+        currency,
+        name: "EditBridge",
+        description: `Upgrade to ${upgradeTarget.name} Tier`,
+        order_id: orderId,
+        theme: { color: upgradeTarget.accent },
+        modal: {
+          ondismiss: () => {
+            setIsProcessingPayment(false);
+            toast.info("Payment cancelled.");
+          },
+          backdropclose: false,
+          escape: false,
+        },
+        handler: async (response: any) => {
+          try {
+            const verifyRes = await fetch("/api/editor/membership/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              }),
+            });
+
+            if (!verifyRes.ok) {
+              const errData = await verifyRes.json().catch(() => ({}));
+              toast.error(errData.error ?? "Payment verification failed. Please contact support.");
+              return;
+            }
+
+            const verifyData = await verifyRes.json();
+            toast.success(`Success! Upgraded to ${upgradeTarget.name} plan.`);
+            setCurrentTier(verifyData.tier);
+            setExpiresAt(verifyData.expiresAt);
+            setUpgradeTarget(null);
+          } catch (err) {
+            console.error("Verification failed:", err);
+            toast.error("An error occurred during verification. Please contact support.");
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Upgrade error:", err);
+      toast.error("Something went wrong during checkout.");
+      setIsProcessingPayment(false);
+    }
   }
 
   return (
@@ -142,7 +272,14 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
           <div>
             <p className="text-gray-400 text-[10px] uppercase font-bold tracking-widest leading-none">Your Current Tier</p>
             <p className="text-gray-950 font-extrabold text-base mt-1">{activePlanDetails.name}</p>
-            <span className="text-[10px] text-gray-500 leading-none">{activePlanDetails.commission}% commission fee</span>
+            <div className="flex flex-col gap-0.5 mt-0.5">
+              <span className="text-[10px] text-gray-500 leading-none">{activePlanDetails.commission}% commission fee</span>
+              {expiresAt && (
+                <span className="text-[9px] text-gray-400 leading-none mt-1">
+                  Active until {new Date(expiresAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -212,14 +349,15 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
                 <button 
                   onClick={() => handleUpgradeClick(plan)}
                   className={cn(
-                    "w-full text-center py-3 rounded-2xl text-xs font-bold transition-all shadow-sm text-white",
-                    isCurrent
+                    "w-full text-center py-3 rounded-2xl text-xs font-bold transition-all shadow-sm text-white flex items-center justify-center gap-2",
+                    (isCurrent || isProcessingPayment)
                       ? "bg-gray-100 text-gray-400 cursor-default shadow-none border border-gray-200"
                       : "hover:shadow-md hover:opacity-90"
                   )}
-                  style={!isCurrent ? { backgroundColor: plan.accent } : undefined}
-                  disabled={isCurrent}
+                  style={!(isCurrent || isProcessingPayment) ? { backgroundColor: plan.accent } : undefined}
+                  disabled={isCurrent || isProcessingPayment}
                 >
+                  {isProcessingPayment && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {isCurrent ? "Current Plan" : plan.price === 0 ? "Downgrade to Hobby" : `Upgrade to ${plan.name}`}
                 </button>
               </div>
