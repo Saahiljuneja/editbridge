@@ -33,17 +33,6 @@ const RESOURCES = [
   { href: "/compare",     icon: BarChart2,  label: "Compare",          desc: "Side-by-side editor comparison"   },
 ];
 
-const CATEGORY_STRIP = [
-  { label: "🔥 Trending",         href: "/browse?sort=rating"     },
-  { label: "YouTube Editing",     href: "/browse?niche=youtube"   },
-  { label: "Short-form & Reels",  href: "/browse?niche=reels"     },
-  { label: "Wedding Films",       href: "/browse?niche=wedding"   },
-  { label: "Corporate Video",     href: "/browse?niche=corporate" },
-  { label: "Cinematic",           href: "/browse?niche=cinematic" },
-  { label: "Gaming Edits",        href: "/browse?niche=gaming"    },
-  { label: "Podcast",             href: "/browse?niche=podcast"   },
-  { label: "Motion Graphics",     href: "/browse?niche=motion"    },
-];
 
 const ROLE_LABELS: Record<string, string> = {
   client:           "Client",
@@ -351,20 +340,6 @@ export function Navbar({
         <div className="hidden md:block border-t border-gray-100">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-
-              {/* Service category shortcuts */}
-              {CATEGORY_STRIP.map(({ label, href }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors shrink-0"
-                >
-                  {label}
-                </Link>
-              ))}
-
-              {/* Separator */}
-              <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
 
               {/* Page nav links */}
               {navLinks.map(({ href, label }) => (
