@@ -7,8 +7,7 @@ import { useSession, signOut } from "next-auth/react";
 import {
   Menu, X, ChevronDown, LayoutDashboard,
   Settings, LogOut, HelpCircle,
-  BookOpen, Mail, Users, ArrowRight, Sparkles,
-  BarChart2, Trophy, Film, Search, Info,
+  ArrowRight, Sparkles, Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -23,16 +22,15 @@ const NAV_LINKS = [
   { href: "/find-editor", label: "Match Me", icon: Sparkles, flag: "find_editor_quiz" as const },
 ];
 
-// Resources dropdown: informational + discovery
 const RESOURCES = [
-  { href: "/how-it-works", icon: Info,       label: "How It Works",    desc: "How EditBridge works"             },
-  { href: "/about",        icon: Users,      label: "About us",        desc: "Our story and mission"            },
-  { href: "/blog",         icon: BookOpen,   label: "Blog",            desc: "Guides and creator tips"          },
-  { href: "/showcase",     icon: Film,       label: "Showcase",        desc: "Hand-picked editor work"          },
-  { href: "/leaderboard",  icon: Trophy,     label: "Top 100 Editors", desc: "Best-rated editors on EditBridge" },
-  { href: "/faq",          icon: HelpCircle, label: "FAQ",             desc: "Common questions answered"        },
-  { href: "/contact",      icon: Mail,       label: "Contact",         desc: "Support and enquiries"            },
-  { href: "/compare",      icon: BarChart2,  label: "Compare",         desc: "Side-by-side editor comparison"   },
+  { href: "/how-it-works", label: "How It Works"    },
+  { href: "/about",        label: "About us"        },
+  { href: "/blog",         label: "Blog"            },
+  { href: "/showcase",     label: "Showcase"        },
+  { href: "/leaderboard",  label: "Top 100 Editors" },
+  { href: "/faq",          label: "FAQ"             },
+  { href: "/contact",      label: "Contact"         },
+  { href: "/compare",      label: "Compare"         },
 ];
 
 const POPULAR_SEARCHES = [
@@ -69,7 +67,6 @@ export function Navbar({
   const router   = useRouter();
 
   const [mobileOpen,           setMobileOpen]           = useState(false);
-  const [moreOpen,             setMoreOpen]             = useState(false);
   const [userOpen,             setUserOpen]             = useState(false);
   const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
   const [searchQuery,          setSearchQuery]          = useState("");
@@ -129,7 +126,6 @@ export function Navbar({
 
   /* close everything on route change */
   useEffect(() => {
-    setMoreOpen(false);
     setUserOpen(false);
     setMobileOpen(false);
     setSearchFocused(false);
@@ -152,11 +148,6 @@ export function Navbar({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  /* [fix #1] close Resources when row 2 collapses — prevents overflow-hidden clipping */
-  useEffect(() => {
-    if (!row2Visible) setMoreOpen(false);
-  }, [row2Visible]);
 
   /* cleanup blur timer */
   useEffect(() => () => { if (blurTimer.current) clearTimeout(blurTimer.current); }, []);
@@ -611,14 +602,14 @@ export function Navbar({
             : "max-h-0 opacity-0 border-t-0 pointer-events-none"
         )}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center overflow-x-auto [&::-webkit-scrollbar]:hidden">
 
               {navLinks.map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
                   className={cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm border-b-[3px] transition-colors shrink-0",
+                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-3 text-sm border-b-[3px] transition-colors shrink-0",
                     isActive(href)
                       ? "border-[var(--brand-client)] text-[var(--brand-client)] font-semibold"
                       : "border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300"
@@ -629,54 +620,22 @@ export function Navbar({
                 </Link>
               ))}
 
-              {/* Resources dropdown */}
-              <div className="relative shrink-0">
-                <button
-                  onClick={() => setMoreOpen(o => !o)}
-                  aria-expanded={moreOpen}
-                  aria-haspopup="true"
+              <span className="shrink-0 w-px h-4 bg-gray-200 mx-2" />
+
+              {RESOURCES.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
                   className={cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm border-b-[3px] transition-colors",
-                    moreOpen
+                    "whitespace-nowrap px-3 py-3 text-sm border-b-[3px] transition-colors shrink-0",
+                    isActive(href)
                       ? "border-[var(--brand-client)] text-[var(--brand-client)] font-semibold"
                       : "border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300"
                   )}
                 >
-                  Resources
-                  <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
-                </button>
-
-                {moreOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
-                    <div className="absolute left-0 top-full mt-1 w-64 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden p-1.5">
-                      {RESOURCES.map(({ href, icon: Icon, label, desc }) => (
-                        <Link key={href} href={href}
-                          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                          <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-[#7c6ff7]/10 flex items-center justify-center shrink-0 transition-colors">
-                            <Icon className="w-4 h-4 text-gray-400 group-hover:text-[#7c6ff7] transition-colors" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800">{label}</p>
-                            <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
-                          </div>
-                        </Link>
-                      ))}
-                      <div className="mx-3 my-1.5 border-t border-gray-100" />
-                      <Link href="/signup/editor"
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#7c6ff7]/5 transition-colors group">
-                        <div className="w-8 h-8 rounded-lg bg-[#7c6ff7]/10 flex items-center justify-center shrink-0">
-                          <Sparkles className="w-4 h-4 text-[#7c6ff7]" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[#7c6ff7]">Become an editor</p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">Apply and start earning</p>
-                        </div>
-                      </Link>
-                    </div>
-                  </>
-                )}
-              </div>
+                  {label}
+                </Link>
+              ))}
 
             </div>
           </div>
