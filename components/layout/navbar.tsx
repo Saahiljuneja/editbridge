@@ -232,7 +232,12 @@ export function Navbar({
       )}
 
       {/* ── Main navbar ── */}
-      <nav className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-[0_1px_8px_rgba(0,0,0,0.06)]">
+      <nav className={cn(
+        "sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 transition-shadow duration-300",
+        row2Visible
+          ? "shadow-[0_1px_8px_rgba(0,0,0,0.06)]"
+          : "shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
+      )}>
 
         {/* ── Row 1: Logo + Search + Right actions ── */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
