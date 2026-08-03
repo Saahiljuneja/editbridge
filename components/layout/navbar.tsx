@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -34,6 +34,17 @@ const RESOURCES = [
 ];
 
 
+const POPULAR_SEARCHES = [
+  "YouTube Editing",
+  "Short-form Reels",
+  "Wedding Films",
+  "Corporate Video",
+  "Gaming Edits",
+  "Podcast Editing",
+  "Motion Graphics",
+  "Thumbnail Design",
+];
+
 const ROLE_LABELS: Record<string, string> = {
   client:           "Client",
   editor:           "Editor",
@@ -56,11 +67,15 @@ export function Navbar({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [mobileOpen,        setMobileOpen]        = useState(false);
-  const [moreOpen,          setMoreOpen]          = useState(false);
-  const [userOpen,          setUserOpen]          = useState(false);
+  const [mobileOpen,           setMobileOpen]           = useState(false);
+  const [moreOpen,             setMoreOpen]             = useState(false);
+  const [userOpen,             setUserOpen]             = useState(false);
   const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
-  const [searchQuery,       setSearchQuery]       = useState("");
+  const [searchQuery,          setSearchQuery]          = useState("");
+  const [searchFocused,        setSearchFocused]        = useState(false);
+  const [row2Visible,          setRow2Visible]          = useState(true);
+  const lastScrollY  = useRef(0);
+  const blurTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   type AnnouncementBar = { id: string; title: string; body: string; type: string };
   const [announcements, setAnnouncements] = useState<AnnouncementBar[]>([]);
@@ -108,7 +123,46 @@ export function Navbar({
     setMoreOpen(false);
     setUserOpen(false);
     setMobileOpen(false);
+    setSearchFocused(false);
   }, [pathname]);
+
+  /* hide row 2 on scroll-down, restore on scroll-up / at top */
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      if (y < 10) {
+        setRow2Visible(true);
+      } else if (y > lastScrollY.current + 4) {
+        setRow2Visible(false);
+      } else if (y < lastScrollY.current - 4) {
+        setRow2Visible(true);
+      }
+      lastScrollY.current = y;
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* cleanup blur timer */
+  useEffect(() => () => { if (blurTimer.current) clearTimeout(blurTimer.current); }, []);
+
+  function handleSearchFocus() {
+    if (blurTimer.current) clearTimeout(blurTimer.current);
+    setSearchFocused(true);
+  }
+  function handleSearchBlur() {
+    blurTimer.current = setTimeout(() => setSearchFocused(false), 150);
+  }
+  function handleSuggestionClick(label: string) {
+    setSearchQuery(label);
+    setSearchFocused(false);
+    router.push(`/browse?q=${encodeURIComponent(label)}`);
+  }
+
+  const suggestions = searchQuery.trim()
+    ? POPULAR_SEARCHES.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+    : POPULAR_SEARCHES;
+  const showDropdown = searchFocused;
 
   const initials = session?.user?.name
     ? session.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -204,34 +258,71 @@ export function Navbar({
             </Link>
 
             {/* ── Search bar (desktop) ── */}
-            <form onSubmit={handleSearch} className="hidden md:flex flex-1 items-center mx-4">
-              <div className="flex-1 flex items-center gap-2.5 rounded-l-xl border border-r-0 border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-gray-400 transition-all">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="What service are you looking for today?"
-                  className="flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
-                    aria-label="Clear search"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-[11px] rounded-r-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors shrink-0 border border-gray-900"
-                aria-label="Search"
-              >
-                <Search className="w-4 h-4" />
-              </button>
-            </form>
+            <div className="hidden md:flex flex-1 items-center mx-4 relative">
+              <form onSubmit={handleSearch} className="w-full flex items-center">
+                <div className="flex-1 flex items-center gap-2.5 rounded-l-xl border border-r-0 border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-gray-400 transition-all">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    onFocus={handleSearchFocus}
+                    onBlur={handleSearchBlur}
+                    placeholder="What service are you looking for today?"
+                    className="flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-[11px] rounded-r-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors shrink-0 border border-gray-900"
+                  aria-label="Search"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </form>
+
+              {/* ── Autocomplete dropdown ── */}
+              {showDropdown && (
+                <div className="absolute left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.12)] z-50 overflow-hidden">
+                  <div className="px-4 py-2.5 border-b border-gray-100">
+                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                      {searchQuery.trim() ? "Suggestions" : "Popular searches"}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    {suggestions.length > 0 ? suggestions.map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onMouseDown={() => handleSuggestionClick(label)}
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        {label}
+                      </button>
+                    )) : (
+                      <button
+                        type="button"
+                        onMouseDown={() => handleSuggestionClick(searchQuery)}
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        Search for &ldquo;{searchQuery}&rdquo;
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* ── Right side ── */}
             <div className="flex items-center gap-2 ml-auto md:ml-0">
@@ -336,8 +427,13 @@ export function Navbar({
           </div>
         </div>
 
-        {/* ── Row 2: Category strip + Nav links (desktop only) ── */}
-        <div className="hidden md:block border-t border-gray-200">
+        {/* ── Row 2: Nav links (desktop only, hides on scroll-down) ── */}
+        <div className={cn(
+          "hidden md:block overflow-hidden transition-[max-height,opacity,border-width] duration-300 ease-in-out",
+          row2Visible
+            ? "max-h-[44px] opacity-100 border-t border-gray-200"
+            : "max-h-0 opacity-0 border-t-0"
+        )}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">
 
@@ -347,10 +443,10 @@ export function Navbar({
                   key={href}
                   href={href}
                   className={cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition-colors shrink-0",
+                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm border-b-[3px] transition-colors shrink-0",
                     isActive(href)
-                      ? "border-[var(--brand-client)] text-[var(--brand-client)]"
-                      : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      ? "border-[var(--brand-client)] text-[var(--brand-client)] font-semibold"
+                      : "border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300"
                   )}
                 >
                   {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
@@ -363,10 +459,10 @@ export function Navbar({
                 <button
                   onClick={() => setMoreOpen(o => !o)}
                   className={cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm border-b-[3px] transition-colors",
                     moreOpen
-                      ? "border-[var(--brand-client)] text-[var(--brand-client)]"
-                      : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                      ? "border-[var(--brand-client)] text-[var(--brand-client)] font-semibold"
+                      : "border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300"
                   )}
                 >
                   Resources
