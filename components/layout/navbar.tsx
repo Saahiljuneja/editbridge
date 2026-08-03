@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Menu, X, ChevronDown, LayoutDashboard,
-  Settings, LogOut, ShieldCheck, HelpCircle,
+  Settings, LogOut, HelpCircle,
   BookOpen, Mail, Users, ArrowRight, Sparkles,
-  BarChart2, Trophy, Film,
+  BarChart2, Trophy, Film, Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -33,6 +33,18 @@ const RESOURCES = [
   { href: "/compare",     icon: BarChart2,  label: "Compare",          desc: "Side-by-side editor comparison"   },
 ];
 
+const CATEGORY_STRIP = [
+  { label: "🔥 Trending",         href: "/browse?sort=rating"     },
+  { label: "YouTube Editing",     href: "/browse?niche=youtube"   },
+  { label: "Short-form & Reels",  href: "/browse?niche=reels"     },
+  { label: "Wedding Films",       href: "/browse?niche=wedding"   },
+  { label: "Corporate Video",     href: "/browse?niche=corporate" },
+  { label: "Cinematic",           href: "/browse?niche=cinematic" },
+  { label: "Gaming Edits",        href: "/browse?niche=gaming"    },
+  { label: "Podcast",             href: "/browse?niche=podcast"   },
+  { label: "Motion Graphics",     href: "/browse?niche=motion"    },
+];
+
 const ROLE_LABELS: Record<string, string> = {
   client:           "Client",
   editor:           "Editor",
@@ -53,11 +65,13 @@ export function Navbar({
 } = {}) {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
 
   const [mobileOpen,        setMobileOpen]        = useState(false);
   const [moreOpen,          setMoreOpen]          = useState(false);
   const [userOpen,          setUserOpen]          = useState(false);
   const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
+  const [searchQuery,       setSearchQuery]       = useState("");
 
   type AnnouncementBar = { id: string; title: string; body: string; type: string };
   const [announcements, setAnnouncements] = useState<AnnouncementBar[]>([]);
@@ -84,7 +98,6 @@ export function Navbar({
       .catch(() => {});
   }, []);
 
-  // A link with a `flag` is hidden entirely while that flag is off — mirrors MobileNav's behaviour.
   const navLinks = NAV_LINKS.filter((l) => !("flag" in l) || flags[(l as { flag: string }).flag] !== false);
 
   const visibleAnnouncements = announcements.filter(a => !dismissedIds.has(a.id));
@@ -93,6 +106,12 @@ export function Navbar({
   function dismissAnnouncement(id: string) {
     setDismissedIds(prev => new Set(prev).add(id));
     setAnnouncementIdx(0);
+  }
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    router.push(q ? `/browse?q=${encodeURIComponent(q)}` : "/browse");
   }
 
   /* close dropdowns on route change */
@@ -113,7 +132,7 @@ export function Navbar({
     : "/client/dashboard";
 
   const roleLabel = ROLE_LABELS[session?.user?.role ?? ""] ?? "Member";
-  const isActive  = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive  = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href.split("?")[0]);
 
   return (
     <>
@@ -171,11 +190,13 @@ export function Navbar({
 
       {/* ── Main navbar ── */}
       <nav className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between" style={{ height: 64 }}>
 
-            {/* ── Logo ── */}
-            <Link href="/" className="flex items-center gap-2.5 shrink-0 mr-8 group">
+        {/* ── Row 1: Logo + Search + Right actions ── */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3" style={{ height: 64 }}>
+
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={logoUrl} alt={platformName ?? "Logo"} className="h-8 w-auto max-w-[140px] object-contain" />
@@ -193,66 +214,44 @@ export function Navbar({
               )}
             </Link>
 
-            {/* ── Desktop nav ── */}
-            <div className="hidden md:flex items-center gap-0.5 flex-1">
-              {navLinks.map(({ href, label }) => (
-                <Link key={href} href={href}
-                  className={cn(
-                    "px-3.5 py-2 rounded-xl text-sm font-medium transition-all",
-                    isActive(href)
-                      ? "text-[var(--brand-client)] bg-[var(--brand-client)]/8"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  )}>
-                  {label}
-                </Link>
-              ))}
-
-              {/* Resources dropdown */}
-              <div className="relative">
-                <button onClick={() => setMoreOpen(o => !o)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all",
-                    moreOpen ? "text-[var(--brand-client)] bg-[var(--brand-client)]/8" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  )}>
-                  Resources
-                  <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
-                </button>
-
-                {moreOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
-                    <div className="absolute left-0 top-full mt-2 w-64 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden p-1.5">
-                      {RESOURCES.map(({ href, icon: Icon, label, desc }) => (
-                        <Link key={href} href={href}
-                          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                          <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-[#7c6ff7]/10 flex items-center justify-center shrink-0 transition-colors">
-                            <Icon className="w-4 h-4 text-gray-400 group-hover:text-[#7c6ff7] transition-colors" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800">{label}</p>
-                            <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
-                          </div>
-                        </Link>
-                      ))}
-                      <div className="mx-3 my-1.5 border-t border-gray-100" />
-                      <Link href="/signup/editor"
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#7c6ff7]/5 transition-colors group">
-                        <div className="w-8 h-8 rounded-lg bg-[#7c6ff7]/10 flex items-center justify-center shrink-0">
-                          <Sparkles className="w-4 h-4 text-[#7c6ff7]" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[#7c6ff7]">Become an editor</p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">Apply and start earning</p>
-                        </div>
-                      </Link>
-                    </div>
-                  </>
+            {/* ── Search bar (desktop) ── */}
+            <form onSubmit={handleSearch} className="hidden md:flex flex-1 items-center gap-2 mx-4">
+              <div className="flex-1 flex items-center gap-2.5 rounded-xl border border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-[var(--brand-client)] focus-within:ring-2 focus-within:ring-[var(--brand-client)]/20 transition-all">
+                <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search video editors, reels, YouTube, wedding..."
+                  className="flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 )}
               </div>
-            </div>
+              <button
+                type="submit"
+                className="px-4 py-2.5 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-sky-600 transition-colors shrink-0"
+              >
+                Search
+              </button>
+            </form>
 
             {/* ── Right side ── */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto md:ml-0">
+
+              {/* Mobile search icon */}
+              <Link href="/browse" className="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Search editors">
+                <Search className="w-5 h-5" />
+              </Link>
+
               {session ? (
                 <>
                   <NotificationBell />
@@ -308,7 +307,7 @@ export function Navbar({
                           <div className="p-1.5">
                             <DropItem href={dashboardHref} icon={LayoutDashboard} label="Dashboard" />
                             <DropItem href={session?.user?.role === "editor" ? "/editor/settings" : session?.user?.role === "admin" || session?.user?.role?.startsWith("staff_") ? "/admin/settings" : "/settings"} icon={Settings} label="Settings" />
-                            <DropItem href="/faq"          icon={HelpCircle}      label="Help & FAQ" />
+                            <DropItem href="/faq" icon={HelpCircle} label="Help & FAQ" />
                           </div>
                           <div className="border-t border-gray-100 p-1.5">
                             <button
@@ -325,8 +324,12 @@ export function Navbar({
                 </>
               ) : (
                 <>
-<Link href="/signup"
-                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] shadow-[0_2px_12px_rgba(14,165,233,0.4)] hover:shadow-[0_4px_20px_rgba(14,165,233,0.55)] hover:-translate-y-px">
+                  <Link href="/login"
+                    className="hidden sm:flex px-3.5 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
+                    Sign in
+                  </Link>
+                  <Link href="/signup"
+                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all bg-[var(--brand-client)] hover:bg-sky-600 shadow-[0_2px_12px_rgba(14,165,233,0.4)] hover:shadow-[0_4px_20px_rgba(14,165,233,0.55)] hover:-translate-y-px">
                     Get started
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
@@ -343,6 +346,93 @@ export function Navbar({
             </div>
           </div>
         </div>
+
+        {/* ── Row 2: Category strip + Nav links (desktop only) ── */}
+        <div className="hidden md:block border-t border-gray-100">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+
+              {/* Service category shortcuts */}
+              {CATEGORY_STRIP.map(({ label, href }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors shrink-0"
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {/* Separator */}
+              <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
+
+              {/* Page nav links */}
+              {navLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition-colors shrink-0",
+                    isActive(href)
+                      ? "border-[var(--brand-client)] text-[var(--brand-client)]"
+                      : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                  )}
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {/* Resources dropdown */}
+              <div className="relative shrink-0">
+                <button
+                  onClick={() => setMoreOpen(o => !o)}
+                  className={cn(
+                    "flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+                    moreOpen
+                      ? "border-[var(--brand-client)] text-[var(--brand-client)]"
+                      : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                  )}
+                >
+                  Resources
+                  <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
+                </button>
+
+                {moreOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
+                    <div className="absolute left-0 top-full mt-1 w-64 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden p-1.5">
+                      {RESOURCES.map(({ href, icon: Icon, label, desc }) => (
+                        <Link key={href} href={href}
+                          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                          <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-[#7c6ff7]/10 flex items-center justify-center shrink-0 transition-colors">
+                            <Icon className="w-4 h-4 text-gray-400 group-hover:text-[#7c6ff7] transition-colors" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-800">{label}</p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
+                          </div>
+                        </Link>
+                      ))}
+                      <div className="mx-3 my-1.5 border-t border-gray-100" />
+                      <Link href="/signup/editor"
+                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#7c6ff7]/5 transition-colors group">
+                        <div className="w-8 h-8 rounded-lg bg-[#7c6ff7]/10 flex items-center justify-center shrink-0">
+                          <Sparkles className="w-4 h-4 text-[#7c6ff7]" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-[#7c6ff7]">Become an editor</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">Apply and start earning</p>
+                        </div>
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
       </nav>
 
       <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
