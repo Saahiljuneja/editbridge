@@ -405,16 +405,6 @@ export function Navbar({
                 )}
               </div>
 
-              {/* Become an Editor CTA — hidden for logged-in editors */}
-              {session?.user?.role !== "editor" && (
-                <Link
-                  href="/signup/editor"
-                  className="ml-auto shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#7c6ff7] border border-[#7c6ff7]/30 bg-[#7c6ff7]/5 hover:bg-[#7c6ff7]/10 hover:border-[#7c6ff7]/50 transition-colors whitespace-nowrap"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  Become an Editor
-                </Link>
-              )}
 
             </div>
           </div>
