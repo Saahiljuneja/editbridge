@@ -612,7 +612,7 @@ export function Navbar({
             : "max-h-0 opacity-0 border-t-0"
         )}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center">
+            <div className="flex items-center justify-center gap-1">
 
               {navLinks.map(({ href, label, icon: Icon }) => (
                 <Link
