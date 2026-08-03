@@ -138,12 +138,17 @@ export function Navbar({
       const y = window.scrollY;
       if (y < 10) {
         setRow2Visible(true);
-      } else if (y > lastScrollY.current + 4) {
+        lastScrollY.current = y;
+      } else if (y > lastScrollY.current + 40) {
+        // Only hide after 40px of sustained downward scroll
         setRow2Visible(false);
-      } else if (y < lastScrollY.current - 4) {
+        lastScrollY.current = y;
+      } else if (y < lastScrollY.current - 10) {
+        // Show after 10px upward scroll
         setRow2Visible(true);
+        lastScrollY.current = y;
       }
-      lastScrollY.current = y;
+      // Don't update lastScrollY unless threshold is crossed — delta accumulates
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
