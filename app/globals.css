@@ -28,11 +28,14 @@ body {
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-white: #ffffff;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading);
+
+
 
   /* ── Layered shadow scale ──────────────────────────────────────────────── */
   /* sm  — cards, list rows: crisp 2-layer, no colour tint                   */
@@ -102,35 +105,35 @@ body {
   --brand-client: #0EA5E9;
   --brand-teal: #0F6E56;
   /* Derived hover shades — auto-darken 15% regardless of which color is set */
-  --brand-client-hover: color-mix(in oklab, var(--brand-client) 85%, black);
-  --brand-editor-hover: color-mix(in oklab, var(--brand-editor) 85%, black);
-  --brand-teal-hover: color-mix(in oklab, var(--brand-teal) 85%, black);
+  --brand-client-hover: #0284C7;
+  --brand-editor-hover: #6D28D9;
+  --brand-teal-hover: #0D7C66;
 
-  --background: #FAF5FF;
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #000000;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #000000;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #9ca3af;
+  --chart-1: #000000;
+  --chart-2: #374151;
+  --chart-3: #4b5563;
+  --chart-4: #6b7280;
+  --chart-5: #9ca3af;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: #ffffff;
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -259,6 +262,16 @@ body {
     caret-color: #ffffff;
     transition: background-color 5000s ease-in-out 0s;
   }
+
+  /* Exclude inputs inside light-theme auth card wrapper from dark autofill */
+  .auth-card-container input:-webkit-autofill,
+  .auth-card-container input:-webkit-autofill:hover,
+  .auth-card-container input:-webkit-autofill:focus,
+  .auth-card-container input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #171717 !important;
+    caret-color: #171717 !important;
+  }
 }
 
 @keyframes marquee {
@@ -275,3 +288,4 @@ body {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+

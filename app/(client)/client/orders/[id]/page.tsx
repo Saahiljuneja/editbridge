@@ -19,6 +19,7 @@ import { DisputeForm } from "./dispute-form";
 import { formatCurrency, formatDate, formatDateTime, displayNameFromFull } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { TopoBackground } from "@/components/common/topo-background";
 import {
   Download,
   Clock,
@@ -154,75 +155,76 @@ export default async function ClientOrderDetailPage({
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top bar */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
+      {/* Topographic backdrop */}
+      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
+
+      <div className="max-w-4xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Top bar Card */}
+        <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-4 flex items-center justify-between shadow-sm relative z-10">
           <div className="flex items-center gap-3 min-w-0">
             <Link
               href="/client/orders"
-              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors shrink-0"
+              className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-neutral-900 font-bold uppercase tracking-wider shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Orders
             </Link>
-            <span className="text-gray-200">/</span>
-            <span className="text-sm text-gray-700 font-medium truncate max-w-[180px] md:max-w-xs">
+            <span className="text-neutral-200 select-none">/</span>
+            <span className="text-xs text-neutral-700 font-extrabold truncate max-w-[180px] md:max-w-xs uppercase tracking-wider">
               {order.packageTitle}
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href={`/client/orders/${order.id}/invoice`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 bg-[#ffffff] hover:bg-neutral-50 transition-colors shadow-sm"
             >
-              <FileText className="w-3.5 h-3.5" /> Invoice
+              <FileText className="w-3.5 h-3.5 text-neutral-400" /> Invoice
             </Link>
             {order.status === "completed" && (
               <a
                 href={`/api/orders/${order.id}/invoice`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50 text-xs font-medium text-sky-700 hover:bg-sky-100 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sky-150 bg-sky-50 text-xs font-bold text-sky-700 hover:bg-sky-100 transition-colors shadow-sm"
               >
-                <Download className="w-3.5 h-3.5" /> Download PDF
+                <Download className="w-3.5 h-3.5" /> PDF
               </a>
             )}
             <Link
               href={`/reorder/${order.id}`}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 bg-[#ffffff] hover:bg-neutral-50 transition-colors shadow-sm"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Re-order
+              <RefreshCw className="w-3.5 h-3.5 text-neutral-400" /> Re-order
             </Link>
             <OrderStatusBadge
               status={order.status as Parameters<typeof OrderStatusBadge>[0]["status"]}
             />
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Page heading */}
-        <div className="flex items-start gap-4 mb-7">
-          <div className="w-12 h-12 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center text-sm font-bold text-[#0EA5E9] select-none shrink-0">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="w-12 h-12 rounded-xl bg-neutral-100 border border-neutral-200/30 flex items-center justify-center text-sm font-bold text-neutral-400 select-none shrink-0 uppercase">
             {editorInitials || "?"}
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{order.packageTitle}</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <h1 className="text-xl font-black text-neutral-900 tracking-tight leading-none">{order.packageTitle}</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1.5">
               with {editorName} · placed {formatDate(order.createdAt)}
             </p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-[1fr_300px] gap-8 items-start">
+        <div className="grid md:grid-cols-[1fr_300px] gap-6 items-start">
           {/* Left column */}
-          <div className="space-y-5">
+          <div className="space-y-6">
             {/* Project brief */}
-            <section className="rounded-xl border border-border bg-white p-5 space-y-4">
-              <h2 className="font-semibold text-gray-900">Project brief</h2>
+            <section className="rounded-3xl border border-neutral-200/50 bg-[#ffffff] p-6 space-y-4 shadow-sm">
+              <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider mb-2">Project brief</h2>
 
               {order.brief && (
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                <p className="text-sm text-neutral-500 whitespace-pre-wrap leading-relaxed">
                   {order.brief}
                 </p>
               )}
@@ -235,12 +237,12 @@ export default async function ClientOrderDetailPage({
                 bd.mustAvoid ||
                 bd.additionalNotes ||
                 bd.referenceUrls?.length) ? (
-                <div className="space-y-3 border-t border-gray-100 pt-4">
+                <div className="space-y-4 border-t border-neutral-100 pt-4">
                   {bd.mood && bd.mood.length > 0 && (
                     <div>
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <Film className="w-3.5 h-3.5 text-gray-400" />
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 mb-2 select-none">
+                        <Film className="w-3.5 h-3.5 text-neutral-400" />
+                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                           Vibe &amp; Style
                         </p>
                       </div>
@@ -248,7 +250,7 @@ export default async function ClientOrderDetailPage({
                         {bd.mood.map((m: string) => (
                           <span
                             key={m}
-                            className="text-xs px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100 font-medium capitalize"
+                            className="text-xs px-2.5 py-1 rounded-full bg-[#f3f4f6] text-neutral-600 border border-neutral-200/20 font-bold capitalize"
                           >
                             {m.replace(/_/g, " ")}
                           </span>
@@ -261,22 +263,22 @@ export default async function ClientOrderDetailPage({
                     <div className="grid grid-cols-2 gap-4">
                       {bd.musicPreference && (
                         <div>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <Music className="w-3 h-3 text-gray-400" />
-                            <p className="text-xs text-gray-400">Music</p>
+                          <div className="flex items-center gap-1.5 mb-1 select-none">
+                            <Music className="w-3 h-3 text-neutral-400" />
+                            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Music</p>
                           </div>
-                          <p className="text-sm font-medium text-gray-800 capitalize">
+                          <p className="text-xs font-bold text-neutral-700 capitalize">
                             {bd.musicPreference.replace(/_/g, " ")}
                           </p>
                         </div>
                       )}
                       {bd.colorLook && (
                         <div>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <Palette className="w-3 h-3 text-gray-400" />
-                            <p className="text-xs text-gray-400">Color grading</p>
+                          <div className="flex items-center gap-1.5 mb-1 select-none">
+                            <Palette className="w-3 h-3 text-neutral-400" />
+                            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Color grading</p>
                           </div>
-                          <p className="text-sm font-medium text-gray-800 capitalize">
+                          <p className="text-xs font-bold text-neutral-700 capitalize">
                             {bd.colorLook.replace(/_/g, " ")}
                           </p>
                         </div>
@@ -286,28 +288,28 @@ export default async function ClientOrderDetailPage({
 
                   {bd.mustInclude && (
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Must include</p>
-                      <p className="text-sm text-gray-800">{bd.mustInclude}</p>
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Must include</p>
+                      <p className="text-xs font-bold text-neutral-700">{bd.mustInclude}</p>
                     </div>
                   )}
 
                   {bd.mustAvoid && (
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Must avoid</p>
-                      <p className="text-sm text-gray-800">{bd.mustAvoid}</p>
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Must avoid</p>
+                      <p className="text-xs font-bold text-neutral-700">{bd.mustAvoid}</p>
                     </div>
                   )}
 
                   {bd.additionalNotes && (
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Additional notes</p>
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap">{bd.additionalNotes}</p>
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Additional notes</p>
+                      <p className="text-xs font-semibold text-neutral-500 whitespace-pre-wrap leading-relaxed">{bd.additionalNotes}</p>
                     </div>
                   )}
 
                   {bd.referenceUrls && bd.referenceUrls.length > 0 && (
                     <div>
-                      <p className="text-xs text-gray-400 mb-2">References</p>
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2">References</p>
                       <div className="space-y-1.5">
                         {bd.referenceUrls.map((url: string, i: number) => (
                           <a
@@ -315,7 +317,7 @@ export default async function ClientOrderDetailPage({
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 text-xs text-[#0EA5E9] hover:text-sky-700 hover:underline truncate transition-colors"
+                            className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 truncate transition-colors"
                           >
                             <ExternalLink className="w-3 h-3 shrink-0" />
                             {url}
@@ -337,7 +339,7 @@ export default async function ClientOrderDetailPage({
                   url: string;
                   note: string;
                   addedAt: string;
-                }[]) ?? []
+                  }[]) ?? []
               }
               readonly={["completed", "cancelled", "disputed"].includes(
                 order.status
@@ -349,9 +351,9 @@ export default async function ClientOrderDetailPage({
 
             {/* Deliveries */}
             {orderDeliveries.length > 0 && (
-              <section className="rounded-xl border border-border bg-white p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-gray-900">Deliveries</h2>
+              <section className="rounded-3xl border border-neutral-200/50 bg-[#ffffff] p-6 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                  <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Deliveries</h2>
                   <DownloadAllButton orderId={order.id} />
                 </div>
                 {orderDeliveries.map((d) => {
@@ -360,12 +362,12 @@ export default async function ClientOrderDetailPage({
                     /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(d.fileUrl);
                   return (
                     <div key={d.id} className="space-y-3">
-                      <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
+                      <div className="flex items-center justify-between bg-neutral-50/50 rounded-2xl px-4 py-3.5 border border-neutral-200/50">
                         <div className="min-w-0 mr-3">
-                          <p className="text-sm font-semibold text-gray-900 truncate">
+                          <p className="text-sm font-bold text-neutral-900 truncate">
                             {d.fileName}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
+                          <p className="text-xs text-neutral-400 font-semibold mt-0.5">
                             v{d.versionNumber} · {formatDateTime(d.createdAt)}
                           </p>
                         </div>
@@ -373,17 +375,14 @@ export default async function ClientOrderDetailPage({
                           href={publicUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={cn(
-                            buttonVariants({ size: "sm", variant: "outline" }),
-                            "gap-1.5 shrink-0"
-                          )}
+                          className="px-3.5 py-1.5 rounded-xl border border-neutral-200 bg-[#ffffff] hover:bg-neutral-50 text-xs font-bold text-neutral-700 transition-colors shadow-sm inline-flex items-center gap-1.5 shrink-0"
                         >
                           <Download className="w-3.5 h-3.5" />
                           Download
                         </a>
                       </div>
                       {isVideo && (
-                        <div className="rounded-xl overflow-hidden bg-black aspect-video">
+                        <div className="rounded-2xl overflow-hidden bg-black aspect-video">
                           <video
                             src={publicUrl}
                             controls
@@ -417,19 +416,19 @@ export default async function ClientOrderDetailPage({
 
             {/* Revision history */}
             {orderRevisions.length > 0 && (
-              <section className="rounded-xl border border-border bg-white p-5">
-                <h2 className="font-semibold text-gray-900 mb-4">Revision requests</h2>
+              <section className="rounded-3xl border border-neutral-200/50 bg-[#ffffff] p-6 shadow-sm">
+                <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider mb-4">Revision requests</h2>
                 <div className="space-y-4">
                   {orderRevisions.map((r, i) => (
                     <div key={r.id} className="flex gap-3">
-                      <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
-                        <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
+                      <div className="w-7 h-7 rounded-xl bg-neutral-100 border border-neutral-200/40 flex items-center justify-center shrink-0 mt-0.5">
+                        <RotateCcw className="w-3.5 h-3.5 text-neutral-500" />
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground mb-1">
+                        <p className="text-xs text-neutral-400 font-bold mb-1">
                           Revision #{i + 1} · {formatDate(r.createdAt)}
                         </p>
-                        <p className="text-sm text-gray-800">{r.feedbackText}</p>
+                        <p className="text-sm text-neutral-600 font-medium">{r.feedbackText}</p>
                       </div>
                     </div>
                   ))}
@@ -447,7 +446,7 @@ export default async function ClientOrderDetailPage({
                 const msLeft = autoApproveAt.getTime() - Date.now();
                 const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
                 return (
-                  <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex items-start gap-3">
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800 flex items-start gap-3">
                     <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
                       <Clock className="w-3.5 h-3.5 text-amber-600" />
                     </div>
@@ -482,7 +481,7 @@ export default async function ClientOrderDetailPage({
               <ReviewForm orderId={order.id} editorName={editorName} />
             )}
             {order.status === "completed" && clientReview && (
-              <div className="rounded-xl border border-border bg-white p-4 text-sm text-muted-foreground">
+              <div className="rounded-2xl border border-neutral-200/50 bg-[#ffffff] p-4 text-sm text-neutral-400 font-semibold shadow-sm">
                 You&apos;ve already submitted a review for this order.
               </div>
             )}
@@ -494,11 +493,11 @@ export default async function ClientOrderDetailPage({
               <DisputeForm orderId={order.id} />
             )}
             {openDispute && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+              <div className="rounded-2xl border border-red-200 bg-red-50/50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
                 <span>A dispute is open for this order.</span>
                 <Link
                   href={`/client/disputes/${openDispute.id}`}
-                  className="underline underline-offset-2 font-medium"
+                  className="underline underline-offset-2 font-semibold"
                 >
                   View dispute
                 </Link>
@@ -523,15 +522,15 @@ export default async function ClientOrderDetailPage({
               }
             />
 
-            <div className="rounded-xl border border-border bg-white p-5 space-y-4 sticky top-24 text-sm">
+            <div className="rounded-3xl border border-neutral-200/50 bg-[#ffffff] p-5 space-y-4 sticky top-24 text-sm shadow-sm">
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Package</p>
-                <p className="font-semibold text-gray-900">{order.packageTitle}</p>
+                <p className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider mb-1">Package</p>
+                <p className="font-bold text-neutral-900">{order.packageTitle}</p>
               </div>
 
-              <div className="space-y-2.5 text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 shrink-0" />
+              <div className="space-y-2.5 text-neutral-500">
+                <div className="flex items-center gap-2 font-semibold text-xs">
+                  <Clock className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
                   {order.deadline ? (
                     !["completed", "cancelled", "disputed"].includes(order.status) ? (
                       <DeadlineCountdown deadline={order.deadline.toISOString()} />
@@ -542,8 +541,8 @@ export default async function ClientOrderDetailPage({
                     `${order.packageDeliveryDays}d delivery`
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+                <div className="flex items-center gap-2 font-semibold text-xs">
+                  <RotateCcw className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
                   {order.packageRevisionCount === -1
                     ? "Unlimited"
                     : order.packageRevisionCount}{" "}
@@ -552,21 +551,18 @@ export default async function ClientOrderDetailPage({
                 </div>
               </div>
 
-              <div className="border-t border-border pt-3">
+              <div className="border-t border-neutral-100 pt-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Total paid</span>
-                  <span className="font-bold text-gray-900 tabular-nums">
+                  <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">Total paid</span>
+                  <span className="font-black text-neutral-900 tabular-nums">
                     {formatCurrency(order.totalAmount)}
                   </span>
                 </div>
               </div>
 
               <Link
-                href={`/messages/${order.id}`}
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "w-full justify-center gap-2"
-                )}
+                href={`/client/messages?editorId=${order.editorId}`}
+                className="w-full bg-black hover:bg-neutral-900 text-white hover:text-white border-transparent text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
               >
                 <MessageSquare className="w-3.5 h-3.5" /> Message editor
               </Link>

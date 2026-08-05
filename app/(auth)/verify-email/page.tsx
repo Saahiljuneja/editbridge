@@ -109,84 +109,102 @@ function VerifyEmailContent() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {verified ? (
-        <motion.div
-          key="success"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          className="text-center"
-        >
+    <div className="w-full">
+      <style>{`
+        /* Local overrides to force OtpInput to look premium black/gray instead of client blue */
+        div[data-slot="otp-container"] input,
+        input[inputmode="numeric"] {
+          border-color: #d1d5db !important;
+          background-color: #ffffff !important;
+          color: #111827 !important;
+        }
+        div[data-slot="otp-container"] input:focus,
+        input[inputmode="numeric"]:focus {
+          border-color: #000000 !important;
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
+        }
+      `}</style>
+
+      <AnimatePresence mode="wait">
+        {verified ? (
           <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
-            className="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center mx-auto mb-5"
+            key="success"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="text-center"
           >
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </motion.div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Email verified!</h1>
-          <p className="text-sm text-gray-500">Your account is active. Signing you in…</p>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="form"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="text-center"
-        >
-          <motion.div
-            initial={{ scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 18 }}
-            className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mx-auto mb-5"
-          >
-            <Mail className="w-7 h-7 text-[var(--brand-client)]" />
-          </motion.div>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Check your email</h1>
-          <p className="text-sm text-gray-500 mb-1">
-            We sent a 6-digit code to
-          </p>
-          <p className="text-sm font-semibold text-gray-800 mb-7">{email || "your email"}</p>
-
-          <div className="mb-2">
-            <OtpInput ref={otpRef} length={OTP_LENGTH} onComplete={handleComplete} disabled={submitting} error={hasError} />
-          </div>
-
-          <AnimatePresence>
-            {submitting && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center justify-center gap-1.5 text-sm text-[var(--brand-client)] mt-4"
-              >
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Verifying…
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="mt-6 flex items-center justify-center gap-1.5 text-sm">
-            <span className="text-gray-400">Didn&apos;t receive it?</span>
-            <button
-              onClick={handleResend}
-              disabled={resendCooldown > 0 || resending}
-              className="flex items-center gap-1 text-[var(--brand-client)] font-medium hover:underline disabled:opacity-40 disabled:no-underline"
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
+              className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-5"
             >
-              {resending && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
-            </button>
-          </div>
+              <CheckCircle className="w-8 h-8 text-emerald-600" />
+            </motion.div>
+            <h1 className="text-2xl font-black text-neutral-900 mb-2">Email verified!</h1>
+            <p className="text-sm text-neutral-500 font-medium">Your account is active. Signing you in…</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="text-center"
+          >
+            {/* Star Logo & Heading */}
+            <div className="flex flex-col items-center mb-6 text-center">
+              <div className="w-[52px] h-[52px] rounded-[16px] bg-[#111827] flex items-center justify-center shadow-[0_6px_16px_rgba(0,0,0,0.12)] mb-3 transition-transform hover:scale-105">
+                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+                </svg>
+              </div>
+              <h1 className="text-[1.75rem] font-black text-neutral-900 tracking-tight leading-none mb-1">
+                Check your email
+              </h1>
+              <p className="text-[12.5px] text-neutral-400 font-semibold leading-relaxed mb-4 max-w-[320px] mx-auto">
+                We sent a 6-digit verification code to <br />
+                <strong className="text-neutral-800 break-all">{email || "your email"}</strong>
+              </p>
+            </div>
 
-          <p className="mt-4 text-xs text-gray-400">Code expires in 10 minutes</p>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            <div className="mb-2" data-slot="otp-container">
+              <OtpInput ref={otpRef} length={OTP_LENGTH} onComplete={handleComplete} disabled={submitting} error={hasError} />
+            </div>
+
+            <AnimatePresence>
+              {submitting && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center justify-center gap-1.5 text-sm text-neutral-900 font-semibold mt-4"
+                >
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-500" />
+                  Verifying…
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="mt-6 flex items-center justify-center gap-1.5 text-sm">
+              <span className="text-neutral-400 font-semibold">Didn&apos;t receive it?</span>
+              <button
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || resending}
+                className="flex items-center gap-1 text-neutral-950 font-bold hover:underline disabled:opacity-40 disabled:no-underline"
+              >
+                {resending && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
+              </button>
+            </div>
+
+            <p className="mt-4 text-xs text-neutral-400 font-semibold">Code expires in 10 minutes</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -197,3 +215,4 @@ export default function VerifyEmailPage() {
     </Suspense>
   );
 }
+

@@ -12,7 +12,12 @@ const createSchema = z.object({
   content: z.string().min(1),
   category: z.string().min(1).max(100),
   readTime: z.string().min(1).max(30),
-  status: z.enum(["draft", "published"]),
+  status: z.enum(["draft", "published", "in-review"]),
+  thumbnailUrl: z.string().optional().nullable(),
+  publishedAt: z.string().datetime().optional().nullable(),
+  ogImageUrl: z.string().optional().nullable(),
+  twitterCardType: z.string().max(50).optional().nullable(),
+  canonicalUrl: z.string().optional().nullable(),
 });
 
 export async function GET() {
@@ -41,7 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
 
-  const { title, slug, excerpt, content, category, readTime, status } = parsed.data;
+  const { title, slug, excerpt, content, category, readTime, status, thumbnailUrl, publishedAt, ogImageUrl, twitterCardType, canonicalUrl } = parsed.data;
 
   const [post] = await db
     .insert(blogPosts)
@@ -53,8 +58,12 @@ export async function POST(req: NextRequest) {
       category,
       readTime,
       status,
+      thumbnailUrl,
+      ogImageUrl: ogImageUrl ?? null,
+      twitterCardType: twitterCardType ?? "summary_large_image",
+      canonicalUrl: canonicalUrl ?? null,
       authorId: session.user.userId!,
-      publishedAt: status === "published" ? new Date() : null,
+      publishedAt: publishedAt ? new Date(publishedAt) : (status === "published" ? new Date() : null),
     })
     .returning();
 

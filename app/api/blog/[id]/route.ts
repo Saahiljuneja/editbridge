@@ -12,7 +12,12 @@ const updateSchema = z.object({
   content: z.string().min(1).optional(),
   category: z.string().min(1).max(100).optional(),
   readTime: z.string().min(1).max(30).optional(),
-  status: z.enum(["draft", "published"]).optional(),
+  status: z.enum(["draft", "published", "in-review"]).optional(),
+  thumbnailUrl: z.string().optional().nullable(),
+  publishedAt: z.string().datetime().optional().nullable(),
+  ogImageUrl: z.string().optional().nullable(),
+  twitterCardType: z.string().max(50).optional().nullable(),
+  canonicalUrl: z.string().optional().nullable(),
 });
 
 async function requireAdmin() {
@@ -51,7 +56,9 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const updates: Record<string, unknown> = { ...parsed.data, updatedAt: new Date() };
-  if (parsed.data.status === "published" && existing.status === "draft") {
+  if (parsed.data.publishedAt) {
+    updates.publishedAt = new Date(parsed.data.publishedAt);
+  } else if (parsed.data.status === "published" && existing.status === "draft") {
     updates.publishedAt = new Date();
   }
 

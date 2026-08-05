@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { X, LogOut, Sparkles, ExternalLink } from "lucide-react";
+import { X, LogOut, Sparkles, ExternalLink, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
@@ -198,9 +198,10 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 <Link
                   href="/signup"
                   onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-[var(--brand-client)] text-white hover:bg-[var(--brand-editor-hover)] transition-colors text-center"
+                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-bold bg-black text-white hover:bg-neutral-800 shadow-[0_2px_12px_rgba(0,0,0,0.15)] transition-colors text-center"
                 >
-                  Sign up
+                  Get started
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </>

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { AdminThemeProvider } from "@/components/admin/admin-theme-provider";
 import type { UserRole } from "@/types";
 
@@ -26,7 +27,13 @@ export default async function AdminLayout({
     <AdminThemeProvider>
       <div className="h-screen overflow-hidden bg-gray-50 flex">
         <AdminSidebar />
-        <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">{children}</main>
+        <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
+          <DashboardHeader
+            userName={session.user.name ?? ""}
+            userImage={session.user.image ?? null}
+          />
+          {children}
+        </main>
       </div>
     </AdminThemeProvider>
   );

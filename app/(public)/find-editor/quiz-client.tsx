@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -224,7 +224,7 @@ export function FindEditorQuizClient() {
               disabled={!canAdvance || submitting}
               className={cn(
                 "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all",
-                canAdvance && !submitting ? "bg-[var(--brand-client)] hover:opacity-90" : "bg-gray-200 cursor-not-allowed"
+                canAdvance && !submitting ? "bg-black hover:bg-neutral-800" : "bg-gray-200 cursor-not-allowed"
               )}
             >
               {submitting ? (

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ShieldCheck, KeyRound } from "lucide-react";
+import { ShieldCheck, KeyRound, Loader2 } from "lucide-react";
 
 export default function TwoFactorPage() {
   const { data: session, status, update } = useSession();
@@ -50,8 +50,6 @@ export default function TwoFactorPage() {
         toast.warning(`Only ${data.remainingBackupCodes} backup code${data.remainingBackupCodes !== 1 ? "s" : ""} left — generate new ones from Settings soon.`);
       }
 
-      // Re-run the jwt callback (trigger:"update") — it clears twoFactorPending
-      // based on the server-side marker /authenticate just wrote, not on anything we send here.
       await update({});
 
       const role = session?.user?.role;
@@ -81,16 +79,23 @@ export default function TwoFactorPage() {
   }
 
   return (
-    <>
-      <div className="w-12 h-12 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4">
-        <ShieldCheck className="w-6 h-6 text-[var(--brand-client)]" />
+    <div className="w-full text-center">
+      {/* Star Logo & Heading */}
+      <div className="flex flex-col items-center mb-6 text-center">
+        <div className="w-[52px] h-[52px] rounded-[16px] bg-[#111827] flex items-center justify-center shadow-[0_6px_16px_rgba(0,0,0,0.12)] mb-3 transition-transform hover:scale-105">
+          <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+          </svg>
+        </div>
+        <h1 className="text-[1.75rem] font-black text-neutral-900 tracking-tight leading-none mb-1">
+          Two-factor verification
+        </h1>
+        <p className="text-[12.5px] text-neutral-400 font-semibold max-w-[320px] mx-auto">
+          {useBackup
+            ? "Enter one of your unused backup codes."
+            : "Enter the 6-digit code from your authenticator app."}
+        </p>
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Two-factor verification</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        {useBackup
-          ? "Enter one of your unused backup codes."
-          : "Enter the 6-digit code from your authenticator app."}
-      </p>
 
       {!useBackup ? (
         <div className="space-y-4">
@@ -104,7 +109,7 @@ export default function TwoFactorPage() {
             disabled={submitting}
             placeholder="000000"
             maxLength={6}
-            className="w-full text-center text-2xl font-mono tracking-[0.5em] px-4 py-3.5 rounded-xl border border-gray-200 outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/20 disabled:opacity-50"
+            className="w-full text-center text-2xl font-mono tracking-[0.5em] px-4 py-3.5 rounded-2xl border-2 border-neutral-200 bg-[#ffffff] text-neutral-900 outline-none focus:border-black focus:ring-2 focus:ring-black/5 disabled:opacity-50 font-bold"
           />
         </div>
       ) : (
@@ -117,32 +122,36 @@ export default function TwoFactorPage() {
             onChange={(e) => handleBackupChange(e.target.value)}
             disabled={submitting}
             placeholder="XXXX-XXXX"
-            className="w-full text-center text-lg font-mono tracking-widest px-4 py-3.5 rounded-xl border border-gray-200 outline-none focus:border-[var(--brand-client)] focus:ring-2 focus:ring-[var(--brand-client)]/20 disabled:opacity-50"
+            className="w-full text-center text-lg font-mono tracking-widest px-4 py-3.5 rounded-2xl border-2 border-neutral-200 bg-[#ffffff] text-neutral-900 outline-none focus:border-black focus:ring-2 focus:ring-black/5 disabled:opacity-50 font-bold"
           />
           <button
             type="submit"
             disabled={submitting || code.trim().length === 0}
-            className="w-full py-3 rounded-xl bg-[var(--brand-client)] text-white text-sm font-semibold hover:bg-[var(--brand-editor-hover)] transition-colors disabled:opacity-50"
+            className="w-full h-[52px] rounded-2xl bg-black text-white hover:bg-neutral-900 text-[14.5px] font-bold transition-all active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+            }}
           >
-            {submitting ? "Verifying…" : "Verify"}
+            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Verify</span>}
           </button>
         </form>
       )}
 
       <button
         onClick={() => { setUseBackup((v) => !v); setCode(""); }}
-        className="mt-4 flex items-center gap-1.5 text-sm text-[var(--brand-client)] hover:underline mx-auto"
+        className="mt-6 flex items-center justify-center gap-1.5 text-sm text-neutral-950 font-bold hover:underline mx-auto"
       >
         <KeyRound className="w-3.5 h-3.5" />
-        {useBackup ? "Use authenticator code instead" : "Use backup code"}
+        {useBackup ? "Use authenticator code" : "Use backup code"}
       </button>
 
       <button
         onClick={() => signOut({ callbackUrl: "/login" })}
-        className="mt-6 text-xs text-gray-400 hover:text-gray-600 mx-auto block"
+        className="mt-6 text-xs text-neutral-400 font-bold hover:text-neutral-900 mx-auto block"
       >
         Sign out and use a different account
       </button>
-    </>
+    </div>
   );
 }
+

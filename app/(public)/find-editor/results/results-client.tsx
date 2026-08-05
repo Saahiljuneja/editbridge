@@ -88,7 +88,7 @@ export function FindEditorResultsClient() {
             <p className="text-gray-500 mb-4">
               We couldn't find an editor in this category just yet.
             </p>
-            <Link href="/browse" className={cn(buttonVariants(), "bg-[var(--brand-client)]")}>
+            <Link href="/browse" className={cn(buttonVariants(), "bg-black hover:bg-neutral-800 text-white")}>
               Browse all editors
             </Link>
           </div>

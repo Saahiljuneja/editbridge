@@ -14,6 +14,7 @@ import { PortfolioVideoPlayer } from "@/components/public/portfolio-video-player
 import { RequestQuoteButton } from "@/components/client/request-quote-button";
 import { PackageClickLink } from "@/components/editor/package-click-link";
 import { FRAME_STYLES, type FrameKey } from "@/lib/xp-shop-config";
+import { TopoBackground } from "@/components/common/topo-background";
 import { toast } from "sonner";
 
 interface Package {
@@ -127,8 +128,8 @@ function Avatar({ src, name, size = 80, activeFrame }: { src: string | null; nam
 function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Package; editorId: string; isAvailable: boolean; isHighlighted?: boolean }) {
   const price = (pkg.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
   return (
-    <div className={`relative border rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-all bg-white ${
-      isHighlighted ? "border-indigo-500 ring-2 ring-indigo-500/10 shadow-sm" : "border-gray-200 hover:border-gray-300"
+    <div className={`relative border rounded-[20px] p-5 flex flex-col gap-3 hover:shadow-md transition-all bg-[#ffffff] ${
+      isHighlighted ? "border-indigo-500 ring-2 ring-indigo-500/10 shadow-sm" : "border-neutral-200/60 hover:border-neutral-300"
     }`}>
       {isHighlighted && (
         <span className="absolute -top-2.5 right-4 bg-indigo-600 text-white text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
@@ -136,32 +137,32 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
         </span>
       )}
       {pkg.tier && (
-        <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">{pkg.tier}</span>
+        <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600">{pkg.tier}</span>
       )}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-gray-900 text-sm leading-snug">{pkg.title}</h3>
-        <span className="text-base font-bold text-gray-900 shrink-0">{price}</span>
+        <h3 className="font-bold text-neutral-900 text-sm leading-snug">{pkg.title}</h3>
+        <span className="text-base font-black text-neutral-900 shrink-0">{price}</span>
       </div>
-      <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">{pkg.description}</p>
+      <p className="text-xs text-neutral-400 leading-relaxed line-clamp-3">{pkg.description}</p>
       <div className="flex flex-wrap gap-1.5">
-        <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
-          <Clock className="w-3 h-3" />{pkg.deliveryDays}d delivery
+        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
+          <Clock className="w-3 h-3 text-neutral-400" />{pkg.deliveryDays}d delivery
         </span>
-        <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
-          <TrendingUp className="w-3 h-3" />{pkg.revisionCount} revision{pkg.revisionCount !== 1 ? "s" : ""}
+        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
+          <TrendingUp className="w-3 h-3 text-neutral-400" />{pkg.revisionCount} revision{pkg.revisionCount !== 1 ? "s" : ""}
         </span>
         {pkg.videoLengthLimit && (
-          <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
-            <Play className="w-3 h-3" />{pkg.videoLengthLimit}
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
+            <Play className="w-3 h-3 text-neutral-400" />{pkg.videoLengthLimit}
           </span>
         )}
         {pkg.includesSourceFiles && (
-          <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
             Source Files
           </span>
         )}
         {pkg.includesCommercialRights && (
-          <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
             Commercial Use
           </span>
         )}
@@ -169,7 +170,7 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
       {pkg.addons.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {pkg.addons.slice(0, 4).map(a => (
-            <span key={a} className="text-[10px] bg-indigo-50 text-indigo-700 rounded-md px-1.5 py-0.5 capitalize">
+            <span key={a} className="text-[10px] font-bold bg-indigo-50/70 text-indigo-700 rounded-md px-1.5 py-0.5 capitalize">
               {a.replace(/_/g, " ")}
             </span>
           ))}
@@ -179,8 +180,8 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
         <PackageClickLink
           href={`/client/orders/new?editorId=${editorId}&packageId=${pkg.id}`}
           packageId={pkg.id}
-          className={`mt-auto block w-full text-center text-sm font-semibold py-2.5 rounded-xl transition-colors ${
-            isHighlighted ? "bg-indigo-600 hover:bg-indigo-700 text-white" : "bg-gray-900 hover:bg-gray-800 text-white"
+          className={`mt-auto block w-full text-center text-xs font-extrabold py-3 rounded-xl transition-all active:scale-[0.99] ${
+            isHighlighted ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-600/10" : "bg-black hover:bg-neutral-900 text-white"
           }`}
         >
           Hire for {price}
@@ -188,7 +189,7 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
       ) : (
         <button
           disabled
-          className="mt-auto block w-full text-center bg-gray-100 text-gray-400 text-sm font-semibold py-2.5 rounded-xl cursor-not-allowed border border-gray-200"
+          className="mt-auto block w-full text-center bg-neutral-100 text-neutral-400 text-xs font-extrabold py-3 rounded-xl cursor-not-allowed border border-neutral-200/60"
         >
           Unavailable
         </button>
@@ -238,66 +239,71 @@ function ReviewCard({ review }: { review: Review }) {
 function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (index: number) => void }) {
   if (items.length === 0) return null;
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
       {items.map((item, index) => {
         const thumb = item.type === "video"
           ? (item.thumbnailUrl || getThumbnailUrl(item.url))
           : null;
         const source = item.type === "video" ? getVideoSource(item.url) : null;
         return (
-          <button key={item.id} onClick={() => onOpen(index)}
-            className="group relative aspect-video rounded-xl overflow-hidden bg-gray-150 border border-gray-200 text-left">
-            {item.type === "video" ? (
-              thumb ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={thumb} alt={item.title ?? "Video"} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
-                      <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+          <button
+            key={item.id}
+            onClick={() => onOpen(index)}
+            className="group bg-[#ffffff] rounded-[22px] p-2 border border-neutral-200/55 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col text-left cursor-pointer"
+          >
+            {/* Rounded Preview Container */}
+            <div className="relative aspect-video w-full rounded-[16px] overflow-hidden bg-neutral-50 shrink-0">
+              {item.type === "video" ? (
+                thumb ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={thumb} alt={item.title ?? "Video"} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
+                        <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                      </div>
                     </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900 gap-1">
+                    <Play className="w-7 h-7 text-white/70 group-hover:text-white transition-colors" />
+                    {source && source !== "direct" && (
+                      <span className={`text-[8px] font-bold uppercase tracking-wider text-white/50 px-1.5 py-0.5 rounded ${
+                        source === "youtube" ? "bg-red-600/60" :
+                        source === "vimeo"   ? "bg-sky-500/60" :
+                        "bg-green-600/60"
+                      }`}>
+                        {source === "youtube" ? "YouTube" : source === "vimeo" ? "Vimeo" : "Drive"}
+                      </span>
+                    )}
                   </div>
-                </>
+                )
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 gap-1">
-                  <Play className="w-8 h-8 text-white/70 group-hover:text-white transition-colors" />
-                  {source && source !== "direct" && (
-                    <span className={`text-[9px] font-bold uppercase tracking-wider text-white/50 px-1.5 py-0.5 rounded ${
-                      source === "youtube" ? "bg-red-600/60" :
-                      source === "vimeo"   ? "bg-sky-500/60" :
-                      "bg-green-600/60"
-                    }`}>
-                      {source === "youtube" ? "YouTube" : source === "vimeo" ? "Vimeo" : "Drive"}
-                    </span>
-                  )}
-                </div>
-              )
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.url} alt={item.title ?? "Portfolio image"} className="w-full h-full object-cover"
-                onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-            )}
-            {item.title && (
-              <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-2 text-[10px] text-white/90 truncate">
-                {item.title}
-              </span>
-            )}
-            {item.isFeatured && (
-              <span className="absolute top-1.5 right-1.5 bg-amber-400 rounded-full w-2 h-2" />
-            )}
-            {item.orderId && (
-              <span className="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[9px] font-bold text-indigo-700 flex items-center gap-0.5 cursor-help group/vtooltip">
-                <BadgeCheck className="w-2.5 h-2.5" />Verified
-                <div className="absolute top-full left-0 mt-1 w-44 hidden group-hover/vtooltip:block bg-gray-900 text-white text-[9px] rounded p-2 leading-normal shadow-md z-30 font-medium normal-case">
-                  Verified Order: This video was created for an actual completed order on EditBridge.
-                </div>
-              </span>
-            )}
-            {item.beforeUrl && (
-              <span className="absolute top-1.5 right-1.5 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[9px] font-bold text-gray-700 flex items-center gap-0.5">
-                <ArrowLeftRight className="w-2.5 h-2.5" />Before/After
-              </span>
-            )}
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.url} alt={item.title ?? "Portfolio image"} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+                  onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+              )}
+
+              {/* Badges Overlays */}
+              {item.orderId && (
+                <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[8px] font-bold text-indigo-700 flex items-center gap-0.5 cursor-help group/vtooltip z-10 shadow-sm">
+                  <BadgeCheck className="w-2.5 h-2.5" />Verified
+                  <div className="absolute top-full left-0 mt-1 w-44 hidden group-hover/vtooltip:block bg-gray-900 text-white text-[9px] rounded p-2 leading-normal shadow-md z-30 font-medium normal-case">
+                    Verified Order: This video was created for an actual completed order on EditBridge.
+                  </div>
+                </span>
+              )}
+              {item.beforeUrl && (
+                <span className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[8px] font-bold text-neutral-700 flex items-center gap-0.5 z-10 shadow-sm">
+                  <ArrowLeftRight className="w-2.5 h-2.5" />Before/After
+                </span>
+              )}
+            </div>
+
+            {/* Label Footer */}
+            <div className="pt-2.5 px-1 pb-0.5 flex-1 flex flex-col">
+              <p className="text-neutral-800 text-[11px] font-bold leading-tight line-clamp-1 group-hover:text-black transition-colors">{item.title ?? "Untitled"}</p>
+            </div>
           </button>
         );
       })}
@@ -507,9 +513,12 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
     : editor.portfolioItems.filter(item => item.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
+      {/* Topographic backdrop */}
+      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
+
       {/* Cover */}
-      <div className="h-56 sm:h-64 w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-800 border-b border-gray-200">
+      <div className="h-56 sm:h-64 w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-800 border-b border-neutral-200/50 z-10">
         {editor.coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={editor.coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
@@ -525,11 +534,11 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
         )}
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Avatar row */}
         <div className="flex items-end justify-between pb-1 pt-4 sm:pt-6">
           <div className="relative shrink-0 -mt-16 sm:-mt-20 z-10">
-            <div className="ring-4 ring-white rounded-full shadow-lg overflow-hidden bg-white">
+            <div className="ring-4 ring-[#ffffff] rounded-full shadow-lg overflow-hidden bg-[#ffffff]">
               <Avatar src={editor.image} name={displayName} size={96} activeFrame={editor.activeFrame} />
             </div>
 
@@ -547,14 +556,14 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             {editor.isAvailable ? (
               <Link
                 href={`/client/orders/new?editorId=${editor.id}`}
-                className="inline-flex items-center gap-1.5 bg-[#0EA5E9] hover:bg-sky-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.99]"
               >
                 Hire me
               </Link>
             ) : (
               <button
                 disabled
-                className="inline-flex items-center gap-1.5 bg-gray-200 text-gray-400 text-sm font-bold px-5 py-2.5 rounded-xl cursor-not-allowed border border-gray-300"
+                className="inline-flex items-center gap-1.5 bg-neutral-100 text-neutral-400 text-xs font-extrabold px-5 py-2.5 rounded-xl cursor-not-allowed border border-neutral-200/50"
               >
                 Unavailable
               </button>
@@ -567,12 +576,11 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                   window.location.href = `/login?callbackUrl=${encodeURIComponent(`/client/messages?editorId=${editor.id}`)}`;
                 }
               }}
-              className="inline-flex items-center gap-1.5 bg-white border border-gray-250 hover:bg-gray-50 text-gray-707 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 bg-[#ffffff] border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-extrabold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
             >
-              <MessageSquare className="w-4 h-4 text-gray-500" />Message
+              <MessageSquare className="w-4 h-4 text-neutral-400" />Message
             </Link>
 
-            
             {/* Bookmark button */}
             <button
               onClick={handleBookmarkToggle}
@@ -580,11 +588,11 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
               className={`inline-flex items-center justify-center border p-2.5 rounded-xl transition-colors shadow-sm ${
                 bookmarked
                   ? "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
-                  : "bg-white border-gray-250 hover:bg-gray-50 text-gray-700"
+                  : "bg-[#ffffff] border-neutral-200 hover:bg-neutral-50 text-neutral-700"
               }`}
               title={bookmarked ? "Remove from wishlist" : "Save to wishlist"}
             >
-              <Bookmark className={`w-4 h-4 ${bookmarked ? "fill-indigo-600 text-indigo-600" : "text-gray-500"}`} />
+              <Bookmark className={`w-4 h-4 ${bookmarked ? "fill-indigo-600 text-indigo-600" : "text-neutral-400"}`} />
             </button>
 
             {/* Share button */}
@@ -593,40 +601,40 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 navigator.clipboard.writeText(window.location.href);
                 toast.success("Profile link copied!");
               }}
-              className="inline-flex items-center justify-center bg-white border border-gray-250 hover:bg-gray-50 text-gray-700 p-2.5 rounded-xl transition-colors shadow-sm"
+              className="inline-flex items-center justify-center bg-[#ffffff] border border-neutral-200 hover:bg-neutral-50 text-neutral-700 p-2.5 rounded-xl transition-colors shadow-sm"
               title="Share profile"
             >
-              <Share2 className="w-4 h-4 text-gray-500" />
+              <Share2 className="w-4 h-4 text-neutral-400" />
             </button>
           </div>
         </div>
 
         {/* Name / title / niches */}
         <div className="mt-4 mb-8">
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight tracking-tight">{displayName}</h1>
-          {editor.title && <p className="text-base text-gray-500 font-medium mt-1">{editor.title}</p>}
+          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 leading-tight tracking-tight">{displayName}</h1>
+          {editor.title && <p className="text-sm text-neutral-400 font-bold mt-1">{editor.title}</p>}
           
           <div className="flex items-center gap-2 mt-3 flex-wrap">
             {editor.isAvailable ? (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/50 rounded-full px-2.5 py-0.5 shadow-sm">
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/50 rounded-full px-2.5 py-0.5 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />Available
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200/50 rounded-full px-2.5 py-0.5 shadow-sm">
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-red-700 bg-red-50 border border-red-200/50 rounded-full px-2.5 py-0.5 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500" />Not Accepting Orders
               </span>
             )}
             
             {editor.avgRating && (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-700 font-semibold bg-white border border-gray-150 rounded-full px-2.5 py-0.5 shadow-sm">
+              <span className="inline-flex items-center gap-1 text-xs text-neutral-700 font-bold bg-[#ffffff] border border-neutral-200/60 rounded-full px-2.5 py-0.5 shadow-sm">
                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                 {editor.avgRating}
-                <span className="text-gray-400 font-normal">({editor.reviewCount})</span>
+                <span className="text-neutral-400 font-normal">({editor.reviewCount})</span>
               </span>
             )}
 
             {niches.map(n => (
-              <span key={n} className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100/50 rounded-full px-2.5 py-0.5 shadow-sm capitalize">
+              <span key={n} className="inline-flex items-center gap-1 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100/50 rounded-full px-2.5 py-0.5 shadow-sm capitalize">
                 {n}
               </span>
             ))}
@@ -639,16 +647,16 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           <div className="space-y-8 min-w-0">
             {/* Featured Video (Showreel) */}
             {editor.featuredVideoUrl && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Featured Video (Showreel)</h2>
+              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
+                <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Featured Video (Showreel)</h2>
                 <div className="rounded-xl overflow-hidden aspect-video bg-black shadow-inner">
                   <PortfolioVideoPlayer
-                    url={editor.featuredVideoUrl}
-                    title="Featured Video"
-                    editorName={displayName}
-                    editorVerified={editor.kycStatus === "approved"}
-                    aspectRatio="16/9"
-                    className="w-full"
+                     url={editor.featuredVideoUrl}
+                     title="Featured Video"
+                     editorName={displayName}
+                     editorVerified={editor.kycStatus === "approved"}
+                     aspectRatio="16/9"
+                     className="w-full"
                   />
                 </div>
               </section>
@@ -656,13 +664,13 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
 
             {/* About */}
             {editor.bio && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 tracking-tight mb-3">About me</h2>
-                <p className={`text-sm text-gray-600 leading-relaxed ${!bioExpanded && bioLong ? "line-clamp-4" : ""}`}>
+              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
+                <h2 className="text-base font-black text-neutral-900 tracking-tight mb-3">About me</h2>
+                <p className={`text-sm text-neutral-500 leading-relaxed ${!bioExpanded && bioLong ? "line-clamp-4" : ""}`}>
                   {editor.bio}
                 </p>
                 {bioLong && (
-                  <button onClick={() => setBioExpanded(e => !e)} className="text-xs font-semibold text-indigo-600 mt-2 hover:text-indigo-855 flex items-center gap-0.5">
+                  <button onClick={() => setBioExpanded(e => !e)} className="text-xs font-bold text-indigo-600 mt-2 hover:text-indigo-700 flex items-center gap-0.5">
                     {bioExpanded ? <><ChevronUp className="w-3.5 h-3.5" />Show less</> : <><ChevronDown className="w-3.5 h-3.5" />Read more</>}
                   </button>
                 )}
@@ -676,8 +684,8 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 : [];
               if (clientsList.length === 0) return null;
               return (
-                <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm overflow-hidden">
-                  <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Notable Clients & Brands</h2>
+                <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm overflow-hidden">
+                  <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Notable Clients & Brands</h2>
                   <div className="relative w-full overflow-hidden">
                     {/* Fade gradients */}
                     <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
@@ -688,27 +696,27 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                         {clientsList.map((c, idx) => (
                           <div
                             key={`orig-${c}-${idx}`}
-                            className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50/50 hover:bg-indigo-50/30 hover:text-indigo-600 border border-gray-100 hover:border-indigo-150 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                            className="flex items-center gap-2 text-xs font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
                           >
-                            <span className="text-indigo-400">⚡</span>
+                            <span className="text-indigo-500">⚡</span>
                             {c}
                           </div>
                         ))}
                         {clientsList.map((c, idx) => (
                           <div
                             key={`clone1-${c}-${idx}`}
-                            className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50/50 hover:bg-indigo-50/30 hover:text-indigo-600 border border-gray-100 hover:border-indigo-150 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                            className="flex items-center gap-2 text-xs font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
                           >
-                            <span className="text-indigo-400">⚡</span>
+                            <span className="text-indigo-500">⚡</span>
                             {c}
                           </div>
                         ))}
                         {clientsList.map((c, idx) => (
                           <div
                             key={`clone2-${c}-${idx}`}
-                            className="flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-50/50 hover:bg-indigo-50/30 hover:text-indigo-600 border border-gray-100 hover:border-indigo-150 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                            className="flex items-center gap-2 text-xs font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
                           >
-                            <span className="text-indigo-400">⚡</span>
+                            <span className="text-indigo-500">⚡</span>
                             {c}
                           </div>
                         ))}
@@ -721,35 +729,35 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
 
             {/* Skills & Tools */}
             {(editor.skills.length > 0 || editor.tools.length > 0 || workStyleTags.length > 0) && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Skills & Tools</h2>
+              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
+                <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Skills & Tools</h2>
                 <div className="space-y-4">
                   {editor.skills.length > 0 && (
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Skills</p>
+                      <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest mb-2">Skills</p>
                       <div className="flex flex-wrap gap-1.5">
                         {editor.skills.map(s => (
-                          <span key={s} className="text-xs bg-gray-50 border border-gray-150 text-gray-700 rounded-lg px-2.5 py-1">{s}</span>
+                          <span key={s} className="text-xs bg-[#f3f4f6] border border-neutral-200/40 text-neutral-600 font-semibold rounded-lg px-2.5 py-1">{s}</span>
                         ))}
                       </div>
                     </div>
                   )}
                   {editor.tools.length > 0 && (
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Software</p>
+                      <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest mb-2">Software</p>
                       <div className="flex flex-wrap gap-1.5">
                         {editor.tools.map(t => (
-                          <span key={t} className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg px-2.5 py-1 font-medium">{t}</span>
+                          <span key={t} className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg px-2.5 py-1 font-bold">{t}</span>
                         ))}
                       </div>
                     </div>
                   )}
                   {workStyleTags.length > 0 && (
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Work style</p>
+                      <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest mb-2">Work style</p>
                       <div className="flex flex-wrap gap-1.5">
                         {workStyleTags.map(t => (
-                          <span key={t} className="text-xs bg-violet-50 border border-violet-100 text-violet-700 rounded-lg px-2.5 py-1 font-medium">{t}</span>
+                          <span key={t} className="text-xs bg-violet-50 border border-violet-100 text-violet-700 rounded-lg px-2.5 py-1 font-bold">{t}</span>
                         ))}
                       </div>
                     </div>
@@ -759,25 +767,25 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             )}
 
             {/* Portfolio */}
-            <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-              <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Portfolio</h2>
+            <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
+              <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Portfolio</h2>
               {editor.portfolioItems.length === 0 ? (
-                <div className="border border-dashed border-gray-250 rounded-xl p-8 text-center text-gray-400 font-medium">
+                <div className="border border-dashed border-neutral-200 rounded-xl p-8 text-center text-neutral-400 font-semibold">
                   No portfolio items uploaded yet.
                 </div>
               ) : (
                 <>
-                  {/* Category Filter tabs */}
+                  {/* Category Filter tabs (capsule layout) */}
                   {categories.length > 2 && (
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-4 scrollbar-none">
+                    <div className="inline-flex items-center gap-1 bg-[#f3f4f6] rounded-[18px] border border-neutral-200/50 p-1 mb-4 overflow-x-auto scrollbar-none max-w-full">
                       {categories.map((cat) => (
                         <button
                           key={cat}
                           onClick={() => setSelectedCategory(cat)}
-                          className={`text-xs font-semibold px-3.5 py-2 rounded-lg border transition-all shrink-0 ${
+                          className={`text-[11px] font-bold px-3.5 py-1.5 rounded-[14px] transition-all shrink-0 ${
                             selectedCategory === cat
-                              ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
-                              : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                              ? "bg-[#000000] text-white shadow-sm"
+                              : "text-neutral-500 hover:text-neutral-900"
                           }`}
                         >
                           {cat}
@@ -791,10 +799,10 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             </section>
 
             {/* Packages */}
-            <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-              <h2 className="text-base font-bold text-gray-900 tracking-tight mb-4">Packages</h2>
+            <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
+              <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Packages</h2>
               {editor.packages.length === 0 ? (
-                <div className="border border-dashed border-gray-250 rounded-xl p-8 text-center text-gray-400 font-medium">
+                <div className="border border-dashed border-neutral-200 rounded-xl p-8 text-center text-neutral-400 font-semibold">
                   No preset packages configured yet. Request a custom quote below.
                 </div>
               ) : (
@@ -816,32 +824,31 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
               )}
             </section>
 
-
             {/* Reviews */}
             {editor.reviews.length > 0 && (
-              <section className="bg-white rounded-2xl border border-gray-150/70 p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
-                  <h2 className="text-base font-bold text-gray-900 tracking-tight">
+              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+                  <h2 className="text-base font-black text-neutral-900 tracking-tight">
                     Reviews ({editor.reviewCount})
                   </h2>
                 </div>
 
                 {/* Rating Breakdown Graph */}
                 {editor.reviewCount > 0 && editor.ratingDistribution && (
-                  <div className="bg-gray-50 border border-gray-150 rounded-2xl p-5 mb-6 flex flex-col gap-2.5 shadow-inner">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rating Breakdown</p>
+                  <div className="bg-neutral-50/50 border border-neutral-200/50 rounded-2xl p-5 mb-6 flex flex-col gap-2.5">
+                    <p className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">Rating Breakdown</p>
                     <div className="space-y-2">
                       {[5, 4, 3, 2, 1].map((stars, idx) => {
                         const pct = editor.ratingDistribution ? (editor.ratingDistribution[idx] ?? 0) : 0;
                         return (
                           <div key={stars} className="flex items-center gap-3 text-xs">
-                            <span className="w-8 font-semibold text-gray-600 flex items-center gap-0.5 shrink-0">
+                            <span className="w-8 font-extrabold text-neutral-500 flex items-center gap-0.5 shrink-0">
                               {stars}★
                             </span>
-                            <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2.5 bg-neutral-200/40 rounded-full overflow-hidden">
                               <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
                             </div>
-                            <span className="w-8 text-right font-bold text-gray-400 shrink-0">
+                            <span className="w-8 text-right font-extrabold text-neutral-400 shrink-0">
                               {pct}%
                             </span>
                           </div>
@@ -857,7 +864,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 {editor.reviews.length > 6 && (
                   <Link
                     href={`/editor/${editor.id}/reviews`}
-                    className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-[#0EA5E9] hover:text-sky-600 transition-colors"
+                    className="mt-5 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-700 transition-colors"
                   >
                     View all {editor.reviewCount} reviews <ChevronRight className="w-4 h-4" />
                   </Link>
@@ -869,29 +876,29 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           {/* Right sidebar */}
           <aside className="space-y-5">
             {/* Stats */}
-            <div className="bg-white border border-gray-150/70 rounded-2xl p-5 shadow-sm space-y-3.5">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Stats</h3>
+            <div className="bg-[#ffffff] border border-neutral-200/50 rounded-3xl p-5 shadow-sm space-y-3.5">
+              <h3 className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Stats</h3>
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 flex items-center gap-1.5">
+                  <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />Orders completed
                   </span>
-                  <span className="text-sm font-bold text-gray-900">{editor.totalOrders}</span>
+                  <span className="text-sm font-bold text-neutral-900">{editor.totalOrders}</span>
                 </div>
                 {editor.completionRate !== null && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 flex items-center gap-1.5">
+                    <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
                       <TrendingUp className="w-3.5 h-3.5 text-[#0EA5E9]" />Completion rate
                     </span>
-                    <span className="text-sm font-bold text-gray-900">{editor.completionRate}%</span>
+                    <span className="text-sm font-bold text-neutral-900">{editor.completionRate}%</span>
                   </div>
                 )}
                 {editor.avgResponseTime !== null && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 flex items-center gap-1.5">
+                    <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-amber-500" />Avg response
                     </span>
-                    <span className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-neutral-900 flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${
                         editor.avgResponseTime < 60 ? "bg-emerald-500" :
                         editor.avgResponseTime < 240 ? "bg-amber-400" :
@@ -905,10 +912,10 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 )}
                 {/* Profile View Counter */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 flex items-center gap-1.5">
+                  <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
                     <Eye className="w-3.5 h-3.5 text-sky-500" />Profile views
                   </span>
-                  <span className="text-sm font-bold text-gray-900">
+                  <span className="text-sm font-bold text-neutral-900">
                     {editor.viewCount?.toLocaleString() ?? 0}
                   </span>
                 </div>
@@ -916,47 +923,47 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             </div>
 
             {/* Details */}
-            <div className="bg-white border border-gray-150/70 rounded-2xl p-5 shadow-sm space-y-3.5">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Details</h3>
+            <div className="bg-[#ffffff] border border-neutral-200/50 rounded-3xl p-5 shadow-sm space-y-3.5">
+              <h3 className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Details</h3>
               <div className="space-y-2.5">
                 {editor.location && (
                   <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
-                    <span className="text-sm text-gray-700">{editor.location}</span>
+                    <MapPin className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
+                    <span className="text-sm font-semibold text-neutral-600">{editor.location}</span>
                   </div>
                 )}
                 {expLabel && (
                   <div className="flex items-start gap-2">
-                    <Briefcase className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
-                    <span className="text-sm text-gray-700">
+                    <Briefcase className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
+                    <span className="text-sm font-semibold text-neutral-600">
                       {expLabel}{editor.yearsOfExperience ? ` · ${editor.yearsOfExperience} yr${editor.yearsOfExperience !== 1 ? "s" : ""}` : ""}
                     </span>
                   </div>
                 )}
                 {languages.length > 0 && (
                   <div className="flex items-start gap-2">
-                    <Globe className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
-                    <span className="text-sm text-gray-700">
+                    <Globe className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
+                    <span className="text-sm font-semibold text-neutral-600">
                       {languages.map(l => `${l.language} (${l.level})`).join(", ")}
                     </span>
                   </div>
                 )}
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
-                  <span className="text-sm text-gray-700">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
+                  <span className="text-sm font-semibold text-neutral-600">
                     Member since {new Date(editor.kycApprovedAt || editor.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
                   </span>
                 </div>
-
               </div>
             </div>
 
             {/* CTA */}
             {editor.packages.length > 0 && (
-              <div className="border border-indigo-100 bg-indigo-50/50 rounded-2xl p-5 text-center space-y-3 shadow-inner">
-                <p className="text-sm font-bold text-indigo-950">
+              <div className="border border-neutral-200/50 bg-[#ffffff] rounded-3xl p-5 text-center space-y-3.5 shadow-sm">
+                <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Pricing</p>
+                <p className="text-sm font-bold text-neutral-500 leading-tight">
                   Starting from{" "}
-                  <span className="text-base text-indigo-900 font-extrabold">
+                  <span className="text-lg text-neutral-900 font-black">
                     {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", {
                       style: "currency", currency: "INR", maximumFractionDigits: 0
                     })}
@@ -965,22 +972,22 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 {editor.isAvailable ? (
                   <Link
                     href={`/client/orders/new?editorId=${editor.id}`}
-                    className="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors shadow-sm"
+                    className="block w-full bg-black hover:bg-neutral-900 text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm"
                   >
                     Get started
                   </Link>
                 ) : (
                   <button
                     disabled
-                    className="block w-full bg-gray-200 text-gray-400 text-sm font-bold py-2.5 rounded-xl cursor-not-allowed border border-gray-300 shadow-inner"
+                    className="block w-full bg-neutral-100 text-neutral-400 text-xs font-bold py-3 rounded-xl cursor-not-allowed border border-neutral-200/50"
                   >
                     Unavailable
                   </button>
                 )}
-                <div className="relative flex items-center gap-2 py-0.5">
-                  <div className="flex-1 h-px bg-indigo-100" />
-                  <span className="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">or</span>
-                  <div className="flex-1 h-px bg-indigo-100" />
+                <div className="relative flex items-center gap-2 py-0.5 select-none">
+                  <div className="flex-1 h-px bg-neutral-100" />
+                  <span className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-wider">or</span>
+                  <div className="flex-1 h-px bg-neutral-100" />
                 </div>
                 <RequestQuoteButton editorId={editor.id} />
               </div>
@@ -1001,15 +1008,15 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
       )}
 
       {/* Mobile Sticky CTA Bar */}
-      <div className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-250 px-4 py-3.5 shadow-2xl flex items-center justify-between gap-4 lg:hidden transition-all duration-300 transform ${
+      <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#ffffff] border-t border-neutral-200/60 px-4 py-3.5 shadow-2xl flex items-center justify-between gap-4 lg:hidden transition-all duration-300 transform ${
         showStickyBar ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
       }`}>
         <div className="flex items-center gap-2.5 min-w-0">
           <Avatar src={editor.image} name={displayName} size={40} activeFrame={editor.activeFrame} />
           <div className="min-w-0">
-            <p className="text-xs font-bold text-gray-900 truncate">{displayName}</p>
+            <p className="text-xs font-bold text-neutral-900 truncate">{displayName}</p>
             {editor.packages.length > 0 && (
-              <p className="text-[10px] font-semibold text-gray-500">
+              <p className="text-[10px] font-semibold text-neutral-400">
                 Starting from {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
               </p>
             )}
@@ -1019,14 +1026,14 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           {editor.isAvailable ? (
             <Link
               href={`/client/orders/new?editorId=${editor.id}`}
-              className="bg-[#0EA5E9] hover:bg-sky-600 text-white text-xs font-bold px-4.5 py-2.5 rounded-xl transition-colors shadow-sm"
+              className="bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-4.5 py-2.5 rounded-xl transition-all shadow-sm"
             >
               Hire me
             </Link>
           ) : (
             <button
               disabled
-              className="bg-gray-100 text-gray-400 text-xs font-bold px-4.5 py-2.5 rounded-xl cursor-not-allowed border border-gray-200"
+              className="bg-neutral-100 text-neutral-400 text-xs font-extrabold px-4.5 py-2.5 rounded-xl cursor-not-allowed border border-neutral-200/50"
             >
               Unavailable
             </button>

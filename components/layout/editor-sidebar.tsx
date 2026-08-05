@@ -181,11 +181,11 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
     return (
       <Link key={href} href={href} onClick={onNavigate}
         className={cn(
-          "flex items-center justify-between px-2.5 py-[10px] rounded-lg text-[12.5px] font-medium transition-all mb-0.5 group",
-          active ? "bg-white/[0.08] text-white" : "text-white/55 hover:text-white hover:bg-white/[0.05]"
+          "flex items-center justify-between px-3.5 py-[9px] rounded-full text-[12.5px] font-semibold transition-all mb-0.5 group",
+          active ? "bg-white/[0.09] text-white" : "text-white/55 hover:text-white hover:bg-white/[0.05]"
         )}>
         <span className="flex items-center gap-2.5 min-w-0">
-          <span className={cn("w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors",
+          <span className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors",
             active ? "bg-white/10" : "bg-white/[0.04] group-hover:bg-white/[0.07]")}
             style={active ? { background: ACCENT + "28" } : {}}>
             <ItemIcon className="w-3.5 h-3.5" style={active ? { color: ACCENT } : {}} />
@@ -193,7 +193,7 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
           <span className="truncate">{label}</span>
         </span>
         {count > 0 && (
-          <span className="text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none ml-1 shrink-0"
+          <span className="text-[10px] font-bold rounded-full px-2 py-0.5 leading-none ml-1 shrink-0"
             style={{ background: active ? ACCENT : "rgba(255,255,255,0.1)", color: "white" }}>
             {count > 99 ? "99+" : count}
           </span>

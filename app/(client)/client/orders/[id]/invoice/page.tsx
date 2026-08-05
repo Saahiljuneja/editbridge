@@ -65,7 +65,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
       {/* Invoice card */}
       <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden print:shadow-none print:rounded-none print:border-0">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #0EA5E9 0%, #6C5CE7 100%)" }}>
+        <div className="px-8 py-6 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #000000 0%, #171717 100%)" }}>
           <div className="flex items-start justify-between">
             <div>
               <p className="text-white font-bold text-xl">EditBridge</p>

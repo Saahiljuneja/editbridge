@@ -5,7 +5,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldCheck, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthTabToggle } from "../auth-tab-toggle";
 
@@ -19,6 +19,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [remember, setRemember] = useState(true);
 
   useEffect(() => {
     if (searchParams.get("verified") === "1") {
@@ -74,6 +75,12 @@ function LoginForm() {
       return;
     }
 
+    // When "Remember me" is unchecked, convert the auth cookie to a session cookie
+    // (expires when browser closes) instead of the default 30-day persistent cookie.
+    if (!remember) {
+      await fetch("/api/auth/session-cookie", { method: "POST" }).catch(() => {});
+    }
+
     const session = await getSession();
     const role = session?.user?.role;
     if (["admin", "staff_kyc", "staff_support", "staff_dispute", "staff_moderation"].includes(role ?? "")) {
@@ -110,17 +117,8 @@ function LoginForm() {
         </div>
       </div>
 
-      {/* Row of Three Social Icons */}
+      {/* Social Icons */}
       <div className="flex items-center justify-center gap-3.5 mb-4.5">
-        {/* Facebook */}
-        <button
-          type="button"
-          className="w-[42px] h-[42px] rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-transform active:scale-95 shadow-sm hover:opacity-90"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-        </button>
         {/* Apple */}
         <button
           type="button"
@@ -207,10 +205,20 @@ function LoginForm() {
         {/* Remember me & Forgot Password */}
         <div className="flex items-center justify-between pt-0.5 pb-1">
           <label className="flex items-center gap-2.5 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              className="w-4.5 h-4.5 rounded border-neutral-300 accent-black cursor-pointer"
-            />
+            <div className="relative shrink-0">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={e => setRemember(e.target.checked)}
+                className="sr-only"
+              />
+              <div className={cn(
+                "w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all",
+                remember ? "bg-black border-black" : "bg-white border-neutral-300"
+              )}>
+                {remember && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+              </div>
+            </div>
             <span className="text-[12.5px] text-neutral-400 font-bold">Remember me</span>
           </label>
           <Link

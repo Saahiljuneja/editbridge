@@ -173,28 +173,11 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
           filter: "blur(32px)" }}
       />
 
-      {/* Top announcement bar */}
-      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-        className="relative z-10 border-b border-white/8 py-3 px-6 bg-white/5 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <motion.span animate={{ scale: [1, 1.8, 1] }} transition={{ duration: 1.8, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            <span className="text-[11px] text-white/40 font-medium tracking-wide">India&apos;s verified video editing marketplace · Launched 2026</span>
-          </div>
-          <div className="hidden md:flex items-center divide-x divide-white/8">
-            {([["KYC Verified", ShieldCheck], ["Payment Protected", Lock], ["Revisions Included", CheckCircle]] as const).map(([label, Icon]) => (
-              <span key={label} className="flex items-center gap-1.5 px-4 text-[11px] text-white/30 font-medium">
-                <Icon className="w-3 h-3 text-sky-400" />{label}
-              </span>
-            ))}
-          </div>
-        </div>
-      </motion.div>
+
 
       {/* Main content — centered */}
       <div className="relative z-10 flex-1 flex items-start lg:items-center px-5 sm:px-8 lg:px-16">
-        <div className="max-w-5xl mx-auto w-full pt-8 pb-4 lg:pt-8 lg:pb-14 text-center">
+        <div className="max-w-5xl mx-auto w-full pt-8 pb-4 lg:pt-[15px] lg:pb-[15px] text-center">
 
           {/* Live badge */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
@@ -243,7 +226,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent py-3 px-1.5 min-w-0"
               />
               <button type="submit"
-                className="bg-[var(--brand-client)] hover:bg-sky-600 text-white text-sm font-bold px-6 py-3 rounded-xl transition-colors shrink-0">
+                className="bg-black hover:bg-neutral-800 text-white text-sm font-bold px-6 py-3 rounded-xl transition-colors shrink-0">
                 Search
               </button>
             </form>
@@ -296,10 +279,6 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
               <span className="text-xs text-white/40 font-medium">4.9★ avg rating</span>
-              <span className="text-white/15 text-xs">·</span>
-              <span className="text-xs text-white/40 font-medium">Packages from ₹299</span>
-              <span className="text-white/15 text-xs">·</span>
-              <span className="text-xs text-white/40 font-medium">Escrow-protected</span>
               <span className="text-white/15 text-xs">·</span>
               <Link href="/find-editor" className="inline-flex items-center gap-1 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors">
                 Not sure? Let us match you <ArrowRight className="w-3 h-3" />
@@ -1188,8 +1167,8 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
                 Join EditBridge, get KYC verified, and start earning from clients across India.
               </p>
               <Link href="/signup/editor"
-                className="inline-flex items-center gap-2 bg-[var(--brand-client)] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all"
-                style={{ boxShadow: "0 6px 20px rgba(14,165,233,0.35)" }}>
+                className="inline-flex items-center gap-2 bg-black text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-neutral-800 hover:scale-[1.02] transition-all"
+                style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.15)" }}>
                 Apply now <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </motion.div>
@@ -1489,7 +1468,7 @@ export function BeforeAfterSection() {
         </div>
 
         <Reveal className="mt-10 text-center">
-          <Link href="/browse" className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white font-semibold px-7 py-3.5 rounded-xl text-sm transition-colors shadow-[0_8px_24px_rgba(14,165,233,0.45)]">
+          <Link href="/browse" className="inline-flex items-center gap-2 bg-black hover:bg-neutral-800 text-white font-semibold px-7 py-3.5 rounded-xl text-sm transition-colors shadow-[0_8px_24px_rgba(0,0,0,0.15)]">
             Find your editor <ArrowRight className="w-4 h-4" />
           </Link>
         </Reveal>
@@ -2252,7 +2231,7 @@ export function ComparisonSection() {
         <Reveal delay={0.35} className="text-center mt-10">
           <MagBtn className="inline-block">
             <Link href="/browse"
-              className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white font-black px-8 py-3.5 rounded-2xl text-sm transition-colors shadow-lg shadow-sky-500/25">
+              className="inline-flex items-center gap-2 bg-black hover:bg-neutral-800 text-white font-black px-8 py-3.5 rounded-2xl text-sm transition-colors shadow-lg shadow-black/15">
               Find your editor <ArrowRight className="w-4 h-4" />
             </Link>
           </MagBtn>
@@ -2719,7 +2698,7 @@ export function StickyCtaBar() {
               <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
                 <Link
                   href="/browse"
-                  className="inline-flex items-center gap-2 bg-[var(--brand-client)] hover:bg-[var(--brand-client-hover)] text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-sky-500/20"
+                  className="inline-flex items-center gap-2 bg-black hover:bg-neutral-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-black/15"
                 >
                   Browse Editors <ArrowRight className="w-3.5 h-3.5" />
                 </Link>

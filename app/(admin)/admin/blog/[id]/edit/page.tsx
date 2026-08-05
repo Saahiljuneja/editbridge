@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // v2
 
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
@@ -40,6 +40,11 @@ export default async function EditBlogPostPage({
         category: post.category,
         readTime: post.readTime,
         status: post.status,
+        thumbnailUrl: post.thumbnailUrl,
+        publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
+        ogImageUrl: post.ogImageUrl,
+        twitterCardType: post.twitterCardType,
+        canonicalUrl: post.canonicalUrl,
       }}
     />
   );

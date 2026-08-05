@@ -9,6 +9,7 @@ import { ShoppingBag, Clock, CheckCircle2, Search, Download, ChevronLeft, Chevro
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { OrdersListClient } from "./orders-list-client";
+import { TopoBackground } from "@/components/common/topo-background";
 
 const STATUS_TABS = [
   { value: "",                   label: "All" },
@@ -116,47 +117,48 @@ export default async function ClientOrdersPage({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
+      {/* Topographic backdrop */}
+      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
+
+      <div className="max-w-4xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Header Card */}
+        <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">My Orders</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Track and manage all your orders</p>
+            <h1 className="text-2xl font-black text-neutral-900 tracking-tight leading-none">My Orders</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1.5">Track and manage all your orders</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             <a
               href="/api/client/orders/export"
               download
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-neutral-200 bg-[#ffffff] hover:bg-neutral-50 text-xs font-bold text-neutral-700 transition-colors shadow-sm"
             >
               <Download className="w-3.5 h-3.5" /> Export CSV
             </a>
             <Link
               href="/browse"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
             >
               <Search className="w-3.5 h-3.5" /> Browse editors
             </Link>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-6 space-y-5">
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-4">
           {STAT_CONFIG.map(({ label, value, icon: Icon, iconCls, iconBg, topBorder, numCls }) => (
             <div
               key={label}
               className={cn(
-                "bg-white rounded-2xl border border-gray-100 border-t-2 shadow-sm px-5 py-4",
+                "bg-[#ffffff] rounded-3xl border border-neutral-200/50 border-t-2 shadow-sm px-5 py-4",
                 topBorder
               )}
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className={cn("text-2xl font-bold tabular-nums", numCls)}>{value}</p>
-                  <p className="text-xs text-gray-400 mt-0.5 font-medium">{label}</p>
+                  <p className={cn("text-2xl font-black tabular-nums", numCls)}>{value}</p>
+                  <p className="text-[10px] text-neutral-400 mt-0.5 font-bold uppercase tracking-wider">{label}</p>
                 </div>
                 <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", iconBg)}>
                   <Icon className={cn("w-5 h-5", iconCls)} />
@@ -166,20 +168,17 @@ export default async function ClientOrdersPage({
           ))}
         </div>
 
-        {/* Status filter tabs */}
-        <div
-          className="flex gap-1.5 overflow-x-auto pb-0.5"
-          style={{ scrollbarWidth: "none" }}
-        >
+        {/* Status filter tabs (capsule layout) */}
+        <div className="inline-flex items-center gap-1 bg-[#f3f4f6] rounded-[18px] border border-neutral-200/50 p-1 overflow-x-auto scrollbar-none max-w-full">
           {STATUS_TABS.map((tab) => (
             <Link
               key={tab.value}
               href={tab.value ? `/client/orders?status=${tab.value}` : "/client/orders"}
               className={cn(
-                "px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap shrink-0",
+                "text-[11px] font-bold px-3.5 py-1.5 rounded-[14px] transition-all whitespace-nowrap shrink-0",
                 statusFilter === tab.value
-                  ? "bg-[#0EA5E9] text-white shadow-sm"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-sky-300 hover:text-[#0EA5E9]"
+                  ? "bg-[#000000] text-white shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-900"
               )}
             >
               {tab.label}
@@ -189,7 +188,7 @@ export default async function ClientOrdersPage({
 
         {/* Result count */}
         {countRow && countRow.count > 0 && (
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-neutral-400 font-semibold">
             Showing {(page - 1) * PAGE_SIZE + 1}–
             {Math.min(page * PAGE_SIZE, countRow.count)} of {countRow.count} orders
           </p>
@@ -201,7 +200,7 @@ export default async function ClientOrdersPage({
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-2">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-neutral-400 font-semibold">
               Page {page} of {totalPages}
             </p>
             <div className="flex items-center gap-2">
@@ -209,10 +208,10 @@ export default async function ClientOrdersPage({
                 href={pageHref(page - 1)}
                 aria-disabled={page <= 1}
                 className={cn(
-                  "flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors",
+                  "flex items-center gap-1 px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 bg-[#ffffff] transition-colors shadow-sm",
                   page <= 1
-                    ? "border-gray-100 text-gray-300 pointer-events-none"
-                    : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    ? "opacity-40 pointer-events-none"
+                    : "hover:bg-neutral-50"
                 )}
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> Previous
@@ -221,10 +220,10 @@ export default async function ClientOrdersPage({
                 href={pageHref(page + 1)}
                 aria-disabled={page >= totalPages}
                 className={cn(
-                  "flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors",
+                  "flex items-center gap-1 px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-700 bg-[#ffffff] transition-colors shadow-sm",
                   page >= totalPages
-                    ? "border-gray-100 text-gray-300 pointer-events-none"
-                    : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    ? "opacity-40 pointer-events-none"
+                    : "hover:bg-neutral-50"
                 )}
               >
                 Next <ChevronRight className="w-3.5 h-3.5" />

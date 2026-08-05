@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { db } from "@/lib/db";
 import { showcaseItems, editors, users, portfolioItems } from "@/lib/db/schema";
@@ -9,6 +9,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Sparkles, ArrowRight, Heart, Eye, Film } from "lucide-react";
+import { TopoBackground } from "@/components/common/topo-background";
 
 export const metadata: Metadata = {
   title: "Showcase — Hand-picked editor work | EditBridge",
@@ -59,140 +60,149 @@ export default async function ShowcasePage() {
     .filter((row) => row.parsed !== null);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="px-8 py-6 text-center">
-          <p className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[var(--brand-editor)] uppercase mb-3">
-            <Sparkles className="w-3.5 h-3.5" /> Showcase
+    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
+      {/* Topographic contour lines backdrop */}
+      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.65} />
+
+      <div className="max-w-7xl mx-auto px-6 pt-8 space-y-8 relative z-10">
+        {/* Curated Hero Card */}
+        <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-8 text-center shadow-sm relative z-10">
+          <p className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wider text-[#7C3AED] uppercase mb-2 select-none">
+            <Sparkles className="w-3.5 h-3.5 text-[#7C3AED]" /> Curated Showcase
           </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-3">
+          <h1 className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight leading-none mb-3">
             Hand-picked work from our editors
           </h1>
-          <p className="text-sm sm:text-base text-gray-500 px-8 py-6">
-            A curated look at what EditBridge editors can do — real client projects,
-            picked by our team.
+          <p className="text-xs sm:text-sm text-neutral-400 font-semibold max-w-xl mx-auto">
+            A curated look at what EditBridge editors can do — real client projects, hand-picked by our team.
           </p>
         </div>
-      </div>
 
-      <div className="px-8 py-6">
-        {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 flex items-center justify-center mb-4">
-              <Sparkles className="w-6 h-6 text-gray-300" />
+        {/* Curated Items Grid */}
+        <div className="relative z-10">
+          {items.length === 0 ? (
+            <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-16 text-center shadow-sm max-w-lg mx-auto">
+              <div className="w-14 h-14 rounded-2xl bg-[#f3f4f6] border border-neutral-200/30 flex items-center justify-center mb-4 mx-auto">
+                <Sparkles className="w-6 h-6 text-neutral-300" />
+              </div>
+              <p className="font-bold text-neutral-700 text-sm">Nothing showcased yet</p>
+              <p className="text-xs text-neutral-400 mt-1 mb-5">Check back soon for hand-picked editor work.</p>
+              <Link
+                href="/browse"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 active:scale-[0.99] transition-all"
+                style={{ background: "var(--brand-client)" }}
+              >
+                Browse editors <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            <p className="font-semibold text-gray-700">Nothing showcased yet</p>
-            <p className="text-sm text-gray-400 mt-1 mb-5">Check back soon for hand-picked editor work.</p>
-            <Link
-              href="/browse"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: "var(--brand-client)" }}
-            >
-              Browse editors <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item) => {
-              const displayName = item.editorDisplayName || displayNameFromFull(item.editorName);
-              const initials = displayName.slice(0, 2).toUpperCase();
-              return (
-                <div key={item.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                  <div className="aspect-video bg-black">
-                    <iframe
-                      src={item.parsed!.embedUrl}
-                      title={item.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                      loading="lazy"
-                    />
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {items.map((item) => {
+                const displayName = item.editorDisplayName || displayNameFromFull(item.editorName);
+                const initials = displayName.slice(0, 2).toUpperCase();
+                return (
+                  <div key={item.id} className="bg-[#ffffff] rounded-3xl border border-neutral-200/40 shadow-sm overflow-hidden flex flex-col transition-all hover:shadow-md hover:-translate-y-0.5 duration-200">
+                    <div className="aspect-video bg-black">
+                      <iframe
+                        src={item.parsed!.embedUrl}
+                        title={item.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="font-bold text-neutral-900 text-[14px] leading-snug mb-1.5">{item.title}</h3>
+                      {item.description && (
+                        <p className="text-xs text-neutral-400 leading-relaxed line-clamp-2 mb-4 flex-1">{item.description}</p>
+                      )}
+                      <Link
+                        href={`/editor/${item.editorId}`}
+                        className="flex items-center gap-2.5 mt-auto pt-3 border-t border-neutral-100 group"
+                      >
+                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-[var(--brand-client)] to-[#6c63d4] flex items-center justify-center shrink-0">
+                          {item.editorImage ? (
+                            <Image src={item.editorImage} alt={displayName} width={32} height={32} className="object-cover w-full h-full" />
+                          ) : (
+                            <span className="text-white font-bold text-[10px]">{initials}</span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-neutral-800 truncate group-hover:text-[var(--brand-client)] transition-colors">{displayName}</p>
+                          {item.editorTitle && <p className="text-[10px] text-neutral-400 font-semibold truncate">{item.editorTitle}</p>}
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-[var(--brand-client)] transition-colors shrink-0" />
+                      </Link>
+                    </div>
                   </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h3 className="font-bold text-gray-900 text-sm leading-snug mb-1">{item.title}</h3>
-                    {item.description && (
-                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-3 flex-1">{item.description}</p>
-                    )}
-                    <Link
-                      href={`/editor/${item.editorId}`}
-                      className="flex items-center gap-2.5 mt-auto pt-3 border-t border-gray-50 group"
-                    >
-                      <div className="w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-[var(--brand-client)] to-[#6c63d4] flex items-center justify-center shrink-0">
-                        {item.editorImage ? (
-                          <Image src={item.editorImage} alt={displayName} width={32} height={32} className="object-cover w-full h-full" />
-                        ) : (
-                          <span className="text-white font-bold text-[10px]">{initials}</span>
-                        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Featured portfolio items from the feed */}
+        {featuredPortfolio.length > 0 && (
+          <div className="relative z-10 pt-4">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <p className="text-[11px] font-extrabold tracking-wider text-[var(--brand-client)] uppercase mb-1.5 flex items-center gap-1.5 select-none">
+                  <Film className="w-3.5 h-3.5 text-[var(--brand-client)]" /> From the Feed
+                </p>
+                <h2 className="text-xl font-black text-neutral-900 tracking-tight">Top portfolio picks</h2>
+              </div>
+              <Link href="/browse" className="text-xs font-bold text-[var(--brand-client)] hover:underline flex items-center gap-1">
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {featuredPortfolio.map(item => {
+                const r2Base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
+                const proxyUrl = item.url
+                  ? item.url.startsWith("/api/file/") ? item.url
+                    : r2Base && item.url.startsWith(r2Base) ? `/api/file/${item.url.slice(r2Base.length + 1)}`
+                    : `/api/file/${item.url}`
+                  : null;
+                const displayName = item.editorDisplayName || displayNameFromFull(item.editorUserName);
+                return (
+                  <Link
+                    key={item.id}
+                    href={`/editor/${item.editorId}`}
+                    className="group bg-[#ffffff] rounded-[22px] p-2 border border-neutral-200/50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col"
+                  >
+                    {/* Rounded Thumbnail Container */}
+                    <div className="relative aspect-[3/4] w-full rounded-[16px] overflow-hidden bg-neutral-50 shrink-0">
+                      {proxyUrl && item.type === "image" ? (
+                        <Image src={proxyUrl} alt={item.title ?? "Portfolio"} fill className="object-cover transition-transform group-hover:scale-105 duration-300" sizes="(max-width:640px) 50vw, 17vw" unoptimized />
+                      ) : (
+                        <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center">
+                          <Film className="w-8 h-8 text-white/30" />
+                        </div>
+                      )}
+                      {/* Overlay gradient & stats */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 text-white/90 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{item.viewsCount}</span>
+                        <span className="flex items-center gap-0.5"><Heart className="w-3 h-3" />{item.likesCount}</span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[var(--brand-client)] transition-colors">{displayName}</p>
-                        {item.editorTitle && <p className="text-[10px] text-gray-400 truncate">{item.editorTitle}</p>}
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[var(--brand-client)] transition-colors shrink-0" />
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
+                    </div>
+
+                    {/* Polaroid Label Footer */}
+                    <div className="pt-3 px-1 pb-1 flex-1 flex flex-col text-left">
+                      {item.category && (
+                        <span className="text-[8px] font-extrabold text-neutral-400 uppercase tracking-wider mb-0.5">{item.category}</span>
+                      )}
+                      <p className="text-neutral-800 text-[11px] font-bold leading-tight line-clamp-1 group-hover:text-black transition-colors">{item.title ?? "Untitled"}</p>
+                      <p className="text-neutral-400 text-[9px] font-semibold mt-0.5 truncate">👤 {displayName}</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
-
-      {/* Featured portfolio items from the feed */}
-      {featuredPortfolio.length > 0 && (
-        <div className="px-8 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="text-xs font-bold tracking-wider text-[var(--brand-client)] uppercase mb-1 flex items-center gap-1.5">
-                <Film className="w-3.5 h-3.5" /> From the Feed
-              </p>
-              <h2 className="text-xl font-black text-gray-900">Top portfolio picks</h2>
-            </div>
-            <Link href="/feed" className="text-sm font-semibold text-[var(--brand-client)] hover:underline flex items-center gap-1">
-              View all <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {featuredPortfolio.map(item => {
-              const r2Base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
-              const proxyUrl = item.url
-                ? item.url.startsWith("/api/file/") ? item.url
-                  : r2Base && item.url.startsWith(r2Base) ? `/api/file/${item.url.slice(r2Base.length + 1)}`
-                  : `/api/file/${item.url}`
-                : null;
-              const displayName = item.editorDisplayName || displayNameFromFull(item.editorUserName);
-              return (
-                <Link
-                  key={item.id}
-                  href={`/feed?item=${item.id}`}
-                  className="group relative rounded-2xl overflow-hidden bg-gray-100 aspect-[9/16] border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  {proxyUrl && item.type === "image" ? (
-                    <Image src={proxyUrl} alt={item.title ?? "Portfolio"} fill className="object-cover" sizes="(max-width:640px) 50vw, 17vw" unoptimized />
-                  ) : (
-                    <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
-                      <Film className="w-8 h-8 text-white/30" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-2 space-y-0.5">
-                    {item.category && (
-                      <span className="text-[8px] font-bold text-white/50 uppercase tracking-wide">{item.category}</span>
-                    )}
-                    <p className="text-white text-[10px] font-semibold leading-tight line-clamp-2">{item.title ?? "Untitled"}</p>
-                    <p className="text-white/60 text-[9px] truncate">{displayName}</p>
-                    <div className="flex items-center gap-2 text-white/40 text-[9px]">
-                      <span className="flex items-center gap-0.5"><Eye className="w-2 h-2" />{item.viewsCount}</span>
-                      <span className="flex items-center gap-0.5"><Heart className="w-2 h-2" />{item.likesCount}</span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

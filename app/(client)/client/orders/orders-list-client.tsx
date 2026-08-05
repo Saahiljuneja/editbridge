@@ -36,12 +36,12 @@ export function OrdersListClient({
 }) {
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center mb-4">
-          <ShoppingBag className="w-7 h-7 text-[#0EA5E9]" />
+      <div className="rounded-[24px] border border-neutral-200/50 bg-[#ffffff] shadow-sm flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-neutral-50 border border-neutral-200/30 flex items-center justify-center mb-4">
+          <ShoppingBag className="w-7 h-7 text-neutral-300" />
         </div>
-        <p className="font-semibold text-gray-800">No orders found</p>
-        <p className="text-sm text-gray-400 mt-1 mb-5">
+        <p className="font-bold text-neutral-800 text-sm">No orders found</p>
+        <p className="text-xs text-neutral-400 mt-1 mb-5 font-semibold">
           {hasFilter
             ? "No orders match this filter."
             : "You haven't placed any orders yet."}
@@ -49,7 +49,7 @@ export function OrdersListClient({
         {!hasFilter && (
           <Link
             href="/browse"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
           >
             <Search className="w-3.5 h-3.5" /> Browse editors
           </Link>
@@ -59,7 +59,7 @@ export function OrdersListClient({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden divide-y divide-gray-50">
+    <div className="rounded-[24px] border border-neutral-200/50 bg-[#ffffff] shadow-sm overflow-hidden divide-y divide-neutral-100">
       {rows.map((order, i) => {
         const s = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
         const isActive = !["completed", "cancelled"].includes(order.status);
@@ -78,7 +78,7 @@ export function OrdersListClient({
           >
             <Link
               href={`/client/orders/${order.id}`}
-              className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/70 transition-colors group"
+              className="flex items-center gap-4 px-5 py-4 hover:bg-neutral-50/50 transition-colors group"
             >
               {/* Status stripe */}
               <div
@@ -90,39 +90,39 @@ export function OrdersListClient({
               />
 
               {/* Editor avatar */}
-              <div className="w-9 h-9 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-bold text-[#0EA5E9] shrink-0 uppercase select-none">
+              <div className="w-9 h-9 rounded-xl bg-neutral-100 border border-neutral-200/30 flex items-center justify-center text-xs font-bold text-neutral-400 shrink-0 uppercase select-none">
                 {initials.toUpperCase() || "?"}
               </div>
 
               {/* Main info */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-1">
+                <div className="flex items-center gap-1.5 mb-1.5">
                   <span
                     className={cn(
-                      "text-[10px] font-semibold px-2 py-0.5 rounded-full",
+                      "text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider",
                       s.badge
                     )}
                   >
                     {s.label}
                   </span>
                   {order.packageTier && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-500 capitalize">
+                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-neutral-50 border border-neutral-200/30 text-neutral-400 uppercase tracking-wider">
                       {order.packageTier}
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-gray-900 truncate">
+                <p className="text-sm font-bold text-neutral-900 truncate">
                   {order.packageTitle ?? "Custom order"}
                 </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-xs text-gray-400 truncate max-w-[120px]">
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-xs text-neutral-400 font-semibold truncate max-w-[120px]">
                     {order.editorName ?? "Editor"}
                   </span>
-                  <span className="text-gray-200 text-xs select-none">·</span>
+                  <span className="text-neutral-200 text-xs select-none">·</span>
                   {isActive && order.deadline ? (
                     <DeadlineCountdown deadline={order.deadline.toISOString()} />
                   ) : (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-neutral-400 font-semibold">
                       {order.deadline
                         ? formatDate(order.deadline)
                         : formatDate(order.createdAt)}
@@ -133,10 +133,10 @@ export function OrdersListClient({
 
               {/* Amount + arrow */}
               <div className="flex items-center gap-2 shrink-0 ml-2">
-                <span className="font-bold text-sm text-gray-900 tabular-nums">
+                <span className="font-black text-sm text-neutral-900 tabular-nums">
                   {formatCurrency(order.totalAmount)}
                 </span>
-                <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#0EA5E9] group-hover:translate-x-0.5 transition-all duration-150" />
+                <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-black group-hover:translate-x-0.5 transition-all duration-150" />
               </div>
             </Link>
           </motion.div>

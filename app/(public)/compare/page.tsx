@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -268,7 +268,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                 {c.cheapestPackageId ? (
                   <Link
                     href={`/checkout/${c.cheapestPackageId}`}
-                    className="flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] transition-colors"
+                    className="flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-800 transition-colors"
                   >
                     Book now
                   </Link>

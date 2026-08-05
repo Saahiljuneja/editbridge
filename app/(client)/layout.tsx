@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { ClientSidebar } from "@/components/layout/client-sidebar";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { PushPermissionPrompt } from "@/components/push/push-permission";
 
 export default async function ClientLayout({
@@ -22,7 +23,13 @@ export default async function ClientLayout({
         userName={session.user.name ?? ""}
         userImage={session.user.image ?? null}
       />
-      <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">{children}</main>
+      <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
+        <DashboardHeader
+          userName={session.user.name ?? ""}
+          userImage={session.user.image ?? null}
+        />
+        {children}
+      </main>
       <PushPermissionPrompt />
     </div>
   );

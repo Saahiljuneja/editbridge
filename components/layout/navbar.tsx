@@ -72,9 +72,6 @@ export function Navbar({
   const [searchQuery,          setSearchQuery]          = useState("");
   const [searchFocused,        setSearchFocused]        = useState(false);
   const [highlightedIdx,       setHighlightedIdx]       = useState(-1);
-  const [row2Visible,          setRow2Visible]          = useState(true);
-
-  const lastScrollY        = useRef(0);
   const blurTimer          = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef     = useRef<HTMLInputElement>(null);
   const suggestionRefs     = useRef<(HTMLButtonElement | null)[]>([]);
@@ -132,27 +129,7 @@ export function Navbar({
     setHighlightedIdx(-1);
   }, [pathname]);
 
-  /* hide row 2 on scroll-down, restore on scroll-up / at top */
-  useEffect(() => {
-    function onScroll() {
-      const y = window.scrollY;
-      if (y < 10) {
-        setRow2Visible(true);
-        lastScrollY.current = y;
-      } else if (y > lastScrollY.current + 40) {
-        // Only hide after 40px of sustained downward scroll
-        setRow2Visible(false);
-        lastScrollY.current = y;
-      } else if (y < lastScrollY.current - 10) {
-        // Show after 10px upward scroll
-        setRow2Visible(true);
-        lastScrollY.current = y;
-      }
-      // Don't update lastScrollY unless threshold is crossed — delta accumulates
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+
 
   /* cleanup blur timer */
   useEffect(() => () => { if (blurTimer.current) clearTimeout(blurTimer.current); }, []);
@@ -336,12 +313,7 @@ export function Navbar({
       {/* ── Main navbar ── */}
       <nav
         aria-label="Main navigation"
-        className={cn(
-          "sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 transition-shadow duration-300",
-          row2Visible
-            ? "shadow-[0_1px_8px_rgba(0,0,0,0.06)]"
-            : "shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
-        )}
+        className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-[0_1px_8px_rgba(0,0,0,0.06)]"
       >
         {/* ── Row 1 ── */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -575,14 +547,15 @@ export function Navbar({
                     Sign in
                   </Link>
                   <Link href="/signup"
-                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all bg-[var(--brand-client)] hover:bg-sky-600 shadow-[0_2px_12px_rgba(14,165,233,0.4)] hover:shadow-[0_4px_20px_rgba(14,165,233,0.55)] hover:-translate-y-px">
+                    className="hidden sm:flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-bold text-white transition-all bg-black hover:bg-neutral-800 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.25)] hover:-translate-y-px">
                     Get started
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                   {/* [fix #3] mobile-visible compact CTA */}
                   <Link href="/signup"
-                    className="sm:hidden px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[var(--brand-client)] hover:bg-sky-600 transition-colors">
-                    Sign up
+                    className="sm:hidden flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-black hover:bg-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-all">
+                    Get started
+                    <ArrowRight className="w-3 h-3" />
                   </Link>
                 </>
               )}
@@ -599,11 +572,8 @@ export function Navbar({
           </div>
         </div>
 
-        {/* ── Row 2: in-app nav (desktop, hides on scroll-down) ── */}
-        <div className={cn(
-          "hidden md:block border-t border-gray-200 transition-opacity duration-200",
-          row2Visible ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}>
+        {/* ── Row 2: in-app nav (desktop) ── */}
+        <div className="hidden md:block border-t border-gray-200">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center overflow-x-auto [&::-webkit-scrollbar]:hidden">
 

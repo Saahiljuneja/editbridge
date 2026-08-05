@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 import { ReferralCard } from "@/components/client/referral-card";
 import { RewardsCard } from "@/components/rewards/rewards-card";
+import { TopoBackground } from "@/components/common/topo-background";
 
 const STATUS_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
   pending:            { label: "Pending",     dot: "bg-gray-400",    badge: "bg-gray-100 text-gray-600"      },
@@ -154,125 +155,124 @@ export default async function ClientDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
+      {/* Topographic contour line background */}
+      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
 
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
+      <div className="max-w-5xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Dashboard Header */}
+        <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Good {greet}, {firstName}</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <h1 className="text-2xl font-black text-neutral-900 tracking-tight leading-none">Good {greet}, {firstName}</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1.5">
               {activeOrders.length > 0
                 ? `You have ${activeOrders.length} active order${activeOrders.length !== 1 ? "s" : ""}`
                 : "No active orders — ready to find an editor?"}
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             {unreadMessages > 0 && (
               <Link href="/client/messages"
-                className="relative flex items-center gap-1.5 px-3 py-2 rounded-xl border border-sky-200 bg-sky-50 text-sky-700 text-sm font-medium hover:bg-sky-100 transition-colors">
-                <MessageSquare className="w-4 h-4" />
+                className="flex-1 sm:flex-initial relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-sky-150 bg-sky-50 text-sky-700 text-xs font-bold transition-all hover:bg-sky-100/80">
+                <MessageSquare className="w-3.5 h-3.5" />
                 <span>{unreadMessages}</span>
               </Link>
             )}
             {openDisputes > 0 && (
               <Link href="/client/disputes"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm font-medium hover:bg-red-100 transition-colors">
-                <AlertTriangle className="w-4 h-4" />
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-red-150 bg-red-50 text-red-700 text-xs font-bold transition-all hover:bg-red-100/80">
+                <AlertTriangle className="w-3.5 h-3.5" />
                 <span>{openDisputes} dispute{openDisputes !== 1 ? "s" : ""}</span>
               </Link>
             )}
             <Link href="/browse"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors">
-              <Search className="w-4 h-4" /> Find editor
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm">
+              <Search className="w-3.5 h-3.5" /> Find editor
             </Link>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-6 py-6 space-y-5">
 
         {/* KPI row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {KPI_CARDS.map(({ label, value, sub, icon: Icon, href, topBorder, iconBg, iconCls }) => (
             <Link key={label} href={href}
-              className={cn("bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:border-gray-200 transition-all group", topBorder)}>
+              className={cn("bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-5 shadow-sm hover:shadow-md transition-all group relative overflow-hidden", topBorder)}>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-medium text-gray-400">{label}</p>
-                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110", iconBg)}>
+                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{label}</p>
+                <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110", iconBg)}>
                   <Icon className={cn("w-4 h-4", iconCls)} />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900 leading-none mb-1.5 tabular-nums">{value}</p>
-              <p className="text-xs text-gray-400">{sub}</p>
+              <p className="text-2xl font-black text-neutral-900 leading-none mb-1.5 tabular-nums">{value}</p>
+              <p className="text-[10px] text-neutral-400 font-semibold">{sub}</p>
             </Link>
           ))}
         </div>
 
         {/* Main grid */}
-        <div className="grid lg:grid-cols-3 gap-5">
+        <div className="grid lg:grid-cols-3 gap-6">
 
           {/* Left col */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="lg:col-span-2 space-y-6">
 
             {/* Active orders */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+            <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-gray-400" />
-                  <h2 className="font-semibold text-gray-900 text-sm">Active Orders</h2>
+                  <ShoppingBag className="w-4 h-4 text-neutral-400" />
+                  <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Active Orders</h2>
                   {activeOrders.length > 0 && (
-                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-[#0EA5E9] text-white">
+                    <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-black text-white">
                       {activeOrders.length}
                     </span>
                   )}
                 </div>
                 <Link href="/client/orders"
-                  className="text-xs font-medium flex items-center gap-1 text-[#0EA5E9] hover:underline">
+                  className="text-xs font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors">
                   View all <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
 
               {activeOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-3">
-                    <ShoppingBag className="w-5 h-5 text-[#0EA5E9]" />
+                <div className="flex flex-col items-center justify-center py-14 px-6 text-center bg-[#ffffff]">
+                  <div className="w-12 h-12 rounded-2xl bg-neutral-50 border border-neutral-200/40 flex items-center justify-center mb-3">
+                    <ShoppingBag className="w-5 h-5 text-neutral-400" />
                   </div>
-                  <p className="font-semibold text-gray-700 text-sm">No active orders</p>
-                  <p className="text-xs text-gray-400 mt-1 max-w-xs">Find a great editor and start your first project today.</p>
+                  <p className="font-bold text-neutral-700 text-sm">No active orders</p>
+                  <p className="text-xs text-neutral-400 mt-1 max-w-xs font-semibold">Find a great editor and start your first project today.</p>
                   <Link href="/browse"
-                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors">
+                    className="mt-4 inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm">
                     <Search className="w-3.5 h-3.5" /> Browse editors
                   </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-neutral-100">
                   {activeOrders.map(order => {
                     const s = STATUS_STYLES[order.status];
                     return (
                       <Link key={order.id} href={`/client/orders/${order.id}`}
-                        className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors group">
-                        <span className={cn("w-2 h-2 rounded-full shrink-0", s?.dot ?? "bg-gray-300")} />
+                        className="flex items-center gap-4 px-5 py-4 hover:bg-neutral-50/50 transition-colors group">
+                        <span className={cn("w-2 h-2 rounded-full shrink-0", s?.dot ?? "bg-neutral-300")} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate mb-0.5">{order.packageTitle}</p>
+                          <p className="text-sm font-bold text-neutral-900 truncate mb-0.5">{order.packageTitle}</p>
                           <div className="flex items-center gap-2 flex-wrap">
                             {s && (
-                              <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-full", s.badge)}>
+                              <span className={cn("text-[9px] font-extrabold px-2 py-0.5 rounded-full", s.badge)}>
                                 {s.label}
                               </span>
                             )}
-                            <span className="text-xs text-gray-400">{displayNameFromFull(order.editorName ?? "Editor")}</span>
+                            <span className="text-xs text-neutral-400 font-semibold">{displayNameFromFull(order.editorName ?? "Editor")}</span>
                             {order.deadline && (
                               <>
-                                <span className="text-gray-200 text-xs">·</span>
+                                <span className="text-neutral-200 text-xs">·</span>
                                 <DeadlineCountdown deadline={order.deadline.toISOString()} />
                               </>
                             )}
                           </div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-sm font-bold text-gray-900 tabular-nums">{formatCurrency(order.totalAmount)}</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                          <span className="text-sm font-black text-neutral-900 tabular-nums">{formatCurrency(order.totalAmount)}</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-neutral-500 transition-colors" />
                         </div>
                       </Link>
                     );
@@ -283,17 +283,17 @@ export default async function ClientDashboardPage() {
 
             {/* Saved editors */}
             {savedEditorsList.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+              <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
                   <div className="flex items-center gap-2">
                     <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-                    <h2 className="font-semibold text-gray-900 text-sm">Saved Editors</h2>
+                    <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Saved Editors</h2>
                   </div>
-                  <Link href="/client/saved" className="text-xs font-medium flex items-center gap-1 text-[#0EA5E9] hover:underline">
+                  <Link href="/client/saved" className="text-xs font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors">
                     View all <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-neutral-100">
                   {savedEditorsList.map(editor => {
                     const shownName = editor.displayName || displayNameFromFull(editor.name);
                     const initials = shownName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase();
@@ -302,32 +302,32 @@ export default async function ClientDashboardPage() {
                     const unavailable = isAway || !editor.isAvailable;
                     return (
                       <div key={editor.editorId} className="flex items-center gap-3 px-5 py-3.5">
-                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0">
                           {editor.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={editor.image} alt={shownName} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-[#0EA5E9] font-bold text-xs">{initials}</span>
+                            <span className="text-neutral-400 font-bold text-xs">{initials}</span>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{shownName}</p>
+                          <p className="text-sm font-bold text-neutral-900 truncate">{shownName}</p>
                           {isAway ? (
-                            <p className="text-xs text-amber-600">Away until {formatDate(editor.vacationUntil!)}</p>
+                            <p className="text-xs text-amber-600 font-semibold">Away until {formatDate(editor.vacationUntil!)}</p>
                           ) : !editor.isAvailable ? (
-                            <p className="text-xs text-gray-400">Not taking orders</p>
+                            <p className="text-xs text-neutral-400 font-semibold">Not taking orders</p>
                           ) : (
-                            <p className="text-xs text-emerald-600">Available now</p>
+                            <p className="text-xs text-emerald-600 font-semibold">Available now</p>
                           )}
                         </div>
                         {lastOrder ? (
                           <Link
                             href={`/checkout/${lastOrder.packageId}?reorder=true&orderId=${lastOrder.orderId}`}
                             className={cn(
-                              "flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white shrink-0 transition-colors",
+                              "flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white shrink-0 transition-all",
                               unavailable
-                                ? "bg-gray-200 text-gray-400 pointer-events-none"
-                                : "bg-[#0EA5E9] hover:bg-sky-600"
+                                ? "bg-neutral-100 text-neutral-400 pointer-events-none"
+                                : "bg-black hover:bg-neutral-900 shadow-sm"
                             )}
                           >
                             <RefreshCw className="w-3 h-3" /> Re-order
@@ -335,7 +335,7 @@ export default async function ClientDashboardPage() {
                         ) : (
                           <Link
                             href={`/editor/${editor.editorId}`}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors shrink-0"
+                            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shrink-0 shadow-sm"
                           >
                             View
                           </Link>
@@ -349,28 +349,28 @@ export default async function ClientDashboardPage() {
 
             {/* Recent reviews */}
             {recentReviews.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+              <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    <h2 className="font-semibold text-gray-900 text-sm">Reviews You Left</h2>
+                    <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Reviews You Left</h2>
                   </div>
-                  <Link href="/client/reviews" className="text-xs font-medium text-[#0EA5E9] hover:underline">
+                  <Link href="/client/reviews" className="text-xs font-bold text-neutral-600 hover:text-black transition-colors">
                     View all
                   </Link>
                 </div>
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-neutral-100">
                   {recentReviews.map(review => (
                     <div key={review.id} className="px-5 py-4">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <div className="flex">
+                        <div className="flex gap-0.5">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={cn("w-3 h-3", i < review.rating ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
+                            <Star key={i} className={cn("w-3 h-3", i < review.rating ? "fill-amber-400 text-amber-400" : "text-neutral-200 fill-neutral-100")} />
                           ))}
                         </div>
-                        <span className="text-[10px] text-gray-400">{formatDate(review.createdAt)}</span>
+                        <span className="text-[10px] text-neutral-400 font-semibold">{formatDate(review.createdAt)}</span>
                       </div>
-                      {review.text && <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">{review.text}</p>}
+                      {review.text && <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{review.text}</p>}
                     </div>
                   ))}
                 </div>
@@ -379,18 +379,18 @@ export default async function ClientDashboardPage() {
           </div>
 
           {/* Right col / sidebar */}
-          <div className="space-y-4">
+          <div className="space-y-5">
 
             {/* Browse CTA if no orders */}
             {activeOrders.length === 0 && (
-              <div className="rounded-2xl p-5 text-white bg-gradient-to-br from-sky-500 to-indigo-500">
-                <Film className="w-6 h-6 mb-3 opacity-80" />
-                <p className="font-semibold text-sm mb-1">Discover editors</p>
-                <p className="text-xs opacity-75 mb-4 leading-relaxed">
+              <div className="rounded-3xl p-5 text-white bg-gradient-to-br from-neutral-800 to-neutral-950 border border-neutral-850 shadow-sm relative overflow-hidden">
+                <Film className="w-6 h-6 mb-3 text-neutral-300" />
+                <p className="font-black text-sm mb-1 tracking-tight">Discover editors</p>
+                <p className="text-xs text-neutral-400 mb-4 leading-relaxed font-semibold">
                   Browse portfolios, compare packages, and find the perfect editor for your project.
                 </p>
                 <Link href="/browse"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-xs font-semibold transition-colors">
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition-all">
                   Browse now <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -404,16 +404,16 @@ export default async function ClientDashboardPage() {
 
             {/* Editor feed teaser */}
             <Link href="/feed"
-              className="block bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:border-violet-200 hover:shadow-md transition-all group">
+              className="block bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm p-5 hover:shadow-md transition-all group">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-violet-50">
-                  <Film className="w-4 h-4 text-violet-600" />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-neutral-50 border border-neutral-200/30">
+                  <Film className="w-4 h-4 text-neutral-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">Editor Feed</p>
-                  <p className="text-xs text-gray-400">Discover editor portfolios</p>
+                  <p className="text-sm font-bold text-neutral-900">Editor Feed</p>
+                  <p className="text-xs text-neutral-400 font-semibold">Discover editor portfolios</p>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-violet-500 transition-colors shrink-0" />
+                <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-black transition-colors shrink-0" />
               </div>
             </Link>
 

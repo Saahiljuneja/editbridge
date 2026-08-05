@@ -73,7 +73,7 @@ export function PortfolioPreview({ videoUrl, thumbnailUrl, altText }: PortfolioP
       {!shouldPlay && (
         <div className="absolute inset-0 bg-black/5 hover:bg-black/10 transition-colors flex items-center justify-center">
           <div className="w-10 h-10 rounded-full bg-white/90 shadow-md flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform duration-200">
-            <PlayCircle className="w-5 h-5 text-[var(--brand-client)] fill-[var(--brand-client)]/10" />
+            <PlayCircle className="w-5 h-5 text-black fill-black/10" />
           </div>
         </div>
       )}

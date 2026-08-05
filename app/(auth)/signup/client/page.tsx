@@ -7,10 +7,12 @@ import Link from "next/link";
 import { signupSchema } from "@/lib/validations";
 import { toast } from "sonner";
 import { allRulesPassed } from "@/components/ui/password-input";
-import { Eye, EyeOff, Loader2, ShieldCheck, Check } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldCheck, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthTabToggle } from "../../auth-tab-toggle";
-import { COUNTRIES, CURRENCIES } from "../../countries";
+import { COUNTRIES } from "../../countries";
+import { PhoneInput, type PhoneValue } from "../../phone-input";
+import { CountrySelect } from "../../country-select";
 
 const RULES = [
   { label: "At least 1 lowercase letter", test: (p: string) => /[a-z]/.test(p) },
@@ -31,7 +33,8 @@ export default function ClientSignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [country, setCountry] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [phone, setPhone] = useState<PhoneValue>({ countryCode: "US", dialCode: "+1", number: "" });
+  const [agreed, setAgreed] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -57,12 +60,22 @@ export default function ClientSignupPage() {
       return;
     }
 
+    if (!phone.number.trim()) {
+      setErrors({ phone: "Phone number is required." });
+      return;
+    }
+
+    if (!agreed) {
+      setErrors({ terms: "You must agree to the Terms and Privacy Policy." });
+      return;
+    }
+
     setLoading(true);
 
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...result.data, role: "client", country, currency, ...(refCode.trim() ? { ref: refCode.trim() } : {}) }),
+      body: JSON.stringify({ ...result.data, role: "client", country, phone: `${phone.dialCode}${phone.number}`, ...(refCode.trim() ? { ref: refCode.trim() } : {}) }),
     });
 
     if (!res.ok) {
@@ -106,17 +119,8 @@ export default function ClientSignupPage() {
         </div>
       </div>
 
-      {/* Row of Three Social Icons */}
+      {/* Social Icons */}
       <div className="flex items-center justify-center gap-3.5 mb-4.5">
-        {/* Facebook */}
-        <button
-          type="button"
-          className="w-[42px] h-[42px] rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-transform active:scale-95 shadow-sm hover:opacity-90"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-        </button>
         {/* Apple */}
         <button
           type="button"
@@ -252,61 +256,46 @@ export default function ClientSignupPage() {
               value={form.confirmPassword}
               onChange={handleChange}
               autoComplete="new-password"
-              className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6 pr-10"
+              className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6 pr-16"
             />
-            <button
-              type="button"
-              onClick={() => setShowConfirm(v => !v)}
-              className="absolute right-0 text-neutral-400 hover:text-neutral-600 transition-colors"
-              style={{ top: "50%", transform: "translateY(-50%)" }}
-              aria-label={showConfirm ? "Hide password" : "Show password"}
-            >
-              {showConfirm ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
-            </button>
+            <div className="absolute right-0 flex items-center gap-1.5" style={{ top: "50%", transform: "translateY(-50%)" }}>
+              {form.confirmPassword.length > 0 && (
+                form.confirmPassword === form.password
+                  ? <span className="text-[11px] font-bold text-emerald-500 tracking-wide">Matched</span>
+                  : <span className="text-[11px] font-bold text-red-400 tracking-wide">No match</span>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowConfirm(v => !v)}
+                className="text-neutral-400 hover:text-neutral-600 transition-colors"
+                aria-label={showConfirm ? "Hide password" : "Show password"}
+              >
+                {showConfirm ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+              </button>
+            </div>
           </div>
         </div>
         {errors.confirmPassword && <p className="text-xs text-red-500 mt-1 pl-1">{errors.confirmPassword}</p>}
 
         {/* Country */}
-        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
-          <label htmlFor="country" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
-            Country
-          </label>
-          <select
-            id="country"
-            value={country}
-            onChange={e => {
-              setCountry(e.target.value);
-              const found = COUNTRIES.find(c => c.code === e.target.value);
-              if (found) setCurrency(found.currency);
-            }}
-            required
-            className="w-full bg-transparent text-[14px] text-neutral-900 outline-none mt-0.5 h-6 cursor-pointer"
-          >
-            <option value="">Select country</option>
-            {COUNTRIES.map(c => (
-              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-            ))}
-          </select>
-        </div>
+        <CountrySelect
+          value={country}
+          onChange={code => {
+            setCountry(code);
+            const found = COUNTRIES.find(c => c.code === code);
+            if (found) setPhone(p => ({ ...p, countryCode: found.code, dialCode: found.dial }));
+          }}
+          required
+        />
         {errors.country && <p className="text-xs text-red-500 mt-1 pl-1">{errors.country}</p>}
 
-        {/* Currency preference */}
-        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
-          <label htmlFor="currency" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
-            Preferred currency <span className="text-neutral-300 font-normal">(auto-detected)</span>
-          </label>
-          <select
-            id="currency"
-            value={currency}
-            onChange={e => setCurrency(e.target.value)}
-            className="w-full bg-transparent text-[14px] text-neutral-900 outline-none mt-0.5 h-6 cursor-pointer"
-          >
-            {CURRENCIES.map(c => (
-              <option key={c.code} value={c.code}>{c.label}</option>
-            ))}
-          </select>
-        </div>
+        <PhoneInput
+          value={phone}
+          onChange={setPhone}
+          label="Phone number"
+          required
+        />
+        {errors.phone && <p className="text-xs text-red-500 mt-1 pl-1">{errors.phone}</p>}
 
         {/* Referral code stacked input */}
         <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
@@ -323,6 +312,34 @@ export default function ClientSignupPage() {
             className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6"
           />
         </div>
+
+        {/* Terms checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer select-none pt-1">
+          <div className="relative mt-0.5 shrink-0">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={e => {
+                setAgreed(e.target.checked);
+                setErrors(prev => ({ ...prev, terms: "" }));
+              }}
+              className="sr-only"
+            />
+            <div className={cn(
+              "w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all",
+              agreed ? "bg-black border-black" : "bg-white border-neutral-300"
+            )}>
+              {agreed && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+            </div>
+          </div>
+          <span className="text-[12.5px] text-neutral-500 leading-snug font-medium">
+            I agree to the{" "}
+            <Link href="/terms" className="text-neutral-900 font-semibold hover:underline" target="_blank">Terms of Service</Link>
+            {" "}and{" "}
+            <Link href="/privacy" className="text-neutral-900 font-semibold hover:underline" target="_blank">Privacy Policy</Link>
+          </span>
+        </label>
+        {errors.terms && <p className="text-xs text-red-500 pl-1">{errors.terms}</p>}
 
         {/* Submit */}
         <button

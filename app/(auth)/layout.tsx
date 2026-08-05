@@ -73,28 +73,31 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        {/* ── RIGHT: Visual panel (autumn forest road) ── */}
+        {/* ── RIGHT: Visual panel ── */}
         <div style={{
           flex: 1,
           position: "relative",
-          backgroundColor: "#080c14",
-          backgroundImage: "url('/auth_right_image.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: "linear-gradient(145deg, #0a0e1a 0%, #0d1424 50%, #0a1020 100%)",
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "40px",
           overflow: "hidden",
         }} className="hidden xl:flex">
-          {/* Subtle overlay to enhance contrast */}
+
+          {/* Subtle grid pattern */}
           <div style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(to bottom, rgba(8,12,20,0.1) 0%, rgba(8,12,20,0.3) 50%, rgba(4,6,10,0.85) 100%)",
+            backgroundImage: "radial-gradient(circle, rgba(14,165,233,0.06) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
             zIndex: 1,
           }} />
 
-          {/* Location details top-right - Floating White Box */}
+          {/* Glow blobs */}
+          <div style={{ position: "absolute", top: "15%", left: "30%", width: "280px", height: "280px", borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.10) 0%, transparent 70%)", zIndex: 1, pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "20%", right: "10%", width: "220px", height: "220px", borderRadius: "50%", background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)", zIndex: 1, pointerEvents: "none" }} />
+
+          {/* Top-right floating status badge */}
           <div style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "flex-end" }}>
             <div style={{
               background: "#ffffff",
@@ -103,77 +106,108 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               display: "inline-flex",
               flexDirection: "column",
               gap: "2px",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-              maxWidth: "280px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <MessageSquare style={{ width: "12px", height: "12px", color: "#0ea5e9" }} />
                 <span style={{ fontSize: "11px", fontWeight: 700, color: "#1f2937", whiteSpace: "nowrap" }}>Live Collaboration Room</span>
               </div>
-              <span style={{ fontSize: "9px", color: "#6b7280", paddingLeft: "18px" }}>2 online · active review line</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "5px", paddingLeft: "18px" }}>
+                <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+                <span style={{ fontSize: "9px", color: "#6b7280" }}>2 online · active review</span>
+              </div>
             </div>
           </div>
 
-          {/* Polaroid Collage Box (centered overlay) */}
-          <div style={{ position: "relative", zIndex: 10, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", margin: "40px 0" }}>
+          {/* Center: video order review mockup */}
+          <div style={{ position: "relative", zIndex: 10, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", margin: "32px 0" }}>
             <div style={{
               background: "#ffffff",
               borderRadius: "20px",
-              padding: "12px",
-              boxShadow: "0 20px 48px rgba(0,0,0,0.25)",
+              padding: "18px",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.35)",
               width: "100%",
               maxWidth: "340px",
-              transform: "rotate(-2deg)",
             }}>
-              {/* Inner Photos Grid */}
-              <div style={{ display: "grid", gridTemplateRows: "180px 80px", gap: "8px" }}>
-                {/* Top Main Image */}
-                <div style={{
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  backgroundImage: "url('/auth_right_image.jpg')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center 30%",
-                }} />
-                {/* Bottom row: 2 images */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                  <div style={{
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    backgroundImage: "url('/auth_right_image.jpg')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center 80%",
-                  }} />
-                  <div style={{
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    background: "#1f2937",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                    {/* Simulated dashboard view */}
-                    <div style={{ width: "100%", height: "100%", opacity: 0.8, backgroundImage: "linear-gradient(135deg, #0f172a, #020617)" }} />
-                  </div>
+              {/* Card header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#111827" }}>Order #EB-0429 · Final Cut</span>
                 </div>
+                <span style={{ fontSize: "9px", fontWeight: 600, color: "#9ca3af", background: "#f3f4f6", padding: "2px 7px", borderRadius: "20px" }}>v3</span>
               </div>
+
+              {/* Video preview area */}
               <div style={{
-                marginTop: "12px",
+                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+                borderRadius: "12px",
+                height: "120px",
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
-                fontSize: "10.5px",
-                fontWeight: 700,
-                color: "#4b5563",
-                fontFamily: "monospace",
+                justifyContent: "center",
+                marginBottom: "10px",
+                position: "relative",
+                overflow: "hidden",
               }}>
-                <span>💬</span>
-                <span>Active workspace feedback loop</span>
+                {/* Fake waveform bars */}
+                <div style={{ display: "flex", alignItems: "center", gap: "2px", opacity: 0.3 }}>
+                  {[18,30,14,40,22,35,16,28,38,20,32,12,26,42,18,30,24,36,14,28].map((h, i) => (
+                    <div key={i} style={{ width: "3px", height: `${h}px`, borderRadius: "2px", background: "#38bdf8" }} />
+                  ))}
+                </div>
+                {/* Play button */}
+                <div style={{
+                  position: "absolute",
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.15)",
+                  backdropFilter: "blur(4px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1.5px solid rgba(255,255,255,0.2)",
+                }}>
+                  <div style={{ width: 0, height: 0, borderTop: "6px solid transparent", borderBottom: "6px solid transparent", borderLeft: "10px solid white", marginLeft: "3px" }} />
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div style={{ marginBottom: "14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
+                  <span style={{ fontSize: "9px", color: "#9ca3af" }}>00:42</span>
+                  <span style={{ fontSize: "9px", color: "#9ca3af" }}>01:30</span>
+                </div>
+                <div style={{ height: "3px", background: "#e5e7eb", borderRadius: "2px" }}>
+                  <div style={{ height: "100%", width: "47%", background: "#0ea5e9", borderRadius: "2px" }} />
+                </div>
+              </div>
+
+              {/* Comment bubble */}
+              <div style={{ display: "flex", gap: "9px", marginBottom: "14px" }}>
+                <div style={{
+                  width: "26px", height: "26px", borderRadius: "50%",
+                  background: "linear-gradient(135deg, #0ea5e9, #8b5cf6)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "10px", fontWeight: 700, color: "white", flexShrink: 0,
+                }}>R</div>
+                <div style={{ background: "#f3f4f6", borderRadius: "10px 10px 10px 3px", padding: "8px 11px", flex: 1 }}>
+                  <span style={{ fontSize: "10px", color: "#374151", lineHeight: 1.4 }}>
+                    Looks great! Add a subtle fade at 1:24 and it&apos;s perfect ✓
+                  </span>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: "7px" }}>
+                <button style={{ flex: 1, background: "#111827", color: "white", border: "none", borderRadius: "9px", padding: "9px 0", fontSize: "10.5px", fontWeight: 700, cursor: "default" }}>✓ Approve</button>
+                <button style={{ flex: 1, background: "#f3f4f6", color: "#4b5563", border: "none", borderRadius: "9px", padding: "9px 0", fontSize: "10.5px", fontWeight: 600, cursor: "default" }}>Request revision</button>
               </div>
             </div>
           </div>
 
-          {/* Bottom text + Destinations details */}
+          {/* Bottom: headline + feature chips */}
           <div style={{ position: "relative", zIndex: 10 }}>
             <h2 style={{
               fontSize: "2.1rem",
@@ -183,7 +217,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               letterSpacing: "-0.03em",
               marginBottom: "10px",
             }}>
-              Network & collaborate <br />
+              Review & approve <br />
               in <span style={{
                 display: "inline-block",
                 background: "#e0f2fe",
@@ -192,38 +226,31 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 padding: "2px 14px",
                 fontSize: "1.9rem",
                 fontWeight: 800,
-                boxShadow: "0 4px 14px rgba(224,242,254,0.25)",
                 marginLeft: "4px",
               }}>real-time</span>
             </h2>
             <p style={{
               fontSize: "12px",
-              color: "rgba(255,255,255,0.7)",
+              color: "rgba(255,255,255,0.6)",
               lineHeight: 1.6,
               marginBottom: "20px",
-              maxWidth: "420px",
+              maxWidth: "400px",
             }}>
-              Connect directly with verified editors, coordinate creative briefs, review video timelines, and communicate feedback in real-time.
+              Share your brief, give timestamped feedback, and approve deliveries — all inside EditBridge. No WhatsApp threads, no lost files.
             </p>
 
-            {/* Destinations listing */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.4)", borderRadius: "20px", padding: "6px 12px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#38bdf8" }} />
-                <span style={{ fontSize: "10.5px", fontWeight: 600, color: "#ffffff" }}>Live Chat</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.4)", borderRadius: "20px", padding: "6px 12px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#a78bfa" }} />
-                <span style={{ fontSize: "10.5px", fontWeight: 600, color: "#ffffff" }}>Timeline Comments</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.4)", borderRadius: "20px", padding: "6px 12px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#34d399" }} />
-                <span style={{ fontSize: "10.5px", fontWeight: 600, color: "#ffffff" }}>Instant Reviews</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.4)", borderRadius: "20px", padding: "6px 12px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fb7185" }} />
-                <span style={{ fontSize: "10.5px", fontWeight: 600, color: "#ffffff" }}>Escrow Safe</span>
-              </div>
+              {[
+                { label: "Live Chat",          color: "#38bdf8" },
+                { label: "Timeline Comments",  color: "#a78bfa" },
+                { label: "Instant Reviews",    color: "#34d399" },
+                { label: "Escrow Safe",        color: "#fb7185" },
+              ].map(({ label, color }) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.06)", borderRadius: "20px", padding: "6px 12px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: color, display: "inline-block" }} />
+                  <span style={{ fontSize: "10.5px", fontWeight: 600, color: "#ffffff" }}>{label}</span>
+                </div>
+              ))}
             </div>
           </div>
 

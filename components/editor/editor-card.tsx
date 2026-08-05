@@ -64,22 +64,22 @@ export function EditorCard({
 
   return (
     <div className={cn(
-      "group relative bg-white rounded-2xl border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden",
-      hasHighlight ? "border-sky-400 ring-2 ring-sky-100/50 shadow-[0_0_15px_rgba(14,165,233,0.15)] bg-gradient-to-b from-sky-50/10 via-white to-white" : "border-gray-100"
+      "group relative bg-[#ffffff] rounded-[24px] p-3 border border-neutral-200/50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden",
+      hasHighlight && "ring-2 ring-[#7C3AED]/20 border-[#7C3AED]/40 shadow-[0_0_20px_rgba(124,58,237,0.1)]"
     )}>
-      {/* Visual Thumbnail Preview (16:9 ratio) */}
-      <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+      {/* Visual Thumbnail Preview (16:9 ratio, rounded-2xl) */}
+      <div className="relative aspect-video w-full bg-neutral-50 rounded-[18px] overflow-hidden flex items-center justify-center shrink-0">
         <PortfolioPreview videoUrl={videoUrl ?? null} thumbnailUrl={thumbnailUrl ?? null} altText={shownName} />
 
         {/* Compare checkbox overlay */}
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-2.5 left-2.5 z-10">
           <CompareToggle editorId={id} />
         </div>
 
         {/* Featured badge + save button overlay */}
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+        <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
           {isFeatured && (
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">
+            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-extrabold bg-[#ffffff] text-amber-600 border border-neutral-200/30 shadow-sm">
               <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" /> Featured
             </span>
           )}
@@ -93,134 +93,110 @@ export function EditorCard({
         </div>
       </div>
 
-      {/* Top section */}
-      <div className="p-5 pb-0">
-        <div className="flex items-start gap-3.5 mb-3">
+      {/* Details section */}
+      <div className="pt-4 px-2 pb-0 flex-1 flex flex-col">
+        <div className="flex items-start gap-3 mb-3">
           {/* Avatar */}
           <div className="relative shrink-0">
             <div
-              className={cn("w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm overflow-hidden", gradient)}
+              className={cn("w-12 h-12 rounded-[14px] bg-gradient-to-br flex items-center justify-center shadow-sm overflow-hidden", gradient)}
               style={activeFrame && FRAME_STYLES[activeFrame as FrameKey] ? { boxShadow: FRAME_STYLES[activeFrame as FrameKey] } : undefined}
             >
               {image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={image} alt={shownName} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-white text-lg font-bold">{initials}</span>
+                <span className="text-white text-base font-bold">{initials}</span>
               )}
             </div>
             {isAvailable !== false && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-white" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
             )}
           </div>
 
           {/* Identity */}
-          <div className="min-w-0 flex-1 pr-6">
-            <p className="font-bold text-gray-900 text-sm leading-tight truncate">{shownName}</p>
+          <div className="min-w-0 flex-1">
+            <p className="font-extrabold text-neutral-900 text-[14px] leading-tight truncate">{shownName}</p>
             {title ? (
-              <p className="text-xs text-gray-500 mt-0.5 truncate">{title}</p>
+              <p className="text-[11px] text-neutral-400 font-semibold mt-0.5 truncate">{title}</p>
             ) : niches[0] ? (
-              <p className="text-xs text-gray-500 mt-0.5 truncate">{niches[0]}</p>
+              <p className="text-[11px] text-neutral-400 font-semibold mt-0.5 truncate">{niches[0]}</p>
             ) : skills[0] ? (
-              <p className="text-xs text-gray-400 mt-0.5 truncate">{skills[0]}</p>
+              <p className="text-[11px] text-neutral-400 font-semibold mt-0.5 truncate">{skills[0]}</p>
             ) : null}
             {/* Rating */}
-            <div className="flex items-center gap-1 mt-1.5">
+            <div className="flex items-center gap-1 mt-1">
               {avgRating !== null ? (
                 <>
                   <div className="flex gap-0.5">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={cn("w-3 h-3", i < filledStars ? "fill-amber-400 text-amber-400" : "text-gray-200 fill-gray-100")} />
+                      <Star key={i} className={cn("w-2.5 h-2.5", i < filledStars ? "fill-amber-400 text-amber-400" : "text-neutral-200 fill-neutral-100")} />
                     ))}
                   </div>
-                  <span className="text-xs font-semibold text-gray-700">{avgRating}</span>
-                  <span className="text-[10px] text-gray-400">({reviewCount})</span>
+                  <span className="text-[11px] font-bold text-neutral-700">{avgRating}</span>
+                  <span className="text-[9px] text-neutral-400 font-semibold">({reviewCount})</span>
                 </>
               ) : (
-                <span className="text-[10px] text-gray-400">New editor</span>
+                <span className="text-[9px] text-neutral-400 font-semibold">New editor</span>
               )}
             </div>
-            {/* Trust badges — auto-calculated, never self-reported */}
-            {(onTimeRate != null || (verifiedPortfolioCount ?? 0) > 0) && (
-              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                {onTimeRate != null && (
-                  <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">
-                    <Timer className="w-2.5 h-2.5" /> {onTimeRate}% on-time
-                  </span>
-                )}
-                {(verifiedPortfolioCount ?? 0) > 0 && (
-                  <span className="flex items-center gap-1 text-[10px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 rounded-full px-1.5 py-0.5">
-                    <ShieldCheck className="w-2.5 h-2.5" /> {verifiedPortfolioCount} verified
-                  </span>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
         {/* Bio */}
         {bio ? (
-          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-3">{bio}</p>
+          <p className="text-xs text-neutral-400 leading-relaxed line-clamp-2 mb-3.5 px-0.5">{bio}</p>
         ) : (
-          <div className="mb-3" />
+          <div className="mb-3.5" />
         )}
 
-        {/* Niche chips */}
-        {niches.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
-            {niches.slice(0, 2).map((n) => (
-              <span key={n} className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
-                {n}
-              </span>
-            ))}
-            {niches.length > 2 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-400">+{niches.length - 2}</span>
-            )}
-          </div>
-        )}
-
-        {/* Skills */}
+        {/* Niche & Skill chips */}
         <div className="flex flex-wrap gap-1 mb-3">
-          {skills.slice(0, 3).map((skill) => (
-            <span key={skill} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/15">
+          {niches.slice(0, 1).map((n) => (
+            <span key={n} className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-[#f3f4f6] text-neutral-500 border border-neutral-200/50">
+              {n}
+            </span>
+          ))}
+          {skills.slice(0, 2).map((skill) => (
+            <span key={skill} className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#f3f4f6] text-neutral-500 border border-neutral-200/50">
               {skill}
             </span>
           ))}
-          {skills.length > 3 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200">
-              +{skills.length - 3}
+          {skills.length + niches.length > 3 && (
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-medium bg-neutral-50 text-neutral-400 border border-neutral-100">
+              +{skills.length + niches.length - 3}
             </span>
           )}
         </div>
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-50 mx-5" />
+      <div className="border-t border-neutral-100 mx-2" />
 
       {/* Footer */}
-      <div className="p-4 flex items-center justify-between gap-3 mt-auto">
+      <div className="p-3 pb-2 flex items-center justify-between gap-3 mt-auto">
         <div className="min-w-0">
           {minPrice !== null ? (
-            <p className="text-xs text-gray-400 leading-tight">
-              From <span className="text-sm font-bold text-gray-900">{formatCurrency(minPrice)}</span>
+            <p className="text-[10px] text-neutral-400 font-semibold leading-tight">
+              From <span className="text-xs font-black text-neutral-900">{formatCurrency(minPrice)}</span>
             </p>
           ) : (
-            <p className="text-xs text-gray-400">No packages yet</p>
+            <p className="text-[10px] text-neutral-400 font-semibold">No packages yet</p>
           )}
-          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
             {minDelivery != null && (
-              <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
-                <Clock className="w-3 h-3" /> {minDelivery}d
+              <span className="flex items-center gap-0.5 text-[9px] text-neutral-400 font-bold">
+                <Clock className="w-2.5 h-2.5" /> {minDelivery}d
               </span>
             )}
             {totalOrders > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
-                <CheckCircle2 className="w-3 h-3 text-green-500" /> {totalOrders} orders
+              <span className="flex items-center gap-0.5 text-[9px] text-neutral-400 font-bold">
+                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /> {totalOrders} orders
               </span>
             )}
             {location && (
-              <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
-                <MapPin className="w-3 h-3" /> {location}
+              <span className="flex items-center gap-0.5 text-[9px] text-neutral-400 font-bold">
+                <MapPin className="w-2.5 h-2.5" /> {location}
               </span>
             )}
           </div>
@@ -228,8 +204,7 @@ export function EditorCard({
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           <Link
             href={`/editor/${id}`}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors"
-            style={{ background: "var(--brand-client)" }}
+            className="px-3.5 py-1.5 rounded-xl text-[11px] font-extrabold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
           >
             View Profile
           </Link>

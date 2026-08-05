@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { editors, kycApplications, userPoints } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { EditorSidebar } from "@/components/layout/editor-sidebar";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { EditorKycGuard } from "./editor-kyc-guard";
 import { PushPermissionPrompt } from "@/components/push/push-permission";
 import { isFeatureEnabled } from "@/lib/feature-flags";
@@ -64,6 +65,10 @@ export default async function EditorLayout({
           userId={session.user.userId ?? null}
         />
         <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
+          <DashboardHeader
+            userName={session.user.name ?? ""}
+            userImage={session.user.image ?? null}
+          />
           {children}
         </main>
       </div>

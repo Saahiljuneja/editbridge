@@ -627,7 +627,7 @@ export const featureFlags = pgTable("feature_flags", {
 
 // ─── Blog ─────────────────────────────────────────────────────────────────────
 
-export const blogPostStatusEnum = pgEnum("blog_post_status", ["draft", "published"]);
+export const blogPostStatusEnum = pgEnum("blog_post_status", ["draft", "published", "in-review"]);
 
 export const blogPosts = pgTable("blog_posts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -639,9 +639,35 @@ export const blogPosts = pgTable("blog_posts", {
   readTime: text("read_time").notNull().default("5 min read"),
   status: blogPostStatusEnum("status").notNull().default("draft"),
   authorId: uuid("author_id").notNull().references(() => users.id),
+  views: integer("views").notNull().default(0),
+  loveReactions: integer("love_reactions").notNull().default(0),
+  fireReactions: integer("fire_reactions").notNull().default(0),
+  clapReactions: integer("clap_reactions").notNull().default(0),
+  thumbnailUrl: text("thumbnail_url"),
+  ogImageUrl: text("og_image_url"),
+  twitterCardType: text("twitter_card_type").default("summary_large_image"),
+  canonicalUrl: text("canonical_url"),
   publishedAt: timestamp("published_at", { mode: "date" }),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const blogSubscribers = pgTable("blog_subscribers", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const blogComments = pgTable("blog_comments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  postId: uuid("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+  authorName: text("author_name").notNull(),
+  authorEmail: text("author_email").notNull(),
+  content: text("content").notNull(),
+  status: text("status").notNull().default("pending"),
+  adminReply: text("admin_reply"),
+  isPinned: boolean("is_pinned").notNull().default(false),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
 // ─── Help Center ──────────────────────────────────────────────────────────────
