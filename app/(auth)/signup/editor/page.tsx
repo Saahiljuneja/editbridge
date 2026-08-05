@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
@@ -7,8 +7,10 @@ import Link from "next/link";
 import { signupSchema } from "@/lib/validations";
 import { toast } from "sonner";
 import { allRulesPassed } from "@/components/ui/password-input";
-import { Eye, EyeOff, ArrowRight, Loader2, ShieldCheck, Check, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldCheck, Check, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AuthTabToggle } from "../../auth-tab-toggle";
+import { COUNTRIES } from "../../countries";
 
 const RULES = [
   { label: "At least 1 lowercase letter", test: (p: string) => /[a-z]/.test(p) },
@@ -18,26 +20,17 @@ const RULES = [
   { label: "At least 8 characters",       test: (p: string) => p.length >= 8 },
 ];
 
-function GoogleIcon() {
-  return (
-    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-    </svg>
-  );
-}
-
 export default function EditorSignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [kycAcknowledged, setKycAcknowledged] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [country, setCountry] = useState("");
+  const [dialCode, setDialCode] = useState("+1");
+  const [phone, setPhone] = useState("");
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -50,11 +43,6 @@ export default function EditorSignupPage() {
 
     if (!allRulesPassed(form.password)) {
       setErrors({ password: "Password does not meet all requirements." });
-      return;
-    }
-
-    if (!kycAcknowledged) {
-      setErrors({ kyc: "You must acknowledge the KYC requirement to continue" });
       return;
     }
 
@@ -73,7 +61,7 @@ export default function EditorSignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...result.data, role: "editor" }),
+      body: JSON.stringify({ ...result.data, role: "editor", country, phone: phone ? `${dialCode}${phone}` : undefined }),
     });
 
     if (!res.ok) {
@@ -87,178 +75,279 @@ export default function EditorSignupPage() {
     router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
   }
 
-  const inputClass = "w-full h-[52px] rounded-2xl px-4 text-[15px] text-white placeholder-white/25 outline-none transition-all focus:ring-2 focus:ring-sky-400/40"
-  const inputStyle = { background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)" }
-  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)"; }
-  const onBlur  = (e: React.FocusEvent<HTMLInputElement>) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }
+  async function handleGoogle() {
+    setGoogleLoading(true);
+    await fetch("/api/auth/set-google-role", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: "editor" }),
+    });
+    signIn("google", { callbackUrl: "/editor/dashboard" });
+  }
 
   return (
     <div className="w-full">
-      <div className="mb-7">
-        <h1 className="text-[1.9rem] font-black text-white tracking-tight leading-none mb-2">
-          Become an editor
+      {/* Star Logo & Heading */}
+      <div className="flex flex-col items-center mb-4 text-center">
+        <div className="w-[52px] h-[52px] rounded-[16px] bg-[#111827] flex items-center justify-center shadow-[0_6px_16px_rgba(0,0,0,0.12)] mb-2.5 transition-transform hover:scale-105">
+          <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+          </svg>
+        </div>
+        <h1 className="text-[1.75rem] font-black text-neutral-900 tracking-tight leading-none mb-1">
+          Join as an Editor
         </h1>
-        <p className="text-[14px] text-white/40">
-          Start earning by offering your editing skills
+        <p className="text-[12.5px] text-neutral-400 font-semibold mb-3.5">
+          Offer your skills and keep 85% of every order.
         </p>
+        <div className="w-full max-w-[260px] mx-auto">
+          <AuthTabToggle />
+        </div>
       </div>
 
-      {/* Google */}
-      <button
-        type="button"
-        onClick={async () => {
-          if (!kycAcknowledged) {
-            setErrors({ kyc: "Please acknowledge the KYC requirement first." });
-            return;
-          }
-          setGoogleLoading(true);
-          await fetch("/api/auth/set-google-role", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ role: "editor" }),
-          });
-          signIn("google", { callbackUrl: "/editor/dashboard" });
-        }}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 h-[52px] rounded-2xl text-[14px] font-semibold text-white/80 transition-all active:scale-[0.99] disabled:opacity-50 mb-4"
-        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
-        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.11)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
-      >
-        {googleLoading ? <Loader2 className="w-4 h-4 animate-spin text-white/50" /> : <GoogleIcon />}
-        {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
+      {/* Row of Three Social Icons */}
+      <div className="flex items-center justify-center gap-3.5 mb-4.5">
+        {/* Facebook */}
+        <button
+          type="button"
+          className="w-[42px] h-[42px] rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-transform active:scale-95 shadow-sm hover:opacity-90"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </button>
+        {/* Apple */}
+        <button
+          type="button"
+          className="w-[42px] h-[42px] rounded-full bg-[#000000] flex items-center justify-center text-white transition-transform active:scale-95 shadow-sm hover:bg-neutral-900"
+        >
+          <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.54 9.1 1.51 12.06 1.004 1.45 2.188 3.076 3.755 3.014 1.512-.06 2.083-.974 3.909-.974 1.817 0 2.34.974 3.923.94 1.609-.026 2.65-1.468 3.626-2.89 1.127-1.646 1.59-3.237 1.616-3.32-.034-.014-3.1-1.189-3.13-4.757-.025-2.984 2.449-4.417 2.56-4.484-1.4-2.05-3.56-2.285-4.32-2.333-1.983-.162-3.414 1.01-4.292 1.01zm2.34-4.57c.834-1.012 1.393-2.422 1.24-3.826-1.206.05-2.671.803-3.536 1.817-.768.89-1.44 2.324-1.26 3.707 1.347.108 2.72-.686 3.556-1.698z"/>
+          </svg>
+        </button>
+        {/* Google */}
+        <button
+          type="button"
+          onClick={handleGoogle}
+          disabled={googleLoading}
+          className="w-[42px] h-[42px] rounded-full bg-[#ffffff] border border-[#e5e7eb] flex items-center justify-center text-[#1f2937] transition-transform active:scale-95 shadow-sm hover:bg-[#f9fafb] disabled:opacity-50"
+        >
+          {googleLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+          ) : (
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+          )}
+        </button>
+      </div>
 
       {/* Divider */}
-      <div className="relative mb-5">
+      <div className="relative mb-4.5">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/8" />
+          <div className="w-full border-t border-neutral-100" />
         </div>
         <div className="relative flex justify-center">
-          <span className="px-3 text-[11px] font-semibold text-white/20 uppercase tracking-widest">
-            or email
+          <span className="px-3 text-[10.5px] font-extrabold text-neutral-400 uppercase tracking-widest bg-[#ffffff]">
+            or
           </span>
         </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-
-        {/* Name */}
-        <div className="space-y-1.5">
-          <label htmlFor="name" className="block text-[13px] font-semibold text-white/50">Full name</label>
-          <input id="name" name="name" placeholder="Rahul Kumar" value={form.name} onChange={handleChange}
-            autoComplete="name" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-          {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Name stacked input */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="name" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Full name
+          </label>
+          <input
+            id="name"
+            name="name"
+            placeholder="Rahul Kumar"
+            value={form.name}
+            onChange={handleChange}
+            autoComplete="name"
+            className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6"
+          />
         </div>
+        {errors.name && <p className="text-xs text-red-500 mt-1 pl-1">{errors.name}</p>}
 
-        {/* Email */}
-        <div className="space-y-1.5">
-          <label htmlFor="email" className="block text-[13px] font-semibold text-white/50">Email address</label>
-          <input id="email" name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handleChange}
-            autoComplete="email" className={inputClass} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-          {errors.email && <p className="text-xs text-red-400">{errors.email}</p>}
+        {/* Email stacked input */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="email" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Email address
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={handleChange}
+            autoComplete="email"
+            className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6"
+          />
         </div>
+        {errors.email && <p className="text-xs text-red-500 mt-1 pl-1">{errors.email}</p>}
 
-        {/* Password */}
-        <div className="space-y-1.5">
-          <label htmlFor="password" className="block text-[13px] font-semibold text-white/50">Password</label>
-          <div className="relative">
-            <input id="password" name="password" type={showPassword ? "text" : "password"}
-              placeholder="••••••••" value={form.password} onChange={handleChange}
-              autoComplete="new-password" className={cn(inputClass, "pr-12")}
-              style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-            <button type="button" onClick={() => setShowPassword(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
-              aria-label={showPassword ? "Hide password" : "Show password"}>
+        {/* Password stacked input */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="password" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Password
+          </label>
+          <div className="relative flex items-center">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••••••"
+              value={form.password}
+              onChange={handleChange}
+              autoComplete="new-password"
+              className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="absolute right-0 text-neutral-400 hover:text-neutral-600 transition-colors"
+              style={{ top: "50%", transform: "translateY(-50%)" }}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
               {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
             </button>
           </div>
-          {errors.password && <p className="text-xs text-red-400">{errors.password}</p>}
-          {form.password.length > 0 && (
-            <ul className="space-y-1.5 pt-1">
-              {RULES.map(({ label, test }) => {
-                const passed = test(form.password);
-                return (
-                  <li key={label} className="flex items-center gap-2">
-                    <Check className={cn("w-3.5 h-3.5 shrink-0", passed ? "text-sky-400" : "text-white/20")} />
-                    <span className={cn("text-xs", passed ? "text-sky-400" : "text-white/35")}>{label}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
         </div>
+        {errors.password && <p className="text-xs text-red-500 mt-1 pl-1">{errors.password}</p>}
+        {form.password.length > 0 && (
+          <ul className="space-y-1.5 pt-1.5 pl-1">
+            {RULES.map(({ label, test }) => {
+              const passed = test(form.password);
+              return (
+                <li key={label} className="flex items-center gap-2">
+                  <span className={cn("text-xs font-bold transition-colors", passed ? "text-emerald-600" : "text-neutral-400")}>
+                    {passed ? "✓" : "○"} {label}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
 
-        {/* Confirm password */}
-        <div className="space-y-1.5">
-          <label htmlFor="confirmPassword" className="block text-[13px] font-semibold text-white/50">Confirm password</label>
-          <div className="relative">
-            <input id="confirmPassword" name="confirmPassword" type={showConfirm ? "text" : "password"}
-              placeholder="••••••••" value={form.confirmPassword} onChange={handleChange}
-              autoComplete="new-password" className={cn(inputClass, "pr-12")}
-              style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
-            <button type="button" onClick={() => setShowConfirm(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
-              aria-label={showConfirm ? "Hide password" : "Show password"}>
+        {/* Confirm password stacked input */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="confirmPassword" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Confirm password
+          </label>
+          <div className="relative flex items-center">
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirm ? "text" : "password"}
+              placeholder="••••••••••••"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              autoComplete="new-password"
+              className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirm(v => !v)}
+              className="absolute right-0 text-neutral-400 hover:text-neutral-600 transition-colors"
+              style={{ top: "50%", transform: "translateY(-50%)" }}
+              aria-label={showConfirm ? "Hide password" : "Show password"}
+            >
               {showConfirm ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
             </button>
           </div>
-          {errors.confirmPassword && <p className="text-xs text-red-400">{errors.confirmPassword}</p>}
         </div>
+        {errors.confirmPassword && <p className="text-xs text-red-500 mt-1 pl-1">{errors.confirmPassword}</p>}
 
-        {/* KYC acknowledgement */}
-        <label
-          className="flex items-start gap-3 p-4 rounded-2xl cursor-pointer transition-all"
-          style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.22)" }}
-        >
-          <input
-            type="checkbox"
-            className="mt-0.5 w-4 h-4 accent-sky-400 shrink-0"
-            checked={kycAcknowledged}
-            onChange={(e) => { setKycAcknowledged(e.target.checked); setErrors((p) => ({ ...p, kyc: "" })); }}
-          />
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400/80 shrink-0 mt-0.5" />
-            <span className="text-[13px] text-amber-300/80 leading-relaxed">
-              I understand that identity verification (KYC) is required before I can accept orders.
-            </span>
+        {/* Country of residence */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="country" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Country of residence
+          </label>
+          <select
+            id="country"
+            value={country}
+            onChange={e => {
+              setCountry(e.target.value);
+              const found = COUNTRIES.find(c => c.code === e.target.value);
+              if (found) setDialCode(found.dial);
+            }}
+            required
+            className="w-full bg-transparent text-[14px] text-neutral-900 outline-none mt-0.5 h-6 cursor-pointer"
+          >
+            <option value="">Select country</option>
+            {COUNTRIES.map(c => (
+              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+            ))}
+          </select>
+        </div>
+        {errors.country && <p className="text-xs text-red-500 mt-1 pl-1">{errors.country}</p>}
+
+        {/* Phone number */}
+        <div className="relative rounded-[20px] border border-neutral-200 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <div className="px-4 pt-2.5">
+            <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+              Phone number <span className="text-neutral-300 font-normal">(for 2FA)</span>
+            </label>
           </div>
-        </label>
-        {errors.kyc && <p className="text-xs text-red-400">{errors.kyc}</p>}
+          <div className="flex items-center px-4 pb-2.5 gap-2">
+            <select
+              value={dialCode}
+              onChange={e => setDialCode(e.target.value)}
+              className="bg-transparent text-[14px] text-neutral-900 outline-none h-6 cursor-pointer shrink-0"
+              style={{ maxWidth: "100px" }}
+            >
+              {COUNTRIES.map(c => (
+                <option key={c.code} value={c.dial}>{c.flag} {c.dial}</option>
+              ))}
+            </select>
+            <div className="w-px h-4 bg-neutral-200 shrink-0" />
+            <input
+              type="tel"
+              placeholder="Enter phone number"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              autoComplete="tel"
+              className="flex-1 bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none h-6"
+            />
+          </div>
+        </div>
 
         {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className={cn(
-            "w-full h-[52px] rounded-2xl text-[15px] font-bold text-white mt-1",
-            "flex items-center justify-center gap-2 transition-all active:scale-[0.99]",
-            "disabled:opacity-50 disabled:cursor-not-allowed"
-          )}
+          className="w-full h-[52px] rounded-2xl bg-black text-white hover:bg-neutral-900 text-[14.5px] font-bold transition-all active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)",
-            boxShadow: "0 4px 32px rgba(14,165,233,0.40), inset 0 1px 0 rgba(255,255,255,0.15)",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
           }}
         >
-          {loading
-            ? <Loader2 className="w-5 h-5 animate-spin" />
-            : <><span>Create editor account</span><ArrowRight className="w-4 h-4" /></>
-          }
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <span>Create account</span>
+          )}
         </button>
       </form>
 
       {/* Trust badge */}
-      <div className="flex items-center justify-center gap-1.5 mt-4">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/70 shrink-0" />
-        <span className="text-[12px] text-white/25 font-medium">256-bit SSL · Your data is always safe</span>
+      <div className="flex items-center justify-center gap-1.5 mt-3.5">
+        <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+        <span className="text-[12px] text-neutral-400 font-semibold">256-bit SSL · Your data is always safe</span>
       </div>
 
       {/* Sign-in link */}
-      <div className="mt-6 pt-5 border-t border-white/8 text-center">
-        <p className="text-[14px] text-white/35">
+      <div className="mt-4 pt-3.5 border-t border-neutral-100 text-center">
+        <p className="text-[13px] text-neutral-400 font-medium">
           Already have an account?{" "}
-          <Link href="/login" className="font-bold text-white/80 hover:text-sky-400 transition-colors">
+          <Link href="/login" className="font-bold text-neutral-900 hover:underline">
             Sign in →
           </Link>
         </p>
@@ -266,3 +355,4 @@ export default function EditorSignupPage() {
     </div>
   );
 }
+

@@ -5,8 +5,9 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Eye, EyeOff, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AuthTabToggle } from "../auth-tab-toggle";
 
 function LoginForm() {
   const router = useRouter();
@@ -31,9 +32,6 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
-    // Read directly from the DOM to capture browser-autofilled values.
-    // Autofill often populates the visible input without firing React's onChange,
-    // so React state can be stale ("") even though the field looks filled.
     const emailEl = document.getElementById("email") as HTMLInputElement | null;
     const passwordEl = document.getElementById("password") as HTMLInputElement | null;
     const emailVal = (emailEl?.value?.trim() || email).toLowerCase().trim();
@@ -92,109 +90,113 @@ function LoginForm() {
     await signIn("google", { callbackUrl });
   }
 
-  const inputClass = "w-full h-[52px] rounded-2xl px-4 text-[15px] text-white placeholder-white/25 outline-none transition-all focus:ring-2 focus:ring-sky-400/40"
-
   return (
     <div className="w-full">
-
-      {/* Heading */}
-      <div className="mb-7">
-        <h1 className="text-[1.9rem] font-black text-white tracking-tight leading-none mb-2">
+      {/* Star Logo & Heading */}
+      <div className="flex flex-col items-center mb-4 text-center">
+        <div className="w-[52px] h-[52px] rounded-[16px] bg-[#111827] flex items-center justify-center shadow-[0_6px_16px_rgba(0,0,0,0.12)] mb-2.5 transition-transform hover:scale-105">
+          <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+          </svg>
+        </div>
+        <h1 className="text-[1.75rem] font-black text-neutral-900 tracking-tight leading-none mb-1">
           Welcome back
         </h1>
-        <p className="text-[14px] text-white/40">
-          Sign in to your <span className="text-white/65 font-medium">EditBridge</span> account
+        <p className="text-[12.5px] text-neutral-400 font-semibold mb-3.5">
+          Sign in to your EditBridge account.
         </p>
+        <div className="w-full max-w-[260px] mx-auto">
+          <AuthTabToggle />
+        </div>
       </div>
 
-      {/* Google */}
-      <button
-        type="button"
-        onClick={handleGoogle}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 h-[52px] rounded-2xl text-[14px] font-semibold text-white/80 transition-all active:scale-[0.99] disabled:opacity-50 mb-4"
-        style={{
-          background: "rgba(255,255,255,0.07)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          backdropFilter: "blur(8px)",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.11)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
-      >
-        {googleLoading ? <Loader2 className="w-4 h-4 animate-spin text-white/50" /> : <GoogleIcon />}
-        {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
+      {/* Row of Three Social Icons */}
+      <div className="flex items-center justify-center gap-3.5 mb-4.5">
+        {/* Facebook */}
+        <button
+          type="button"
+          className="w-[42px] h-[42px] rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-transform active:scale-95 shadow-sm hover:opacity-90"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </button>
+        {/* Apple */}
+        <button
+          type="button"
+          className="w-[42px] h-[42px] rounded-full bg-[#000000] flex items-center justify-center text-white transition-transform active:scale-95 shadow-sm hover:bg-neutral-900"
+        >
+          <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.54 9.1 1.51 12.06 1.004 1.45 2.188 3.076 3.755 3.014 1.512-.06 2.083-.974 3.909-.974 1.817 0 2.34.974 3.923.94 1.609-.026 2.65-1.468 3.626-2.89 1.127-1.646 1.59-3.237 1.616-3.32-.034-.014-3.1-1.189-3.13-4.757-.025-2.984 2.449-4.417 2.56-4.484-1.4-2.05-3.56-2.285-4.32-2.333-1.983-.162-3.414 1.01-4.292 1.01zm2.34-4.57c.834-1.012 1.393-2.422 1.24-3.826-1.206.05-2.671.803-3.536 1.817-.768.89-1.44 2.324-1.26 3.707 1.347.108 2.72-.686 3.556-1.698z"/>
+          </svg>
+        </button>
+        {/* Google */}
+        <button
+          type="button"
+          onClick={handleGoogle}
+          disabled={googleLoading}
+          className="w-[42px] h-[42px] rounded-full bg-[#ffffff] border border-[#e5e7eb] flex items-center justify-center text-[#1f2937] transition-transform active:scale-95 shadow-sm hover:bg-[#f9fafb] disabled:opacity-50"
+        >
+          {googleLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+          ) : (
+            <GoogleIcon />
+          )}
+        </button>
+      </div>
 
       {/* Divider */}
-      <div className="relative mb-5">
+      <div className="relative mb-4.5">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/8" />
+          <div className="w-full border-t border-neutral-100" />
         </div>
         <div className="relative flex justify-center">
-          <span className="px-3 text-[11px] font-semibold text-white/20 uppercase tracking-widest"
-            style={{ background: "transparent" }}>
-            or email
+          <span className="px-3 text-[10.5px] font-extrabold text-neutral-400 uppercase tracking-widest bg-[#ffffff]">
+            or
           </span>
         </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleCredentials} className="space-y-4">
-
-        {/* Email */}
-        <div className="space-y-1.5">
-          <label htmlFor="email" className="block text-[13px] font-semibold text-white/50">
-            Email address
+      <form onSubmit={handleCredentials} className="space-y-3">
+        {/* Email stacked input */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="email" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Username or Email
           </label>
           <input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder="robert.fox@gmail.com"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className={inputClass}
-            style={{
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.10)",
-            }}
-            onFocus={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)"; }}
-            onBlur={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }}
+            className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6"
           />
         </div>
 
-        {/* Password */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="block text-[13px] font-semibold text-white/50">
-              Password
-            </label>
-            <Link href="/forgot-password" className="text-[13px] font-semibold text-sky-400 hover:text-sky-300 transition-colors">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="relative">
+        {/* Password stacked input */}
+        <div className="relative rounded-[20px] border border-neutral-200 px-4 py-2.5 bg-[#ffffff] transition-all focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black text-left">
+          <label htmlFor="password" className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none">
+            Password
+          </label>
+          <div className="relative flex items-center">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder="••••••••••••"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className={cn(inputClass, "pr-12")}
-              style={{
-                background: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.10)",
-              }}
-              onFocus={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)"; }}
-              onBlur={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }}
+              className="w-full bg-transparent text-[14px] text-neutral-900 placeholder-neutral-300 outline-none mt-0.5 h-6 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+              className="absolute right-0 text-neutral-400 hover:text-neutral-600 transition-colors"
+              style={{ top: "50%", transform: "translateY(-50%)" }}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
@@ -202,38 +204,51 @@ function LoginForm() {
           </div>
         </div>
 
+        {/* Remember me & Forgot Password */}
+        <div className="flex items-center justify-between pt-0.5 pb-1">
+          <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              className="w-4.5 h-4.5 rounded border-neutral-300 accent-black cursor-pointer"
+            />
+            <span className="text-[12.5px] text-neutral-400 font-bold">Remember me</span>
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-[12.5px] font-bold text-neutral-500 hover:text-neutral-900 transition-colors"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className={cn(
-            "w-full h-[52px] rounded-2xl text-[15px] font-bold text-white mt-1",
-            "flex items-center justify-center gap-2 transition-all active:scale-[0.99]",
-            "disabled:opacity-50 disabled:cursor-not-allowed"
-          )}
+          className="w-full h-[52px] rounded-2xl bg-black text-white hover:bg-neutral-900 text-[14.5px] font-bold transition-all active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)",
-            boxShadow: "0 4px 32px rgba(14,165,233,0.40), inset 0 1px 0 rgba(255,255,255,0.15)",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
           }}
         >
-          {loading
-            ? <Loader2 className="w-5 h-5 animate-spin" />
-            : <><span>Sign in</span><ArrowRight className="w-4 h-4" /></>
-          }
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <span>Sign in</span>
+          )}
         </button>
       </form>
 
       {/* Trust badge */}
-      <div className="flex items-center justify-center gap-1.5 mt-4">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/70 shrink-0" />
-        <span className="text-[12px] text-white/25 font-medium">256-bit SSL · Your data is always safe</span>
+      <div className="flex items-center justify-center gap-1.5 mt-3.5">
+        <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+        <span className="text-[12px] text-neutral-400 font-semibold">256-bit SSL · Your data is always safe</span>
       </div>
 
-      {/* Divider + sign up */}
-      <div className="mt-6 pt-5 border-t border-white/8 text-center">
-        <p className="text-[14px] text-white/35">
+      {/* Divider + Sign Up link */}
+      <div className="mt-4 pt-3.5 border-t border-neutral-100 text-center">
+        <p className="text-[13px] text-neutral-400 font-medium">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-bold text-white/80 hover:text-sky-400 transition-colors">
+          <Link href="/signup" className="font-bold text-neutral-900 hover:underline">
             Create one free →
           </Link>
         </p>
@@ -249,6 +264,7 @@ export default function LoginPage() {
     </Suspense>
   );
 }
+
 
 function GoogleIcon() {
   return (
