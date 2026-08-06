@@ -36,7 +36,7 @@ export default async function TransactionsPage() {
     .innerJoin(users, eq(users.id, editors.userId))
     .where(eq(orders.clientId, userId))
     .orderBy(desc(orders.createdAt))
-    .limit(200);
+    .limit(50);
 
   const completed = txns.filter((t) => t.status === "completed");
   const totalSpent = completed.reduce((s, t) => s + t.totalAmount, 0);
@@ -53,7 +53,7 @@ export default async function TransactionsPage() {
         <div className="grid grid-cols-3 gap-4">
           {[
             { label: "Total spent", value: formatCurrency(totalSpent), icon: IndianRupee, color: "var(--brand-client)" },
-            { label: "Orders placed", value: String(txns.filter((t) => t.status !== "cancelled").length), icon: ShoppingBag, color: "var(--brand-editor)" },
+            { label: "Orders placed", value: String(txns.filter((t) => t.status !== "cancelled").length), icon: ShoppingBag, color: "var(--brand-client)" },
             { label: "Avg per order", value: avgOrder ? formatCurrency(avgOrder) : "—", icon: TrendingUp, color: "#059669" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">

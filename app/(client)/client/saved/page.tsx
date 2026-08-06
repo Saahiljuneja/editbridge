@@ -178,7 +178,7 @@ export default async function SavedEditorsPage() {
                         href={`/checkout/${lastOrder.packageId}?reorder=true&orderId=${lastOrder.orderId}`}
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-colors",
-                          isAway || !editor.isAvailable ? "bg-gray-300 pointer-events-none" : "bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)]"
+                          isAway || !editor.isAvailable ? "bg-gray-300 pointer-events-none" : "bg-[var(--brand-client)] hover:bg-sky-600"
                         )}
                       >
                         <RefreshCw className="w-3.5 h-3.5" /> Re-order
@@ -186,7 +186,7 @@ export default async function SavedEditorsPage() {
                     ) : (
                       <Link
                         href={`/editor/${editor.editorId}`}
-                        className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] transition-colors"
+                        className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[var(--brand-client)] hover:bg-sky-600 transition-colors"
                       >
                         View profile
                       </Link>

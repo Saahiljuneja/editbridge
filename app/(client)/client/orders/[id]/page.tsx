@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -403,7 +405,7 @@ export default async function ClientOrderDetailPage({
             )}
 
             {/* Extension request panel */}
-            {order.extensionStatus === "pending" && (
+            {order.extensionStatus && (
               <ExtensionPanel
                 orderId={order.id}
                 viewerRole="client"

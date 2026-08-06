@@ -75,7 +75,7 @@ export default async function ClientAnalyticsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-100">
-        <div className="px-6 py-5 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Spending Analytics</h1>
             <p className="text-sm text-gray-400 mt-0.5">Your EditBridge spending at a glance</p>

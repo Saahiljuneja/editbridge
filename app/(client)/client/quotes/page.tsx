@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { QuoteCountdown } from "@/components/quotes/quote-countdown";
 import { QuoteDeclineButton } from "./quote-decline-button";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 const STATUS_CONFIG: Record<
   string,
@@ -36,8 +37,8 @@ export default async function ClientQuotesPage() {
   const session = await auth();
   if (!session || session.user?.role !== "client") redirect("/login");
 
-  const quotes = await db
-    .select({
+  const [quotes, platformConfig] = await Promise.all([
+    db.select({
       id: quoteRequests.id,
       videoType: quoteRequests.videoType,
       brief: quoteRequests.brief,
@@ -56,7 +57,10 @@ export default async function ClientQuotesPage() {
     .innerJoin(editors, eq(editors.id, quoteRequests.editorId))
     .innerJoin(users, eq(users.id, editors.userId))
     .where(eq(quoteRequests.clientId, session.user.userId!))
-    .orderBy(desc(quoteRequests.createdAt));
+    .orderBy(desc(quoteRequests.createdAt)),
+    getPlatformSettings(),
+  ]);
+  const processingFeePct = platformConfig.processingFeePct / 100;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -196,7 +200,7 @@ export default async function ClientQuotesPage() {
                               Accept &amp; Pay{" "}
                               {formatCurrency(
                                 quote.offeredPrice +
-                                  Math.round(quote.offeredPrice * 0.04)
+                                  Math.round(quote.offeredPrice * processingFeePct)
                               )}
                             </Link>
                             <QuoteDeclineButton quoteId={quote.id} />

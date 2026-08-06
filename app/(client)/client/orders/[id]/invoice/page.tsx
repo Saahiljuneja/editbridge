@@ -17,6 +17,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const [order] = await db
     .select({
       id: orders.id,
+      editorId: orders.editorId,
       status: orders.status,
       brief: orders.brief,
       totalAmount: orders.totalAmount,
@@ -44,21 +45,19 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
     .select({ name: users.name, email: users.email })
     .from(editors)
     .innerJoin(users, eq(users.id, editors.userId))
-    .where(eq(editors.id,
-      (await db.select({ editorId: orders.editorId }).from(orders).where(eq(orders.id, id)).limit(1))[0]?.editorId ?? ""
-    ))
+    .where(eq(editors.id, order.editorId))
     .limit(1);
 
   const processingFee = order.processingFee ?? 0;
   const packageAmount = order.totalAmount - processingFee;
-  const gst = Math.round(packageAmount * 0.18);
-  const subtotal = packageAmount - gst;
+  const subtotal = Math.round(packageAmount / 1.18);
+  const gst = packageAmount - subtotal;
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       {/* Print/Back bar — hidden on print */}
       <div className="max-w-2xl mx-auto mb-6 flex items-center justify-between print:hidden">
-        <a href={`/orders/${order.id}`} className="text-sm text-gray-500 hover:text-gray-800">← Back to order</a>
+        <a href={`/client/orders/${order.id}`} className="text-sm text-gray-500 hover:text-gray-800">← Back to order</a>
         <PrintButton />
       </div>
 

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -34,7 +36,7 @@ export default async function ReviewPage({
     .limit(1);
 
   if (!order) notFound();
-  if (order.status !== "completed") redirect(`/orders/${id}`);
+  if (order.status !== "completed") redirect(`/client/orders/${id}`);
 
   const [editorUser, existingReview] = await Promise.all([
     db
@@ -66,7 +68,7 @@ export default async function ReviewPage({
       <div className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href={`/orders/${id}`} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">
+            <Link href={`/client/orders/${id}`} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">
               ← Order
             </Link>
             <span className="text-gray-200">/</span>

@@ -107,7 +107,7 @@ export default async function ClientReviewsPage() {
 
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
                   <span className="text-xs text-gray-400">{formatDate(review.createdAt)}</span>
-                  <Link href={`/orders/${review.orderId}`} className="text-xs font-medium text-[var(--brand-client)] hover:underline">
+                  <Link href={`/client/orders/${review.orderId}`} className="text-xs font-medium text-[var(--brand-client)] hover:underline">
                     View order
                   </Link>
                 </div>

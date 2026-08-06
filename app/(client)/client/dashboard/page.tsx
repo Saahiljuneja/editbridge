@@ -98,6 +98,7 @@ export default async function ClientDashboardPage() {
         .from(orders)
         .where(and(eq(orders.clientId, userId), inArray(orders.editorId, savedEditorIds), sql`${orders.packageId} IS NOT NULL`))
         .orderBy(desc(orders.createdAt))
+        .limit(savedEditorIds.length * 3)
     : [];
   const savedLastOrderByEditor = new Map<string, { orderId: string; packageId: string }>();
   for (const o of savedLastOrders) {

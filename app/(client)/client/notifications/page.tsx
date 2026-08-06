@@ -13,7 +13,7 @@ import { MarkAllReadButton } from "./mark-all-read-button";
 
 const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
   new_order:          { icon: ShoppingBag,   color: "text-blue-600",   bg: "bg-blue-50" },
-  new_message:        { icon: MessageSquare, color: "text-violet-600", bg: "bg-violet-50" },
+  new_message:        { icon: MessageSquare, color: "text-[var(--brand-client)]", bg: "bg-[var(--brand-client)]/10" },
   revision_requested: { icon: AlertCircle,   color: "text-amber-600",  bg: "bg-amber-50" },
   delivery_received:  { icon: CheckCircle2,  color: "text-green-600",  bg: "bg-green-50" },
   review_received:    { icon: Star,          color: "text-amber-500",  bg: "bg-amber-50" },

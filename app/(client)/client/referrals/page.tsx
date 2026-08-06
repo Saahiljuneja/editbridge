@@ -16,13 +16,14 @@ interface ReferralData {
 
 export default function ReferralsPage() {
   const [data, setData] = useState<ReferralData | null>(null);
+  const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch("/api/referrals")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setData(d); })
-      .catch(() => {});
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d => setData(d))
+      .catch(() => setError(true));
   }, []);
 
   async function copy() {
@@ -76,7 +77,9 @@ export default function ReferralsPage() {
         {/* Your link */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <h2 className="font-semibold text-gray-900">Your referral link</h2>
-          {data ? (
+          {error ? (
+            <p className="text-sm text-red-500">Failed to load referral data. Please refresh the page.</p>
+          ) : data ? (
             <>
               <div className="flex gap-2">
                 <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 font-mono break-all">
@@ -88,7 +91,7 @@ export default function ReferralsPage() {
                     "px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors shrink-0",
                     copied
                       ? "bg-green-100 text-green-700"
-                      : "bg-[var(--brand-client)] text-white hover:bg-[var(--brand-editor-hover)]"
+                      : "bg-[var(--brand-client)] text-white hover:bg-sky-600"
                   )}
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

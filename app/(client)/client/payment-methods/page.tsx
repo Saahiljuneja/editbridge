@@ -94,7 +94,7 @@ export default async function PaymentMethodsPage() {
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <p className="font-semibold text-gray-900 text-sm">Recent payments</p>
-              <Link href="/transactions" className="text-xs font-semibold text-[var(--brand-client)] hover:underline">
+              <Link href="/client/transactions" className="text-xs font-semibold text-[var(--brand-client)] hover:underline">
                 View all →
               </Link>
             </div>
@@ -110,7 +110,7 @@ export default async function PaymentMethodsPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-xs text-gray-400">{formatDate(p.createdAt)}</p>
-                    <Link href={`/orders/${p.id}`}
+                    <Link href={`/client/orders/${p.id}`}
                       className="text-xs font-semibold text-[var(--brand-client)] hover:underline">
                       View order
                     </Link>

@@ -45,8 +45,9 @@ export default async function ClientChatPage({
     db
       .select()
       .from(messages)
-      .where(eq(messages.orderId, orderId))
-      .orderBy(asc(messages.createdAt)),
+      .where(and(eq(messages.orderId, orderId), eq(messages.isBlocked, false)))
+      .orderBy(asc(messages.createdAt))
+      .limit(100),
   ]);
 
   const editorName = displayNameFromFull(editorUser?.name);

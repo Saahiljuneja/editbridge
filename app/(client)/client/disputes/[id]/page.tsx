@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -65,7 +67,7 @@ export default async function DisputeDetailPage({
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       <div className="mb-4">
-        <Link href={`/orders/${dispute.orderId}`} className="text-sm text-muted-foreground hover:text-foreground">
+        <Link href={`/client/orders/${dispute.orderId}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← Back to order
         </Link>
       </div>
@@ -164,7 +166,7 @@ export default async function DisputeDetailPage({
         )}
 
         <Link
-          href={`/orders/${dispute.orderId}`}
+          href={`/client/orders/${dispute.orderId}`}
           className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
         >
           View order
