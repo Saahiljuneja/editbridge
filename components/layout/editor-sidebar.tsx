@@ -36,7 +36,7 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
     label: "Profile", icon: User,
     items: [
       { href: "/editor/profile",         label: "My Profile",    icon: User },
-      { href: "/editor/saved-portfolio", label: "Saved",         icon: Bookmark },
+      { href: "/editor/saved-portfolio", label: "Bookmarked",    icon: Bookmark },
       { href: "/editor/packages",        label: "Services",      icon: Package },
       { href: "/editor/reviews",         label: "Reviews",       icon: Star },
       { href: "/editor/clients",         label: "Clients",       icon: Users },

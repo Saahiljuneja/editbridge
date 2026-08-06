@@ -16,28 +16,19 @@ export function EditorKycGuard({
   const pathname = usePathname();
   const router = useRouter();
 
+  const onKycPath = pathname.startsWith("/editor/kyc");
+
+  const redirectTo =
+    kycStatus === "pending" && !onKycPath
+      ? "/editor/kyc/pending"
+      : (kycStatus === "rejected" || kycStatus === "expired") && !onKycPath
+        ? "/editor/kyc/resubmit"
+        : null;
+
   useEffect(() => {
-    // Not submitted yet — allow dashboard access, banner handles the prompt
-    if (kycStatus === "not_submitted") return;
+    if (redirectTo) router.replace(redirectTo);
+  }, [redirectTo, router]);
 
-    // Submitted and awaiting review
-    if (kycStatus === "pending") {
-      if (!pathname.startsWith("/editor/kyc")) {
-        router.replace("/editor/kyc/pending");
-      }
-      return;
-    }
-
-    // Rejected or expired — send back to KYC resubmit form
-    if (kycStatus === "rejected" || kycStatus === "expired") {
-      if (!pathname.startsWith("/editor/kyc")) {
-        router.replace("/editor/kyc/resubmit");
-      }
-      return;
-    }
-
-    // approved — no restriction
-  }, [kycStatus, pathname, router]);
-
+  if (redirectTo) return null;
   return <>{children}</>;
 }

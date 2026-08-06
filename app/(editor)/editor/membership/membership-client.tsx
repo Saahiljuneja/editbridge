@@ -135,9 +135,6 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
           Editor Membership plans (Hobby, Starter, Pro, Agency) are currently disabled by the administration. 
           Once active, you will be able to upgrade your account to lower your platform commissions, upload more portfolio items, and get search boosts.
         </p>
-        <div className="text-xs text-gray-400 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50">
-          Feature flag: <code className="font-mono text-amber-600">editor_membership_pricing</code> is currently inactive.
-        </div>
       </div>
     );
   }
