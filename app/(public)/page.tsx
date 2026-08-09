@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   AnimatedHero,
   AnimatedStats,
@@ -15,11 +16,27 @@ import {
   ComparisonSection,
   LeaderboardTeaser,
   BlogPreviewSection,
-  CombinedStrip,
   GuaranteeBar,
   BackToTopButton,
   EscrowFlowSection,
+  AnimatedFindEditorCTA,
 } from "@/components/home/animated-sections";
+
+export const metadata: Metadata = {
+  title: "EditBridge — Hire KYC-Verified Video Editors in India",
+  description: "Browse India's most trusted marketplace for video editing and thumbnail design. Every editor is government ID verified. Payments held in escrow until you approve.",
+  openGraph: {
+    title: "EditBridge — KYC-Verified Video Editors",
+    description: "Hire verified video editors for YouTube, Reels, Shorts, Podcasts and more. Escrow-protected payments. Dispute resolution included.",
+    type: "website",
+    url: "https://editbridge.in",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EditBridge — KYC-Verified Video Editors",
+    description: "India's trusted marketplace for video editing. Escrow-protected. Government ID verified.",
+  },
+};
 import { CategoryBrowseSection } from "@/components/home/category-browse-section";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { db } from "@/lib/db";
@@ -233,14 +250,17 @@ export default async function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <BackToTopButton />
+      <StickyCtaBar />
       <div className="flex flex-col">
         <ScrollProgressBar />
         {/* 1. Hero */}
         <AnimatedHero availableCount={availableCount} />
         {/* 2. Editor cards — show who's on the platform immediately */}
-        <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} />
+        <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} editorCount={editorCount} />
         {/* 3. Categories — browse by type right away */}
         <CategoryBrowseSection />
+        {/* Find Editor CTA Quiz */}
+        {quizEnabled && <AnimatedFindEditorCTA />}
         {/* Escrow flow — builds payment trust */}
         <EscrowFlowSection />
         {/* Stats */}
@@ -253,6 +273,9 @@ export default async function HomePage() {
         {/* 11. Leaderboard only when editors have real completed orders */}
         {showLeaderboard && <LeaderboardTeaser editors={leaderboardEditors} />}
         <AnimatedWhySection />
+
+        {/* Before / After comparison section */}
+        <BeforeAfterSection />
 
         <ComparisonSection />
         <AnimatedScrollingReviews />

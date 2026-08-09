@@ -14,7 +14,7 @@ const LINKS = {
   ],
   "For Editors": [
     { label: "Join as editor",  href: "/signup/editor" },
-    { label: "KYC verification",href: "/how-it-works" },
+    { label: "KYC verification",href: "/how-it-works#kyc" },
   ],
   "Company": [
     { label: "About us",        href: "/about" },
@@ -48,15 +48,15 @@ export function Footer({ logoUrl, platformName, socialTwitter, socialInstagram, 
   ].filter(s => s.href);
 
   return (
-    <footer className="bg-[#07050f] border-t border-white/5">
+    <footer className="bg-white border-t border-neutral-200/60">
       {/* Trust bar */}
-      <div className="border-b border-white/5">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5">
+      <div className="border-b border-neutral-200/50 bg-neutral-50/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
             {TRUST_BADGES.map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-2">
-                <Icon className="w-4 h-4 text-[#8B7FE8]" />
-                <span className="text-xs text-white/50 font-medium">{label}</span>
+                <Icon className="w-4 h-4 text-neutral-800" />
+                <span className="text-[11px] text-neutral-500 font-bold uppercase tracking-wider">{label}</span>
               </div>
             ))}
           </div>
@@ -68,22 +68,22 @@ export function Footer({ logoUrl, platformName, socialTwitter, socialInstagram, 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
+            <Link href="/" className="flex items-center gap-2 mb-4 group">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={logoUrl} alt={name} className="h-7 w-auto max-w-[120px] object-contain" />
               ) : (
                 <>
-                  <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
-                    <span className="text-white font-extrabold text-xs">E</span>
+                  <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center">
+                    <span className="text-white font-black text-xs">E</span>
                   </div>
-                  <span className="text-lg font-extrabold text-white tracking-tight">
-                    Edit<span className="text-[#8B7FE8]">Bridge</span>
+                  <span className="text-lg font-black text-black tracking-tight">
+                    Edit<span className="text-neutral-500">Bridge</span>
                   </span>
                 </>
               )}
             </Link>
-            <p className="text-sm text-white/40 leading-relaxed max-w-xs">
+            <p className="text-xs text-neutral-400 font-medium leading-relaxed max-w-xs">
               India&apos;s trusted marketplace for video editing and thumbnail design.
             </p>
 
@@ -93,7 +93,7 @@ export function Footer({ logoUrl, platformName, socialTwitter, socialInstagram, 
                 {socials.map(({ href, label, svg }) => (
                   <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                     aria-label={label}
-                    className="text-white/30 hover:text-white/70 transition-colors">
+                    className="text-neutral-400 hover:text-black transition-colors">
                     {svg}
                   </a>
                 ))}
@@ -104,13 +104,13 @@ export function Footer({ logoUrl, platformName, socialTwitter, socialInstagram, 
           {/* Link columns */}
           {Object.entries(LINKS).map(([heading, links]) => (
             <div key={heading}>
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-4">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400 mb-4 select-none">
                 {heading}
               </h3>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {links.map(({ label, href }) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-white/50 hover:text-white transition-colors">
+                    <Link href={href} className="text-sm text-neutral-500 hover:text-black transition-colors font-medium">
                       {label}
                     </Link>
                   </li>
@@ -121,11 +121,11 @@ export function Footer({ logoUrl, platformName, socialTwitter, socialInstagram, 
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/25">
+        <div className="mt-12 pt-8 border-t border-neutral-200/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-neutral-400 font-medium">
             © {new Date().getFullYear()} {name}. All rights reserved.
           </p>
-          <p className="text-xs text-white/25">
+          <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">
             15% commission · Escrow-protected · KYC-verified
           </p>
         </div>

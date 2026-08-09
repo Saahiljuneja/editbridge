@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Browse Verified Video Editors — EditBridge",
+  description: "Find and hire KYC-verified video editors for YouTube, Reels, Shorts, Podcasts and more. Compare packages, check portfolios, and book with escrow protection.",
+};
 import { SearchBar } from "@/components/common/search-bar";
 import { EditorCard } from "@/components/editor/editor-card";
 import { ComparePanel } from "@/components/browse/compare-panel";
@@ -23,7 +29,8 @@ interface BrowseSearchParams {
 }
 
 async function fetchEditors(params: BrowseSearchParams) {
-  const url = new URL(`${process.env.NEXT_PUBLIC_APP_URL}/api/editors`);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${process.env.PORT ?? 3000}`;
+  const url = new URL(`${baseUrl}/api/editors`);
   if (params.q) url.searchParams.set("q", params.q);
   if (params.niche) url.searchParams.set("niche", params.niche);
   if (params.experience) url.searchParams.set("experience", params.experience);
@@ -104,7 +111,7 @@ function PaginationBar({ page, totalPages, searchParams }: { page: number; total
       {page > 1 && (
         <Link
           href={{ query: { ...searchParams, page: page - 1 } }}
-          className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 rounded-full border border-neutral-200 text-xs font-bold uppercase tracking-wider text-neutral-600 hover:bg-neutral-50 transition-colors"
         >
           ← Previous
         </Link>
@@ -117,10 +124,10 @@ function PaginationBar({ page, totalPages, searchParams }: { page: number; total
               key={p}
               href={{ query: { ...searchParams, page: p } }}
               className={cn(
-                "w-9 h-9 flex items-center justify-center rounded-xl text-sm font-medium transition-colors",
+                "w-9 h-9 flex items-center justify-center rounded-full text-xs font-bold transition-colors",
                 p === page
-                  ? "bg-[var(--brand-client)] text-white"
-                  : "text-gray-500 hover:bg-gray-100"
+                  ? "bg-black text-white shadow-sm"
+                  : "text-neutral-500 hover:bg-neutral-50"
               )}
             >
               {p}
@@ -131,7 +138,7 @@ function PaginationBar({ page, totalPages, searchParams }: { page: number; total
       {page < totalPages && (
         <Link
           href={{ query: { ...searchParams, page: page + 1 } }}
-          className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 rounded-full border border-neutral-200 text-xs font-bold uppercase tracking-wider text-neutral-600 hover:bg-neutral-50 transition-colors"
         >
           Next →
         </Link>
@@ -191,36 +198,30 @@ export default async function BrowsePage({
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-safe">
+    <div className="min-h-screen bg-white pb-safe">
       {/* Premium Hero */}
-      <div className="relative bg-[#080E1A] overflow-hidden">
-        {/* Ambient glow layers */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-64 rounded-full bg-[#0EA5E9]/20 blur-[96px]" />
-          <div className="absolute bottom-0 left-1/4 w-64 h-48 rounded-full bg-[#7C3AED]/15 blur-[72px]" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-48 rounded-full bg-[#0EA5E9]/10 blur-[72px]" />
-        </div>
+      <div className="relative bg-white eb-contour-bg overflow-hidden border-b border-neutral-200/60 py-10">
         {/* Subtle dot-grid texture */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)", backgroundSize: "28px 28px" }}
+          className="pointer-events-none absolute inset-0 opacity-[0.02]"
+          style={{ backgroundImage: "radial-gradient(circle, #000000 1px, transparent 1px)", backgroundSize: "28px 28px" }}
         />
 
-        <div className="relative max-w-3xl mx-auto px-6 pt-12 pb-10 text-center">
+        <div className="relative max-w-3xl mx-auto px-6 pt-6 pb-6 text-center">
           {/* Live badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs text-white/60 font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 rounded-full border border-neutral-200/60 bg-neutral-50/50 text-[11px] text-neutral-500 font-bold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             KYC-verified editors · Escrow-protected · ₹0 fraud, ever
           </div>
 
           {/* Heading */}
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-[1.1] mb-3">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-black leading-[1.1] mb-3">
             Find your perfect{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-violet-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-neutral-500 font-semibold">
               video editor
             </span>
           </h1>
-          <p className="text-sm md:text-base text-white/40 mb-8 font-medium">
+          <p className="text-sm md:text-base text-neutral-500 mb-8 font-medium">
             Browse 100+ hand-verified editors. Pay only when you approve the work.
           </p>
 
@@ -229,26 +230,26 @@ export default async function BrowsePage({
             <Suspense>
               <SearchBar
                 placeholder="Search by name, skill, or niche…"
-                inputClassName="py-4 pl-12 pr-4 text-base rounded-2xl border-transparent bg-white shadow-2xl shadow-black/40 focus:ring-2 focus:ring-sky-400/40 focus:border-transparent placeholder:text-gray-400"
+                inputClassName="py-4 pl-12 pr-4 text-sm rounded-full border border-neutral-200 bg-neutral-50/50 focus:bg-white focus:border-black focus:ring-0 placeholder:text-neutral-400 shadow-sm transition-all duration-300"
               />
             </Suspense>
           </div>
 
           {/* Trust chips */}
           <div className="flex items-center justify-center gap-6 mt-8 flex-wrap">
-            <div className="flex items-center gap-1.5 text-xs text-white/40 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-bold uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
               KYC-verified
             </div>
-            <div className="w-px h-3 bg-white/10 shrink-0" />
-            <div className="flex items-center gap-1.5 text-xs text-white/40 font-medium">
-              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
+            <div className="w-px h-3 bg-neutral-200 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-bold uppercase tracking-wider">
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
               4.9★ avg rating
             </div>
-            <div className="w-px h-3 bg-white/10 shrink-0" />
-            <div className="flex items-center gap-1.5 text-xs text-white/40 font-medium">
-              <Lock className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-              Escrow-protected payments
+            <div className="w-px h-3 bg-neutral-200 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-bold uppercase tracking-wider">
+              <Lock className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
+              Escrow-protected
             </div>
           </div>
         </div>

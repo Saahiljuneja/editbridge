@@ -10,7 +10,7 @@ import {
   Star, ShieldCheck, Lock, ArrowRight, CheckCircle,
   Clock, Users, Zap, FileCheck, MessageSquare, ThumbsUp,
   ChevronLeft, ChevronRight, ArrowUpRight, Bell, Package,
-  TrendingUp, X, Check, Search, ChevronUp,
+  TrendingUp, X, ChevronDown, Search, ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PortfolioPreview } from "@/components/common/portfolio-preview";
@@ -116,7 +116,6 @@ const NICHES = ["YouTube.", "Reels.", "Shorts.", "Podcasts.", "Ads."];
 
 export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }) {
   const [idx, setIdx] = useState(0);
-  const [progress, setProgress] = useState(54);
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const headY  = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
@@ -133,8 +132,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
   useEffect(() => {
     if (prefersReduced) return;
     const a = setInterval(() => setIdx(i => (i + 1) % NICHES.length), 2800);
-    const b = setInterval(() => setProgress(p => p >= 95 ? 24 : p + 1), 95);
-    return () => { clearInterval(a); clearInterval(b); };
+    return () => clearInterval(a);
   }, [prefersReduced]);
 
   return (
@@ -271,15 +269,13 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                   <div key={k} className="w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-[9px] font-bold text-white" style={{ background: bg }}>{i}</div>
                 ))}
               </div>
-              <p className="text-white/40 text-xs"><span className="text-white/70 font-semibold">Early creators</span> already on EditBridge</p>
+              <p className="text-white/40 text-xs"><span className="text-white/70 font-semibold">Creators across India</span> trust EditBridge</p>
               <div className="flex items-center gap-1 pl-4 border-l border-white/10">
                 {[1,2,3,4,5].map(j => <Star key={j} className="w-3 h-3 text-amber-400 fill-amber-400" />)}
                 <span className="text-white/40 text-xs ml-1">Loved by creators</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-              <span className="text-xs text-white/40 font-medium">4.9★ avg rating</span>
-              <span className="text-white/15 text-xs">·</span>
               <Link href="/find-editor" className="inline-flex items-center gap-1 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors">
                 Not sure? Let us match you <ArrowRight className="w-3 h-3" />
               </Link>
@@ -294,7 +290,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
         <motion.div className="flex whitespace-nowrap" animate={{ x: ["0%","-50%"] }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
           {[...Array(2)].map((_, k) => (
             <div key={k} className="flex">
-              {["KYC-Verified Editors","Verified Payment Protection","Revisions Included","Real-time Collaboration","Identity Verified","Dispute Resolution","Fast Delivery","Launched 2026"].map(s => (
+              {["KYC-Verified Editors","Verified Payment Protection","Revisions Included","Real-time Collaboration","Identity Verified","Dispute Resolution","Fast Delivery","India-Native Platform"].map(s => (
                 <span key={s} className="inline-flex items-center gap-3 text-[10px] text-white/25 font-bold uppercase tracking-[0.18em] px-8">
                   <span className="w-1 h-1 rounded-full bg-sky-400/60 inline-block" />{s}
                 </span>
@@ -418,9 +414,16 @@ const TRUST_STATS_DATA = [
 ];
 
 export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPaid = 0 }: { editorCount?: number; completedOrders?: number; totalPaid?: number }) {
-  void editorCount; void completedOrders; void totalPaid;
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const stats = [
+    { ...TRUST_STATS_DATA[0], value: `${editorCount}+`, label: "KYC Verified Editors", sub: "Govt ID verified" },
+    TRUST_STATS_DATA[1],
+    completedOrders > 0
+      ? { ...TRUST_STATS_DATA[2], value: `${completedOrders.toLocaleString()}+`, label: "Orders completed", sub: "Delivered & approved" }
+      : TRUST_STATS_DATA[2],
+    TRUST_STATS_DATA[3],
+  ];
 
   return (
     <section ref={ref} className="bg-white py-10 md:py-16 px-6 overflow-hidden">
@@ -438,7 +441,7 @@ export function AnimatedStats({ editorCount = 100, completedOrders = 0, totalPai
         </motion.div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {TRUST_STATS_DATA.map(({ value, label, sub, desc, bg, Icon, svg }, i) => (
+          {stats.map(({ value, label, sub, desc, bg, Icon, svg }, i) => (
             <motion.div
               key={label}
               initial={{ opacity: 0, y: 24 }}
@@ -979,7 +982,149 @@ const EDITOR_FILTERS = [
   { label: "Podcast",    terms: ["podcast", "audio"] },
 ];
 
-export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEditor[] }) {
+function EditorCard({ e, i }: { e: any; i: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [shadowOffset, setShadowOffset] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    setCoords({ x, y });
+
+    // Light source shadow offset (shifts opposite to cursor)
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const dx = (x - centerX) / centerX;
+    const dy = (y - centerY) / centerY;
+    setShadowOffset({
+      x: dx * 12,
+      y: dy * 12
+    });
+  };
+
+  const editorHref = e.href ?? "/browse";
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setShadowOffset({ x: 0, y: 0 });
+      }}
+      layout
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className={cn(
+        "group relative rounded-2xl border transition-premium overflow-hidden flex flex-col backdrop-blur-md bg-white/5 border-white/10 transition-shadow duration-300",
+        e.hasHighlight ? "border-sky-400/60 ring-1 ring-sky-400/30" : ""
+      )}
+      style={{
+        boxShadow: isHovered
+          ? `${-shadowOffset.x}px ${-shadowOffset.y}px 25px rgba(0, 0, 0, 0.45)`
+          : "0 4px 20px rgba(0, 0, 0, 0.25)"
+      }}
+    >
+      {/* Dynamic Cursor Light Source Overlay */}
+      {isHovered && (
+        <div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300 z-10"
+          style={{
+            background: `radial-gradient(350px circle at ${coords.x}px ${coords.y}px, rgba(255,255,255,0.06), transparent 80%)`,
+          }}
+        />
+      )}
+
+      {/* Visual Preview Header (16:9 ratio) */}
+      <div className="relative aspect-video w-full bg-gray-950 border-b border-white/5 overflow-hidden flex items-center justify-center shrink-0">
+        <PortfolioPreview
+          videoUrl={e.videoUrl}
+          thumbnailUrl={e.thumbnailUrl}
+          altText={e.name}
+        />
+      </div>
+
+      {/* Card header gradient */}
+      <div className="relative px-6 pt-6 pb-5 overflow-hidden flex-1 flex flex-col"
+        style={{ background: `linear-gradient(135deg, ${e.col}10 0%, ${e.col}03 100%)` }}>
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: e.col }} />
+        {/* Avatar + badge row */}
+        <div className="relative flex items-start justify-between mb-4">
+          <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg overflow-hidden shrink-0"
+            style={{
+              background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)`,
+              boxShadow: e.activeFrame && FRAME_STYLES[e.activeFrame as FrameKey] ? FRAME_STYLES[e.activeFrame as FrameKey] : undefined
+            }}>
+            {e.image ? (
+              <img src={e.image} alt={e.name} className="w-full h-full object-cover" />
+            ) : (
+              e.initials
+            )}
+          </div>
+          {e.isFeatured
+            ? <span className="text-[9px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-full px-2.5 py-1">Featured</span>
+            : <span className="text-[9px] font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20 rounded-full px-2.5 py-1 flex items-center gap-1">
+                <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
+              </span>
+          }
+        </div>
+        <h3 className="font-black text-white text-lg leading-tight mb-0.5">{e.name}</h3>
+        <p className="text-sm text-white/60 mb-2">{e.role}</p>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span className="text-xs font-bold text-white/90">{e.rating.toFixed(1)}</span>
+            {e.reviews > 0 && <span className="text-xs text-white/40">({e.reviews})</span>}
+          </div>
+          <span className="text-white/20">·</span>
+          <span className="text-xs text-white/45">{e.loc}</span>
+        </div>
+      </div>
+
+      {/* Skills */}
+      <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-white/5">
+        {e.skills.map((s: string) => (
+          <span key={s} className="text-[11px] font-medium bg-white/10 text-white/80 rounded-lg px-2.5 py-1 transition-premium">{s}</span>
+        ))}
+      </div>
+
+      {/* Stats row */}
+      <div className="px-6 py-4 flex items-center gap-4 border-b border-white/5">
+        <div className="flex items-center gap-1.5 text-xs text-white/60">
+          <Package className="w-3.5 h-3.5 text-white/30" />
+          {e.orders > 0 ? `${e.orders} orders` : <span className="text-white/30">New</span>}
+        </div>
+        <span className="text-white/20">·</span>
+        <div className="flex items-center gap-1.5 text-xs text-white/60">
+          <Clock className="w-3.5 h-3.5 text-white/30" />
+          {e.time} delivery
+        </div>
+      </div>
+
+      {/* Price + CTA */}
+      <div className="px-6 py-5 flex items-center justify-between mt-auto">
+        <div>
+          <p className="text-[10px] text-white/40 font-medium mb-0.5">Starting from</p>
+          <p className="text-xl font-black text-white">{e.price}</p>
+        </div>
+        <Link href={editorHref}
+          className="inline-flex items-center gap-1.5 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all hover:opacity-90 hover:scale-[1.03]"
+          style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}40` }}>
+          Book now <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </motion.div>
+  );
+}
+
+export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: { editors?: RealEditor[]; editorCount?: number }) {
   const [activeFilter, setActiveFilter] = useState("All");
 
   const allEditors = realEditors && realEditors.length > 0
@@ -1016,8 +1161,14 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
       });
 
   return (
-    <section className="bg-white py-10 md:py-16 px-6">
-      <div className="max-w-7xl mx-auto">
+    <section className="bg-[#080E1A] py-10 md:py-16 px-6 text-white border-y border-white/5 relative overflow-hidden">
+      {/* Background soft glowing blobbies */}
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div className="absolute -left-1/4 top-1/4 w-96 h-96 rounded-full bg-violet-600/20 blur-3xl" />
+        <div className="absolute -right-1/4 bottom-1/4 w-96 h-96 rounded-full bg-sky-600/20 blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-end justify-between mb-10 flex-wrap gap-6">
           <Reveal>
@@ -1025,11 +1176,11 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
               <div className="h-px w-10 bg-[var(--brand-client)]"/>
               <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Our editors</span>
             </div>
-            <h2 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-none">
-              Verified talent.<br /><span className="text-gray-200">Ready now.</span>
+            <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-none">
+              Verified talent.<br /><span className="text-white/20">Ready now.</span>
             </h2>
           </Reveal>
-          <Link href="/browse" className="inline-flex items-center gap-2 border border-gray-200 text-gray-500 hover:text-[var(--brand-client)] hover:border-[var(--brand-client)]/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
+          <Link href="/browse" className="inline-flex items-center gap-2 border border-white/10 text-white/60 hover:text-white hover:border-white/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
             All editors <ArrowUpRight className="w-4 h-4"/>
           </Link>
         </div>
@@ -1039,10 +1190,10 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
           {EDITOR_FILTERS.map(({ label }) => (
             <button key={label} onClick={() => setActiveFilter(label)}
               className={cn(
-                "text-xs font-semibold px-4 py-2 rounded-full border transition-all",
+                "text-xs font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer",
                 activeFilter === label
                   ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)] shadow-sm"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)]"
+                  : "bg-white/5 text-white/60 border-white/10 hover:border-white/20 hover:text-white"
               )}>
               {label}
             </button>
@@ -1052,104 +1203,9 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
         {/* 3-column grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
-            {filteredEditors.map((e, i) => {
-              const editorHref = (e as { href?: string }).href ?? "/browse";
-              return (
-                <motion.div key={e.name}
-                  layout
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className={cn(
-                    "group relative rounded-2xl border bg-white hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col",
-                    e.hasHighlight
-                      ? "border-sky-400 ring-2 ring-sky-100/50 shadow-sky-100"
-                      : "border-gray-100 hover:border-gray-200"
-                  )}
-                  style={{ boxShadow: e.hasHighlight ? "0 4px 20px rgba(14,165,233,0.06)" : "0 2px 12px rgba(0,0,0,0.04)" }}
-                >
-                  {/* Visual Preview Header (16:9 ratio) */}
-                  <div className="relative aspect-video w-full bg-gray-50 border-b border-gray-100 overflow-hidden flex items-center justify-center shrink-0">
-                    <PortfolioPreview
-                      videoUrl={(e as any).videoUrl}
-                      thumbnailUrl={(e as any).thumbnailUrl}
-                      altText={e.name}
-                    />
-                  </div>
-
-                  {/* Card header gradient */}
-                  <div className="relative px-6 pt-6 pb-5 overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${e.col}08 0%, ${e.col}02 100%)` }}>
-                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20 pointer-events-none" style={{ background: e.col }} />
-                    {/* Avatar + badge row */}
-                    <div className="relative flex items-start justify-between mb-4">
-                      <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg overflow-hidden shrink-0"
-                        style={{
-                          background: `linear-gradient(135deg, ${e.col}dd, ${e.col}99)`,
-                          boxShadow: e.activeFrame && FRAME_STYLES[e.activeFrame as FrameKey] ? FRAME_STYLES[e.activeFrame as FrameKey] : undefined
-                        }}>
-                        {e.image ? (
-                          <img src={e.image} alt={e.name} className="w-full h-full object-cover" />
-                        ) : (
-                          e.initials
-                        )}
-                      </div>
-                      {e.isFeatured
-                        ? <span className="text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2.5 py-1">Featured</span>
-                        : <span className="text-[9px] font-bold bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/20 rounded-full px-2.5 py-1 flex items-center gap-1">
-                            <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
-                          </span>
-                      }
-                    </div>
-                    <h3 className="font-black text-gray-900 text-lg leading-tight mb-0.5">{e.name}</h3>
-                    <p className="text-sm text-gray-500 mb-2">{e.role}</p>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-bold text-gray-700">{e.rating.toFixed(1)}</span>
-                        {e.reviews > 0 && <span className="text-xs text-gray-400">({e.reviews})</span>}
-                      </div>
-                      <span className="text-gray-200">·</span>
-                      <span className="text-xs text-gray-400">{e.loc}</span>
-                    </div>
-                  </div>
-
-                  {/* Skills */}
-                  <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-gray-50">
-                    {e.skills.map(s => (
-                      <span key={s} className="text-[11px] font-medium bg-gray-50 text-gray-500 rounded-lg px-2.5 py-1">{s}</span>
-                    ))}
-                  </div>
-
-                  {/* Stats row */}
-                  <div className="px-6 py-4 flex items-center gap-4 border-b border-gray-50">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <Package className="w-3.5 h-3.5 text-gray-300" />
-                      {e.orders > 0 ? `${e.orders} orders` : <span className="text-gray-300">New</span>}
-                    </div>
-                    <span className="text-gray-200">·</span>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <Clock className="w-3.5 h-3.5 text-gray-300" />
-                      {e.time} delivery
-                    </div>
-                  </div>
-
-                  {/* Price + CTA */}
-                  <div className="px-6 py-5 flex items-center justify-between mt-auto">
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-medium mb-0.5">Starting from</p>
-                      <p className="text-xl font-black text-gray-900">{e.price}</p>
-                    </div>
-                    <Link href={editorHref}
-                      className="inline-flex items-center gap-1.5 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all hover:opacity-90 hover:scale-[1.03]"
-                      style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}40` }}>
-                      Book now <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {filteredEditors.map((e, i) => (
+              <EditorCard e={e} i={i} key={e.href} />
+            ))}
 
             {/* CTA card — always shown as the last card */}
             <motion.div key="cta-card"
@@ -1157,17 +1213,17 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: filteredEditors.length * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-[var(--brand-client)]/40 hover:bg-[var(--brand-client)]/3 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
+              className="relative rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02] hover:border-[var(--brand-client)]/40 hover:bg-[var(--brand-client)]/5 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
             >
               <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--brand-client)]/15 transition-colors">
                 <ArrowUpRight className="w-6 h-6 text-[var(--brand-client)]" />
               </div>
-              <h3 className="font-black text-gray-800 text-lg mb-2">Become a verified editor</h3>
-              <p className="text-sm text-gray-400 mb-6 leading-relaxed max-w-[200px]">
+              <h3 className="font-black text-white text-lg mb-2">Become a verified editor</h3>
+              <p className="text-sm text-white/40 mb-6 leading-relaxed max-w-[200px]">
                 Join EditBridge, get KYC verified, and start earning from clients across India.
               </p>
               <Link href="/signup/editor"
-                className="inline-flex items-center gap-2 bg-black text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-neutral-800 hover:scale-[1.02] transition-all"
+                className="inline-flex items-center gap-2 bg-white text-black text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-neutral-100 hover:scale-[1.02] transition-all"
                 style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.15)" }}>
                 Apply now <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -1177,8 +1233,8 @@ export function AnimatedEditorCards({ editors: realEditors }: { editors?: RealEd
 
         {/* View all */}
         <div className="mt-10 flex justify-center">
-          <Link href="/browse" className="inline-flex items-center gap-2 border border-[var(--brand-client)]/30 text-[var(--brand-client)] hover:bg-[var(--brand-client)]/5 font-semibold px-6 py-3 rounded-xl text-sm transition-all">
-            View all 100+ editors <ArrowRight className="w-4 h-4" />
+          <Link href="/browse" className="inline-flex items-center gap-2 border border-white/15 text-white hover:bg-white/5 font-semibold px-6 py-3 rounded-xl text-sm transition-all">
+            View all {editorCount > 0 ? `${editorCount}+` : ""} editors <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
@@ -1691,10 +1747,6 @@ function ReviewCard({ quote, author, role, initials, col, rating }: typeof REVIE
         <div>
           <p className="text-gray-900 text-xs font-semibold">{author}</p>
           <p className="text-gray-400 text-[10px]">{role}</p>
-          <div className="flex items-center gap-1 mt-1">
-            <CheckCircle className="w-3 h-3 text-emerald-500" />
-            <span className="text-[9px] text-emerald-600 font-semibold">Verified order</span>
-          </div>
         </div>
       </div>
     </div>
@@ -1957,27 +2009,29 @@ export function LeaderboardTeaser({ editors: eds }: { editors: LeaderboardEditor
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {list.slice(0, 5).map((ed, i) => (
-            <motion.div key={ed.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center text-center p-4 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all group cursor-pointer">
-              <div className="relative mb-3">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-md"
-                  style={{ background: `linear-gradient(135deg, ${RANK_COLORS[i]}cc, ${RANK_COLORS[i]}88)` }}>
-                  {ed.initials}
+            <Link key={ed.id} href={`/editor/${ed.id}`}>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-col items-center text-center p-4 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all group">
+                <div className="relative mb-3">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-md"
+                    style={{ background: `linear-gradient(135deg, ${RANK_COLORS[i]}cc, ${RANK_COLORS[i]}88)` }}>
+                    {ed.initials}
+                  </div>
+                  <span className="absolute -top-2 -right-2 text-sm">{RANK_BADGES[i]}</span>
                 </div>
-                <span className="absolute -top-2 -right-2 text-sm">{RANK_BADGES[i]}</span>
-              </div>
-              <p className="text-sm font-bold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors">{ed.name}</p>
-              <p className="text-[10px] text-gray-400 mb-2 truncate max-w-[9rem]">{ed.niche ?? "Video Editing"}</p>
-              <div className="flex items-center gap-1 text-[11px] text-amber-500 font-bold">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                {ed.avgRating?.toFixed(1) ?? "—"}
-              </div>
-              <p className="text-[10px] text-gray-300 mt-0.5">{ed.totalOrders} orders</p>
-            </motion.div>
+                <p className="text-sm font-bold text-gray-900 group-hover:text-[var(--brand-client)] transition-colors">{ed.name}</p>
+                <p className="text-[10px] text-gray-400 mb-2 truncate max-w-[9rem]">{ed.niche ?? "Video Editing"}</p>
+                <div className="flex items-center gap-1 text-[11px] text-amber-500 font-bold">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  {ed.avgRating?.toFixed(1) ?? "—"}
+                </div>
+                <p className="text-[10px] text-gray-300 mt-0.5">{ed.totalOrders} orders</p>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>
@@ -2627,10 +2681,10 @@ export function AnimatedFAQ() {
                   className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group">
                   <span className="font-bold text-gray-900 text-base leading-snug">{q}</span>
                   <motion.div
-                    animate={{ rotate: open === i ? 45 : 0 }}
+                    animate={{ rotate: open === i ? 180 : 0 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className="shrink-0 w-6 h-6 rounded-full border border-gray-200 group-hover:border-gray-400 flex items-center justify-center transition-colors">
-                    <Check className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={2.5} />
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={2.5} />
                   </motion.div>
                 </button>
                 <AnimatePresence initial={false}>
@@ -2996,7 +3050,7 @@ export function EscrowFlowSection() {
                 <div className="flex items-center gap-3 w-full">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 relative z-10 bg-[#06040f]"
                     style={{ border: `2px solid ${color}`, boxShadow: `0 0 16px ${color}40` }}>
-                    <Icon className="w-4.5 h-4.5" style={{ color }} />
+                    <Icon className="w-[18px] h-[18px]" style={{ color }} />
                   </div>
                   <span className="text-[10px] font-black tracking-[0.2em] text-white/20">{n}</span>
                 </div>

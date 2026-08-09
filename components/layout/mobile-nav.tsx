@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { X, LogOut, Sparkles, ExternalLink, ArrowRight } from "lucide-react";
+import { X, LogOut, Sparkles, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
@@ -25,7 +25,7 @@ const publicLinks = [
 const clientLinks = [
   { href: "/client/dashboard",       label: "Dashboard" },
   { href: "/feed",            label: "Feed" },
-  { href: "/client/browse",          label: "Browse Editors" },
+  { href: "/browse",                  label: "Browse Editors" },
   { href: "/find-editor",     label: "Find an Editor", flag: "find_editor_quiz" as const },
   { href: "/client/orders",          label: "My Orders" },
   { href: "/client/messages",        label: "Messages" },
@@ -161,7 +161,6 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 )}
               >
                 <span>{label}</span>
-                {href === "/contact" && <ExternalLink className="w-3.5 h-3.5 text-gray-300" />}
               </Link>
             );
           })}
