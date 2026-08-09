@@ -12,6 +12,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 const ALLOWED: UserRole[] = ["admin", "staff_support", "staff_dispute"];
 const PAGE_SIZE = 25;
 

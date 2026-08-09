@@ -21,14 +21,16 @@ export function ImpersonateButton({ userId }: { userId: string }) {
       // Open the switch URL via POST form submit in a new tab to avoid query param token leakage
       const newTab = window.open("", "_blank");
       if (newTab) {
-        newTab.document.write(`
-          <form id="switch-form" method="POST" action="/api/auth/impersonate-switch">
-            <input type="hidden" name="token" value="${data.token}" />
-          </form>
-          <script>
-            document.getElementById('switch-form').submit();
-          </script>
-        `);
+        const form = newTab.document.createElement("form");
+        form.method = "POST";
+        form.action = "/api/auth/impersonate-switch";
+        const input = newTab.document.createElement("input");
+        input.type = "hidden";
+        input.name = "token";
+        input.value = data.token;
+        form.appendChild(input);
+        newTab.document.body.appendChild(form);
+        form.submit();
       }
       toast.success(`Impersonation tab opened. You remain logged in here as admin.`);
     } catch { toast.error("Something went wrong."); }

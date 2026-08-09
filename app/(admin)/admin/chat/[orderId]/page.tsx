@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -13,8 +15,6 @@ import { AdminChatInterventionForm } from "./intervention-form";
 import { BlockMessageButton } from "./block-message-button";
 
 const ALLOWED: UserRole[] = ["admin", "staff_support", "staff_dispute", "staff_moderation"];
-
-export const dynamic = "force-dynamic";
 
 export default async function AdminChatConversationPage({
   params,

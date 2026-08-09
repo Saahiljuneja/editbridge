@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { orders, payouts, packages, users, featuredPayments } from "@/lib/db/schema";
+import { orders, payouts, packages, users, editors, featuredPayments } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { DollarSign, TrendingUp, Wallet, Star, Landmark } from "lucide-react";
@@ -48,7 +48,8 @@ export default async function AdminRevenuePage() {
       .from(payouts)
       .innerJoin(orders, eq(orders.id, payouts.orderId))
       .leftJoin(packages, eq(packages.id, orders.packageId))
-      .innerJoin(users, eq(users.id, orders.clientId))
+      .innerJoin(editors, eq(editors.id, payouts.editorId))
+      .innerJoin(users, eq(users.id, editors.userId))
       .orderBy(desc(payouts.createdAt))
       .limit(50),
   ]);

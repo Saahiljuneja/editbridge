@@ -22,6 +22,8 @@ const ACTION_COLORS: Record<string, string> = {
   "announcement.delete":     "bg-red-50 text-red-700 border-red-200",
 };
 
+export const dynamic = "force-dynamic";
+
 const PAGE_SIZE = 50;
 
 export default async function AuditLogPage({

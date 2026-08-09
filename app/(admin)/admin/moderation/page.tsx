@@ -78,7 +78,7 @@ export default async function AdminModerationPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Blocked messages</p>
           <p className="text-3xl font-bold text-amber-600">{blockedMsgCount}</p>
           <Link href="/admin/chat" className="text-xs text-[var(--brand-client)] underline underline-offset-2 mt-1 block">
-            View in Chat Oversight ?
+            View in Chat Oversight →
           </Link>
         </div>
         <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
@@ -142,8 +142,8 @@ export default async function AdminModerationPage() {
                 <td className="px-5 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[120px]">{row.packageTitle}</td>
                 <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{row.reviewerName ?? "Unknown"}</td>
                 <td className="px-4 py-3 text-center">
-                  <Badge className={cn("text-xs border-0", RATING_COLORS[row.rating] ?? "bg-gray-100")}>
-                    {"?".repeat(row.rating)}
+                  <Badge className={cn("text-xs border-0 font-semibold", RATING_COLORS[row.rating] ?? "bg-gray-100")}>
+                    {"★".repeat(row.rating)}{"☆".repeat(5 - row.rating)}
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs max-w-[180px] truncate">

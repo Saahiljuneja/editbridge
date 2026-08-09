@@ -42,6 +42,8 @@ const DEFAULTS: Record<string, string> = {
   custom_css:             "",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminThemePage() {
   const session = await auth();
   if (!session || session.user.role !== "admin") redirect("/admin/dashboard");

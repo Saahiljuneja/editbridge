@@ -264,7 +264,7 @@ export default async function AdminAnalyticsPage() {
         <div className="a-card p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200">Top editors by orders</h2>
-            <Link href="/admin/editors" className="text-xs text-[var(--brand-client)] hover:underline">View all</Link>
+            <Link href="/admin/editor-performance" className="text-xs text-[var(--brand-client)] hover:underline">View all</Link>
           </div>
           <div className="space-y-3">
             {topEditors.map((editor, idx) => (
