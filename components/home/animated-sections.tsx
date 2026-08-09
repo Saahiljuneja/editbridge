@@ -10,7 +10,7 @@ import {
   Star, ShieldCheck, Lock, ArrowRight, CheckCircle,
   Clock, Users, Zap, FileCheck, MessageSquare, ThumbsUp,
   ChevronLeft, ChevronRight, ArrowUpRight, Bell, Package,
-  TrendingUp, X, ChevronDown, Search, ChevronUp,
+  TrendingUp, X, ChevronDown, Search, ChevronUp, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PortfolioPreview } from "@/components/common/portfolio-preview";
