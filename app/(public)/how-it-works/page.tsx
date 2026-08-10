@@ -130,7 +130,7 @@ export default function HowItWorksPage() {
         <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-[120px] opacity-20 pointer-events-none" style={{ background: "#7c6ff7" }} />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none" style={{ background: "#34d399" }} />
 
-        <div className="relative z-10 px-8 py-6 text-center">
+        <div className="relative z-10 px-8 text-center">
           <Reveal>
             <div className="inline-flex items-center gap-2 border border-[#7c6ff7]/30 bg-[#7c6ff7]/10 text-[#7c6ff7] text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
               How it works
@@ -158,7 +158,7 @@ export default function HowItWorksPage() {
 
       {/* ── Guarantees bar ── */}
       <section className="bg-white border-b border-gray-100 py-8 px-6">
-        <div className="px-8 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
+        <div className="px-8 grid grid-cols-2 sm:grid-cols-4 gap-6">
           {GUARANTEES.map(({ icon: Icon, label, desc }, i) => (
             <Reveal key={label} delay={i * 0.07}>
               <div className="flex flex-col items-center text-center gap-2">
@@ -174,9 +174,9 @@ export default function HowItWorksPage() {
       </section>
 
       {/* ── For Clients ── */}
-      <section className="py-24 px-6 bg-white">
-        <div className="px-8 py-6">
-          <Reveal className="mb-16">
+      <section className="py-14 md:py-24 px-6 bg-white">
+        <div className="px-8">
+          <Reveal className="mb-10 md:mb-16">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-8 bg-[#7c6ff7]" />
               <span className="text-[10px] font-black text-[#7c6ff7] uppercase tracking-[0.28em]">For clients</span>
@@ -225,9 +225,9 @@ export default function HowItWorksPage() {
       </section>
 
       {/* ── For Editors ── */}
-      <section className="py-24 px-6 bg-gray-50">
-        <div className="px-8 py-6">
-          <Reveal className="mb-16">
+      <section className="py-14 md:py-24 px-6 bg-gray-50">
+        <div className="px-8">
+          <Reveal className="mb-10 md:mb-16">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-px w-8 bg-[#34d399]" />
               <span className="text-[10px] font-black text-[#059669] uppercase tracking-[0.28em]">For editors</span>
@@ -266,9 +266,9 @@ export default function HowItWorksPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-24 px-6 bg-white">
-        <div className="px-8 py-6">
-          <Reveal className="mb-14 text-center">
+      <section className="py-14 md:py-24 px-6 bg-white">
+        <div className="px-8">
+          <Reveal className="mb-8 md:mb-14 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-8 bg-gray-200" />
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.28em]">FAQ</span>
@@ -287,9 +287,9 @@ export default function HowItWorksPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="relative bg-[#06040f] py-24 px-6 overflow-hidden">
+      <section className="relative bg-[#06040f] py-14 md:py-24 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(124,111,247,0.15),transparent)]" />
-        <div className="relative z-10 px-8 py-6 text-center">
+        <div className="relative z-10 px-8 text-center">
           <Reveal>
             <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-5">
               Ready to get started?
