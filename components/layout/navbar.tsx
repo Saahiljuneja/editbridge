@@ -566,8 +566,8 @@ export function Navbar({
 
         {/* ── Row 2: in-app nav (desktop) ── */}
         <div className="hidden md:block border-t border-neutral-200/60">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden">
+            <div className="flex items-center justify-start lg:justify-center min-w-max lg:min-w-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
               {navLinks.map(({ href, label, icon: Icon }) => (
                 <Link
