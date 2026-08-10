@@ -552,9 +552,9 @@ export function Navbar({
                 </>
               )}
 
-              {/* Mobile hamburger */}
+              {/* Mobile hamburger — hidden; bottom nav's More button handles mobile menu */}
               <button
-                className="md:hidden p-2 rounded-xl transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                className="hidden p-2 rounded-xl transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
               >
