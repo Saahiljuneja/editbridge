@@ -209,9 +209,9 @@ export default async function BrowsePage({
 
         <div className="relative max-w-3xl mx-auto px-6 pt-6 pb-6 text-center">
           {/* Live badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 rounded-full border border-neutral-200/60 bg-neutral-50/50 text-[11px] text-neutral-500 font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 rounded-full border border-neutral-200/60 bg-neutral-50/50 text-[11px] text-neutral-500 font-bold uppercase tracking-wider max-w-[90vw]">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            KYC-verified editors · Escrow-protected · ₹0 fraud, ever
+            <span className="truncate">KYC-verified · Escrow-protected · ₹0 fraud, ever</span>
           </div>
 
           {/* Heading */}
@@ -236,20 +236,20 @@ export default async function BrowsePage({
           </div>
 
           {/* Trust chips */}
-          <div className="flex items-center justify-center gap-6 mt-8 flex-wrap">
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-bold uppercase tracking-wider">
+          <div className="grid grid-cols-3 sm:flex sm:items-center sm:justify-center sm:gap-6 mt-8 gap-2">
+            <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-neutral-500 font-bold uppercase tracking-wider">
               <ShieldCheck className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
-              KYC-verified
+              <span>KYC-verified</span>
             </div>
-            <div className="w-px h-3 bg-neutral-200 shrink-0" />
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-bold uppercase tracking-wider">
+            <div className="hidden sm:block w-px h-3 bg-neutral-200 shrink-0 mx-auto" />
+            <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-neutral-500 font-bold uppercase tracking-wider">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
-              4.9★ avg rating
+              <span>4.9★ rating</span>
             </div>
-            <div className="w-px h-3 bg-neutral-200 shrink-0" />
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-bold uppercase tracking-wider">
+            <div className="hidden sm:block w-px h-3 bg-neutral-200 shrink-0 mx-auto" />
+            <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-neutral-500 font-bold uppercase tracking-wider">
               <Lock className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
-              Escrow-protected
+              <span>Escrow-safe</span>
             </div>
           </div>
         </div>
