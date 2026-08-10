@@ -60,12 +60,12 @@ export default function AboutPage() {
     <div className="flex flex-col">
 
       {/* ══ HERO ══ */}
-      <section className="relative bg-[#06040f] pt-28 pb-32 px-6 overflow-hidden">
+      <section className="relative bg-[#06040f] pt-20 pb-24 md:pt-28 md:pb-32 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[140px] opacity-15 pointer-events-none" style={{ background: "#7c6ff7" }} />
         <div className="absolute bottom-0 right-1/3 w-72 h-72 rounded-full blur-[120px] opacity-10 pointer-events-none" style={{ background: "#34d399" }} />
 
-        <div className="relative z-10 px-8 py-6">
+        <div className="relative z-10 px-8">
           <Reveal>
             <div className="inline-flex items-center gap-2 border border-[#7c6ff7]/30 bg-[#7c6ff7]/10 text-[#7c6ff7] text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-10">
               About EditBridge
@@ -107,8 +107,8 @@ export default function AboutPage() {
       </section>
 
       {/* ══ THE PROBLEM WE SOLVED ══ */}
-      <section className="py-28 px-6 bg-white">
-        <div className="px-8 py-6">
+      <section className="py-16 md:py-28 px-6 bg-white">
+        <div className="px-8">
           <div className="grid lg:grid-cols-2 gap-20 items-start">
 
             {/* Left: story */}
@@ -163,9 +163,9 @@ export default function AboutPage() {
       </section>
 
       {/* ══ WHY WE BUILT THIS ══ */}
-      <section className="py-28 px-6 bg-gray-50 overflow-hidden">
-        <div className="px-8 py-6">
-          <Reveal className="mb-16">
+      <section className="py-16 md:py-28 px-6 bg-gray-50 overflow-hidden">
+        <div className="px-8">
+          <Reveal className="mb-10 md:mb-16">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-8 bg-gray-300" />
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.28em]">Why we built this</span>
@@ -222,9 +222,9 @@ export default function AboutPage() {
       </section>
 
       {/* ══ VALUES ══ */}
-      <section className="py-28 px-6 bg-white">
-        <div className="px-8 py-6">
-          <Reveal className="mb-16">
+      <section className="py-16 md:py-28 px-6 bg-white">
+        <div className="px-8">
+          <Reveal className="mb-10 md:mb-16">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-8 bg-[#7c6ff7]" />
               <span className="text-[10px] font-black text-[#7c6ff7] uppercase tracking-[0.28em]">What we stand for</span>
@@ -260,12 +260,12 @@ export default function AboutPage() {
       </section>
 
       {/* ══ WHO WE'RE BUILT FOR ══ */}
-      <section className="py-28 px-6 bg-[#06040f] overflow-hidden relative">
+      <section className="py-16 md:py-28 px-6 bg-[#06040f] overflow-hidden relative">
         <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-15 pointer-events-none" style={{ background: "#7c6ff7" }} />
 
-        <div className="relative z-10 px-8 py-6">
-          <Reveal className="mb-16">
+        <div className="relative z-10 px-8">
+          <Reveal className="mb-10 md:mb-16">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-8 bg-[#7c6ff7]" />
               <span className="text-[10px] font-black text-[#7c6ff7] uppercase tracking-[0.28em]">Who we serve</span>
@@ -327,8 +327,8 @@ export default function AboutPage() {
       </section>
 
       {/* ══ CTA ══ */}
-      <section className="py-28 px-6 bg-white">
-        <div className="px-8 py-6">
+      <section className="py-16 md:py-28 px-6 bg-white">
+        <div className="px-8">
           <Reveal>
             <div className="rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(145deg,#06040f 0%,#1a1040 60%,#0a1f1a 100%)" }}>
               <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
@@ -345,7 +345,7 @@ export default function AboutPage() {
                     or edit content —
                   </span>
                 </h2>
-                <p className="text-white/35 text-lg mb-12 px-8 py-6 leading-relaxed">
+                <p className="text-white/35 text-lg mb-12 px-8 leading-relaxed">
                   we built EditBridge for you. Safe payments, verified editors, fair earnings.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
