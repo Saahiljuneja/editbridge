@@ -1542,7 +1542,7 @@ const WHY_FEATURES = [
   { icon: MessageSquare, title: "Real-time Collaboration",      desc: "Briefs, files, revisions, and feedback — all in one place. No scattered DMs, no lost files.",                              col: "var(--brand-teal)" },
   { icon: FileCheck,     title: "Revisions Included",           desc: "Every package comes with revision rounds built in. Your editor works until you're satisfied — no extra charges.",           col: "#d97706" },
   { icon: ThumbsUp,      title: "Verified Reviews Only",        desc: "Stars are only left by clients who actually placed and completed an order. No fake reviews, ever.",                         col: "#db2777" },
-  { icon: Zap,           title: "Structured Dispute Resolution",desc: "Dedicated support for every disagreement. Clear timelines, fair outcomes, and a team that takes both sides seriously.",    col: "var(--brand-editor)", span: "lg:col-span-3", full: true },
+  { icon: Zap,           title: "Structured Dispute Resolution",desc: "Dedicated support for every disagreement. Clear timelines, fair outcomes, and a team that takes both sides seriously.",    col: "var(--brand-editor)", span: "sm:col-span-2 lg:col-span-3", full: true },
 ];
 
 export function AnimatedWhySection() {
