@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { db } from "@/lib/db";
-import { editors } from "@/lib/db/schema";
+import { editors, blogPosts } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { CATEGORY_PAGES } from "@/lib/category-seo";
 
@@ -45,5 +45,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable during build — skip dynamic pages
   }
 
-  return [...STATIC_PAGES, ...CATEGORY_SITEMAP, ...editorPages];
+  // Fetch published blog posts
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await db
+      .select({ slug: blogPosts.slug, updatedAt: blogPosts.updatedAt })
+      .from(blogPosts)
+      .where(eq(blogPosts.status, "published"));
+
+    blogPages = posts.map((p) => ({
+      url: `${BASE_URL}/blog/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+
+    if (posts.length > 0) {
+      blogPages.push({
+        url: `${BASE_URL}/blog`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      });
+    }
+  } catch {
+    // DB unavailable during build — skip
+  }
+
+  return [...STATIC_PAGES, ...CATEGORY_SITEMAP, ...editorPages, ...blogPages];
 }
