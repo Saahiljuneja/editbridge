@@ -51,13 +51,28 @@ export default async function EditorMessagesPage() {
   if (orderIds.length > 0) {
     const idList = sql.join(orderIds.map(id => sql`${id}::uuid`), sql`, `);
 
+    const subquery = db
+      .select({
+        orderId: messages.orderId,
+        content: messages.content,
+        senderId: messages.senderId,
+        createdAt: messages.createdAt,
+        rn: sql<number>`row_number() over (partition by ${messages.orderId} order by ${messages.createdAt} desc)`.as("rn"),
+      })
+      .from(messages)
+      .where(and(sql`${messages.orderId} = ANY(ARRAY[${idList}])`, eq(messages.isBlocked, false)))
+      .as("sub");
+
     [lastMessages, unreadCounts] = await Promise.all([
       db
-        .select({ orderId: messages.orderId, content: messages.content, senderId: messages.senderId, createdAt: messages.createdAt })
-        .from(messages)
-        .where(and(sql`${messages.orderId} = ANY(ARRAY[${idList}])`, eq(messages.isBlocked, false)))
-        .orderBy(desc(messages.createdAt))
-        .limit(orderIds.length * 3),
+        .select({
+          orderId: subquery.orderId,
+          content: subquery.content,
+          senderId: subquery.senderId,
+          createdAt: subquery.createdAt,
+        })
+        .from(subquery)
+        .where(eq(subquery.rn, 1)),
 
       db
         .select({ orderId: messages.orderId, count: sql<number>`COUNT(*)::int` })

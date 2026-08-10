@@ -7,13 +7,13 @@ import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<string, { label: string; stripe: string; badge: string }> = {
-  pending:            { label: "Pending",    stripe: "bg-amber-400",   badge: "bg-amber-50 text-amber-700 border border-amber-200" },
-  in_progress:        { label: "In Progress",stripe: "bg-[#0EA5E9]",   badge: "bg-sky-50 text-sky-700 border border-sky-200" },
-  delivered:          { label: "Delivered",  stripe: "bg-violet-500",  badge: "bg-violet-50 text-violet-700 border border-violet-200" },
-  revision_requested: { label: "Revision",   stripe: "bg-orange-400",  badge: "bg-orange-50 text-orange-700 border border-orange-200" },
+  pending:            { label: "Pending",    stripe: "bg-neutral-200", badge: "bg-neutral-50 text-neutral-600 border border-neutral-200" },
+  in_progress:        { label: "In Progress",stripe: "bg-black",       badge: "bg-black text-white border-black" },
+  delivered:          { label: "Delivered",  stripe: "bg-neutral-800", badge: "bg-neutral-900 text-white border-neutral-900" },
+  revision_requested: { label: "Revision",   stripe: "bg-neutral-400", badge: "bg-white text-neutral-700 border border-neutral-300" },
   disputed:           { label: "Disputed",   stripe: "bg-red-500",     badge: "bg-red-50 text-red-700 border border-red-200" },
-  completed:          { label: "Completed",  stripe: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border border-emerald-200" },
-  cancelled:          { label: "Cancelled",  stripe: "bg-gray-300",    badge: "bg-gray-50 text-gray-500 border border-gray-200" },
+  completed:          { label: "Completed",  stripe: "bg-neutral-300", badge: "bg-neutral-50 text-neutral-800 border border-neutral-250" },
+  cancelled:          { label: "Cancelled",  stripe: "bg-neutral-100", badge: "bg-neutral-50 text-neutral-400 border border-neutral-200" },
 };
 
 type OrderRow = {
@@ -36,12 +36,12 @@ export function OrdersListClient({
 }) {
   if (rows.length === 0) {
     return (
-      <div className="rounded-[24px] border border-neutral-200/50 bg-[#ffffff] shadow-sm flex flex-col items-center justify-center py-20 text-center">
+      <div className="rounded-[24px] border border-neutral-200/50 bg-[#ffffff] shadow-none flex flex-col items-center justify-center py-20 text-center">
         <div className="w-14 h-14 rounded-2xl bg-neutral-50 border border-neutral-200/30 flex items-center justify-center mb-4">
           <ShoppingBag className="w-7 h-7 text-neutral-300" />
         </div>
-        <p className="font-bold text-neutral-800 text-sm">No orders found</p>
-        <p className="text-xs text-neutral-400 mt-1 mb-5 font-semibold">
+        <p className="font-black text-neutral-800 text-xs uppercase tracking-wider">No orders found</p>
+        <p className="text-[11px] text-neutral-400 mt-1 mb-5 font-semibold">
           {hasFilter
             ? "No orders match this filter."
             : "You haven't placed any orders yet."}
@@ -49,7 +49,7 @@ export function OrdersListClient({
         {!hasFilter && (
           <Link
             href="/browse"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
           >
             <Search className="w-3.5 h-3.5" /> Browse editors
           </Link>
@@ -59,7 +59,7 @@ export function OrdersListClient({
   }
 
   return (
-    <div className="rounded-[24px] border border-neutral-200/50 bg-[#ffffff] shadow-sm overflow-hidden divide-y divide-neutral-100">
+    <div className="rounded-[24px] border border-neutral-200/60 bg-[#ffffff] shadow-none overflow-hidden divide-y divide-neutral-100">
       {rows.map((order, i) => {
         const s = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
         const isActive = !["completed", "cancelled"].includes(order.status);
@@ -90,13 +90,13 @@ export function OrdersListClient({
               />
 
               {/* Editor avatar */}
-              <div className="w-9 h-9 rounded-xl bg-neutral-100 border border-neutral-200/30 flex items-center justify-center text-xs font-bold text-neutral-400 shrink-0 uppercase select-none">
+              <div className="w-9 h-9 rounded-xl bg-black border border-neutral-900 flex items-center justify-center text-[10px] font-bold text-white shrink-0 uppercase select-none">
                 {initials.toUpperCase() || "?"}
               </div>
 
               {/* Main info */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="flex items-center gap-1.5 mb-1">
                   <span
                     className={cn(
                       "text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider",
@@ -106,23 +106,23 @@ export function OrdersListClient({
                     {s.label}
                   </span>
                   {order.packageTier && (
-                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-neutral-50 border border-neutral-200/30 text-neutral-400 uppercase tracking-wider">
+                    <span className="text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-neutral-50 border border-neutral-200/50 text-neutral-400 uppercase tracking-wider">
                       {order.packageTier}
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-bold text-neutral-900 truncate">
+                <p className="text-xs font-bold text-neutral-900 truncate">
                   {order.packageTitle ?? "Custom order"}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-xs text-neutral-400 font-semibold truncate max-w-[120px]">
+                  <span className="text-[11px] text-neutral-400 font-semibold truncate max-w-[120px]">
                     {order.editorName ?? "Editor"}
                   </span>
                   <span className="text-neutral-200 text-xs select-none">·</span>
                   {isActive && order.deadline ? (
                     <DeadlineCountdown deadline={order.deadline.toISOString()} />
                   ) : (
-                    <span className="text-xs text-neutral-400 font-semibold">
+                    <span className="text-[11px] text-neutral-400 font-semibold">
                       {order.deadline
                         ? formatDate(order.deadline)
                         : formatDate(order.createdAt)}
@@ -133,7 +133,7 @@ export function OrdersListClient({
 
               {/* Amount + arrow */}
               <div className="flex items-center gap-2 shrink-0 ml-2">
-                <span className="font-black text-sm text-neutral-900 tabular-nums">
+                <span className="font-black text-xs text-neutral-900 tabular-nums">
                   {formatCurrency(order.totalAmount)}
                 </span>
                 <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-black group-hover:translate-x-0.5 transition-all duration-150" />

@@ -1,10 +1,10 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { payouts, orders, packages, editors, users } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, sql, count } from "drizzle-orm";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Wallet, TrendingUp, Hourglass, CheckCircle2, Gift, ShieldAlert } from "lucide-react";
+import { Wallet, TrendingUp, Hourglass, CheckCircle2, Gift, ShieldAlert, ChevronLeft, ChevronRight } from "lucide-react";
 import { getAvailableCredits } from "@/lib/rewards";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -19,12 +19,20 @@ const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string }
   completed:  { label: "Settled",    dot: "bg-green-400",  text: "text-green-700" },
 };
 
-export default async function EditorPayoutsPage() {
+export default async function EditorPayoutsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
   if (!session || session.user?.role !== "editor") redirect("/login");
 
   const editorId = session.user.editorId;
   if (!editorId) redirect("/editor/kyc");
+
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10));
+  const PAGE_SIZE = 20;
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -45,6 +53,23 @@ export default async function EditorPayoutsPage() {
     .where(eq(users.id, session.user.userId!))
     .limit(1);
   const show2faNudge = !!editorRow?.bankAccountName && !userRow?.twoFactorEnabled;
+
+  const [summaryRow, payoutsCountRow] = await Promise.all([
+    db
+      .select({
+        totalEarned: sql<number>`COALESCE(SUM(CASE WHEN ${payouts.status} = 'completed' THEN ${payouts.netAmount} ELSE 0 END), 0)::int`,
+        totalPending: sql<number>`COALESCE(SUM(CASE WHEN ${payouts.status} != 'completed' THEN ${payouts.netAmount} ELSE 0 END), 0)::int`,
+        thisMonth: sql<number>`COALESCE(SUM(CASE WHEN ${payouts.status} = 'completed' AND ${payouts.settledAt} >= ${monthStart} THEN ${payouts.netAmount} ELSE 0 END), 0)::int`,
+      })
+      .from(payouts)
+      .where(eq(payouts.editorId, editorId)),
+
+    db
+      .select({ v: count() })
+      .from(payouts)
+      .where(eq(payouts.editorId, editorId))
+      .then(r => r[0].v)
+  ]);
 
   const rows = await db
     .select({
@@ -67,21 +92,31 @@ export default async function EditorPayoutsPage() {
     .innerJoin(orders, eq(orders.id, payouts.orderId))
     .leftJoin(packages, eq(packages.id, orders.packageId))
     .where(eq(payouts.editorId, editorId))
-    .orderBy(desc(payouts.createdAt));
+    .orderBy(desc(payouts.createdAt))
+    .limit(PAGE_SIZE)
+    .offset((page - 1) * PAGE_SIZE);
 
-  const totalEarned  = rows.filter(r => r.status === "completed").reduce((s, r) => s + r.netAmount, 0);
-  const totalPending = rows.filter(r => r.status !== "completed").reduce((s, r) => s + r.netAmount, 0);
+  const totalEarned  = summaryRow[0]?.totalEarned ?? 0;
+  const totalPending = summaryRow[0]?.totalPending ?? 0;
   const { total: availableCredits } = await getAvailableCredits(session.user.userId!);
-  const thisMonth    = rows.filter(r => r.status === "completed" && r.settledAt && r.settledAt >= monthStart).reduce((s, r) => s + r.netAmount, 0);
+  const thisMonth    = summaryRow[0]?.thisMonth ?? 0;
 
   // TDS summary for the financial year (April–March)
   const fyStart = now.getMonth() >= 3
     ? new Date(now.getFullYear(), 3, 1)
     : new Date(now.getFullYear() - 1, 3, 1);
-  const totalTdsThisFy = rows
-    .filter(r => r.createdAt >= fyStart)
-    .reduce((s, r) => s + (r.tdsAmount ?? 0), 0);
-  const hasTdsThisFy = rows.some(r => r.createdAt >= fyStart && (r.tdsAmount ?? 0) > 0);
+
+  const [tdsRow] = await db
+    .select({
+      totalTds: sql<number>`COALESCE(SUM(${payouts.tdsAmount}), 0)::int`,
+      hasTds: sql<boolean>`COALESCE(COUNT(CASE WHEN (${payouts.tdsAmount} > 0) THEN 1 END) > 0, false)`
+    })
+    .from(payouts)
+    .where(and(eq(payouts.editorId, editorId), sql`${payouts.createdAt} >= ${fyStart}`));
+
+  const totalTdsThisFy = tdsRow?.totalTds ?? 0;
+  const hasTdsThisFy = tdsRow?.hasTds ?? false;
+  const totalPages = Math.ceil(payoutsCountRow / PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -271,6 +306,40 @@ export default async function EditorPayoutsPage() {
                 })}
               </tbody>
             </table>
+            {totalPages > 1 && (
+              <div className="px-5 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-4">
+                <p className="text-xs text-gray-500">
+                  Page <span className="font-medium text-gray-700">{page}</span> of{" "}
+                  <span className="font-medium text-gray-700">{totalPages}</span>
+                </p>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/editor/payouts?page=${page - 1}`}
+                    aria-disabled={page <= 1}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-colors",
+                      page <= 1
+                        ? "border-gray-100 text-gray-300 pointer-events-none"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50 bg-white"
+                    )}
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" /> Previous
+                  </Link>
+                  <Link
+                    href={`/editor/payouts?page=${page + 1}`}
+                    aria-disabled={page >= totalPages}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-colors",
+                      page >= totalPages
+                        ? "border-gray-100 text-gray-300 pointer-events-none"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50 bg-white"
+                    )}
+                  >
+                    Next <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

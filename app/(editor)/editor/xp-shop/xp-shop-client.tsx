@@ -50,10 +50,11 @@ function parseReason(reason: string) {
       type: "Avatar Frame",
     };
   }
+  const isCredit = !reason.startsWith("xp_shop_") && !reason.startsWith("xp_frame_");
   return {
     name: reason.replace(/_/g, " "),
-    emoji: "🛍️",
-    type: "Purchase",
+    emoji: isCredit ? "⭐" : "🛍️",
+    type: isCredit ? "Earning" : "Purchase",
   };
 }
 
@@ -560,30 +561,34 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
         </div>
       </div>
 
-      {/* Spend History */}
+      {/* Transaction History */}
       <section className="space-y-3">
-        <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300">Redemption History</h2>
+        <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300">Transaction History</h2>
         {localHistory.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 text-center text-xs text-gray-400">
-            No purchases logged yet. Redeem a boost or profile frame above to begin!
+            No transactions logged yet. Earn points or redeem a boost above to begin!
           </div>
         ) : (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-105 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800 shadow-sm">
             {localHistory.map(tx => {
               const details = parseReason(tx.reason);
+              const isPositive = tx.amount > 0;
               return (
                 <div key={tx.id} className="p-4 flex items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl leading-none shrink-0">{details.emoji}</span>
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white">{details.name}</p>
+                      <p className="font-bold text-gray-900 dark:text-white capitalize">{details.name}</p>
                       <p className="text-[10px] text-gray-450 mt-0.5">
                         {details.type} · {new Date(tx.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 font-bold text-red-500">
-                    <span>{tx.amount} XP</span>
+                  <div className={cn(
+                    "flex items-center gap-1 font-bold",
+                    isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-500"
+                  )}>
+                    <span>{isPositive ? `+${tx.amount}` : tx.amount} XP</span>
                   </div>
                 </div>
               );

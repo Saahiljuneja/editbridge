@@ -1,20 +1,21 @@
-﻿"use client";
+"use client";
 
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
+import nextDynamic from "next/dynamic";
 
 
 const STATUS_COLORS: Record<string, string> = {
-  completed:          "var(--brand-client)",
-  in_progress:        "#3B82F6",
-  pending:            "#9CA3AF",
-  delivered:          "var(--brand-client)",
-  revision_requested: "#F59E0B",
-  cancelled:          "#EF4444",
-  disputed:           "#F97316",
+  completed:          "#000000",
+  in_progress:        "#737373",
+  pending:            "#e5e5e5",
+  delivered:          "#262626",
+  revision_requested: "#a3a3a3",
+  cancelled:          "#d4d4d4",
+  disputed:           "#ef4444",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -28,14 +29,14 @@ interface Props {
   statusData: { status: string; count: number }[];
 }
 
-export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
+function AnalyticsChartsInner({ chartData, pkgData, statusData }: Props) {
   const hasChartData = chartData.length > 0;
   const hasPkgData = pkgData.length > 0;
 
   return (
     <div className="space-y-6">
       {/* Earnings + orders line chart */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
+      <div className="rounded-2xl border border-neutral-200/60 bg-white shadow-none p-6">
         <p className="font-semibold text-gray-900 text-sm mb-5">Earnings — last 6 months</p>
         {!hasChartData ? (
           <div className="h-48 flex items-center justify-center text-sm text-gray-400">No completed orders yet.</div>
@@ -51,9 +52,9 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
               />
               <Tooltip
                 formatter={(v) => [formatCurrency(Number(v ?? 0)), "Earnings"]}
-                contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB", fontSize: 12 }}
+                contentStyle={{ borderRadius: 16, border: "1px solid #E5E7EB", fontSize: 12 }}
               />
-              <Bar dataKey="earnings" fill="var(--brand-client)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="earnings" fill="#000000" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -61,7 +62,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Package performance */}
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
+        <div className="rounded-2xl border border-neutral-200/60 bg-white shadow-none p-6">
           <p className="font-semibold text-gray-900 text-sm mb-5">Package performance</p>
           {!hasPkgData ? (
             <div className="h-40 flex items-center justify-center text-sm text-gray-400">No packages yet.</div>
@@ -73,7 +74,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
                     <div className="flex items-center gap-2">
                       <span
                         className="inline-block w-2 h-2 rounded-full shrink-0"
-                        style={{ background: "var(--brand-client)" }}
+                        style={{ background: "#000000" }}
                       />
                       <span className="text-sm font-medium text-gray-800 truncate max-w-[160px]">{pkg.title}</span>
                     </div>
@@ -83,7 +84,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
                     <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full"
-                        style={{ width: `${pkg.completionRate}%`, background: "var(--brand-client)" }}
+                        style={{ width: `${pkg.completionRate}%`, background: "#000000" }}
                       />
                     </div>
                     <span className="text-xs font-medium text-gray-500 w-12 text-right">{formatCurrency(pkg.earnings)}</span>
@@ -95,7 +96,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
         </div>
 
         {/* Order status donut */}
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
+        <div className="rounded-2xl border border-neutral-200/60 bg-white shadow-none p-6">
           <p className="font-semibold text-gray-900 text-sm mb-5">Order breakdown</p>
           {statusData.length === 0 ? (
             <div className="h-40 flex items-center justify-center text-sm text-gray-400">No orders yet.</div>
@@ -110,7 +111,7 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
                   </Pie>
                   <Tooltip
                     formatter={(v, n) => [v, STATUS_LABELS[String(n)] ?? n]}
-                    contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB", fontSize: 12 }}
+                    contentStyle={{ borderRadius: 16, border: "1px solid #E5E7EB", fontSize: 12 }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -132,3 +133,15 @@ export function AnalyticsCharts({ chartData, pkgData, statusData }: Props) {
     </div>
   );
 }
+
+export const AnalyticsCharts = nextDynamic(
+  async () => AnalyticsChartsInner,
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] w-full bg-white border border-neutral-200/60 rounded-2xl shadow-none animate-pulse flex items-center justify-center">
+        <span className="text-xs text-gray-450">Loading charts...</span>
+      </div>
+    )
+  }
+);

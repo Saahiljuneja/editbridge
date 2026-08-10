@@ -24,7 +24,7 @@ export default async function XpShopPage() {
       createdAt: pointTransactions.createdAt,
     })
     .from(pointTransactions)
-    .where(and(eq(pointTransactions.userId, session.user.userId), lt(pointTransactions.amount, 0)))
+    .where(eq(pointTransactions.userId, session.user.userId))
     .orderBy(desc(pointTransactions.createdAt))
     .limit(10),
   ]);

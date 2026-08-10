@@ -8,7 +8,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { Clock, RefreshCw, Video, ChevronDown, FileArchive, Briefcase } from "lucide-react";
 import type { Package } from "@/types";
 
-const ACCENT = "var(--brand-client)";
+const ACCENT = "#000000";
 
 const VIDEO_LENGTH_OPTIONS = [
   "Up to 1 min",
@@ -284,7 +284,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
     }
   }
 
-  const inputClass = "w-full px-3 py-2 rounded-xl border border-gray-200 text-sm outline-none bg-white transition-colors";
+  const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wide outline-none focus:bg-white focus:border-black transition-all placeholder:text-neutral-400";
 
   function ChipButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
     return (
@@ -292,12 +292,11 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         type="button"
         onClick={onClick}
         className={cn(
-          "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
+          "px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-all cursor-pointer",
           selected
-            ? "text-white border-transparent"
-            : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
+            ? "bg-black text-white border-black"
+            : "border-neutral-200 text-neutral-500 hover:border-neutral-350 bg-white hover:text-black"
         )}
-        style={selected ? { background: ACCENT, borderColor: ACCENT } : {}}
       >
         {children}
       </button>
@@ -603,18 +602,17 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                     prev.includes(r.value) ? prev.filter((x) => x !== r.value) : [...prev, r.value]
                   )}
                   className={cn(
-                    "flex flex-col items-center px-3 py-2 rounded-xl border transition-all min-w-[60px]",
-                    sel ? "border-transparent text-white" : "border-gray-200 bg-white hover:border-gray-300 text-gray-700"
+                    "flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all min-w-[70px] cursor-pointer",
+                    sel ? "bg-black text-white border-black" : "border-neutral-200 bg-white hover:border-neutral-300 text-neutral-500 hover:text-black font-semibold"
                   )}
-                  style={sel ? { background: ACCENT } : {}}
                 >
-                  <span className="text-xs font-bold">{r.label}</span>
-                  <span className="text-[10px] opacity-70 mt-0.5">{r.sub}</span>
+                  <span className="text-[11px] font-bold">{r.label}</span>
+                  <span className="text-[9px] opacity-75 mt-0.5">{r.sub}</span>
                 </button>
               );
             })}
           </div>
-          <p className="text-[11px] text-gray-400">Select all ratios you deliver for this package.</p>
+          <p className="text-[10px] text-neutral-400 font-medium">Select all ratios you deliver for this package.</p>
         </div>
 
         {/* Add-ons */}
@@ -628,17 +626,16 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                   key={a.value}
                   className={cn(
                     "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 cursor-pointer transition-all",
-                    sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+                    sel ? "border-black bg-neutral-50/50" : "border-neutral-200 bg-white hover:border-neutral-350"
                   )}
-                  style={sel ? { background: `${ACCENT}10`, borderColor: `${ACCENT}60` } : {}}
                 >
                   <input
                     type="checkbox"
                     checked={sel}
                     onChange={() => toggleAddon(a.value)}
-                    className="w-3.5 h-3.5 shrink-0 accent-[var(--brand-client)]"
+                    className="w-3.5 h-3.5 shrink-0 accent-black cursor-pointer"
                   />
-                  <span className="text-xs font-medium" style={sel ? { color: ACCENT } : { color: "#374151" }}>
+                  <span className={cn("text-xs font-bold", sel ? "text-black" : "text-neutral-600")}>
                     {a.label}
                   </span>
                 </label>
@@ -774,19 +771,18 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3 pt-5 mt-3 border-t border-gray-100">
+      <div className="flex gap-3 pt-5 mt-3 border-t border-neutral-100">
         <button
           type="submit"
           disabled={saving}
-          className={cn("flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity", saving && "opacity-60 cursor-not-allowed")}
-          style={{ background: ACCENT }}
+          className={cn("flex-1 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-900 transition-all cursor-pointer", saving && "opacity-60 cursor-not-allowed")}
         >
           {saving ? "Saving…" : existing ? "Save changes" : "Create service"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors cursor-pointer"
         >
           Cancel
         </button>

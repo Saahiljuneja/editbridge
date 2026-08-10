@@ -91,28 +91,28 @@ export default async function ClientOrdersPage({
       label: "Total Orders",
       value: statsRow?.total ?? 0,
       icon: ShoppingBag,
-      iconCls: "text-gray-500",
-      iconBg: "bg-gray-100",
-      topBorder: "border-t-gray-300",
-      numCls: "text-gray-900",
+      iconCls: "text-neutral-500",
+      iconBg: "bg-neutral-100",
+      topBorder: "border-t-neutral-300",
+      numCls: "text-neutral-900",
     },
     {
       label: "Active",
       value: statsRow?.active ?? 0,
       icon: Clock,
-      iconCls: "text-[#0EA5E9]",
-      iconBg: "bg-sky-50",
-      topBorder: "border-t-[#0EA5E9]",
-      numCls: "text-[#0EA5E9]",
+      iconCls: "text-black",
+      iconBg: "bg-neutral-50",
+      topBorder: "border-t-black",
+      numCls: "text-black",
     },
     {
       label: "Completed",
       value: statsRow?.completed ?? 0,
       icon: CheckCircle2,
-      iconCls: "text-emerald-600",
-      iconBg: "bg-emerald-50",
-      topBorder: "border-t-emerald-500",
-      numCls: "text-emerald-700",
+      iconCls: "text-neutral-600",
+      iconBg: "bg-neutral-50",
+      topBorder: "border-t-neutral-600",
+      numCls: "text-neutral-700",
     },
   ];
 
@@ -132,13 +132,13 @@ export default async function ClientOrdersPage({
             <a
               href="/api/client/orders/export"
               download
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-neutral-200 bg-[#ffffff] hover:bg-neutral-50 text-xs font-bold text-neutral-700 transition-colors shadow-sm"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-full border border-neutral-200 bg-[#ffffff] hover:bg-neutral-50 text-[10px] font-bold uppercase tracking-wider text-neutral-700 transition-colors shadow-none"
             >
               <Download className="w-3.5 h-3.5" /> Export CSV
             </a>
             <Link
               href="/browse"
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-900 transition-all shadow-sm"
             >
               <Search className="w-3.5 h-3.5" /> Browse editors
             </Link>
@@ -169,16 +169,14 @@ export default async function ClientOrdersPage({
         </div>
 
         {/* Status filter tabs (capsule layout) */}
-        <div className="inline-flex items-center gap-1 bg-[#f3f4f6] rounded-[18px] border border-neutral-200/50 p-1 overflow-x-auto scrollbar-none max-w-full">
+        <div className="eb-capsule-tabs overflow-x-auto scrollbar-none max-w-full">
           {STATUS_TABS.map((tab) => (
             <Link
               key={tab.value}
               href={tab.value ? `/client/orders?status=${tab.value}` : "/client/orders"}
               className={cn(
-                "text-[11px] font-bold px-3.5 py-1.5 rounded-[14px] transition-all whitespace-nowrap shrink-0",
-                statusFilter === tab.value
-                  ? "bg-[#000000] text-white shadow-sm"
-                  : "text-neutral-500 hover:text-neutral-900"
+                "eb-capsule-tab-item",
+                statusFilter === tab.value && "eb-capsule-tab-item-active"
               )}
             >
               {tab.label}

@@ -6,6 +6,7 @@ import {
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
 import { TrendingUp, ShoppingBag, Clock, Users } from "lucide-react";
+import nextDynamic from "next/dynamic";
 
 type DayPoint    = { month: string; earnings: number };
 type ActivePoint = { status: string; count: number };
@@ -38,7 +39,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const REPEAT_COLORS = ["#0EA5E9", "#3B82F6", "#8B5CF6"];
 
-export function EditorDashboardCharts({
+function EditorDashboardChartsInner({
   earningsData,
   activeOrderData,
   responseTimeData,
@@ -180,3 +181,15 @@ export function EditorDashboardCharts({
     </div>
   );
 }
+
+export const EditorDashboardCharts = nextDynamic(
+  async () => EditorDashboardChartsInner,
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] w-full bg-white border border-gray-100 rounded-2xl animate-pulse flex items-center justify-center">
+        <span className="text-xs text-gray-400">Loading metrics...</span>
+      </div>
+    )
+  }
+);

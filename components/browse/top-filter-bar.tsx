@@ -108,28 +108,28 @@ export function TopFilterBar() {
   const nicheLabel = NICHES.find(n => n.value === get("niche") && n.value)?.label;
 
   return (
-    <div ref={barRef} className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20 shadow-sm">
+    <div ref={barRef} className="bg-white/98 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-20 shadow-none">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center gap-2 py-3">
+        <div className="flex items-center gap-2 py-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
 
           {/* Available Now toggle */}
           <button
             onClick={() => update("available", get("available") === "true" ? "" : "true")}
             className={cn(
-              "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[13px] font-semibold transition-all whitespace-nowrap shrink-0",
+              "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[12px] font-bold uppercase tracking-wider transition-all whitespace-nowrap shrink-0",
               get("available") === "true"
-                ? "border-emerald-400 text-emerald-700 bg-emerald-50 shadow-sm"
-                : "border-gray-200 text-gray-600 bg-white hover:border-emerald-300 hover:text-emerald-600 hover:shadow-sm"
+                ? "border-black text-black bg-neutral-50 shadow-sm"
+                : "border-neutral-200 text-neutral-500 bg-white hover:border-neutral-300 hover:text-black hover:shadow-sm"
             )}
           >
             <span className={cn(
               "w-1.5 h-1.5 rounded-full shrink-0",
-              get("available") === "true" ? "bg-emerald-500 animate-pulse" : "bg-gray-300"
+              get("available") === "true" ? "bg-emerald-500 animate-pulse" : "bg-neutral-350"
             )} />
             Available Now
           </button>
 
-          <div className="h-6 w-px bg-gray-200 shrink-0" />
+          <div className="h-6 w-px bg-neutral-200 shrink-0" />
 
           {/* Category dropdown */}
           <DropBtn
@@ -146,7 +146,7 @@ export function TopFilterBar() {
             ))}
           </DropBtn>
 
-          <div className="h-6 w-px bg-gray-200 shrink-0" />
+          <div className="h-6 w-px bg-neutral-200 shrink-0" />
 
           {/* Sort */}
           <DropBtn
@@ -202,7 +202,7 @@ export function TopFilterBar() {
             panelWidth="w-64"
           >
             <div className="p-4 space-y-3">
-              <p className="text-xs font-semibold text-gray-500">Budget range (₹)</p>
+              <p className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Budget range (₹)</p>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -210,21 +210,21 @@ export function TopFilterBar() {
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && commitBudget()}
-                  className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 placeholder:text-gray-300"
+                  className="w-full text-xs rounded-full border border-neutral-200 px-3.5 py-2 focus:outline-none focus:border-black placeholder:text-neutral-450"
                 />
-                <span className="text-gray-300 shrink-0 text-xs">—</span>
+                <span className="text-neutral-300 shrink-0 text-xs">—</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && commitBudget()}
-                  className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20 focus:border-[var(--brand-client)]/50 placeholder:text-gray-300"
+                  className="w-full text-xs rounded-full border border-neutral-200 px-3.5 py-2 focus:outline-none focus:border-black placeholder:text-neutral-450"
                 />
               </div>
               <button
                 onClick={commitBudget}
-                className="w-full bg-[var(--brand-client)] text-white text-sm font-semibold py-2 rounded-xl hover:bg-sky-600 transition-colors"
+                className="w-full bg-black text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-full hover:bg-neutral-900 transition-all cursor-pointer"
               >
                 Apply
               </button>
@@ -235,7 +235,7 @@ export function TopFilterBar() {
           {activeCount > 0 && (
             <button
               onClick={clearAll}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors shrink-0"
+              className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-neutral-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
               Clear ({activeCount})
@@ -258,10 +258,10 @@ function DropBtn({
       <button
         onClick={onToggle}
         className={cn(
-          "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[13px] font-semibold transition-all whitespace-nowrap",
+          "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[12px] font-bold uppercase tracking-wider transition-all whitespace-nowrap",
           active
-            ? "border-[var(--brand-client)] text-[var(--brand-client)] bg-[var(--brand-client)]/8 shadow-sm"
-            : "border-gray-200 text-gray-600 bg-white hover:border-gray-300 hover:shadow-sm"
+            ? "border-black text-black bg-neutral-50 shadow-sm"
+            : "border-neutral-200 text-neutral-500 bg-white hover:border-neutral-300 hover:shadow-sm"
         )}
       >
         {label}
@@ -269,7 +269,7 @@ function DropBtn({
       </button>
       {open && (
         <div className={cn(
-          "absolute left-0 top-full mt-2 bg-white rounded-2xl border border-gray-100 shadow-2xl shadow-black/8 z-30 overflow-hidden",
+          "absolute left-0 top-full mt-2 bg-white rounded-2xl border border-neutral-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.06)] z-30 overflow-hidden",
           panelWidth
         )}>
           {children}
@@ -288,10 +288,10 @@ function DropItem({
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-2 text-left px-4 py-2.5 text-sm transition-colors",
+        "w-full flex items-center gap-2 text-left px-4 py-2.5 text-xs font-semibold transition-colors",
         selected
-          ? "bg-[var(--brand-client)]/8 text-[var(--brand-client)] font-semibold"
-          : "text-gray-700 hover:bg-gray-50"
+          ? "bg-neutral-50 text-black font-bold"
+          : "text-neutral-700 hover:bg-neutral-50/50"
       )}
     >
       {children}

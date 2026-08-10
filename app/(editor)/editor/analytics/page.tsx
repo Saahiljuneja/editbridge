@@ -7,11 +7,7 @@ import { orders, packages, reviews, portfolioItems } from "@/lib/db/schema";
 import { eq, sql, and, count, sum } from "drizzle-orm";
 import { formatCurrency } from "@/lib/utils";
 import { TrendingUp, ShoppingBag, Star, IndianRupee, BarChart3, Target, Heart, Eye, MessageCircle } from "lucide-react";
-import nextDynamic from "next/dynamic";
-
-const AnalyticsCharts = nextDynamic(
-  () => import("./analytics-charts").then((m) => m.AnalyticsCharts)
-);
+import { AnalyticsCharts } from "./analytics-charts";
 import { ProfileAnalyticsSection } from "@/components/editor/profile-analytics-section";
 
 export default async function EditorAnalyticsPage() {
@@ -109,15 +105,15 @@ export default async function EditorAnalyticsPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b border-neutral-200/60">
         <div className="px-6 py-5 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Your performance at a glance</p>
+            <h1 className="text-sm font-black text-black uppercase tracking-wider">Analytics</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-0.5">Your performance at a glance</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 text-blue-600" />
+          <div className="w-9 h-9 rounded-xl bg-neutral-50 border border-neutral-200 flex items-center justify-center text-black">
+            <BarChart3 className="w-4 h-4" />
           </div>
         </div>
       </div>
@@ -127,74 +123,75 @@ export default async function EditorAnalyticsPage() {
         <ProfileAnalyticsSection />
 
         <div>
-          <h2 className="font-semibold text-gray-900 text-sm mb-4">Order Performance</h2>
+          <h2 className="text-xs font-black text-neutral-800 uppercase tracking-wider mb-4">Order Performance</h2>
 
-        {/* KPI cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              label: "This Month",
-              value: formatCurrency(thisMonth),
-              sub: momChange !== null ? `${momChange >= 0 ? "+" : ""}${momChange}% vs last month` : "First month",
-              subColor: momChange !== null && momChange >= 0 ? "text-emerald-600" : "text-red-500",
-              icon: IndianRupee, bg: "bg-emerald-50", color: "text-emerald-600",
-            },
-            {
-              label: "Total Orders",
-              value: totalOrders,
-              sub: `${completedOrders} completed`,
-              subColor: "text-gray-400",
-              icon: ShoppingBag, bg: "bg-blue-50", color: "text-blue-600",
-            },
-            {
-              label: "Completion Rate",
-              value: `${completionRate}%`,
-              sub: completionRate >= 90 ? "Excellent" : completionRate >= 70 ? "Good" : "Needs work",
-              subColor: completionRate >= 90 ? "text-emerald-600" : completionRate >= 70 ? "text-amber-600" : "text-red-500",
-              icon: Target, bg: "bg-amber-50", color: "text-amber-600",
-            },
-            {
-              label: "Avg Rating",
-              value: avgRatingRow ? `${avgRatingRow} ★` : "N/A",
-              sub: `${reviewCountRow} review${reviewCountRow !== 1 ? "s" : ""}`,
-              subColor: "text-gray-400",
-              icon: Star, bg: "bg-blue-50", color: "text-blue-600",
-            },
-          ].map(({ label, value, sub, subColor, icon: Icon, bg, color }) => (
-            <div key={label} className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium text-gray-500">{label}</p>
-                <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center`}>
-                  <Icon className={`w-4 h-4 ${color}`} />
+          {/* KPI cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                label: "This Month",
+                value: formatCurrency(thisMonth),
+                sub: momChange !== null ? `${momChange >= 0 ? "+" : ""}${momChange}% vs last month` : "First month",
+                subColor: momChange !== null && momChange >= 0 ? "text-emerald-600" : "text-red-500",
+                icon: IndianRupee,
+              },
+              {
+                label: "Total Orders",
+                value: totalOrders,
+                sub: `${completedOrders} completed`,
+                subColor: "text-neutral-400 font-bold",
+                icon: ShoppingBag,
+              },
+              {
+                label: "Completion Rate",
+                value: `${completionRate}%`,
+                sub: completionRate >= 90 ? "Excellent" : completionRate >= 70 ? "Good" : "Needs work",
+                subColor: completionRate >= 90 ? "text-emerald-600" : completionRate >= 70 ? "text-amber-600" : "text-red-500",
+                icon: Target,
+              },
+              {
+                label: "Avg Rating",
+                value: avgRatingRow ? `${avgRatingRow} ★` : "N/A",
+                sub: `${reviewCountRow} review${reviewCountRow !== 1 ? "s" : ""}`,
+                subColor: "text-neutral-400 font-bold",
+                icon: Star,
+              },
+            ].map(({ label, value, sub, subColor, icon: Icon }) => (
+              <div key={label} className="eb-kpi-card shadow-none">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-black text-neutral-450 uppercase tracking-wider">{label}</p>
+                  <div className="w-8 h-8 rounded-xl bg-neutral-50 border border-neutral-200/60 flex items-center justify-center text-black">
+                    <Icon className="w-4 h-4" />
+                  </div>
                 </div>
+                <p className="text-xl font-bold text-gray-900 mb-1">{value}</p>
+                <p className={`text-[10px] font-bold ${subColor}`}>{sub}</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-              <p className={`text-xs font-medium ${subColor}`}>{sub}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Feed / Portfolio stats */}
         <div>
-          <h2 className="font-semibold text-gray-900 text-sm mb-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-[var(--brand-client)]" /> Feed Performance
+          <h2 className="text-xs font-black text-neutral-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-black" /> Feed Performance
           </h2>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {[
-              { label: "Portfolio Items", value: Number(feedStats?.itemCount ?? 0), icon: BarChart3, bg: "bg-sky-50", color: "text-sky-600" },
-              { label: "Featured", value: Number(feedStats?.featuredCount ?? 0), icon: TrendingUp, bg: "bg-amber-50", color: "text-amber-500" },
-              { label: "Total Views", value: Number(feedStats?.totalViews ?? 0), icon: Eye, bg: "bg-indigo-50", color: "text-indigo-600" },
-              { label: "Total Likes", value: Number(feedStats?.totalLikes ?? 0), icon: Heart, bg: "bg-red-50", color: "text-red-500" },
-              { label: "Total Comments", value: Number(feedStats?.totalComments ?? 0), icon: MessageCircle, bg: "bg-violet-50", color: "text-violet-600" },
-            ].map(({ label, value, icon: Icon, bg, color }) => (
-              <div key={label} className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
+              { label: "Portfolio Items", value: Number(feedStats?.itemCount ?? 0), icon: BarChart3 },
+              { label: "Featured", value: Number(feedStats?.featuredCount ?? 0), icon: TrendingUp },
+              { label: "Total Views", value: Number(feedStats?.totalViews ?? 0), icon: Eye },
+              { label: "Total Likes", value: Number(feedStats?.totalLikes ?? 0), icon: Heart },
+              { label: "Total Comments", value: Number(feedStats?.totalComments ?? 0), icon: MessageCircle },
+            ].map(({ label, value, icon: Icon }) => (
+              <div key={label} className="eb-kpi-card shadow-none">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-gray-500">{label}</p>
-                  <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center`}>
-                    <Icon className={`w-4 h-4 ${color}`} />
+                  <p className="text-[10px] font-black text-neutral-450 uppercase tracking-wider">{label}</p>
+                  <div className="w-8 h-8 rounded-xl bg-neutral-50 border border-neutral-200/60 flex items-center justify-center text-black">
+                    <Icon className="w-4 h-4" />
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</p>
+                <p className="text-xl font-bold text-gray-900">{value.toLocaleString()}</p>
               </div>
             ))}
           </div>
@@ -206,8 +203,6 @@ export default async function EditorAnalyticsPage() {
           pkgData={pkgData}
           statusData={statusData}
         />
-        </div>
-
       </div>
     </div>
   );

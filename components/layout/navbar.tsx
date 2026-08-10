@@ -313,7 +313,7 @@ export function Navbar({
       {/* ── Main navbar ── */}
       <nav
         aria-label="Main navigation"
-        className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-[0_1px_8px_rgba(0,0,0,0.06)]"
+        className="sticky top-0 z-40 w-full bg-white/98 backdrop-blur-md border-b border-neutral-200/60 shadow-none"
       >
         {/* ── Row 1 ── */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -326,21 +326,22 @@ export function Navbar({
                 <img src={logoUrl} alt={platformName ?? "Logo"} className="h-8 w-auto max-w-[140px] object-contain" />
               ) : (
                 <>
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7c6ff7] to-[var(--brand-client)] flex items-center justify-center shadow-[0_2px_8px_rgba(74,63,181,0.4)] group-hover:shadow-[0_4px_16px_rgba(74,63,181,0.5)] transition-all">
+                  <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center transition-all">
                     <span className="text-white font-black text-sm">E</span>
                   </div>
-                  <span className="text-[1.15rem] font-black tracking-tight text-gray-900">
-                    {platformName ?? <>Edit<span className="text-[var(--brand-client)]">Bridge</span></>}
+                  <span className="text-[1.15rem] font-black tracking-tight text-black">
+                    {platformName ?? <>Edit<span className="text-neutral-500 font-semibold">Bridge</span></>}
                   </span>
                 </>
               )}
             </Link>
 
             {/* ── Search (desktop) ── */}
-            <div className="hidden md:flex flex-1 items-center mx-4 relative">
+            <div className="hidden md:flex flex-1 items-center mx-4 relative max-w-md">
               {/* [fix #4] role="search" + aria-label on the form */}
-              <form onSubmit={handleSearch} className="w-full flex items-center" role="search" aria-label="Search editors">
-                <div className="flex-1 flex items-center gap-2.5 rounded-l-xl border border-r-0 border-gray-200 px-4 py-2.5 bg-white hover:border-gray-300 focus-within:border-gray-400 transition-all">
+              <form onSubmit={handleSearch} className="w-full flex items-center relative" role="search" aria-label="Search editors">
+                <div className="flex-1 flex items-center gap-2.5 rounded-full border border-neutral-200 px-4 py-2 bg-neutral-50/50 hover:border-neutral-300 focus-within:bg-white focus-within:border-black transition-all">
+                  <Search className="w-4 h-4 text-neutral-400 shrink-0" />
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -349,34 +350,25 @@ export function Navbar({
                     onFocus={handleSearchFocus}
                     onBlur={handleSearchBlur}
                     onKeyDown={handleSearchKeyDown}
-                    // [fix #7] shorter placeholder
                     placeholder="Search editors, niches, styles..."
-                    // [fix #4] ARIA combobox attributes
                     aria-autocomplete="list"
                     aria-expanded={showDropdown}
                     aria-haspopup="listbox"
                     aria-controls={showDropdown ? "search-suggestions" : undefined}
                     aria-activedescendant={highlightedIdx >= 0 ? `suggestion-${highlightedIdx}` : undefined}
-                    className="flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+                    className="flex-1 min-w-0 text-sm text-neutral-900 placeholder:text-neutral-400 bg-transparent focus:outline-none"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => { setSearchQuery(""); searchInputRef.current?.focus(); }}
-                      className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+                      className="text-neutral-400 hover:text-neutral-600 transition-colors shrink-0"
                       aria-label="Clear search"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
-                <button
-                  type="submit"
-                  className="px-4 py-[11px] rounded-r-xl bg-gray-900 text-white hover:bg-gray-700 transition-colors shrink-0 border border-gray-900"
-                  aria-label="Search"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
               </form>
 
               {/* ── Autocomplete dropdown ── */}
@@ -385,10 +377,10 @@ export function Navbar({
                   id="search-suggestions"
                   role="listbox"
                   aria-label="Search suggestions"
-                  className="absolute left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.12)] z-50 overflow-hidden"
+                  className="absolute left-0 right-0 top-[calc(100%+4px)] bg-white rounded-2xl border border-neutral-200 shadow-[0_8px_30px_rgba(0,0,0,0.06)] z-50 overflow-hidden"
                 >
-                  <div className="px-4 py-2.5 border-b border-gray-100">
-                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                  <div className="px-4 py-2.5 border-b border-neutral-100">
+                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.12em]">
                       {searchQuery.trim() ? "Suggestions" : "Popular searches"}
                     </p>
                   </div>
@@ -406,13 +398,13 @@ export function Navbar({
                         onBlur={handleSearchBlur}
                         onKeyDown={e => handleSuggestionKeyDown(e, idx)}
                         className={cn(
-                          "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors text-left focus:outline-none",
+                          "flex items-center gap-3 w-full px-4 py-2.5 text-xs transition-colors text-left focus:outline-none font-medium",
                           highlightedIdx === idx
-                            ? "bg-[var(--brand-client)]/5 text-[var(--brand-client)]"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "bg-neutral-50 text-black font-bold"
+                            : "text-neutral-700 hover:bg-neutral-50/50"
                         )}
                       >
-                        <Search className={cn("w-3.5 h-3.5 shrink-0 transition-colors", highlightedIdx === idx ? "text-[var(--brand-client)]" : "text-gray-400")} />
+                        <Search className={cn("w-3.5 h-3.5 shrink-0 transition-colors", highlightedIdx === idx ? "text-black" : "text-neutral-400")} />
                         {label}
                       </button>
                     )) : searchQuery.trim() ? (
@@ -427,13 +419,13 @@ export function Navbar({
                         onBlur={handleSearchBlur}
                         onKeyDown={e => handleSuggestionKeyDown(e, 0)}
                         className={cn(
-                          "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors text-left focus:outline-none",
+                          "flex items-center gap-3 w-full px-4 py-2.5 text-xs transition-colors text-left focus:outline-none font-medium",
                           highlightedIdx === 0
-                            ? "bg-[var(--brand-client)]/5 text-[var(--brand-client)]"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "bg-neutral-50 text-black font-bold"
+                            : "text-neutral-700 hover:bg-neutral-50/50"
                         )}
                       >
-                        <Search className={cn("w-3.5 h-3.5 shrink-0", highlightedIdx === 0 ? "text-[var(--brand-client)]" : "text-gray-400")} />
+                        <Search className={cn("w-3.5 h-3.5 shrink-0", highlightedIdx === 0 ? "text-black" : "text-neutral-400")} />
                         Search for &ldquo;{searchQuery}&rdquo;
                       </button>
                     ) : null}
@@ -443,7 +435,7 @@ export function Navbar({
             </div>
 
             {/* ── Right side ── */}
-            <div className="flex items-center gap-2 ml-auto md:ml-0">
+            <div className="flex items-center gap-2 ml-auto">
 
               {/* Mobile search icon */}
               <Link href="/browse" className="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Search editors">
@@ -455,7 +447,7 @@ export function Navbar({
                   <NotificationBell />
 
                   <Link href={dashboardHref}
-                    className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                    className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-neutral-600 hover:text-black hover:bg-neutral-50">
                     <LayoutDashboard className="w-4 h-4" />
                     Dashboard
                   </Link>
@@ -467,21 +459,21 @@ export function Navbar({
                       onClick={() => setUserOpen(o => !o)}
                       aria-expanded={userOpen}
                       aria-haspopup="true"
-                      className="flex items-center gap-2 px-2 py-1.5 rounded-xl border transition-all border-gray-200 bg-gray-50 hover:bg-gray-100"
+                      className="flex items-center gap-2 px-2 py-1.5 rounded-[14px] border transition-all border-neutral-200 bg-neutral-50/50 hover:bg-neutral-50"
                     >
-                      <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
+                      <div className="w-7 h-7 rounded-[8px] bg-black flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
                         {session.user?.image
                           // eslint-disable-next-line @next/next/no-img-element
                           ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
                           : initials}
                       </div>
                       <div className="hidden sm:block text-left max-w-[90px]">
-                        <p className="text-xs font-semibold truncate leading-none text-gray-800">
+                        <p className="text-xs font-bold truncate leading-none text-neutral-800">
                           {session.user?.name?.split(" ")[0]}
                         </p>
-                        <p className="text-[10px] leading-none mt-0.5 text-gray-400">{roleLabel}</p>
+                        <p className="text-[9px] font-black tracking-wider uppercase leading-none mt-0.5 text-neutral-400">{roleLabel}</p>
                       </div>
-                      <ChevronDown className={cn("w-3.5 h-3.5 shrink-0 transition-all text-gray-400", userOpen && "rotate-180")} />
+                      <ChevronDown className={cn("w-3.5 h-3.5 shrink-0 transition-all text-neutral-400", userOpen && "rotate-180")} />
                     </button>
 
                     {userOpen && (
@@ -490,20 +482,20 @@ export function Navbar({
                         <div
                           ref={userMenuRef}
                           role="menu"
-                          className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-gray-100 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] z-20 overflow-hidden"
+                          className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-neutral-200/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] z-20 overflow-hidden"
                         >
-                          <div className="px-4 py-4 border-b border-gray-100">
+                          <div className="px-4 py-4 border-b border-neutral-100">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-[var(--brand-client)] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+                              <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
                                 {session.user?.image
                                   // eslint-disable-next-line @next/next/no-img-element
                                   ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
                                   : initials}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-bold text-gray-900 truncate">{session.user?.name}</p>
-                                <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
-                                <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#7c6ff7]/10 text-[#7c6ff7] text-[10px] font-black uppercase tracking-wide">
+                                <p className="text-sm font-black text-black truncate">{session.user?.name}</p>
+                                <p className="text-xs text-neutral-400 truncate">{session.user?.email}</p>
+                                <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full border border-neutral-200 bg-neutral-50 text-neutral-700 text-[9px] font-mono font-bold tracking-wider">
                                   {roleLabel}
                                 </span>
                               </div>
@@ -573,7 +565,7 @@ export function Navbar({
         </div>
 
         {/* ── Row 2: in-app nav (desktop) ── */}
-        <div className="hidden md:block border-t border-gray-200">
+        <div className="hidden md:block border-t border-neutral-200/60">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center overflow-x-auto [&::-webkit-scrollbar]:hidden">
 
@@ -582,10 +574,10 @@ export function Navbar({
                   key={href}
                   href={href}
                   className={cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-3 text-sm border-b-[3px] transition-colors shrink-0",
+                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-3 text-xs uppercase tracking-wider border-b-2 transition-colors shrink-0 font-bold",
                     isActive(href)
-                      ? "border-[var(--brand-client)] text-[var(--brand-client)] font-semibold"
-                      : "border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300"
+                      ? "border-black text-black"
+                      : "border-transparent text-neutral-400 hover:text-neutral-800 hover:border-neutral-300"
                   )}
                 >
                   {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
@@ -593,17 +585,17 @@ export function Navbar({
                 </Link>
               ))}
 
-              <span className="shrink-0 w-px h-4 bg-gray-200 mx-2" />
+              <span className="shrink-0 w-px h-4 bg-neutral-200 mx-2" />
 
               {RESOURCES.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
                   className={cn(
-                    "whitespace-nowrap px-3 py-3 text-sm border-b-[3px] transition-colors shrink-0",
+                    "whitespace-nowrap px-3 py-3 text-xs uppercase tracking-wider border-b-2 transition-colors shrink-0 font-bold",
                     isActive(href)
-                      ? "border-[var(--brand-client)] text-[var(--brand-client)] font-semibold"
-                      : "border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300"
+                      ? "border-black text-black"
+                      : "border-transparent text-neutral-400 hover:text-neutral-800 hover:border-neutral-300"
                   )}
                 >
                   {label}

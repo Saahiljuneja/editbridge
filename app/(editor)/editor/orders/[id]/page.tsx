@@ -129,9 +129,10 @@ export default async function EditorOrderDetailPage({
   const canDeliver = ["pending", "in_progress", "revision_requested"].includes(order.status);
 
   const briefData = (order.briefData as BriefData | null) ?? {};
-  if (briefData?.customAddons?.extraRevision && order.packageRevisionCount !== null && order.packageRevisionCount !== -1) {
-    order.packageRevisionCount += 1;
-  }
+  const computedRevisionCount =
+    briefData?.customAddons?.extraRevision && order.packageRevisionCount !== null && order.packageRevisionCount !== -1
+      ? order.packageRevisionCount + 1
+      : order.packageRevisionCount;
 
   const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
   const StatusIcon = cfg.icon;
@@ -405,8 +406,8 @@ export default async function EditorOrderDetailPage({
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <RotateCcw className="w-3.5 h-3.5 shrink-0" />
-                  {order.packageRevisionCount === -1 ? "Unlimited" : order.packageRevisionCount}{" "}
-                  revision{order.packageRevisionCount !== 1 ? "s" : ""}
+                  {computedRevisionCount === -1 ? "Unlimited" : computedRevisionCount}{" "}
+                  revision{computedRevisionCount !== 1 ? "s" : ""}
                 </div>
               </div>
 

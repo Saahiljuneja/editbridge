@@ -78,10 +78,10 @@ export function MessageBubble({ message, isSelf }: MessageBubbleProps) {
         className={cn(
           "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm",
           isSelf
-            ? "bg-[var(--brand-client)] text-white rounded-br-sm"
+            ? "bg-black text-white rounded-br-sm"
             : isAdminMessage
-              ? "bg-violet-50 border border-violet-200 text-foreground rounded-bl-sm"
-              : "bg-muted text-foreground rounded-bl-sm"
+              ? "bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-bl-sm"
+              : "bg-neutral-100/80 text-neutral-900 rounded-bl-sm"
         )}
       >
         {message.content && <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>}

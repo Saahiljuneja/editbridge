@@ -199,15 +199,15 @@ export function ChatWindow({
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] rounded-2xl border border-border bg-white overflow-hidden relative">
+    <div className="flex flex-col h-[calc(100vh-12rem)] rounded-[24px] border border-neutral-200/60 bg-white overflow-hidden relative shadow-none">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-semibold text-[#0EA5E9]">
+      <div className="px-5 py-4 border-b border-neutral-200/60 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-[10px] font-bold text-white uppercase select-none">
           {otherPartyName.slice(0, 2).toUpperCase()}
         </div>
         <div>
-          <p className="font-semibold text-sm">{otherPartyName}</p>
-          <p className="text-xs text-muted-foreground">Order chat</p>
+          <p className="font-bold text-xs text-neutral-800 uppercase tracking-wider">{otherPartyName}</p>
+          <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-0.5">Order chat</p>
         </div>
       </div>
 
@@ -258,46 +258,46 @@ export function ChatWindow({
 
       {/* Save Template Modal Overlay */}
       {showSaveTemplateModal && (
-        <div className="absolute inset-0 bg-black/40 z-20 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm border border-gray-100 shadow-xl space-y-4">
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-20 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-neutral-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-4">
             <div>
-              <p className="font-bold text-gray-900 text-sm">Save message as template</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">This will add the current input text to your quick-reply menu.</p>
+              <p className="font-black text-black text-xs uppercase tracking-wider">Save as template</p>
+              <p className="text-[10px] text-neutral-400 font-semibold mt-0.5">This will add the current input text to your quick-reply menu.</p>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-[10px] font-semibold text-gray-700 uppercase tracking-wider mb-1">Template Title</label>
+                <label className="block text-[9px] font-black text-neutral-450 uppercase tracking-wider mb-1.5">Template Title</label>
                 <input
                   value={newTemplateTitle}
                   onChange={(e) => setNewTemplateTitle(e.target.value)}
                   placeholder="e.g. Greeting, Follow-up"
                   maxLength={60}
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                  className="w-full rounded-full border border-neutral-200 px-3.5 py-2 text-xs focus:outline-none focus:border-black placeholder:text-neutral-350"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold text-gray-700 uppercase tracking-wider mb-1">Shortcut (lowercase letters only, optional)</label>
+                <label className="block text-[9px] font-black text-neutral-450 uppercase tracking-wider mb-1.5">Shortcut (lowercase only, optional)</label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">/</span>
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-450 text-xs">/</span>
                   <input
                     value={newTemplateShortcut}
                     onChange={(e) => setNewTemplateShortcut(e.target.value)}
                     placeholder="thanks"
                     maxLength={20}
-                    className="w-full rounded-xl border border-gray-200 pl-6 pr-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                    className="w-full rounded-full border border-neutral-200 pl-6 pr-3.5 py-2 text-xs focus:outline-none focus:border-black placeholder:text-neutral-350"
                   />
                 </div>
               </div>
-              <div className="border border-gray-50 rounded-xl bg-gray-50/50 p-3 text-[11px] text-gray-500 max-h-24 overflow-y-auto italic">
+              <div className="border border-neutral-100 rounded-2xl bg-neutral-50/50 p-3.5 text-[11px] text-neutral-500 max-h-24 overflow-y-auto italic">
                 &ldquo;{content.trim()}&rdquo;
               </div>
             </div>
-            <div className="flex gap-2 justify-end text-xs">
+            <div className="flex gap-2 justify-end">
               <button
                 type="button"
                 onClick={() => setShowSaveTemplateModal(false)}
                 disabled={savingTemplate}
-                className="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-lg text-gray-600 font-semibold"
+                className="px-5 py-2 border border-neutral-200 hover:bg-neutral-50 rounded-full text-neutral-600 font-bold uppercase tracking-wider text-[10px] cursor-pointer transition-all"
               >
                 Cancel
               </button>
@@ -305,7 +305,7 @@ export function ChatWindow({
                 type="button"
                 onClick={handleSaveAsTemplate}
                 disabled={savingTemplate || !newTemplateTitle.trim()}
-                className="px-4 py-2 rounded-lg text-white font-semibold flex items-center gap-1.5 disabled:opacity-50 bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+                className="px-5 py-2 rounded-full text-white font-bold uppercase tracking-wider text-[10px] flex items-center gap-1.5 disabled:opacity-50 bg-black hover:bg-neutral-900 transition-all cursor-pointer"
               >
                 {savingTemplate ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Template"}
               </button>
@@ -315,17 +315,17 @@ export function ChatWindow({
       )}
 
       {/* Input Form */}
-      <form onSubmit={handleSend} className="relative px-5 py-4 border-t border-border flex items-end gap-2">
+      <form onSubmit={handleSend} className="relative px-5 py-4 border-t border-neutral-200/60 flex items-end gap-2">
         {/* Response template "/" picker — editor-only */}
         {isEditor && showPicker && (
-          <div className="absolute left-5 right-5 bottom-full mb-2 max-h-64 overflow-y-auto rounded-xl border border-border bg-white shadow-lg z-10">
-            <div className="px-3 py-2 border-b border-gray-50 flex items-center gap-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide sticky top-0 bg-white">
+          <div className="absolute left-5 right-5 bottom-full mb-2 max-h-64 overflow-y-auto rounded-2xl border border-neutral-200/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)] z-10">
+            <div className="px-3 py-2 border-b border-neutral-100 flex items-center gap-1.5 text-[10px] font-black text-neutral-450 uppercase tracking-wide sticky top-0 bg-white">
               <MessageSquareText className="w-3.5 h-3.5" /> Response templates
             </div>
             {filteredTemplates.length === 0 ? (
-              <p className="px-3 py-3 text-xs text-gray-400">
+              <p className="px-3 py-3 text-xs text-neutral-450">
                 {templates.length === 0
-                  ? <>No templates yet — add some in <span className="font-medium text-gray-500">Settings → Templates</span>.</>
+                  ? <>No templates yet — add some in <span className="font-semibold text-neutral-600">Settings → Templates</span>.</>
                   : "No matching templates."}
               </p>
             ) : (
@@ -334,15 +334,15 @@ export function ChatWindow({
                   key={t.id}
                   type="button"
                   onClick={() => insertTemplate(t)}
-                  className="w-full text-left px-3 py-2.5 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+                  className="w-full text-left px-3 py-2.5 hover:bg-neutral-50 transition-colors border-b border-neutral-50 last:border-0 cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-900">{t.title}</p>
+                    <p className="text-xs font-bold text-neutral-800">{t.title}</p>
                     {t.shortcut && (
-                      <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">/{t.shortcut}</span>
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-500">/{t.shortcut}</span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-400 truncate mt-0.5">{t.content}</p>
+                  <p className="text-[11px] text-neutral-400 truncate mt-0.5">{t.content}</p>
                 </button>
               ))
             )}
@@ -353,8 +353,8 @@ export function ChatWindow({
           type="button"
           onClick={() => setShowAttach(!showAttach)}
           className={cn(
-            "p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0",
-            showAttach && "bg-muted text-foreground"
+            "p-2.5 h-9 w-9 flex items-center justify-center rounded-full text-neutral-400 hover:text-black hover:bg-neutral-50 transition-colors shrink-0 cursor-pointer",
+            showAttach && "bg-neutral-100 text-black"
           )}
           aria-label="Attach file"
         >
@@ -365,7 +365,7 @@ export function ChatWindow({
           <button
             type="button"
             onClick={() => setShowSaveTemplateModal(true)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-[#0EA5E9] hover:bg-muted transition-colors shrink-0"
+            className="p-2.5 h-9 w-9 flex items-center justify-center rounded-full text-neutral-400 hover:text-black hover:bg-neutral-50 transition-colors shrink-0 cursor-pointer"
             title="Save as quick-reply template"
             aria-label="Save as template"
           >
@@ -383,7 +383,7 @@ export function ChatWindow({
               ? `Message ${otherPartyName}… (Enter to send, "/" for templates)`
               : `Message ${otherPartyName}… (Enter to send, Shift+Enter for new line)`
           }
-          className="min-h-[44px] max-h-36 resize-none flex-1"
+          className="min-h-[40px] max-h-36 resize-none flex-1"
           rows={1}
           maxLength={5000}
         />
@@ -392,13 +392,12 @@ export function ChatWindow({
           type="submit"
           disabled={sending || (!content.trim() && !attachKey)}
           className={cn(
-            buttonVariants({ size: "sm" }),
-            "bg-[#0EA5E9] hover:bg-sky-600 shrink-0 px-3",
+            "bg-black hover:bg-neutral-900 text-white rounded-full h-9 w-9 flex items-center justify-center shrink-0 cursor-pointer transition-all",
             (sending || (!content.trim() && !attachKey)) && "opacity-50 cursor-not-allowed"
           )}
           aria-label="Send message"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3.5 h-3.5" />
         </button>
       </form>
     </div>

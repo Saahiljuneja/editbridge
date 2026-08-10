@@ -232,6 +232,86 @@ body {
 
   /* Table header cells */
   .a-th { @apply text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500; }
+
+  /* ── EditBridge Premium Visual Design System Tokens ─────────────────── */
+  .eb-contour-bg {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'%3E%3Cpath d='M-100,200 C100,100 300,300 500,200 C700,100 900,300 1100,200 M-100,250 C100,150 300,350 500,250 C700,150 900,350 1100,250 M-100,300 C100,200 300,400 500,300 C700,200 900,400 1100,300 M-100,350 C100,250 300,450 500,350 C700,250 900,450 1100,350 M-100,400 C100,300 300,500 500,400 C700,300 900,500 1100,400 M-100,450 C100,350 300,550 500,450 C700,350 900,550 1100,450 M-100,500 C100,400 300,600 500,500 C700,400 900,600 1100,500 M-100,550 C100,450 300,650 500,550 C700,450 900,650 1100,550' fill='none' stroke='%23f3f4f6' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-size: 800px 800px;
+    background-repeat: repeat;
+  }
+  .dark .eb-contour-bg {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'%3E%3Cpath d='M-100,200 C100,100 300,300 500,200 C700,100 900,300 1100,200 M-100,250 C100,150 300,350 500,250 C700,150 900,350 1100,250 M-100,300 C100,200 300,400 500,300 C700,200 900,400 1100,300 M-100,350 C100,250 300,450 500,350 C700,250 900,450 1100,350 M-100,400 C100,300 300,500 500,400 C700,300 900,500 1100,400 M-100,450 C100,350 300,550 500,450 C700,350 900,550 1100,450 M-100,500 C100,400 300,600 500,500 C700,400 900,600 1100,500 M-100,550 C100,450 300,650 500,550 C700,450 900,650 1100,550' fill='none' stroke='%23222222' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+
+  .eb-input-card {
+    @apply rounded-[20px] border border-neutral-200 bg-white px-4 py-2.5 flex flex-col focus-within:ring-2 focus-within:ring-black/5 focus-within:border-black transition-all;
+  }
+  .dark .eb-input-card {
+    @apply border-neutral-800 bg-[#161616] focus-within:ring-white/5 focus-within:border-white;
+  }
+
+  .eb-input-label {
+    @apply text-[10px] font-bold text-neutral-400 uppercase tracking-wider select-none mb-0.5;
+  }
+  .dark .eb-input-label {
+    @apply text-neutral-500;
+  }
+
+  .eb-input-field {
+    @apply bg-transparent border-none outline-none h-6 text-[14px] text-neutral-900 placeholder:text-neutral-400 w-full focus:ring-0 p-0;
+  }
+  .dark .eb-input-field {
+    @apply text-white placeholder:text-neutral-600;
+  }
+
+  .eb-capsule-tabs {
+    @apply rounded-full p-1 bg-[#f3f4f6] border border-neutral-200/60 flex items-center gap-1;
+  }
+  .dark .eb-capsule-tabs {
+    @apply bg-[#1a1a1a] border-neutral-800;
+  }
+
+  .eb-capsule-tab-item {
+    @apply rounded-full px-4 py-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors select-none cursor-pointer;
+  }
+  .dark .eb-capsule-tab-item {
+    @apply text-neutral-400 hover:text-white;
+  }
+
+  .eb-capsule-tab-item-active {
+    @apply bg-black text-white shadow-sm hover:text-white;
+  }
+  .dark .eb-capsule-tab-item-active {
+    @apply bg-white text-black hover:text-black;
+  }
+
+  .eb-polaroid-widget {
+    @apply bg-white rounded-2xl border border-neutral-200/50 shadow-md p-2 flex flex-col;
+  }
+  .dark .eb-polaroid-widget {
+    @apply bg-[#161616] border-neutral-800 shadow-2xl;
+  }
+
+  .eb-polaroid-footer {
+    @apply pt-2 px-1 text-xs font-bold text-neutral-800 flex items-center gap-1.5;
+  }
+  .dark .eb-polaroid-footer {
+    @apply text-neutral-200;
+  }
+
+  .eb-kpi-card {
+    @apply rounded-[24px] border border-neutral-200/50 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all;
+  }
+  .dark .eb-kpi-card {
+    @apply border-neutral-800 bg-[#161616] shadow-none;
+  }
+
+  .eb-btn-pill {
+    @apply flex items-center justify-center gap-2 h-[52px] px-6 rounded-full bg-black text-white text-sm font-bold shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:bg-neutral-900 active:scale-[0.98] transition-all disabled:opacity-50;
+  }
+  .dark .eb-btn-pill {
+    @apply bg-white text-black hover:bg-neutral-100 shadow-[0_8px_24px_rgba(255,255,255,0.06)];
+  }
 }
 
 @layer base {
@@ -287,5 +367,15 @@ body {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.transition-premium {
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 

@@ -25,11 +25,7 @@ import { AutoPauseBanner } from "./auto-pause-banner";
 import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 import { AvailabilityToggle } from "@/components/editor/availability-toggle";
 import { TopoBackground } from "@/components/common/topo-background";
-import nextDynamic from "next/dynamic";
-
-const EditorDashboardCharts = nextDynamic(
-  () => import("./dashboard-charts").then((m) => m.EditorDashboardCharts)
-);
+import { EditorDashboardCharts } from "./dashboard-charts";
 
 export default async function EditorDashboardPage() {
   const session = await auth();
