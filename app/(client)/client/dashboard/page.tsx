@@ -3,278 +3,298 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { orders, packages, messages, disputes, editors, users, reviews, savedEditors } from "@/lib/db/schema";
-import { and, eq, sql, desc, ne, inArray } from "drizzle-orm";
-import { formatCurrency, formatDate, displayNameFromFull } from "@/lib/utils";
+import { orders, packages, messages, editors, users, reviews, savedEditors } from "@/lib/db/schema";
+import { and, eq, sql, desc, ne } from "drizzle-orm";
+import { formatCurrency, displayNameFromFull, cn } from "@/lib/utils";
 import {
-  ShoppingBag, ArrowRight, MessageSquare, Star,
-  Search, AlertTriangle, CheckCircle2, IndianRupee,
-  Heart, RefreshCw, Film, Clock,
+  ArrowRight, MessageSquare, Star,
+  Search, AlertTriangle, CheckCircle2,
+  RefreshCw, Clock, Users, Plus, Bell, ChevronDown,
+  Folder, Gift, Package, IndianRupee,
 } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
-import { ReferralCard } from "@/components/client/referral-card";
-import { RewardsCard } from "@/components/rewards/rewards-card";
 import { TopoBackground } from "@/components/common/topo-background";
 
-const STATUS_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
-  pending:            { label: "Pending",     dot: "bg-gray-400",    badge: "bg-gray-100 text-gray-600"      },
-  in_progress:        { label: "In Progress", dot: "bg-[#0EA5E9]",   badge: "bg-sky-100 text-sky-700"        },
-  delivered:          { label: "Delivered",   dot: "bg-violet-500",  badge: "bg-violet-100 text-violet-700"  },
-  revision_requested: { label: "Revision",    dot: "bg-amber-500",   badge: "bg-amber-100 text-amber-700"    },
-  disputed:           { label: "Disputed",    dot: "bg-red-500",     badge: "bg-red-100 text-red-700"        },
-};
+function relativeTime(date: Date): string {
+  const diff = Date.now() - date.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 2) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
 
 export default async function ClientDashboardPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
   const userId = session.user.userId!;
-  const firstName = displayNameFromFull(session.user.name);
+  const fullName = session.user.name ?? "";
+  const firstName = displayNameFromFull(fullName) || "there";
 
   const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const [activeOrders, statsRow, unreadRow, openDisputeRow, recentReviews, monthSpentRow, savedEditorsList] = await Promise.all([
-    db.select({
-      id: orders.id, status: orders.status,
-      totalAmount: orders.totalAmount, deadline: orders.deadline,
-      createdAt: orders.createdAt, packageTitle: packages.title,
-      editorName: users.name,
-    })
-      .from(orders)
-      .leftJoin(packages, eq(packages.id, orders.packageId))
-      .innerJoin(editors, eq(editors.id, orders.editorId))
-      .innerJoin(users, eq(users.id, editors.userId))
-      .where(and(eq(orders.clientId, userId), sql`${orders.status} NOT IN ('completed','cancelled')`))
-      .orderBy(sql`${orders.deadline} ASC NULLS LAST`).limit(5),
-
-    db.select({
-      total:      sql<number>`COUNT(*)::int`,
-      completed:  sql<number>`COUNT(*) FILTER (WHERE ${orders.status} = 'completed')::int`,
-      totalSpent: sql<number>`COALESCE(SUM(${orders.totalAmount}) FILTER (WHERE ${orders.status} = 'completed'),0)::int`,
-    }).from(orders).where(eq(orders.clientId, userId)).then(r => r[0]),
-
-    db.select({ count: sql<number>`COUNT(*)::int` })
-      .from(messages).innerJoin(orders, eq(messages.orderId, orders.id))
-      .where(
-        and(
-          eq(orders.clientId, userId),
-          ne(messages.senderId, userId),
-          eq(messages.isRead, false),
-          sql`${orders.status} NOT IN ('completed','cancelled')`,
-          eq(messages.isBlocked, false)
-        )
-      )
-      .then(r => r[0]),
-
-    db.select({ count: sql<number>`COUNT(*)::int` })
-      .from(disputes).innerJoin(orders, eq(orders.id, disputes.orderId))
-      .where(and(eq(orders.clientId, userId), eq(disputes.status, "open"))).then(r => r[0]),
-
-    db.select({ id: reviews.id, rating: reviews.rating, text: reviews.text, createdAt: reviews.createdAt })
-      .from(reviews).where(and(eq(reviews.reviewerId, userId), eq(reviews.role, "client")))
-      .orderBy(desc(reviews.createdAt)).limit(3),
-
-    db.select({ total: sql<number>`COALESCE(SUM(${orders.totalAmount}) FILTER (WHERE ${orders.status} = 'completed'),0)::int` })
-      .from(orders).where(and(eq(orders.clientId, userId), sql`${orders.updatedAt} >= ${monthStart}`)).then(r => r[0]),
-
-    db.select({
-      editorId: editors.id, name: users.name, displayName: editors.displayName,
-      image: users.image, isAvailable: editors.isAvailable, vacationUntil: editors.vacationUntil,
-    })
-      .from(savedEditors)
-      .innerJoin(editors, eq(editors.id, savedEditors.editorId))
-      .innerJoin(users, eq(users.id, editors.userId))
-      .where(eq(savedEditors.clientId, userId))
-      .orderBy(desc(savedEditors.createdAt))
-      .limit(4),
-  ]);
-
-  const savedEditorIds = savedEditorsList.map(e => e.editorId);
-  const savedLastOrders = savedEditorIds.length
-    ? await db.select({ editorId: orders.editorId, orderId: orders.id, packageId: orders.packageId })
+  const [activeOrders, statsRow, unreadRow, savedEditorsList, recommendedEditors, recentActivity] =
+    await Promise.all([
+      // Active orders (not completed / cancelled)
+      db
+        .select({
+          id: orders.id,
+          status: orders.status,
+          deadline: orders.deadline,
+          packageTitle: packages.title,
+          editorName: users.name,
+        })
         .from(orders)
-        .where(and(eq(orders.clientId, userId), inArray(orders.editorId, savedEditorIds), sql`${orders.packageId} IS NOT NULL`))
-        .orderBy(desc(orders.createdAt))
-        .limit(savedEditorIds.length * 3)
-    : [];
-  const savedLastOrderByEditor = new Map<string, { orderId: string; packageId: string }>();
-  for (const o of savedLastOrders) {
-    if (!savedLastOrderByEditor.has(o.editorId) && o.packageId) {
-      savedLastOrderByEditor.set(o.editorId, { orderId: o.orderId, packageId: o.packageId });
-    }
-  }
+        .leftJoin(packages, eq(packages.id, orders.packageId))
+        .innerJoin(editors, eq(editors.id, orders.editorId))
+        .innerJoin(users, eq(users.id, editors.userId))
+        .where(and(eq(orders.clientId, userId), sql`${orders.status} NOT IN ('completed','cancelled')`))
+        .orderBy(sql`${orders.deadline} ASC NULLS LAST`)
+        .limit(5),
 
-  const unreadMessages  = unreadRow?.count       ?? 0;
-  const openDisputes    = openDisputeRow?.count   ?? 0;
-  const monthSpent      = monthSpentRow?.total    ?? 0;
-  const totalSpent      = statsRow?.totalSpent    ?? 0;
-  const totalOrders     = statsRow?.total         ?? 0;
-  const completedOrders = statsRow?.completed     ?? 0;
+      // Lifetime stats
+      db
+        .select({
+          completed:  sql<number>`COUNT(*) FILTER (WHERE ${orders.status} = 'completed')::int`,
+          totalSpent: sql<number>`COALESCE(SUM(${orders.totalAmount}) FILTER (WHERE ${orders.status} = 'completed'), 0)::int`,
+        })
+        .from(orders)
+        .where(eq(orders.clientId, userId))
+        .then(r => r[0]),
 
-  const greet = now.getHours() < 12 ? "morning" : now.getHours() < 17 ? "afternoon" : "evening";
+      // Unread messages
+      db
+        .select({ count: sql<number>`COUNT(*)::int` })
+        .from(messages)
+        .innerJoin(orders, eq(messages.orderId, orders.id))
+        .where(
+          and(
+            eq(orders.clientId, userId),
+            ne(messages.senderId, userId),
+            eq(messages.isRead, false),
+            sql`${orders.status} NOT IN ('completed','cancelled')`,
+            eq(messages.isBlocked, false)
+          )
+        )
+        .then(r => r[0]),
 
-  const KPI_CARDS = [
-    {
-      label: "Spent this month",
-      value: formatCurrency(monthSpent),
-      sub: `${formatCurrency(totalSpent)} all-time`,
-      icon: IndianRupee,
-      href: "/client/orders",
-      topBorder: "border-t-2 border-emerald-500",
-      iconBg: "bg-emerald-50", iconCls: "text-emerald-600",
-    },
-    {
-      label: "Active orders",
-      value: String(activeOrders.length),
-      sub: activeOrders.length === 0 ? "Nothing in progress" : "In progress now",
-      icon: Clock,
-      href: "/client/orders",
-      topBorder: "border-t-2 border-[#0EA5E9]",
-      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]",
-    },
-    {
-      label: "Completed",
-      value: String(completedOrders),
-      sub: `of ${totalOrders} total order${totalOrders !== 1 ? "s" : ""}`,
-      icon: CheckCircle2,
-      href: "/client/orders",
-      topBorder: "border-t-2 border-teal-500",
-      iconBg: "bg-teal-50", iconCls: "text-teal-600",
-    },
-    {
-      label: "Unread messages",
-      value: String(unreadMessages),
-      sub: unreadMessages === 0 ? "All caught up" : "Waiting for you",
-      icon: MessageSquare,
-      href: "/client/messages",
-      topBorder: "border-t-2 border-amber-400",
-      iconBg: "bg-amber-50", iconCls: "text-amber-600",
-    },
-  ];
+      // Saved editors (count only)
+      db
+        .select({ editorId: editors.id })
+        .from(savedEditors)
+        .innerJoin(editors, eq(editors.id, savedEditors.editorId))
+        .where(eq(savedEditors.clientId, userId)),
+
+      // Top available editors by avg rating
+      db
+        .select({
+          editorId:    editors.id,
+          name:        users.name,
+          displayName: editors.displayName,
+          image:       users.image,
+          title:       editors.title,
+          totalOrders: editors.totalOrders,
+          avgRating:   sql<number | null>`ROUND(AVG(${reviews.rating})::numeric, 1)`,
+          reviewCount: sql<number>`COUNT(DISTINCT ${reviews.id})::int`,
+        })
+        .from(editors)
+        .innerJoin(users, eq(users.id, editors.userId))
+        .leftJoin(reviews, and(eq(reviews.revieweeId, editors.userId), eq(reviews.role, "client")))
+        .where(eq(editors.isAvailable, true))
+        .groupBy(editors.id, users.id)
+        .orderBy(sql`AVG(${reviews.rating}) DESC NULLS LAST`, desc(editors.totalOrders))
+        .limit(4),
+
+      // Recent order activity (last 5 by updated)
+      db
+        .select({
+          id:           orders.id,
+          status:       orders.status,
+          updatedAt:    orders.updatedAt,
+          packageTitle: packages.title,
+          editorName:   users.name,
+        })
+        .from(orders)
+        .leftJoin(packages, eq(packages.id, orders.packageId))
+        .innerJoin(editors, eq(editors.id, orders.editorId))
+        .innerJoin(users, eq(users.id, editors.userId))
+        .where(eq(orders.clientId, userId))
+        .orderBy(desc(orders.updatedAt))
+        .limit(5),
+    ]);
+
+  const unreadMessages  = unreadRow?.count     ?? 0;
+  const totalSpent      = statsRow?.totalSpent  ?? 0;
+  const completedOrders = statsRow?.completed   ?? 0;
 
   return (
-    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
-      {/* Topographic contour line background */}
-      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
 
-      <div className="max-w-5xl mx-auto px-6 pt-6 space-y-6 relative z-10">
-        {/* Dashboard Header */}
-        <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
+      <div className="max-w-6xl mx-auto px-6 pt-8 space-y-6 relative z-10">
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-black text-neutral-900 tracking-tight leading-none">Good {greet}, {firstName}</h1>
-            <p className="text-xs text-neutral-400 font-semibold mt-1.5">
-              {activeOrders.length > 0
-                ? `You have ${activeOrders.length} active order${activeOrders.length !== 1 ? "s" : ""}`
-                : "No active orders — ready to find an editor?"}
-            </p>
+            <h1 className="text-[26px] font-black text-neutral-900 tracking-tight leading-none">
+              {greeting}, {firstName} 👋
+            </h1>
+            <p className="text-xs text-neutral-400 font-bold mt-2">Let&apos;s create something amazing today.</p>
           </div>
-          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-            {unreadMessages > 0 && (
-              <Link href="/client/messages"
-                className="flex-1 sm:flex-initial relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-sky-150 bg-sky-50 text-sky-700 text-xs font-bold transition-all hover:bg-sky-100/80">
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>{unreadMessages}</span>
-              </Link>
-            )}
-            {openDisputes > 0 && (
-              <Link href="/client/disputes"
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-red-150 bg-red-50 text-red-700 text-xs font-bold transition-all hover:bg-red-100/80">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>{openDisputes} dispute{openDisputes !== 1 ? "s" : ""}</span>
-              </Link>
-            )}
-            <Link href="/browse"
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm">
-              <Search className="w-3.5 h-3.5" /> Find editor
+          <div className="flex items-center gap-4 shrink-0 self-end md:self-auto">
+            <Link
+              href="/client/notifications"
+              className="relative w-10 h-10 rounded-full bg-white border border-neutral-200/60 flex items-center justify-center text-neutral-500 hover:text-neutral-900 transition-colors shadow-sm"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadMessages > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 bg-violet-600 border border-white text-[8px] font-bold text-white rounded-full flex items-center justify-center">
+                  {unreadMessages > 9 ? "9+" : unreadMessages}
+                </span>
+              )}
             </Link>
+            <div className="flex items-center gap-3 bg-white border border-neutral-200/60 rounded-full pl-2.5 pr-4 py-1.5 shadow-sm">
+              <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-violet-100 text-violet-700 text-xs font-bold shrink-0">
+                {session.user.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={session.user.image} alt={fullName || "User"} className="w-full h-full object-cover" />
+                ) : (
+                  (firstName !== "there" ? firstName[0] : "U").toUpperCase()
+                )}
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-bold text-neutral-800 leading-none">{fullName || "User"}</p>
+                <p className="text-[9px] text-neutral-400 font-bold mt-0.5">Client</p>
+              </div>
+              <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+            </div>
           </div>
         </div>
 
-        {/* KPI row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {KPI_CARDS.map(({ label, value, sub, icon: Icon, href, topBorder, iconBg, iconCls }) => (
-            <Link key={label} href={href}
-              className={cn("bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-5 shadow-sm hover:shadow-md transition-all group relative overflow-hidden", topBorder)}>
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{label}</p>
-                <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110", iconBg)}>
-                  <Icon className={cn("w-4 h-4", iconCls)} />
-                </div>
+        {/* KPI Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            {
+              label: "Active Projects",
+              value: String(activeOrders.length),
+              sub: activeOrders.length === 0 ? "No active orders" : `${activeOrders.length} in progress`,
+              Icon: Folder,
+              iconBg: "bg-violet-50",
+              iconColor: "text-violet-600",
+            },
+            {
+              label: "Completed",
+              value: String(completedOrders),
+              sub: "All time",
+              Icon: CheckCircle2,
+              iconBg: "bg-emerald-50",
+              iconColor: "text-emerald-600",
+            },
+            {
+              label: "Total Spent",
+              value: totalSpent > 0 ? formatCurrency(totalSpent) : "₹0",
+              sub: "On completed orders",
+              Icon: IndianRupee,
+              iconBg: "bg-amber-50",
+              iconColor: "text-amber-500",
+            },
+            {
+              label: "Saved Editors",
+              value: String(savedEditorsList.length),
+              sub: savedEditorsList.length === 0 ? "None saved yet" : "Your favourites",
+              Icon: Users,
+              iconBg: "bg-blue-50",
+              iconColor: "text-blue-600",
+            },
+          ].map(({ label, value, sub, Icon, iconBg, iconColor }) => (
+            <div key={label} className="bg-white rounded-3xl border border-neutral-200/60 p-5 shadow-sm flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">{label}</p>
+                <p className="text-3xl font-black text-neutral-900 leading-none">{value}</p>
+                <p className="text-[10px] text-neutral-400 font-semibold mt-1">{sub}</p>
               </div>
-              <p className="text-2xl font-black text-neutral-900 leading-none mb-1.5 tabular-nums">{value}</p>
-              <p className="text-[10px] text-neutral-400 font-semibold">{sub}</p>
-            </Link>
+              <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shrink-0", iconBg)}>
+                <Icon className={cn("w-5 h-5", iconColor)} />
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* Main grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-          {/* Left col */}
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* Active orders */}
-            <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
-                <div className="flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-neutral-400" />
-                  <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Active Orders</h2>
-                  {activeOrders.length > 0 && (
-                    <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-black text-white">
-                      {activeOrders.length}
-                    </span>
-                  )}
-                </div>
-                <Link href="/client/orders"
-                  className="text-xs font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors">
-                  View all <ArrowRight className="w-3 h-3" />
+            {/* Active Orders */}
+            <div className="bg-white rounded-3xl border border-neutral-200/60 shadow-sm p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-base font-black text-neutral-900">Active Projects</h2>
+                <Link href="/client/orders" className="text-xs font-bold text-violet-600 hover:text-violet-700 hover:underline">
+                  View all orders
                 </Link>
               </div>
 
               {activeOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-14 px-6 text-center bg-[#ffffff]">
-                  <div className="w-12 h-12 rounded-2xl bg-neutral-50 border border-neutral-200/40 flex items-center justify-center mb-3">
-                    <ShoppingBag className="w-5 h-5 text-neutral-400" />
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center mb-3">
+                    <Folder className="w-6 h-6 text-violet-400" />
                   </div>
-                  <p className="font-bold text-neutral-700 text-sm">No active orders</p>
-                  <p className="text-xs text-neutral-400 mt-1 max-w-xs font-semibold">Find a great editor and start your first project today.</p>
-                  <Link href="/browse"
-                    className="mt-4 inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm">
+                  <p className="font-bold text-neutral-700 text-sm">No active projects yet</p>
+                  <p className="text-xs text-neutral-400 mt-1 mb-4">Find an editor and place your first order to get started.</p>
+                  <Link
+                    href="/browse"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors"
+                  >
                     <Search className="w-3.5 h-3.5" /> Browse editors
                   </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-neutral-100">
+                <div className="space-y-1">
                   {activeOrders.map(order => {
-                    const s = STATUS_STYLES[order.status];
+                    const editorFirst = displayNameFromFull(order.editorName ?? "Editor");
+                    const daysLeft = order.deadline
+                      ? Math.max(0, Math.ceil((order.deadline.getTime() - now.getTime()) / (1000 * 3600 * 24)))
+                      : null;
+                    const statusClass =
+                      order.status === "delivered"          ? "bg-emerald-100 text-emerald-700" :
+                      order.status === "in_progress"        ? "bg-violet-100 text-violet-700"  :
+                      order.status === "revision_requested" ? "bg-amber-100 text-amber-700"    :
+                      "bg-neutral-100 text-neutral-600";
+                    const statusLabel =
+                      order.status === "delivered"          ? "Delivered"  :
+                      order.status === "in_progress"        ? "In Progress":
+                      order.status === "revision_requested" ? "Revision"   :
+                      order.status === "pending"            ? "Pending"    : order.status;
+
                     return (
-                      <Link key={order.id} href={`/client/orders/${order.id}`}
-                        className="flex items-center gap-4 px-5 py-4 hover:bg-neutral-50/50 transition-colors group">
-                        <span className={cn("w-2 h-2 rounded-full shrink-0", s?.dot ?? "bg-neutral-300")} />
+                      <Link
+                        key={order.id}
+                        href={`/client/orders/${order.id}`}
+                        className="flex items-center gap-4 py-3 border-b border-neutral-100 last:border-0 rounded-xl px-2 -mx-2 hover:bg-neutral-50/80 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0">
+                          <Package className="w-5 h-5 text-violet-500" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-neutral-900 truncate mb-0.5">{order.packageTitle}</p>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {s && (
-                              <span className={cn("text-[9px] font-extrabold px-2 py-0.5 rounded-full", s.badge)}>
-                                {s.label}
-                              </span>
+                          <p className="text-sm font-extrabold text-neutral-800 truncate">
+                            {order.packageTitle ?? "Custom Editing Order"}
+                          </p>
+                          <p className="text-[11px] text-neutral-400 font-bold mt-0.5">
+                            {editorFirst}
+                            {daysLeft !== null && (
+                              <> · <span className={daysLeft <= 1 ? "text-red-500" : ""}>{daysLeft === 0 ? "Due today" : `Due in ${daysLeft}d`}</span></>
                             )}
-                            <span className="text-xs text-neutral-400 font-semibold">{displayNameFromFull(order.editorName ?? "Editor")}</span>
-                            {order.deadline && (
-                              <>
-                                <span className="text-neutral-200 text-xs">·</span>
-                                <DeadlineCountdown deadline={order.deadline.toISOString()} />
-                              </>
-                            )}
-                          </div>
+                          </p>
                         </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-sm font-black text-neutral-900 tabular-nums">{formatCurrency(order.totalAmount)}</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-neutral-500 transition-colors" />
-                        </div>
+                        <span className={cn("text-[10px] font-black px-2.5 py-1 rounded-full shrink-0", statusClass)}>
+                          {statusLabel}
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-neutral-300 shrink-0" />
                       </Link>
                     );
                   })}
@@ -282,141 +302,188 @@ export default async function ClientDashboardPage() {
               )}
             </div>
 
-            {/* Saved editors */}
-            {savedEditorsList.length > 0 && (
-              <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
-                  <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-                    <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Saved Editors</h2>
-                  </div>
-                  <Link href="/client/saved" className="text-xs font-bold flex items-center gap-1 text-neutral-600 hover:text-black transition-colors">
-                    View all <ArrowRight className="w-3 h-3" />
+            {/* Browse Editors */}
+            <div className="bg-white rounded-3xl border border-neutral-200/60 shadow-sm p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-base font-black text-neutral-900">Browse Editors</h2>
+                <Link href="/browse" className="text-xs font-bold text-violet-600 hover:text-violet-700 hover:underline">
+                  View all
+                </Link>
+              </div>
+
+              {recommendedEditors.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <p className="text-sm text-neutral-400">No editors available right now.</p>
+                  <Link href="/browse" className="mt-3 text-xs font-bold text-violet-600 hover:underline">
+                    Browse all editors
                   </Link>
                 </div>
-                <div className="divide-y divide-neutral-100">
-                  {savedEditorsList.map(editor => {
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {recommendedEditors.map(editor => {
                     const shownName = editor.displayName || displayNameFromFull(editor.name);
-                    const initials = shownName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase();
-                    const isAway = editor.vacationUntil && new Date(editor.vacationUntil) > now;
-                    const lastOrder = savedLastOrderByEditor.get(editor.editorId);
-                    const unavailable = isAway || !editor.isAvailable;
+                    const initials = shownName.slice(0, 2).toUpperCase();
                     return (
-                      <div key={editor.editorId} className="flex items-center gap-3 px-5 py-3.5">
-                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0">
+                      <Link
+                        key={editor.editorId}
+                        href={`/editor/${editor.editorId}`}
+                        className="bg-white rounded-2xl border border-neutral-200/60 overflow-hidden flex flex-col p-3 shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-violet-100 to-violet-200 mb-3 flex items-center justify-center">
                           {editor.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={editor.image} alt={shownName} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-neutral-400 font-bold text-xs">{initials}</span>
+                            <span className="text-2xl font-black text-violet-500">{initials}</span>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-neutral-900 truncate">{shownName}</p>
-                          {isAway ? (
-                            <p className="text-xs text-amber-600 font-semibold">Away until {formatDate(editor.vacationUntil!)}</p>
-                          ) : !editor.isAvailable ? (
-                            <p className="text-xs text-neutral-400 font-semibold">Not taking orders</p>
-                          ) : (
-                            <p className="text-xs text-emerald-600 font-semibold">Available now</p>
+                        <div className="space-y-1">
+                          <h3 className="text-xs font-black text-neutral-900 truncate">{shownName}</h3>
+                          {editor.title && (
+                            <p className="text-[10px] text-neutral-400 font-bold leading-none truncate">{editor.title}</p>
                           )}
-                        </div>
-                        {lastOrder ? (
-                          <Link
-                            href={`/checkout/${lastOrder.packageId}?reorder=true&orderId=${lastOrder.orderId}`}
-                            className={cn(
-                              "flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white shrink-0 transition-all",
-                              unavailable
-                                ? "bg-neutral-100 text-neutral-400 pointer-events-none"
-                                : "bg-black hover:bg-neutral-900 shadow-sm"
+                          <div className="flex items-center gap-0.5 pt-1">
+                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            <span className="text-[10px] font-black text-neutral-800">
+                              {editor.avgRating != null ? Number(editor.avgRating).toFixed(1) : "New"}
+                            </span>
+                            {editor.reviewCount > 0 && (
+                              <span className="text-[9px] text-neutral-400 ml-0.5">({editor.reviewCount})</span>
                             )}
-                          >
-                            <RefreshCw className="w-3 h-3" /> Re-order
-                          </Link>
-                        ) : (
-                          <Link
-                            href={`/editor/${editor.editorId}`}
-                            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shrink-0 shadow-sm"
-                          >
-                            View
-                          </Link>
-                        )}
-                      </div>
+                          </div>
+                        </div>
+                      </Link>
                     );
                   })}
                 </div>
-              </div>
-            )}
-
-            {/* Recent reviews */}
-            {recentReviews.length > 0 && (
-              <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Reviews You Left</h2>
-                  </div>
-                  <Link href="/client/reviews" className="text-xs font-bold text-neutral-600 hover:text-black transition-colors">
-                    View all
-                  </Link>
-                </div>
-                <div className="divide-y divide-neutral-100">
-                  {recentReviews.map(review => (
-                    <div key={review.id} className="px-5 py-4">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={cn("w-3 h-3", i < review.rating ? "fill-amber-400 text-amber-400" : "text-neutral-200 fill-neutral-100")} />
-                          ))}
-                        </div>
-                        <span className="text-[10px] text-neutral-400 font-semibold">{formatDate(review.createdAt)}</span>
-                      </div>
-                      {review.text && <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{review.text}</p>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Right col / sidebar */}
-          <div className="space-y-5">
+          {/* Right Column */}
+          <div className="space-y-6">
 
-            {/* Browse CTA if no orders */}
-            {activeOrders.length === 0 && (
-              <div className="rounded-3xl p-5 text-white bg-gradient-to-br from-neutral-800 to-neutral-950 border border-neutral-850 shadow-sm relative overflow-hidden">
-                <Film className="w-6 h-6 mb-3 text-neutral-300" />
-                <p className="font-black text-sm mb-1 tracking-tight">Discover editors</p>
-                <p className="text-xs text-neutral-400 mb-4 leading-relaxed font-semibold">
-                  Browse portfolios, compare packages, and find the perfect editor for your project.
+            {/* Quick Actions */}
+            <div className="bg-white rounded-3xl border border-neutral-200/60 shadow-sm p-6">
+              <h3 className="text-[11px] font-black text-neutral-400 uppercase tracking-wider mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                {([
+                  { href: "/browse",            label: "New Order",   Icon: Plus,           iconBg: "bg-violet-50", iconColor: "text-violet-600" },
+                  { href: "/browse",            label: "Find Editors", Icon: Search,        iconBg: "bg-violet-50", iconColor: "text-violet-600" },
+                  { href: "/client/messages",   label: "Messages",    Icon: MessageSquare,  iconBg: "bg-violet-50", iconColor: "text-violet-600", badge: unreadMessages },
+                  { href: "/client/referrals",  label: "Refer & Earn", Icon: Gift,          iconBg: "bg-amber-50",  iconColor: "text-amber-500" },
+                ] as { href: string; label: string; Icon: React.ElementType; iconBg: string; iconColor: string; badge?: number }[]).map(
+                  ({ href, label, Icon, iconBg, iconColor, badge }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      className="flex items-center justify-between p-3.5 rounded-2xl border border-neutral-100 hover:bg-neutral-50 transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shrink-0", iconBg)}>
+                          <Icon className={cn("w-4 h-4", iconColor)} />
+                        </div>
+                        <span className="text-[13px] font-bold text-neutral-800">{label}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {badge && badge > 0 ? (
+                          <span className="text-[9px] font-bold bg-violet-600 text-white rounded-full px-1.5 py-0.5">
+                            {badge}
+                          </span>
+                        ) : null}
+                        <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-700 transition-colors" />
+                      </div>
+                    </Link>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-3xl border border-neutral-200/60 shadow-sm p-6">
+              <h3 className="text-[11px] font-black text-neutral-400 uppercase tracking-wider mb-5">Recent Activity</h3>
+
+              {recentActivity.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Clock className="w-8 h-8 text-neutral-200 mb-2" />
+                  <p className="text-sm text-neutral-400">No activity yet</p>
+                  <p className="text-xs text-neutral-300 mt-0.5">Order updates will appear here.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recentActivity.map(activity => {
+                    const editorName = displayNameFromFull(activity.editorName ?? "Editor");
+                    const rawTitle   = activity.packageTitle ?? "Custom order";
+                    const title      = rawTitle.length > 22 ? rawTitle.slice(0, 22) + "…" : rawTitle;
+
+                    let iconBg       = "bg-gray-50 border-gray-100";
+                    let iconClr      = "text-gray-400";
+                    let ActivityIcon = Package as React.ElementType;
+                    let text         = "Order status updated";
+
+                    if (activity.status === "pending") {
+                      text = `New order placed — "${title}"`;
+                      iconBg = "bg-violet-50 border-violet-100"; iconClr = "text-violet-600"; ActivityIcon = Plus;
+                    } else if (activity.status === "in_progress") {
+                      text = `${editorName} started working`;
+                      iconBg = "bg-blue-50 border-blue-100";   iconClr = "text-blue-600";    ActivityIcon = Clock;
+                    } else if (activity.status === "delivered") {
+                      text = `${editorName} delivered "${title}"`;
+                      iconBg = "bg-emerald-50 border-emerald-100"; iconClr = "text-emerald-600"; ActivityIcon = CheckCircle2;
+                    } else if (activity.status === "revision_requested") {
+                      text = `Revision requested on "${title}"`;
+                      iconBg = "bg-amber-50 border-amber-100"; iconClr = "text-amber-500";   ActivityIcon = RefreshCw;
+                    } else if (activity.status === "completed") {
+                      text = `"${title}" marked complete`;
+                      iconBg = "bg-emerald-50 border-emerald-100"; iconClr = "text-emerald-600"; ActivityIcon = CheckCircle2;
+                    } else if (activity.status === "disputed") {
+                      text = `Dispute opened on "${title}"`;
+                      iconBg = "bg-red-50 border-red-100";     iconClr = "text-red-500";     ActivityIcon = AlertTriangle;
+                    }
+
+                    return (
+                      <Link
+                        key={activity.id}
+                        href={`/client/orders/${activity.id}`}
+                        className="flex items-start gap-3 group"
+                      >
+                        <div className={cn("w-7 h-7 rounded-xl border flex items-center justify-center shrink-0 mt-0.5", iconBg)}>
+                          <ActivityIcon className={cn("w-3.5 h-3.5", iconClr)} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-neutral-700 leading-normal group-hover:text-neutral-900 transition-colors">
+                            {text}
+                          </p>
+                        </div>
+                        <span className="text-[10px] text-neutral-400 font-bold shrink-0 mt-0.5">
+                          {relativeTime(activity.updatedAt)}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Refer & Earn */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#7C3AED] to-[#5b21b6] p-6 text-white shadow-md flex items-center justify-between">
+              <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-white/10 blur-xl pointer-events-none" />
+              <div className="space-y-1.5 relative z-10 max-w-[160px]">
+                <h4 className="font-black text-sm tracking-tight">Refer & Earn</h4>
+                <p className="text-[10px] text-white/80 leading-relaxed font-semibold">
+                  Invite friends and earn credit on their first order.
                 </p>
-                <Link href="/browse"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition-all">
-                  Browse now <ArrowRight className="w-3.5 h-3.5" />
+                <Link
+                  href="/client/referrals"
+                  className="inline-block mt-3 bg-white text-violet-700 hover:bg-neutral-100 px-4 py-2 rounded-xl text-[10px] font-black transition-all"
+                >
+                  Invite Now
                 </Link>
               </div>
-            )}
-
-            {/* Member rewards — live XP/level/badges */}
-            <RewardsCard />
-
-            {/* Referral — live stats + copy link */}
-            <ReferralCard />
-
-            {/* Editor feed teaser */}
-            <Link href="/feed"
-              className="block bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm p-5 hover:shadow-md transition-all group">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-neutral-50 border border-neutral-200/30">
-                  <Film className="w-4 h-4 text-neutral-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-neutral-900">Editor Feed</p>
-                  <p className="text-xs text-neutral-400 font-semibold">Discover editor portfolios</p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-black transition-colors shrink-0" />
+              <div className="w-20 h-20 relative shrink-0 opacity-90">
+                <Gift className="w-full h-full text-violet-200 stroke-1" />
               </div>
-            </Link>
+            </div>
 
           </div>
         </div>
