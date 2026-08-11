@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -9,6 +9,7 @@ import { Star } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils";
+import { TopoBackground } from "@/components/common/topo-background";
 
 export default async function ClientReviewsPage() {
   const session = await auth();
@@ -38,20 +39,22 @@ export default async function ClientReviewsPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
-        <div className="px-6 py-5 flex items-center justify-between">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-4xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Header Card */}
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">My Reviews</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Reviews you&apos;ve left for editors</p>
+            <h1 className="text-xl font-bold text-neutral-900">My Reviews</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Reviews you&apos;ve left for editors</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-            <Star className="w-4 h-4 text-amber-500" />
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0">
+            <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
           </div>
         </div>
-      </div>
 
-      <div className="px-6 py-6 space-y-5">
+        <div className="relative z-10 space-y-5">
         {rows.length > 0 && (
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5 text-center">
@@ -115,6 +118,7 @@ export default async function ClientReviewsPage() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

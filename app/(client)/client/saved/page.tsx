@@ -10,6 +10,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn, displayNameFromFull, formatDate } from "@/lib/utils";
 import { UnsaveButton } from "./unsave-button";
+import { TopoBackground } from "@/components/common/topo-background";
 
 export default async function SavedEditorsPage() {
   const session = await auth();
@@ -85,16 +86,30 @@ export default async function SavedEditorsPage() {
   const now = new Date();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="flex items-center gap-2 mb-1">
-          <Heart className="w-5 h-5 text-red-500 fill-red-500" />
-          <h1 className="text-xl font-bold text-gray-900">Saved editors ({rows.length})</h1>
-        </div>
-        <p className="text-sm text-gray-400">Your favourite editors, saved for quick access.</p>
-      </div>
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
 
-      <div className="px-6 py-6">
+      <div className="max-w-4xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Header Card */}
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+              <h1 className="text-xl font-bold text-neutral-900">Saved Editors ({rows.length})</h1>
+            </div>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Your favourite editors, saved for quick access</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/browse"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm"
+            >
+              <Search className="w-3.5 h-3.5" /> Browse editors
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative z-10">
         {rows.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
@@ -198,6 +213,7 @@ export default async function SavedEditorsPage() {
             })}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

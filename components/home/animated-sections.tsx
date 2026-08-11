@@ -1204,7 +1204,7 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
             {filteredEditors.map((e, i) => (
-              <EditorCard e={e} i={i} key={e.href} />
+              <EditorCard e={e} i={i} key={e.name} />
             ))}
 
             {/* CTA card — always shown as the last card */}

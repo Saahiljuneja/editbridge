@@ -117,9 +117,9 @@ export default async function ClientOrdersPage({
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
       {/* Topographic backdrop */}
-      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
 
       <div className="max-w-4xl mx-auto px-6 pt-6 space-y-6 relative z-10">
         {/* Header Card */}

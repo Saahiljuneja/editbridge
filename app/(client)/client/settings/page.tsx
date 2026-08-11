@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { User, Lock, LogOut, Settings, ShieldAlert, Eye, EyeOff, MailWarning, Bell, Shield, QrCode, Copy, CheckCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { TopoBackground } from "@/components/common/topo-background";
 
 type ChannelPref = { email: boolean; push: boolean };
 type ClientNotifPrefs = {
@@ -219,21 +220,22 @@ export default function ClientSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top bar */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="px-6 py-5 flex items-center justify-between">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-3xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Header Card */}
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Account Settings</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Manage your profile and security</p>
+            <h1 className="text-xl font-bold text-neutral-900">Account Settings</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Manage your profile and security</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
-            <Settings className="w-4 h-4 text-[var(--brand-client)]" />
+          <div className="w-10 h-10 rounded-2xl bg-violet-50 flex items-center justify-center shrink-0">
+            <Settings className="w-5 h-5 text-violet-600" />
           </div>
         </div>
-      </div>
 
-      <div className="px-6 py-6 space-y-4 max-w-3xl mx-auto">
+        <div className="relative z-10 space-y-4">
         {/* Email verification banner */}
         {session && !session.user.isEmailVerified && (
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200">
@@ -528,6 +530,7 @@ export default function ClientSettingsPage() {
             </p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

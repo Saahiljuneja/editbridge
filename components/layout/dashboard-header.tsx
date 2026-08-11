@@ -127,6 +127,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
   const pathname = usePathname();
+  if (pathname === "/client/dashboard") return null;
   const [stats, setStats] = useState<HeaderStats>({ type: "unknown" });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
