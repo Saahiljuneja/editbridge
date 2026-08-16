@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Zap, Gift, Clock, Trophy, Medal, CheckCircle2, ChevronRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { Level } from "@/lib/rewards";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,6 +18,8 @@ interface CreditTx { id: string; amount: number; reason: string; expiresAt: stri
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+type EditorLevel = "level1" | "level2" | "level3" | "level4" | "level5" | "level6" | "level7";
+
 type LevelMeta = {
   label: string; emoji: string; tagline: string;
   accent: string; ring: string; glow: string; textClass: string;
@@ -26,22 +27,28 @@ type LevelMeta = {
   start: number; end: number;
 };
 
-const LM: Record<Level, LevelMeta> = {
-  bronze:   { label: "Bronze",   emoji: "🥉", tagline: "Getting started",   accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.06)",  textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",   border: "border-amber-500/20",  start: 0,    end: 500      },
-  silver:   { label: "Silver",   emoji: "🥈", tagline: "Building momentum", accent: "#6B7280", ring: "#9CA3AF", glow: "rgba(156,163,175,0.06)", textClass: "text-slate-600",  bgGradient: "from-slate-400/15 to-gray-500/5",     border: "border-slate-400/25",  start: 500,  end: 2000     },
-  gold:     { label: "Gold",     emoji: "🥇", tagline: "Top performer",     accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",   textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",   border: "border-yellow-500/25", start: 2000, end: 5000     },
-  platinum: { label: "Platinum", emoji: "💎", tagline: "Elite editor",      accent: "#4F46E5", ring: "#818CF8", glow: "rgba(129,140,248,0.1)",  textClass: "text-indigo-600", bgGradient: "from-indigo-500/15 to-purple-600/5",  border: "border-indigo-500/25", start: 5000, end: Infinity },
+const LM: Record<EditorLevel, LevelMeta> = {
+  level1: { label: "New Editor", emoji: "🌱", tagline: "Getting started",   accent: "#16A34A", ring: "#4ADE80", glow: "rgba(74,222,128,0.06)",   textClass: "text-green-600",  bgGradient: "from-green-500/10 to-emerald-500/5",  border: "border-green-500/20",  start: 0,     end: 1000  },
+  level2: { label: "Rising",     emoji: "✨", tagline: "Building momentum", accent: "#0EA5E9", ring: "#38BDF8", glow: "rgba(56,189,248,0.06)",   textClass: "text-sky-600",    bgGradient: "from-sky-500/10 to-blue-500/5",       border: "border-sky-500/20",    start: 1000,  end: 3000  },
+  level3: { label: "Skilled",    emoji: "⚡", tagline: "Gaining traction",  accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.08)",   textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",   border: "border-amber-500/20",  start: 3000,  end: 7500  },
+  level4: { label: "Pro",        emoji: "🔥", tagline: "Top performer",     accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",    textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",   border: "border-yellow-500/25", start: 7500,  end: 15000 },
+  level5: { label: "Elite",      emoji: "🏆", tagline: "Elite editor",      accent: "#4F46E5", ring: "#818CF8", glow: "rgba(129,140,248,0.1)",   textClass: "text-indigo-600", bgGradient: "from-indigo-500/15 to-purple-600/5",  border: "border-indigo-500/25", start: 15000, end: 30000 },
+  level6: { label: "Master",     emoji: "👑", tagline: "Platform master",   accent: "#8B5CF6", ring: "#A78BFA", glow: "rgba(167,139,250,0.1)",   textClass: "text-purple-600", bgGradient: "from-purple-500/15 to-indigo-600/5",  border: "border-purple-500/25", start: 30000, end: 50000 },
+  level7: { label: "Legend",     emoji: "🦄", tagline: "Ultimate tier",     accent: "#EC4899", ring: "#F472B6", glow: "rgba(244,114,182,0.1)",   textClass: "text-pink-600",   bgGradient: "from-pink-500/15 to-rose-600/5",      border: "border-pink-500/25",   start: 50000, end: Infinity },
 };
 
-const LEVEL_ORDER: Level[] = ["bronze", "silver", "gold", "platinum"];
-const LEVEL_XP_LABELS = ["0", "500", "2k", "5k"];
+const LEVEL_ORDER: EditorLevel[] = ["level1", "level2", "level3", "level4", "level5", "level6", "level7"];
+const LEVEL_XP_LABELS = ["0", "1k", "3k", "7.5k", "15k", "30k", "50k"];
 const VIOLET = "#1e40af";
 
-const PERKS: Record<Level, Array<{ icon: string; text: string }>> = {
-  bronze:   [{ icon: "📦", text: "3 packages" },      { icon: "🔍", text: "Standard placement" }],
-  silver:   [{ icon: "📦", text: "4 packages" },      { icon: "🎗️", text: "Silver badge" },      { icon: "💸", text: "2% client discount" }],
-  gold:     [{ icon: "📦", text: "5 packages" },      { icon: "⭐", text: "Featured in search" }, { icon: "💸", text: "5% client discount" }],
-  platinum: [{ icon: "📦", text: "5 packages" },      { icon: "🔝", text: "Top placement" },     { icon: "🎨", text: "Custom banner" },      { icon: "💸", text: "10% discount" }],
+const PERKS: Record<EditorLevel, Array<{ icon: string; text: string }>> = {
+  level1: [{ icon: "📦", text: "3 packages" },  { icon: "🔍", text: "Standard placement" }],
+  level2: [{ icon: "📦", text: "4 packages" },  { icon: "🎗️", text: "Rising badge" },      { icon: "💸", text: "2% client discount" }],
+  level3: [{ icon: "📦", text: "5 packages" },  { icon: "⭐", text: "Featured in search" }, { icon: "💸", text: "5% client discount" }],
+  level4: [{ icon: "📦", text: "5 packages" },  { icon: "🔝", text: "Top placement" },     { icon: "🎨", text: "Custom banner" },      { icon: "💸", text: "10% discount" }],
+  level5: [{ icon: "⭐", text: "Priority support" }, { icon: "🎯", text: "Exclusive matches" },  { icon: "💰", text: "Monthly credits" },   { icon: "📈", text: "Higher referrals" }],
+  level6: [{ icon: "👑", text: "Master badge" },     { icon: "🔥", text: "Top-priority matching"}, { icon: "🎁", text: "Anniversary rewards" }, { icon: "🤝", text: "Dedicated support" }],
+  level7: [{ icon: "🦄", text: "Legend status" },    { icon: "✨", text: "Permanent spotlight" }, { icon: "🎁", text: "Exclusive rewards" },    { icon: "🏆", text: "Hall of fame" }],
 };
 
 const BADGES: Record<string, { label: string; emoji: string; desc: string; hint: string; credit?: string }> = {
@@ -187,13 +194,13 @@ export function EditorRewardsClient() {
     </div>
   );
 
-  const lm     = LM[data.level];
+  const lm     = LM[data.level as EditorLevel] ?? LM.level1;
   const pct    = lm.end === Infinity ? 100 : Math.min(100, ((data.xp - lm.start) / (lm.end - lm.start)) * 100);
   const offset = RING_C * (1 - pct / 100);
 
   const earnedSet = new Set(data.badges.map(b => b.badge));
   const earnedMap = Object.fromEntries(data.badges.map(b => [b.badge, b.awardedAt]));
-  const levelIdx  = LEVEL_ORDER.indexOf(data.level);
+  const levelIdx  = LEVEL_ORDER.indexOf(data.level as EditorLevel);
   const now       = new Date();
 
   return (
@@ -282,7 +289,7 @@ export function EditorRewardsClient() {
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-gray-600">{data.xp.toLocaleString()} XP</span>
                   <span style={{ color: lm.accent }}>
-                    <strong>{data.xpToNext.toLocaleString()} XP</strong> to {LM[data.nextLevel as Level].label}
+                    <strong>{data.xpToNext.toLocaleString()} XP</strong> to {(LM[data.nextLevel as EditorLevel] ?? LM.level7).label}
                   </span>
                 </div>
                 <div className="h-3 rounded-full overflow-hidden p-0.5" style={{ background: `${lm.ring}18` }}>
@@ -356,19 +363,19 @@ export function EditorRewardsClient() {
       </div>
 
       {/* ── Next Tier Preview ── */}
-      {data.nextLevel && (
+      {data.nextLevel && (LM[data.nextLevel as EditorLevel]) && (
         <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm">
           <div className="flex items-center gap-2.5 mb-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{ background: `${LM[data.nextLevel as Level].ring}15` }}>
-              {LM[data.nextLevel as Level].emoji}
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{ background: `${LM[data.nextLevel as EditorLevel].ring}15` }}>
+              {LM[data.nextLevel as EditorLevel].emoji}
             </div>
             <div>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Next Tier</p>
-              <p className="text-sm font-bold text-gray-800">{LM[data.nextLevel as Level].label} perks — locked</p>
+              <p className="text-sm font-bold text-gray-800">{LM[data.nextLevel as EditorLevel].label} perks — locked</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {PERKS[data.nextLevel as Level].map(p => (
+            {PERKS[data.nextLevel as EditorLevel].map(p => (
               <span key={p.text} className="text-[11px] flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-gray-400 font-medium">
                 <span className="grayscale opacity-50">{p.icon}</span> {p.text}
               </span>
@@ -382,11 +389,11 @@ export function EditorRewardsClient() {
         <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 mb-5">Editor Tiers</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {([
-            { name: "Bronze",   emoji: "🥉", xp: "0–499",     packages: "3 packages", perks: ["Standard visibility", "Standard support"],                            lv: "bronze"   as Level },
-            { name: "Silver",   emoji: "🥈", xp: "500–1,999", packages: "4 packages", perks: ["Silver badge", "2% client discount"],                                 lv: "silver"   as Level },
-            { name: "Gold",     emoji: "🥇", xp: "2k–4,999",  packages: "5 packages", perks: ["Featured search listing", "5% client discount"],                      lv: "gold"     as Level },
-            { name: "Platinum", emoji: "💎", xp: "5,000+",    packages: "5 packages", perks: ["Top spotlight", "Custom banner", "10% discount", "VIP support"],      lv: "platinum" as Level },
-          ] as const).map(row => {
+            { name: "New Editor", emoji: "🌱", xp: "0–999",    packages: "3 packages", perks: ["Standard visibility", "Standard support"],                       lv: "level1" as EditorLevel },
+            { name: "Rising",     emoji: "✨", xp: "1k–2,999", packages: "4 packages", perks: ["Rising badge", "2% client discount"],                            lv: "level2" as EditorLevel },
+            { name: "Skilled",    emoji: "⚡", xp: "3k–7,499", packages: "5 packages", perks: ["Featured search listing", "5% client discount"],                 lv: "level3" as EditorLevel },
+            { name: "Pro",        emoji: "🔥", xp: "7.5k+",    packages: "5 packages", perks: ["Top spotlight", "Custom banner", "10% discount", "VIP support"], lv: "level4" as EditorLevel },
+          ]).map(row => {
             const meta = LM[row.lv];
             const isCurrent = row.lv === data.level;
             return (
