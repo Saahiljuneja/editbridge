@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -47,7 +47,7 @@ const VALUES = [
 const PROBLEMS = [
   { problem: "Clients couldn't trust strangers with their brand",        fix: "KYC-verified editor profiles with reviews"              },
   { problem: "Editors couldn't trust clients to pay on time",            fix: "Payment held before work begins, released on approval"  },
-  { problem: "Platforms took 30–40% cuts",                               fix: "Flat 15% commission, editors keep 85%"                  },
+  { problem: "Platforms took 30–40% cuts",                               fix: "Flat 20% commission, editors keep 80%"                  },
   { problem: "Communication moved off-platform, no accountability",      fix: "All messages & files stay on EditBridge"               },
 ];
 
@@ -60,20 +60,20 @@ export default function AboutPage() {
     <div className="flex flex-col">
 
       {/* ══ HERO ══ */}
-      <section className="relative bg-[#06040f] pt-20 pb-24 md:pt-28 md:pb-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[140px] opacity-15 pointer-events-none" style={{ background: "#7c6ff7" }} />
-        <div className="absolute bottom-0 right-1/3 w-72 h-72 rounded-full blur-[120px] opacity-10 pointer-events-none" style={{ background: "#34d399" }} />
+      <section className="relative bg-slate-50/50 border-b border-neutral-200/50 pt-20 pb-24 md:pt-28 md:pb-32 px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.08] pointer-events-none" style={{ background: "#7c6ff7" }} />
+        <div className="absolute bottom-0 right-1/3 w-72 h-72 rounded-full blur-[120px] opacity-[0.05] pointer-events-none" style={{ background: "#34d399" }} />
 
         <div className="relative z-10 px-8">
           <Reveal>
-            <div className="inline-flex items-center gap-2 border border-[#7c6ff7]/30 bg-[#7c6ff7]/10 text-[#7c6ff7] text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-10">
+            <div className="inline-flex items-center gap-2 border border-violet-200 bg-violet-50 text-violet-750 text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-10">
               About EditBridge
             </div>
           </Reveal>
 
           <Reveal delay={0.06}>
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tight leading-[0.9] mb-8">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-neutral-900 tracking-tight leading-[0.9] mb-8">
               Built for the<br />
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg,#7c6ff7 20%,#34d399 80%)" }}>
                 Indian creator<br />economy.
@@ -82,7 +82,7 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <p className="text-white/35 text-xl max-w-2xl leading-relaxed mb-14">
+            <p className="text-neutral-500 text-xl max-w-2xl leading-relaxed mb-14">
               We&apos;re on a mission to make creative freelancing safe, fair, and worth it — for editors and clients alike.
             </p>
           </Reveal>
@@ -96,9 +96,9 @@ export default function AboutPage() {
                 { n: "5+",   label: "Creative niches" },
                 { n: "85%",  label: "Editor keeps" },
               ].map(({ n, label }) => (
-                <div key={label} className="rounded-2xl border border-white/[0.07] px-5 py-4" style={{ background: "rgba(255,255,255,0.03)" }}>
-                  <p className="text-white font-black text-2xl leading-none">{n}</p>
-                  <p className="text-white/30 text-xs mt-1.5 font-medium">{label}</p>
+                <div key={label} className="rounded-2xl border border-neutral-200/60 px-5 py-4 bg-white shadow-sm shadow-neutral-100/50">
+                  <p className="text-neutral-900 font-black text-2xl leading-none">{n}</p>
+                  <p className="text-neutral-450 text-xs mt-1.5 font-medium">{label}</p>
                 </div>
               ))}
             </div>
@@ -129,7 +129,7 @@ export default function AboutPage() {
                 {[
                   "EditBridge was born from a simple frustration: hiring a video editor felt like a gamble. Would they deliver? Would they disappear with the brief? Would the quality match the promise?",
                   "On the other side, editors were getting underpaid, ghosted after delivery, or working for platforms that took 30–40% of every order.",
-                  "We built EditBridge to fix both sides. Government ID verification for every editor. Payment held securely until the client approves. A flat 15% commission — only charged when work is actually delivered.",
+                  "We built EditBridge to fix both sides. Government ID verification for every editor. Payment held securely until the client approves. A flat 20% commission — only charged when work is actually delivered.",
                 ].map((p, i) => (
                   <Reveal key={i} delay={i * 0.08}>
                     <p className="text-gray-500 text-base leading-relaxed">{p}</p>
@@ -190,7 +190,7 @@ export default function AboutPage() {
                 accent: "#34d399",
                 title: "Platforms took too much",
                 body: "Most freelance platforms charge editors 20–40% per order. After taxes and time, editors barely broke even. That's not fair compensation for skilled work.",
-                fix: "Flat 15% commission — editors keep 85%, always",
+                fix: "Flat 20% commission — editors keep 80%, always",
               },
               {
                 n: "03",
@@ -260,9 +260,9 @@ export default function AboutPage() {
       </section>
 
       {/* ══ WHO WE'RE BUILT FOR ══ */}
-      <section className="py-16 md:py-28 px-6 bg-[#06040f] overflow-hidden relative">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-15 pointer-events-none" style={{ background: "#7c6ff7" }} />
+      <section className="py-16 md:py-28 px-6 bg-slate-50/50 border-t border-b border-neutral-200/60 overflow-hidden relative">
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-[0.06] pointer-events-none" style={{ background: "#7c6ff7" }} />
 
         <div className="relative z-10 px-8">
           <Reveal className="mb-10 md:mb-16">
@@ -270,31 +270,33 @@ export default function AboutPage() {
               <div className="h-px w-8 bg-[#7c6ff7]" />
               <span className="text-[10px] font-black text-[#7c6ff7] uppercase tracking-[0.28em]">Who we serve</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+            <h2 className="text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight">
               Built for two sides<br />
-              <span className="text-white/15">of the same mission.</span>
+              <span className="text-neutral-400">of the same mission.</span>
             </h2>
           </Reveal>
 
           <div className="grid sm:grid-cols-2 gap-6">
             {/* Clients */}
             <Reveal delay={0.05}>
-              <div className="rounded-3xl p-8 border border-white/[0.07] h-full" style={{ background: "rgba(255,255,255,0.03)" }}>
-                <div className="w-12 h-12 rounded-2xl bg-[#34d399]/15 flex items-center justify-center mb-7">
-                  <Users className="w-6 h-6 text-[#34d399]" />
+              <div className="rounded-3xl p-8 border border-neutral-200/60 bg-white shadow-sm h-full flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-2xl bg-[#34d399]/15 flex items-center justify-center mb-7">
+                    <Users className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h3 className="text-neutral-900 font-black text-2xl mb-3">Creators & brands</h3>
+                  <p className="text-neutral-500 text-sm leading-relaxed mb-7">
+                    YouTube channels, social media teams, D2C brands, agencies — anyone who needs consistent, high-quality video editing without the risk of working with strangers online.
+                  </p>
+                  <ul className="space-y-2.5 mb-8">
+                    {["KYC-verified editors only", "Payment held until you approve", "Revisions included in every package", "Real-time collaboration on platform"].map(f => (
+                      <li key={f} className="flex items-center gap-3 text-sm text-neutral-600">
+                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />{f}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-white font-black text-2xl mb-3">Creators & brands</h3>
-                <p className="text-white/40 text-sm leading-relaxed mb-7">
-                  YouTube channels, social media teams, D2C brands, agencies — anyone who needs consistent, high-quality video editing without the risk of working with strangers online.
-                </p>
-                <ul className="space-y-2.5 mb-8">
-                  {["KYC-verified editors only", "Payment held until you approve", "Revisions included in every package", "Real-time collaboration on platform"].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white/60">
-                      <CheckCircle className="w-4 h-4 text-[#34d399] shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/browse" className="inline-flex items-center gap-2 bg-[#34d399] hover:bg-[#2dd48a] text-[#06040f] font-bold px-5 py-3 rounded-xl text-sm transition-all">
+                <Link href="/browse" className="inline-flex items-center gap-2 bg-emerald-650 hover:bg-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-sm transition-all self-start">
                   Find an editor <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -302,22 +304,24 @@ export default function AboutPage() {
 
             {/* Editors */}
             <Reveal delay={0.1}>
-              <div className="rounded-3xl p-8 border border-white/[0.07] h-full" style={{ background: "rgba(255,255,255,0.03)" }}>
-                <div className="w-12 h-12 rounded-2xl bg-[#7c6ff7]/20 flex items-center justify-center mb-7">
-                  <Star className="w-6 h-6 text-[#7c6ff7]" />
+              <div className="rounded-3xl p-8 border border-neutral-200/60 bg-white shadow-sm h-full flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-2xl bg-[#7c6ff7]/20 flex items-center justify-center mb-7">
+                    <Star className="w-6 h-6 text-[#7c6ff7]" />
+                  </div>
+                  <h3 className="text-neutral-900 font-black text-2xl mb-3">Freelance editors</h3>
+                  <p className="text-neutral-500 text-sm leading-relaxed mb-7">
+                    Video editors, thumbnail designers, motion graphics artists, and podcast editors who want a reliable platform to find clients, get paid on time, and build a sustainable career.
+                  </p>
+                  <ul className="space-y-2.5 mb-8">
+                    {["Keep 85% of every order", "No monthly fees or listing costs", "Payment guaranteed before you start", "Build a verified, trustworthy profile"].map(f => (
+                      <li key={f} className="flex items-center gap-3 text-sm text-neutral-600">
+                        <CheckCircle className="w-4 h-4 text-[#7c6ff7] shrink-0" />{f}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-white font-black text-2xl mb-3">Freelance editors</h3>
-                <p className="text-white/40 text-sm leading-relaxed mb-7">
-                  Video editors, thumbnail designers, motion graphics artists, and podcast editors who want a reliable platform to find clients, get paid on time, and build a sustainable career.
-                </p>
-                <ul className="space-y-2.5 mb-8">
-                  {["Keep 85% of every order", "No monthly fees or listing costs", "Payment guaranteed before you start", "Build a verified, trustworthy profile"].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white/60">
-                      <CheckCircle className="w-4 h-4 text-[#7c6ff7] shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/signup/editor" className="inline-flex items-center gap-2 bg-[#7c6ff7] hover:bg-[#6a5ef0] text-white font-bold px-5 py-3 rounded-xl text-sm transition-all shadow-[0_6px_20px_rgba(124,111,247,0.35)]">
+                <Link href="/signup/editor" className="inline-flex items-center gap-2 bg-[#7c6ff7] hover:bg-[#6a5ef0] text-white font-bold px-5 py-3 rounded-xl text-sm transition-all shadow-[0_6px_20px_rgba(124,111,247,0.35)] self-start">
                   Apply as editor <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -330,22 +334,22 @@ export default function AboutPage() {
       <section className="py-16 md:py-28 px-6 bg-white">
         <div className="px-8">
           <Reveal>
-            <div className="rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(145deg,#06040f 0%,#1a1040 60%,#0a1f1a 100%)" }}>
-              <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
-              <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20 pointer-events-none" style={{ background: "#7c6ff7" }} />
-              <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-[80px] opacity-15 pointer-events-none" style={{ background: "#34d399" }} />
+            <div className="rounded-3xl overflow-hidden border border-neutral-200/60 shadow-sm relative bg-slate-50/20">
+              <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.8) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
+              <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-[0.06] pointer-events-none" style={{ background: "#7c6ff7" }} />
+              <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-[80px] opacity-[0.04] pointer-events-none" style={{ background: "#34d399" }} />
 
               <div className="relative z-10 p-12 sm:p-16 text-center">
-                <div className="inline-flex items-center gap-2 border border-white/10 bg-white/5 text-white/50 text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
+                <div className="inline-flex items-center gap-2 border border-violet-200 bg-violet-50 text-violet-750 text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
                   Join EditBridge
                 </div>
-                <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-[0.95] mb-5">
+                <h2 className="text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-[0.95] mb-5">
                   Whether you create<br />
                   <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg,#7c6ff7,#34d399)" }}>
                     or edit content —
                   </span>
                 </h2>
-                <p className="text-white/35 text-lg mb-12 px-8 leading-relaxed">
+                <p className="text-neutral-500 text-lg mb-12 px-8 leading-relaxed">
                   we built EditBridge for you. Safe payments, verified editors, fair earnings.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -354,7 +358,7 @@ export default function AboutPage() {
                     Find an editor <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link href="/signup/editor"
-                    className="inline-flex items-center justify-center gap-2 border border-white/10 text-white/60 hover:text-white hover:border-white/20 font-medium px-8 py-4 rounded-2xl text-sm transition-all">
+                    className="inline-flex items-center justify-center gap-2 border border-neutral-200 hover:border-neutral-300 text-neutral-600 hover:text-neutral-900 bg-white shadow-sm font-bold px-8 py-4 rounded-2xl text-sm transition-all">
                     Apply as editor
                   </Link>
                 </div>

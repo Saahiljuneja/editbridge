@@ -96,7 +96,7 @@ export function HelpCenterClient({
   return (
     <div className="min-h-screen bg-[#FAF9FC] text-gray-800 pb-20">
       {/* Hero Header Section */}
-      <section className="relative bg-gradient-to-br from-[#0EA5E9]/10 via-[#FAF9FC] to-[#FAF9FC] border-b border-gray-150 py-20 px-6">
+      <section className="relative bg-gradient-to-br from-[#1e40af]/10 via-[#FAF9FC] to-[#FAF9FC] border-b border-gray-150 py-20 px-6">
         <div className="absolute inset-0 pointer-events-none"
           style={{ backgroundImage: "radial-gradient(#e5e7eb 1.2px, transparent 1.2px)", backgroundSize: "28px 28px" }} />
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -104,7 +104,7 @@ export function HelpCenterClient({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 text-[#0EA5E9] px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider mb-6"
+            className="inline-flex items-center gap-2 bg-[#1e40af]/10 border border-[#1e40af]/20 text-[#1e40af] px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider mb-6"
           >
             <LifeBuoy className="w-3.5 h-3.5" /> Support Hub
           </motion.div>
@@ -154,7 +154,7 @@ export function HelpCenterClient({
                 >
                   {isLoading ? (
                     <div className="p-6 text-center text-sm text-gray-400 flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-[#0EA5E9] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin" />
                       Searching...
                     </div>
                   ) : searchResults.length > 0 ? (
@@ -163,10 +163,10 @@ export function HelpCenterClient({
                         <Link
                           key={item.id}
                           href={`/help/article/${item.slug}`}
-                          className="block p-4 hover:bg-sky-50/50 transition-colors"
+                          className="block p-4 hover:bg-blue-50/50 transition-colors"
                         >
                           <p className="font-semibold text-gray-900 text-sm flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-[#0EA5E9]" />
+                            <FileText className="w-4 h-4 text-[#1e40af]" />
                             {item.title}
                           </p>
                           {item.excerpt && (
@@ -207,8 +207,8 @@ export function HelpCenterClient({
                   className="bg-white border border-gray-150/70 rounded-2xl p-6 transition-all duration-200 group flex flex-col justify-between"
                 >
                   <div>
-                    <div className="w-10 h-10 rounded-xl bg-[#0EA5E9]/8 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                      {IconComponent && <IconComponent className="w-5 h-5 text-[#0EA5E9]" />}
+                    <div className="w-10 h-10 rounded-xl bg-[#1e40af]/8 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                      {IconComponent && <IconComponent className="w-5 h-5 text-[#1e40af]" />}
                     </div>
                     <h3 className="font-bold text-gray-900 text-base mb-1.5">{cat.name}</h3>
                     <p className="text-gray-400 text-xs leading-relaxed">{cat.description}</p>
@@ -216,7 +216,7 @@ export function HelpCenterClient({
                   <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
                     <Link
                       href={`/help/${cat.slug}`}
-                      className="text-xs font-semibold text-[#0EA5E9] hover:underline inline-flex items-center gap-1"
+                      className="text-xs font-semibold text-[#1e40af] hover:underline inline-flex items-center gap-1"
                     >
                       View Articles <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
@@ -231,7 +231,7 @@ export function HelpCenterClient({
         <section className="space-y-6">
           <div className="bg-white border border-gray-150/70 rounded-2xl p-6 shadow-sm">
             <h2 className="text-base font-bold text-gray-950 tracking-tight flex items-center gap-2 mb-4">
-              <BookOpen className="w-4 h-4 text-[#0EA5E9]" /> Popular Policies
+              <BookOpen className="w-4 h-4 text-[#1e40af]" /> Popular Policies
             </h2>
             <div className="divide-y divide-gray-100">
               {popularArticles.map((art, ai) => (
@@ -244,7 +244,7 @@ export function HelpCenterClient({
                 >
                   <Link
                     href={`/help/article/${art.slug}`}
-                    className="font-medium text-gray-700 hover:text-[#0EA5E9] hover:underline text-sm block leading-snug mb-1"
+                    className="font-medium text-gray-700 hover:text-[#1e40af] hover:underline text-sm block leading-snug mb-1"
                   >
                     {art.title}
                   </Link>
@@ -257,16 +257,16 @@ export function HelpCenterClient({
           </div>
 
           {/* Need help CTA */}
-          <div className="bg-gradient-to-br from-[#0EA5E9] to-sky-600 rounded-2xl p-6 text-white shadow-sm flex flex-col justify-between h-52">
+          <div className="bg-gradient-to-br from-[#1e40af] to-blue-800 rounded-2xl p-6 text-white shadow-sm flex flex-col justify-between h-52">
             <div>
               <p className="font-bold text-base mb-1">Still need assistance?</p>
-              <p className="text-xs text-sky-100 leading-relaxed">
+              <p className="text-xs text-blue-100 leading-relaxed">
                 If you cannot find answers in our policy center, our verification or dispute support agents are online.
               </p>
             </div>
             <Link
               href="/contact"
-              className="bg-white hover:bg-sky-50 text-slate-900 text-xs font-bold text-center py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
+              className="bg-white hover:bg-blue-50 text-slate-900 text-xs font-bold text-center py-3 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
             >
               Contact Support Agent <ArrowRight className="w-3.5 h-3.5" />
             </Link>

@@ -119,7 +119,7 @@ export default async function HelpArticlePage({
             <div className="flex items-center gap-3 mb-5">
               <Link
                 href={`/help/${row.categorySlug}`}
-                className="text-[11px] font-bold uppercase tracking-widest text-[#0EA5E9] bg-[#0EA5E9]/8 border border-[#0EA5E9]/20 px-3 py-1.5 rounded-full hover:bg-[#0EA5E9]/15 transition-colors"
+                className="text-[11px] font-bold uppercase tracking-widest text-[#1e40af] bg-[#1e40af]/8 border border-[#1e40af]/20 px-3 py-1.5 rounded-full hover:bg-[#1e40af]/15 transition-colors"
               >
                 {row.categoryName}
               </Link>
@@ -147,7 +147,7 @@ export default async function HelpArticlePage({
             <VoteWidget articleId={row.id} />
             <Link
               href="/contact"
-              className="text-xs text-gray-400 hover:text-[#0EA5E9] transition-colors underline"
+              className="text-xs text-gray-400 hover:text-[#1e40af] transition-colors underline"
             >
               Still confused? Contact support →
             </Link>
@@ -159,16 +159,16 @@ export default async function HelpArticlePage({
           {relatedArticles.length > 0 && (
             <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4">
-                <BookOpen className="w-4 h-4 text-[#0EA5E9]" /> Related Articles
+                <BookOpen className="w-4 h-4 text-[#1e40af]" /> Related Articles
               </h3>
               <div className="space-y-3">
                 {relatedArticles.map((rel) => (
                   <Link
                     key={rel.id}
                     href={`/help/article/${rel.slug}`}
-                    className="flex items-start gap-2 text-sm text-gray-600 hover:text-[#0EA5E9] transition-colors group"
+                    className="flex items-start gap-2 text-sm text-gray-600 hover:text-[#1e40af] transition-colors group"
                   >
-                    <ArrowRight className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-300 group-hover:text-[#0EA5E9] transition-colors" />
+                    <ArrowRight className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-300 group-hover:text-[#1e40af] transition-colors" />
                     <span className="leading-snug">{rel.title}</span>
                   </Link>
                 ))}
@@ -177,9 +177,9 @@ export default async function HelpArticlePage({
           )}
 
           {/* Browse all categories */}
-          <div className="bg-gradient-to-br from-[#0EA5E9] to-sky-600 text-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-[#1e40af] to-blue-800 text-white rounded-2xl p-6 shadow-sm">
             <p className="font-bold text-sm mb-1">Browse all policies</p>
-            <p className="text-xs text-sky-100 mb-4 leading-relaxed">
+            <p className="text-xs text-blue-100 mb-4 leading-relaxed">
               View our complete policy directory organized by topic.
             </p>
             <Link

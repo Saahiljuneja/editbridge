@@ -6,7 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { verifySignature } from "@/lib/razorpay";
 import { createInAppNotification, notifyOrderPlacedEditor, editorWantsNotif } from "@/lib/notifications";
 import { consumeCredits } from "@/lib/rewards";
-import { getPlatformSettings } from "@/lib/platform-settings";
+import { getPlatformSettings, getClientProcessingFeeRate } from "@/lib/platform-settings";
 import { getEditorCommissionRate } from "@/lib/membership";
 import { z } from "zod";
 
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!quote || quote.status !== "offered" || !quote.offeredPrice)
     return NextResponse.json({ error: "Invalid quote state" }, { status: 409 });
 
-  const { processingFeePct } = await getPlatformSettings();
+  const processingFeePct = await getClientProcessingFeeRate(session.user.userId!);
   const commissionRatePct = await getEditorCommissionRate(quote.editorId);
   const PROCESSING_FEE = Math.round(quote.offeredPrice * (processingFeePct / 100));
   const commissionAmount = Math.round(quote.offeredPrice * (commissionRatePct / 100));

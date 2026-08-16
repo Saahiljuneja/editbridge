@@ -192,8 +192,9 @@ export default function ClientSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="px-6 py-6 space-y-4 max-w-3xl mx-auto">
+      <div className="relative min-h-screen bg-slate-50/50 overflow-hidden">
+        <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+        <div className="max-w-3xl mx-auto px-6 pt-6 space-y-4 relative z-10">
           {[1, 2].map(i => <div key={i} className="h-32 bg-white rounded-2xl border border-gray-100 animate-pulse" />)}
         </div>
       </div>

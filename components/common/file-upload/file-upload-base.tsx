@@ -24,7 +24,7 @@ export function getReadableFileSize(bytes: number): string {
 function getFileIcon(name: string) {
   const ext = name.split(".").pop()?.toLowerCase() ?? "";
   if (["mp4", "mov", "avi", "mkv", "webm"].includes(ext))
-    return <FileVideo className="w-5 h-5 text-sky-500" />;
+    return <FileVideo className="w-5 h-5 text-brand-primary" />;
   if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext))
     return <FileImage className="w-5 h-5 text-violet-500" />;
   if (["pdf"].includes(ext))
@@ -35,8 +35,8 @@ function getFileIcon(name: string) {
 function ExtBadge({ name }: { name: string }) {
   const ext = (name.split(".").pop() ?? "").toUpperCase().slice(0, 4);
   const colors: Record<string, string> = {
-    MP4: "bg-sky-500", MOV: "bg-sky-400", AVI: "bg-sky-600",
-    MKV: "bg-sky-700", PDF: "bg-red-500",
+    MP4: "bg-brand-primary", MOV: "bg-blue-400", AVI: "bg-brand-primary",
+    MKV: "bg-blue-900", PDF: "bg-red-500",
     JPG: "bg-violet-500", JPEG: "bg-violet-500", PNG: "bg-violet-400",
     GIF: "bg-pink-500", SVG: "bg-orange-500",
   };
@@ -91,7 +91,7 @@ function DropZone({ onDropFiles, accept, isDisabled, label = "Click to upload or
       className={cn(
         "relative border-2 border-dashed rounded-xl p-8 text-center transition-all",
         isDisabled ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200"
-          : dragOver ? "border-sky-400 bg-sky-50 cursor-pointer"
+          : dragOver ? "border-blue-400 bg-blue-50 cursor-pointer"
           : "border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-gray-100/80 cursor-pointer"
       )}
     >
@@ -106,13 +106,13 @@ function DropZone({ onDropFiles, accept, isDisabled, label = "Click to upload or
       />
       <div className="flex flex-col items-center gap-2.5">
         <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center border transition-colors",
-          dragOver ? "border-sky-300 bg-sky-100" : "border-gray-200 bg-white"
+          dragOver ? "border-blue-300 bg-blue-100" : "border-gray-200 bg-white"
         )}>
-          <UploadCloud className={cn("w-5 h-5", dragOver ? "text-sky-500" : "text-gray-400")} />
+          <UploadCloud className={cn("w-5 h-5", dragOver ? "text-brand-primary" : "text-gray-400")} />
         </div>
         <div>
           <p className="text-sm text-gray-600">
-            <span className="font-semibold text-sky-600">Click to upload</span>{" "}
+            <span className="font-semibold text-brand-primary">Click to upload</span>{" "}
             or drag and drop
           </p>
           {hint && <p className="text-xs text-gray-400 mt-0.5">{hint}</p>}

@@ -102,7 +102,7 @@ export function ProfileAnalyticsSection() {
           <p className="text-xs font-medium text-gray-500 mb-3">Most-clicked package</p>
           <div className="relative h-8 rounded-lg bg-gray-100 overflow-hidden">
             <div
-              className="absolute inset-y-0 left-0 rounded-lg bg-gradient-to-r from-[var(--brand-client)] to-[#0284C7] transition-all"
+              className="absolute inset-y-0 left-0 rounded-lg bg-gradient-to-r from-[var(--brand-client)] to-[#1e3a8a] transition-all"
               style={{ width: `${maxClicks > 0 ? (data.mostClickedPackage.clicks / maxClicks) * 100 : 0}%` }}
             />
             <div className="absolute inset-0 flex items-center justify-end px-3">

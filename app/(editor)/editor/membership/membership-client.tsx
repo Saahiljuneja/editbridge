@@ -11,11 +11,16 @@ const MEMBERSHIP_PLANS = [
     id: "hobby",
     name: "Hobby",
     price: 0,
-    commission: 15,
+    commission: 20,
+    maxSets: 2,
+    packagesPerSet: 3,
+    maxFeaturedVideos: 3,
     tagline: "Perfect for testing the platform waters.",
     badge: "Free Tier",
     features: [
-      "Keep 85% of order payouts",
+      "Keep 80% of order payouts",
+      "2 service sets · 3 packages each",
+      "3 featured video slots",
       "Up to 3 portfolio item uploads",
       "Standard search listing index",
       "Basic page views analytics dashboard",
@@ -28,27 +33,37 @@ const MEMBERSHIP_PLANS = [
     name: "Starter",
     price: 499,
     commission: 10,
+    maxSets: 3,
+    packagesPerSet: 3,
+    maxFeaturedVideos: 5,
     tagline: "Level up your freelance presence.",
     badge: "Bronze Level",
     features: [
       "Keep 90% of order payouts",
+      "3 service sets · 3 packages each",
+      "5 featured video slots",
       "Up to 10 portfolio item uploads",
       "Bronze verified platform badge",
       "24-hour priority payouts approval",
       "1 active profile search boost token",
       "Priority email support",
     ],
-    accent: "#0284c7",
+    accent: "#1e3a8a",
   },
   {
     id: "pro",
     name: "Pro",
     price: 1499,
     commission: 5,
+    maxSets: 4,
+    packagesPerSet: 3,
+    maxFeaturedVideos: 10,
     tagline: "Designed for professional video editors.",
     badge: "Silver Level",
     features: [
       "Keep 95% of order payouts",
+      "4 service sets · 3 packages each",
+      "10 featured video slots",
       "Unlimited portfolio item uploads",
       "Silver premium verified badge",
       "Instant checkout payouts transfer",
@@ -64,10 +79,15 @@ const MEMBERSHIP_PLANS = [
     name: "Agency",
     price: 3999,
     commission: 3,
+    maxSets: null,
+    packagesPerSet: 3,
+    maxFeaturedVideos: 15,
     tagline: "Ultimate tier for high-volume studios.",
     badge: "Gold Level",
     features: [
       "Keep 97% of order payouts",
+      "Unlimited service sets · 3 packages each",
+      "15 featured video slots",
       "Unlimited portfolio item uploads",
       "Gold agency verified badge",
       "Featured Agency listing cards in search",
@@ -325,11 +345,25 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
 
                 <div className="border-t border-gray-100 my-1" />
 
-                <div className="py-2.5 px-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Commission</span>
-                  <span className="text-xs font-black text-emerald-600">
-                    {plan.commission}% cut
-                  </span>
+                <div className="space-y-2">
+                  <div className="py-2.5 px-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">Commission</span>
+                    <span className="text-xs font-black text-emerald-600">
+                      {plan.commission}% cut
+                    </span>
+                  </div>
+                  <div className="py-2.5 px-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">Service Sets</span>
+                    <span className="text-xs font-black" style={{ color: plan.accent }}>
+                      {plan.maxSets === null ? "Unlimited" : `${plan.maxSets} sets`} · {plan.packagesPerSet} pkg each
+                    </span>
+                  </div>
+                  <div className="py-2.5 px-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">Featured Videos</span>
+                    <span className="text-xs font-black" style={{ color: plan.accent }}>
+                      {plan.maxFeaturedVideos} slots
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -364,13 +398,13 @@ export function MembershipClient({ isPricingTiersEnabled }: { isPricingTiersEnab
       </div>
 
       {/* Info FAQ Alert */}
-      <div className="rounded-2xl p-5 border border-indigo-50 bg-indigo-50/30 flex gap-4">
-        <Info className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
+      <div className="rounded-2xl p-5 border border-blue-100 bg-blue-50/30 flex gap-4">
+        <Info className="w-5 h-5 text-[#1e40af] shrink-0 mt-0.5" />
         <div className="space-y-1.5">
-          <h4 className="text-indigo-900 font-bold text-sm">How upgrades and billing work</h4>
-          <p className="text-xs text-indigo-700/80 leading-relaxed">
+          <h4 className="text-blue-900 font-bold text-sm">How upgrades and billing work</h4>
+          <p className="text-xs text-blue-900/80 leading-relaxed">
             When upgrading, your lower commission term becomes active immediately for all new orders. Platform subscriptions are billed monthly on your renewal date.
-            You can downgrade or cancel at any time, which reverts your commission cut to the Hobby tier (15%) at the end of your billing cycle.
+            You can downgrade or cancel at any time, which reverts your commission cut to the Hobby tier (20%) at the end of your billing cycle.
           </p>
         </div>
       </div>

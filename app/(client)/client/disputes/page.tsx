@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, ShoppingBag } from "lucide-react";
+import { TopoBackground } from "@/components/common/topo-background";
 import { db } from "@/lib/db";
 import { disputes, orders, packages } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -40,22 +41,24 @@ export default async function DisputesPage() {
   const openCount = rows.filter(r => r.status === "open").length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
-        <div className="px-6 py-5 flex items-center justify-between">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-3xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Header card */}
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">My Disputes</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+            <h1 className="text-xl font-bold text-neutral-900">My Disputes</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">
               {openCount > 0 ? `${openCount} open dispute${openCount !== 1 ? "s" : ""}` : "All disputes resolved"}
             </p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
           </div>
         </div>
-      </div>
 
-      <div className="px-6 py-6">
+        <div>
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mb-4">
@@ -109,6 +112,7 @@ export default async function DisputesPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

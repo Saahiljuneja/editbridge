@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
@@ -40,12 +40,12 @@ export function PageHero({
 }) {
   return (
     <section
-      className="relative overflow-hidden py-20 px-4"
-      style={{ background: "#07050f" }}
+      className="relative overflow-hidden py-20 px-4 border-b border-neutral-200/60"
+      style={{ background: "#f8fafc" }}
     >
       {/* Blob */}
       <div
-        className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl"
+        className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-[0.08] blur-3xl"
         style={{ background: accentColor }}
       />
       <div className="relative z-10 max-w-3xl mx-auto text-center">
@@ -56,8 +56,8 @@ export function PageHero({
           className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6 border"
           style={{
             color: accentColor,
-            borderColor: `${accentColor}40`,
-            background: `${accentColor}15`,
+            borderColor: `${accentColor}25`,
+            background: `${accentColor}08`,
           }}
         >
           {badge}
@@ -66,7 +66,7 @@ export function PageHero({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.08 }}
-          className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight"
+          className="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-5 leading-tight"
         >
           {title}
         </motion.h1>
@@ -74,7 +74,7 @@ export function PageHero({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.16 }}
-          className="text-lg text-white/60 max-w-xl mx-auto"
+          className="text-lg text-neutral-500 max-w-xl mx-auto"
         >
           {subtitle}
         </motion.p>

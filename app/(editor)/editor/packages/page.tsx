@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { editors, packages, userPoints } from "@/lib/db/schema";
+import { editors, packages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { PackagesManager } from "./packages-manager";
 import { Info, Layers } from "lucide-react";
-import { calcLevel, getLevelPerks } from "@/lib/rewards";
-import type { Level } from "@/lib/rewards";
-import { hasActiveBoost } from "@/lib/xp-shop";
+import { getEffectiveTier } from "@/lib/membership";
 
 export default async function PackagesPage() {
   const session = await auth();
@@ -18,20 +16,11 @@ export default async function PackagesPage() {
 
   const [rows, editorRow] = await Promise.all([
     db.select().from(packages).where(eq(packages.editorId, editorId)).orderBy(packages.price),
-    db.select({ userId: editors.userId }).from(editors).where(eq(editors.id, editorId)).limit(1),
+    db.select({ membershipTier: editors.membershipTier, membershipExpiresAt: editors.membershipExpiresAt })
+      .from(editors).where(eq(editors.id, editorId)).limit(1),
   ]);
 
-  let maxPackages = 3;
-  let level: Level = "bronze";
-  if (editorRow[0]) {
-    const userId = editorRow[0].userId;
-    const [[pts], hasSlotBoost] = await Promise.all([
-      db.select({ total: userPoints.total }).from(userPoints).where(eq(userPoints.userId, userId)).limit(1),
-      hasActiveBoost(userId, "extra_package_slot"),
-    ]);
-    level = calcLevel(pts?.total ?? 0) as Level;
-    maxPackages = getLevelPerks(level).maxPackages + (hasSlotBoost ? 1 : 0);
-  }
+  const tier = getEffectiveTier(editorRow[0]?.membershipTier, editorRow[0]?.membershipExpiresAt);
 
   return (
     <div className="px-6 py-8">
@@ -54,7 +43,7 @@ export default async function PackagesPage() {
         </div>
       </div>
 
-      {/* Reward discount notice */}
+      {/* Member Rewards discount notice */}
       <div className="flex gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 mb-8">
         <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
           <Info className="w-4 h-4 text-amber-600" />
@@ -62,15 +51,16 @@ export default async function PackagesPage() {
         <div>
           <p className="text-sm font-bold text-amber-900 mb-1">Member Rewards discount</p>
           <p className="text-xs text-amber-700 leading-relaxed">
-            Clients with Member Rewards may receive up to 10% off your listed price. Your payout reflects the discounted price minus the 15% platform fee &mdash; you&apos;ll see a full breakdown on each order.
+            Clients with Member Rewards may receive up to 10% off your listed price. Your payout reflects the discounted price minus the {tier.commissionRate}% platform fee &mdash; you&apos;ll see a full breakdown on each order.
           </p>
         </div>
       </div>
 
       <PackagesManager
         initialPackages={rows as Parameters<typeof PackagesManager>[0]["initialPackages"]}
-        maxPackages={maxPackages}
-        level={level}
+        maxSets={tier.maxSets === Infinity ? null : tier.maxSets}
+        packagesPerSet={tier.packagesPerSet}
+        membershipTier={tier.name}
       />
     </div>
   );

@@ -66,7 +66,7 @@ export function QuotePayForm({ quoteId, totalAmount }: Props) {
           router.push(`/client/orders/${verifyData.orderId}`);
         },
         prefill: {},
-        theme: { color: "#0EA5E9" },
+        theme: { color: "#1e40af" },
       });
       rz.open();
     } catch (err) {
@@ -80,7 +80,7 @@ export function QuotePayForm({ quoteId, totalAmount }: Props) {
     <button
       onClick={handlePay}
       disabled={loading}
-      className="w-full py-3.5 rounded-xl font-semibold text-white text-sm bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+      className="w-full py-3.5 rounded-xl font-semibold text-white text-sm bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
     >
       {loading ? (
         <>

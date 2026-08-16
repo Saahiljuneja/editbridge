@@ -1,25 +1,36 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { reviews, auditLogs } from "@/lib/db/schema";
+import { reviews } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { logAction } from "@/lib/audit";
+import type { UserRole } from "@/types";
 
-const ALLOWED = ["admin", "staff_moderation"];
+const ALLOWED: UserRole[] = ["admin"];
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || !ALLOWED.includes(session.user.role)) {
+  if (!session || !ALLOWED.includes(session.user.role as UserRole)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
   const { id } = await params;
+
+  const [review] = await db.select().from(reviews).where(eq(reviews.id, id)).limit(1);
+  if (!review) {
+    return NextResponse.json({ error: "Review not found" }, { status: 404 });
+  }
+
   await db.delete(reviews).where(eq(reviews.id, id));
-  await db.insert(auditLogs).values({
-    actorId: session.user.userId,
-    actorRole: session.user.role,
-    action: "review.remove",
+
+  logAction({
+    actorId: session.user.userId!,
+    actorRole: session.user.role as UserRole,
+    action: "review.delete",
     entityType: "review",
     entityId: id,
-    metadata: {},
+    metadata: { revieweeId: review.revieweeId, reviewerId: review.reviewerId, rating: review.rating },
   });
-  return NextResponse.json({ ok: true });
+
+  return NextResponse.json({ success: true });
 }

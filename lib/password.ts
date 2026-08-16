@@ -18,5 +18,6 @@ export async function comparePassword(
   const [salt, storedHash] = stored.split(":");
   if (!salt || !storedHash) return false;
   const inputHash = hash(password, salt);
+  if (storedHash.length !== inputHash.length) return false;
   return timingSafeEqual(Buffer.from(storedHash), Buffer.from(inputHash));
 }

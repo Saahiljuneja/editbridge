@@ -184,7 +184,7 @@ export default async function AdminDisputeDetailPage({
             {isOpen ? "🔴 Open" : "✅ Resolved"}
           </Badge>
           {isOpen && (
-            <Badge className={cn("text-xs border-0 font-semibold px-2.5 py-1", dispute.evidenceText && dispute.evidenceText.trim().length > 0 ? "bg-sky-100 text-sky-700" : "bg-amber-100 text-amber-700")}>
+            <Badge className={cn("text-xs border-0 font-semibold px-2.5 py-1", dispute.evidenceText && dispute.evidenceText.trim().length > 0 ? "bg-blue-100 text-blue-900" : "bg-amber-100 text-amber-700")}>
               {dispute.evidenceText && dispute.evidenceText.trim().length > 0 ? "Ready for Review" : "Awaiting Editor"}
             </Badge>
           )}

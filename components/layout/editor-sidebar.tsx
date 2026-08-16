@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 
 import {
-  LayoutDashboard, User, Package, ShoppingBag, DollarSign,
+  LayoutDashboard, User, Package, ShoppingBag, DollarSign, Wallet,
   MessageSquare, Settings, Star, BarChart2, AlertTriangle,
   Bell, Users, Zap, Sparkles, HelpCircle, Bookmark,
   FileQuestion, Gift, Film, Menu, X, LogOut, ArrowLeft,
@@ -15,8 +15,8 @@ import {
 import { cn } from "@/lib/utils";
 import React from "react";
 
-const ACCENT = "var(--brand-editor)";
-const BG     = "#080512";
+const ACCENT = "#1e40af"; // sky-500 / var(--brand-editor)
+const BG     = "#ffffff";
 
 const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: string; label: string; icon: React.ElementType; badgeKey?: "messages" | "notifications"; flag?: string }[] }[] = [
   {
@@ -28,7 +28,7 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
       { href: "/editor/quotes",          label: "Quotes",        icon: FileQuestion },
       { href: "/editor/questions",       label: "Pre-order Q&A", icon: HelpCircle },
       { href: "/editor/messages",        label: "Messages",      icon: MessageSquare, badgeKey: "messages" as const },
-      { href: "/editor/payouts",         label: "Payouts",       icon: DollarSign },
+      { href: "/editor/wallet",          label: "My Wallet",     icon: Wallet },
       { href: "/editor/disputes",        label: "Disputes",      icon: AlertTriangle },
     ],
   },
@@ -56,17 +56,18 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
   {
     label: "Account", icon: Settings,
     items: [
-      { href: "/editor/notifications",   label: "Notifications", icon: Bell, badgeKey: "notifications" as const },
+      { href: "/editor/notifications",    label: "Notifications", icon: Bell, badgeKey: "notifications" as const },
       { href: "/editor/settings",        label: "Settings",      icon: Settings },
+      { href: "/editor/support",         label: "Support Tickets", icon: MessageSquare },
     ],
   },
 ];
 
 const LEVEL_META: Record<string, { label: string; color: string; bg: string }> = {
-  bronze:   { label: "Bronze",   color: "#B45309", bg: "#78350F40" },
-  silver:   { label: "Silver",   color: "#9CA3AF", bg: "#6B728030" },
-  gold:     { label: "Gold",     color: "#CA8A04", bg: "#78350F40" },
-  platinum: { label: "Platinum", color: "#A78BFA", bg: "#4F46E540" },
+  bronze:   { label: "Bronze",   color: "#B45309", bg: "#78350F15" },
+  silver:   { label: "Silver",   color: "#4B5563", bg: "#4B556315" },
+  gold:     { label: "Gold",     color: "#CA8A04", bg: "#CA8A0415" },
+  platinum: { label: "Platinum", color: "#6D28D9", bg: "#6D28D915" },
 };
 
 type BadgeKey = "messages" | "notifications";
@@ -92,8 +93,8 @@ function RailTooltip({ label, children }: { label: string; children: React.React
       {children}
       {show && (
         <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-[200] pointer-events-none flex items-center">
-          <div className="w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[5px] border-r-gray-800" />
-          <div className="bg-gray-800 border border-white/10 text-white text-[11.5px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
+          <div className="w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[5px] border-r-neutral-800" />
+          <div className="bg-neutral-800 border border-neutral-700 text-white text-[11.5px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
             {label}
           </div>
         </div>
@@ -181,20 +182,18 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
     return (
       <Link key={href} href={href} onClick={onNavigate}
         className={cn(
-          "flex items-center justify-between px-3.5 py-[9px] rounded-full text-[12.5px] font-semibold transition-all mb-0.5 group",
-          active ? "bg-white/[0.09] text-white" : "text-white/55 hover:text-white hover:bg-white/[0.05]"
+          "flex items-center justify-between px-3.5 py-[9px] rounded-xl text-[12.5px] font-bold transition-all mb-0.5 group",
+          active ? "bg-blue-50 text-blue-900 shadow-sm shadow-blue-800/5" : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
         )}>
         <span className="flex items-center gap-2.5 min-w-0">
-          <span className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors",
-            active ? "bg-white/10" : "bg-white/[0.04] group-hover:bg-white/[0.07]")}
-            style={active ? { background: ACCENT + "28" } : {}}>
+          <span className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+            active ? "bg-blue-100" : "bg-neutral-100 group-hover:bg-neutral-200/50")}>
             <ItemIcon className="w-3.5 h-3.5" style={active ? { color: ACCENT } : {}} />
           </span>
           <span className="truncate">{label}</span>
         </span>
         {count > 0 && (
-          <span className="text-[10px] font-bold rounded-full px-2 py-0.5 leading-none ml-1 shrink-0"
-            style={{ background: active ? ACCENT : "rgba(255,255,255,0.1)", color: "white" }}>
+          <span className="text-[10px] font-bold rounded-full px-2 py-0.5 leading-none ml-1 shrink-0 bg-blue-100 text-blue-750">
             {count > 99 ? "99+" : count}
           </span>
         )}
@@ -213,22 +212,20 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
   }
 
   return (
-    <div className="w-[240px] h-full flex flex-col border-r border-white/[0.05]"
-      style={{ background: "rgba(255,255,255,0.028)" }}>
+    <div className="w-[240px] h-full flex flex-col border-r border-neutral-200/60 bg-white">
       <style>{`
         .sb-scroll::-webkit-scrollbar{width:3px}
         .sb-scroll::-webkit-scrollbar-track{background:transparent}
-        .sb-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px}
-        .sb-scroll::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
+        .sb-scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:99px}
+        .sb-scroll::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.15)}
       `}</style>
 
       {/* Header */}
       <div className="px-4 pt-5 pb-4 shrink-0">
-        <p className="text-[10.5px] font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT + "99" }}>Editor Portal</p>
-        <p className="text-[17px] font-bold text-white tracking-tight leading-tight">{activePanel ?? "Navigation"}</p>
+        <p className="text-[10.5px] font-black uppercase tracking-widest mb-1 text-brand-primary">Editor Portal</p>
+        <p className="text-[17px] font-black text-neutral-800 tracking-tight leading-tight">{activePanel ?? "Navigation"}</p>
         {activeItemLabel && (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full mt-2"
-            style={{ background: ACCENT + "20", color: ACCENT }}>
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full mt-2 bg-blue-50 text-blue-900 border border-blue-100">
             {activeItemLabel}
           </span>
         )}
@@ -237,14 +234,14 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
       {/* Items */}
       <div className="relative flex-1 min-h-0">
         <div className={cn("absolute top-0 inset-x-0 h-4 z-10 pointer-events-none transition-opacity", showTopFade ? "opacity-100" : "opacity-0")}
-          style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.028), transparent)" }} />
+          style={{ background: "linear-gradient(to bottom, #ffffff, transparent)" }} />
         <div ref={navRef} onScroll={checkScroll} className="h-full overflow-y-auto sb-scroll px-2 pb-4 scroll-smooth">
           {NAV_GROUPS.map(g => {
             const visibleItems = g.items.filter(it => !it.flag || flags[it.flag]);
             if (visibleItems.length === 0) return null;
             return (
               <div key={g.label} id={`group-${g.label}`} className="scroll-mt-3 mb-6 last:mb-2">
-                <p className="text-[10.5px] font-bold uppercase tracking-wider text-white/30 px-2.5 mb-2">
+                <p className="text-[10.5px] font-black uppercase tracking-wider text-neutral-400 px-2.5 mb-2">
                   {g.label}
                 </p>
                 <div className="space-y-0.5">
@@ -255,61 +252,7 @@ function Panel({ pathname, counts, flags, onNavigate, userName, userImage, initi
           })}
         </div>
         <div className={cn("absolute bottom-0 inset-x-0 h-4 z-10 pointer-events-none transition-opacity", showBottomFade ? "opacity-100" : "opacity-0")}
-          style={{ background: "linear-gradient(to top, rgba(255,255,255,0.028), transparent)" }} />
-      </div>
-
-      {/* Quick actions */}
-      <div className="shrink-0 border-t border-white/[0.06] px-3 pt-2.5 pb-1">
-        <Link href="/"
-          className="flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium text-white/45 hover:text-white hover:bg-white/[0.05] transition-colors mb-0.5">
-          <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
-          Back to website
-        </Link>
-      </div>
-
-      {/* User footer */}
-      <div className="shrink-0 border-t border-white/[0.06] px-3 py-3">
-        <div className="flex items-center gap-2.5 px-1">
-          <div className="relative shrink-0">
-            <div className="relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-[11px] font-bold"
-              style={{ background: `linear-gradient(135deg, ${ACCENT}, #0EA5E9)` }}>
-              {userImage
-                ? <img src={userImage} alt={userName} className="w-full h-full object-cover" />
-                : initials}
-            </div>
-            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border-2"
-              style={{ borderColor: BG }} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[12.5px] font-semibold text-white truncate leading-tight">{userName || "Editor"}</p>
-            <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-              style={{ color: lm.color, background: lm.bg }}>
-              {lm.label}
-            </span>
-          </div>
-          {editorId ? (
-            <Link href={`/editor/${editorId}`} target="_blank" title="View public profile"
-              className="shrink-0 p-1.5 rounded-lg text-white/25 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/10 transition-colors">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </Link>
-          ) : (
-            <button onClick={() => signOut({ callbackUrl: "/" })} title="Sign out"
-              className="shrink-0 p-1.5 rounded-lg text-white/25 hover:text-red-400 hover:bg-red-400/10 transition-colors">
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-        {editorId && (
-          <div className="mt-2 px-1">
-            <button onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11.5px] text-white/30 hover:text-red-400 hover:bg-red-400/10 transition-colors">
-              <LogOut className="w-3 h-3 shrink-0" />
-              Sign out
-            </button>
-          </div>
-        )}
+          style={{ background: "linear-gradient(to top, #ffffff, transparent)" }} />
       </div>
     </div>
   );
@@ -327,12 +270,12 @@ function Rail({ pathname, counts, activePanel, onTogglePanel, progress }: {
   function railIconCls(active: boolean) {
     return cn(
       "relative flex items-center justify-center w-10 h-10 rounded-xl mx-auto transition-all duration-150",
-      active ? "text-white" : "text-white/40 hover:text-white/80 hover:bg-white/[0.06]"
+      active ? "text-blue-900 bg-blue-50" : "text-neutral-400 hover:text-neutral-850 hover:bg-neutral-100/50"
     );
   }
 
   return (
-    <div className="w-14 flex-shrink-0 flex flex-col h-full relative">
+    <div className="w-14 flex-shrink-0 flex flex-col h-full bg-neutral-50/50 border-r border-neutral-200/50 relative">
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-[2px] z-30 overflow-hidden pointer-events-none">
         <div className="h-full transition-[width] ease-out"
@@ -341,12 +284,12 @@ function Rail({ pathname, counts, activePanel, onTogglePanel, progress }: {
 
       {/* Logo */}
       <div className="flex items-center justify-center pt-4 pb-3 shrink-0">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: ACCENT }}>
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-brand-primary">
           <Film className="w-4 h-4 text-white" />
         </div>
       </div>
 
-      <div className="mx-3 my-2 h-px bg-white/[0.06]" />
+      <div className="mx-3 my-2 h-px bg-neutral-200/60" />
 
       {/* Group icons */}
       <div className="px-2 space-y-0.5">
@@ -368,15 +311,13 @@ function Rail({ pathname, counts, activePanel, onTogglePanel, progress }: {
                   if (e.key === "Escape" && activePanel) onTogglePanel(activePanel);
                 }}
                 className={railIconCls(active)}
-                style={panelOpen ? { background: ACCENT + "22" } : anyActive ? { background: "rgba(255,255,255,0.07)" } : {}}>
-                <Icon className="w-4 h-4" style={active ? { color: ACCENT } : {}} />
+                style={panelOpen ? { background: "rgba(30, 64, 175, 0.08)" } : anyActive ? { background: "rgba(30, 64, 175, 0.04)" } : {}}>
+                <Icon className="w-4.5 h-4.5" style={active ? { color: ACCENT } : {}} />
                 {hasBadge && (
-                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full border-[2.5px]"
-                    style={{ background: ACCENT, borderColor: BG }} />
+                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full border-[2px] border-white bg-brand-primary" />
                 )}
                 {panelOpen && (
-                  <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full"
-                    style={{ background: ACCENT }} />
+                  <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full bg-brand-primary" />
                 )}
               </button>
             </RailTooltip>
@@ -402,16 +343,16 @@ function MobileDrawer({ pathname, counts, flags, onClose }: {
     setOpenGroups(prev => { const n = new Set(prev); n.has(label) ? n.delete(label) : n.add(label); return n; });
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: BG }}>
+    <div className="flex flex-col h-full overflow-hidden bg-white">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-5 pb-4 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: ACCENT }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-brand-primary">
             <Film className="w-4 h-4 text-white" />
           </div>
-          <span className="text-[15px] font-bold text-white">EditBridge</span>
+          <span className="text-[15px] font-black text-neutral-850">EditBridge</span>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.05] transition-colors">
+        <button onClick={onClose} className="p-1.5 rounded-lg text-neutral-450 hover:bg-neutral-50 transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -427,17 +368,16 @@ function MobileDrawer({ pathname, counts, flags, onClose }: {
           return (
             <div key={group.label} className="mb-1">
               <button onClick={() => toggleGroup(group.label)}
-                className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-colors",
-                  anyActive ? "text-white" : "text-white/60 hover:text-white hover:bg-white/[0.05]")}>
-                <Icon className={cn("w-4 h-4 shrink-0", anyActive ? "text-white" : "text-white/40")} />
+                className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-bold transition-colors",
+                  anyActive ? "text-blue-750 bg-blue-50/40" : "text-neutral-500 hover:text-neutral-850 hover:bg-neutral-50")}>
+                <Icon className={cn("w-4 h-4 shrink-0", anyActive ? "text-brand-primary" : "text-neutral-450")} />
                 <span className="flex-1 text-left">{group.label}</span>
                 {groupBadgeCount > 0 && (
-                  <span className="text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none mr-0.5"
-                    style={{ background: ACCENT, color: "white" }}>
+                  <span className="text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none mr-0.5 bg-blue-100 text-blue-750">
                     {groupBadgeCount > 99 ? "99+" : groupBadgeCount}
                   </span>
                 )}
-                {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-white/40" /> : <ChevronDown className="w-3.5 h-3.5 text-white/40" />}
+                {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />}
               </button>
               {isOpen && (
                 <div className="ml-7 mt-0.5">
@@ -446,15 +386,14 @@ function MobileDrawer({ pathname, counts, flags, onClose }: {
                     const count  = it.badgeKey ? (counts[it.badgeKey] ?? 0) : 0;
                     return (
                       <Link key={it.href} href={it.href} onClick={onClose}
-                        className={cn("flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-colors",
-                          active ? "text-white" : "text-white/60 hover:text-white")}>
+                        className={cn("flex items-center justify-between px-4 py-2.5 text-[13px] font-bold transition-colors",
+                          active ? "text-blue-900 font-extrabold" : "text-neutral-500 hover:text-neutral-800")}>
                         <span className="flex items-center gap-2">
-                          {active && <span className="w-1.5 h-1.5 rounded-full" style={{ background: ACCENT }} />}
+                          {active && <span className="w-1.5 h-1.5 rounded-full bg-brand-primary" />}
                           {it.label}
                         </span>
                         {count > 0 && (
-                          <span className="text-[10.5px] font-bold rounded-full px-1.5 py-0.5 leading-none"
-                            style={{ background: active ? ACCENT : "rgba(255,255,255,0.1)", color: "white" }}>
+                          <span className="text-[10.5px] font-bold rounded-full px-1.5 py-0.5 leading-none bg-blue-100 text-blue-900">
                             {count}
                           </span>
                         )}
@@ -468,13 +407,13 @@ function MobileDrawer({ pathname, counts, flags, onClose }: {
         })}
       </div>
 
-      <div className="px-4 py-3 border-t border-white/[0.06] shrink-0">
+      <div className="px-4 py-3 border-t border-neutral-100 shrink-0">
         <Link href="/editor/settings" onClick={onClose}
-          className="flex items-center gap-2.5 text-[13px] text-white/60 hover:text-white transition-colors py-2">
+          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-neutral-805 transition-colors py-2 font-bold">
           <Settings className="w-4 h-4" /> Settings
         </Link>
         <button onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center gap-2.5 text-[13px] text-white/60 hover:text-red-400 transition-colors py-2 w-full">
+          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-red-500 transition-colors py-2 w-full font-bold">
           <LogOut className="w-4 h-4" /> Sign out
         </button>
       </div>
@@ -504,9 +443,8 @@ export function EditorSidebar({
   userId = null,
 }: EditorSidebarProps) {
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const userName = session?.user?.name ?? propUserName;
-  const userImage = session?.user?.image ?? propUserImage;
+  const userName = propUserName;
+  const userImage = propUserImage;
 
   const [mobileOpen,  setMobileOpen]  = useState(false);
   const [activePanel, setActivePanel] = useState<string | null>(null);
@@ -600,23 +538,22 @@ export function EditorSidebar({
   return (
     <>
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center gap-3 px-4 border-b border-white/[0.06]"
-        style={{ background: BG }}>
-        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg text-white hover:bg-white/[0.05] transition-colors">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center gap-3 px-4 border-b border-neutral-200 bg-white">
+        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-50 transition-colors">
           <Menu className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: ACCENT }}>
+          <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-brand-primary">
             <Film className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-[14px] font-bold text-white tracking-tight">EditBridge</span>
+          <span className="text-[14px] font-black text-neutral-850 tracking-tight">EditBridge</span>
         </div>
       </div>
 
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-neutral-950/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div className="relative w-72 h-full shadow-2xl">
             <MobileDrawer pathname={pathname} counts={counts} flags={flags} onClose={() => setMobileOpen(false)} />
           </div>
@@ -624,8 +561,7 @@ export function EditorSidebar({
       )}
 
       {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.06]"
-        style={{ background: BG }}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white">
         <div className="flex h-14">
           {NAV_GROUPS.slice(0, 3).map(group => {
             const Icon      = group.icon;
@@ -635,32 +571,31 @@ export function EditorSidebar({
             return (
               <Link key={group.label} href={firstHref}
                 className={cn("flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors",
-                  groupActive ? "text-white" : "text-white/40")}>
+                  groupActive ? "text-blue-800 font-bold" : "text-neutral-450")}>
                 {groupActive && (
-                  <span className="absolute top-0 inset-x-3 h-[2px] rounded-full" style={{ background: ACCENT }} />
+                  <span className="absolute top-0 inset-x-3 h-[2px] rounded-full bg-brand-primary" />
                 )}
                 <div className="relative">
                   <Icon className="w-5 h-5" />
                   {hasBadge && (
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border-[2px]"
-                      style={{ background: ACCENT, borderColor: BG }} />
+                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border-[2px] border-white bg-brand-primary" />
                   )}
                 </div>
-                <span className="text-[9.5px] font-medium">{group.label}</span>
+                <span className="text-[9.5px] font-bold">{group.label}</span>
               </Link>
             );
           })}
           <button onClick={() => setMobileOpen(true)}
-            className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 transition-colors">
+            className="flex-1 flex flex-col items-center justify-center gap-0.5 text-neutral-450 transition-colors">
             <Menu className="w-5 h-5" />
-            <span className="text-[9.5px] font-medium">More</span>
+            <span className="text-[9.5px] font-bold">More</span>
           </button>
         </div>
       </nav>
 
       {/* Desktop sidebar */}
       <aside
-        className="hidden md:flex h-full flex-shrink-0 border-r border-white/[0.06] transition-[width] duration-250 ease-in-out overflow-hidden"
+        className="hidden md:flex h-full flex-shrink-0 border-r border-neutral-200/60 transition-[width] duration-250 ease-in-out overflow-hidden"
         style={{ width: activePanel !== null ? 56 + 240 : 56, background: BG }}>
         <Rail pathname={pathname} counts={counts} activePanel={activePanel}
           onTogglePanel={handleTogglePanel} progress={progress} />

@@ -66,7 +66,7 @@ export function OrderReferences({
         {!readonly && (
           <button
             onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-client)] hover:text-sky-700 border border-[var(--brand-client)]/30 px-3 py-1.5 rounded-lg hover:bg-sky-50 transition-colors">
+            className="flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-client)] hover:text-blue-900 border border-[var(--brand-client)]/30 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
             <Plus className="w-3.5 h-3.5" /> Add link
           </button>
         )}
@@ -74,7 +74,7 @@ export function OrderReferences({
 
       {/* Add form */}
       {open && (
-        <div className="rounded-lg border border-dashed border-[var(--brand-client)]/40 bg-sky-50/40 p-4 space-y-3">
+        <div className="rounded-lg border border-dashed border-[var(--brand-client)]/40 bg-blue-50/40 p-4 space-y-3">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">URL</label>
             <input

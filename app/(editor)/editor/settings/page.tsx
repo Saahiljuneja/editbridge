@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
@@ -756,10 +756,10 @@ function PaymentsTab() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-brand-primary">
         <p className="font-semibold mb-0.5">How payouts work</p>
         <p className="text-xs text-blue-600 leading-relaxed">
-          Earnings are released 7 days after an order is marked complete. Funds are transferred to your registered bank account via NEFT/IMPS. A 15% platform fee is deducted from each order.
+          Earnings are released 7 days after an order is marked complete. Funds are transferred to your registered bank account via NEFT/IMPS. A 20% platform fee is deducted from each order.
         </p>
       </div>
 
@@ -995,7 +995,7 @@ function TemplatesTab() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-brand-primary">
         <p className="font-semibold mb-0.5">Using templates in chat</p>
         <p className="text-xs text-blue-600 leading-relaxed">
           Type &quot;/&quot; in any order chat to quickly insert a template. If you set a shortcut, typing it

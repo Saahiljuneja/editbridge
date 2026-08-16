@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -119,22 +119,22 @@ export default function ContactPage() {
     <div className="flex flex-col bg-white">
 
       {/* ══ HERO ══ */}
-      <section className="relative bg-[#06040f] pt-24 pb-28 px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full blur-[140px] opacity-15 pointer-events-none" style={{ background: "#7c6ff7" }} />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none" style={{ background: "#34d399" }} />
+      <section className="relative bg-slate-50/50 border-b border-neutral-200/50 pt-24 pb-28 px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.08] pointer-events-none" style={{ background: "#7c6ff7" }} />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-[0.05] pointer-events-none" style={{ background: "#34d399" }} />
 
         <div className="relative z-10 px-8 py-6 grid lg:grid-cols-2 gap-16 items-center">
 
           {/* Left */}
           <div>
             <Reveal>
-              <div className="inline-flex items-center gap-2 border border-[#7c6ff7]/30 bg-[#7c6ff7]/10 text-[#7c6ff7] text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
+              <div className="inline-flex items-center gap-2 border border-violet-200 bg-violet-50 text-violet-700 text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
                 Contact us
               </div>
             </Reveal>
             <Reveal delay={0.06}>
-              <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight leading-[0.92] mb-6">
+              <h1 className="text-5xl sm:text-6xl font-black text-neutral-900 tracking-tight leading-[0.92] mb-6">
                 We&apos;re here<br />
                 <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg,#7c6ff7,#34d399)" }}>
                   to help.
@@ -142,7 +142,7 @@ export default function ContactPage() {
               </h1>
             </Reveal>
             <Reveal delay={0.1}>
-              <p className="text-white/35 text-lg leading-relaxed mb-10 max-w-md">
+              <p className="text-neutral-500 text-lg leading-relaxed mb-10 max-w-md">
                 Have a question, issue, or just want to say hi? Reach out and we&apos;ll get back to you fast.
               </p>
             </Reveal>
@@ -153,10 +153,9 @@ export default function ContactPage() {
                   { icon: Zap,          text: "Typical reply under 15 hrs" },
                   { icon: CheckCircle,  text: "Real humans, no bots"      },
                 ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-2 border border-white/[0.08] rounded-full px-3 py-2"
-                    style={{ background: "rgba(255,255,255,0.03)" }}>
+                  <div key={text} className="flex items-center gap-2 border border-neutral-200/60 bg-white rounded-full px-3 py-2 shadow-sm">
                     <Icon className="w-3.5 h-3.5 text-[#7c6ff7]" />
-                    <span className="text-white/40 text-xs font-medium">{text}</span>
+                    <span className="text-neutral-500 text-xs font-medium">{text}</span>
                   </div>
                 ))}
               </div>
@@ -168,24 +167,23 @@ export default function ContactPage() {
             {CHANNELS.map(({ icon: Icon, accent, label, value, desc, href, response }, i) => (
               <Reveal key={label} delay={0.12 + i * 0.08}>
                 <motion.a href={href} whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 300 }}
-                  className="group flex items-center gap-4 rounded-2xl px-5 py-4 border border-white/[0.07] transition-all"
-                  style={{ background: "rgba(255,255,255,0.04)" }}
+                  className="group flex items-center gap-4 rounded-2xl px-5 py-4 border border-neutral-200 bg-white shadow-sm hover:border-neutral-300 transition-all"
                   onMouseEnter={e => (e.currentTarget.style.borderColor = `${accent}35`)}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = "#e2e8f0")}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
                     style={{ background: `${accent}18` }}>
                     <Icon className="w-5 h-5" style={{ color: accent }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-0.5">{label}</p>
-                    <p className="text-white font-bold text-sm truncate">{value}</p>
-                    <p className="text-white/30 text-xs mt-0.5">{desc}</p>
+                    <p className="text-neutral-450 text-[10px] font-black uppercase tracking-widest mb-0.5">{label}</p>
+                    <p className="text-neutral-800 font-extrabold text-base truncate leading-snug group-hover:text-[#7c6ff7] transition-colors">{value}</p>
+                    <p className="text-neutral-450 text-xs mt-0.5">{desc}</p>
                   </div>
                   <div className="shrink-0 text-right">
                     <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ color: accent, background: `${accent}15` }}>
                       {response}
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white/50 group-hover:translate-x-0.5 transition-all mt-2 ml-auto" />
+                    <ArrowRight className="w-4 h-4 text-neutral-300 group-hover:text-neutral-500 group-hover:translate-x-0.5 transition-all mt-2 ml-auto" />
                   </div>
                 </motion.a>
               </Reveal>
@@ -314,20 +312,20 @@ export default function ContactPage() {
       </section>
 
       {/* ══ BOTTOM CTA ══ */}
-      <section className="py-20 px-6 bg-[#06040f] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,rgba(124,111,247,0.15),transparent)]" />
+      <section className="py-20 px-6 bg-slate-50/50 border-t border-neutral-200/60 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,rgba(124,111,247,0.05),transparent)]" />
 
         <div className="relative z-10 px-8 py-6">
           <div className="grid sm:grid-cols-2 gap-6 items-center">
             <Reveal>
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight leading-tight">
                 Still not sure<br />
                 <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg,#7c6ff7,#34d399)" }}>
                   who to email?
                 </span>
               </h2>
-              <p className="text-white/35 text-sm mt-4 leading-relaxed">
+              <p className="text-neutral-500 text-sm mt-4 leading-relaxed">
                 Start with support@editbridge.in — we&apos;ll route it to the right team for you.
               </p>
             </Reveal>
@@ -337,9 +335,9 @@ export default function ContactPage() {
                   className="inline-flex items-center justify-center gap-2 bg-[#7c6ff7] hover:bg-[#6a5ef0] text-white font-bold px-6 py-4 rounded-2xl text-sm transition-all shadow-[0_8px_32px_rgba(124,111,247,0.4)]">
                   <Mail className="w-4 h-4" /> support@editbridge.in
                 </a>
-                <p className="text-white/20 text-xs text-center">
+                <p className="text-neutral-400 text-xs text-center font-bold">
                   For security issues:{" "}
-                  <a href="mailto:security@editbridge.in" className="text-white/40 hover:text-white/60 underline underline-offset-2 transition-colors">
+                  <a href="mailto:security@editbridge.in" className="text-neutral-500 hover:text-neutral-700 underline underline-offset-2 transition-colors">
                     security@editbridge.in
                   </a>
                 </p>

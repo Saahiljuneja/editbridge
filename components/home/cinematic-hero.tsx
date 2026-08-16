@@ -52,7 +52,7 @@ const STYLES = `
       inset 0 1px 1px rgba(255,255,255,0.18);
   }
   .ch-btn-primary {
-    background: linear-gradient(180deg, var(--brand-client) 0%, #0284C7 100%);
+    background: linear-gradient(180deg, var(--brand-client) 0%, #1e3a8a 100%);
     box-shadow: 0 0 0 1px rgba(14,165,233,0.3), 0 12px 24px -4px rgba(14,165,233,0.45),
       inset 0 1px 1px rgba(255,255,255,0.3);
     transition: all 0.3s cubic-bezier(0.25,1,0.5,1); color: white;

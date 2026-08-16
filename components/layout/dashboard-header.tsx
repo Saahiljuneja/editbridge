@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Plus, LogOut, Settings, User, Search, ChevronDown, Zap, ShieldCheck } from "lucide-react";
+import { Bell, Plus, LogOut, Settings, User, Search, ChevronDown, Zap, ShieldCheck, Crown, X, ArrowLeft } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -58,6 +58,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/dashboard":            "Dashboard",
   "/admin/orders":               "Orders",
   "/admin/users":                "Users",
+  "/admin/editors":              "Editors",
   "/admin/kyc":                  "KYC Queue",
   "/admin/disputes":             "Disputes",
   "/admin/payouts":              "Payouts",
@@ -118,6 +119,30 @@ interface HeaderStats {
   unreadNotifications?: number;
 }
 
+// ── Notification row (used in bell dropdown) ──────────────────────────────────
+
+function NotifRow({ n }: { n: { title: string; body: string | null; isRead: boolean; createdAt: string } }) {
+  const ago = (() => {
+    const diff = Date.now() - new Date(n.createdAt).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 2) return "just now";
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h / 24)}d ago`;
+  })();
+  return (
+    <div className="flex items-start gap-2.5">
+      {!n.isRead && <span className="w-1.5 h-1.5 rounded-full bg-[#1e40af] shrink-0 mt-1.5" />}
+      <div className={cn("flex-1 min-w-0", n.isRead && "pl-4")}>
+        <p className="text-xs font-bold text-neutral-900 leading-snug truncate">{n.title}</p>
+        {n.body && <p className="text-[10px] text-neutral-400 font-semibold leading-relaxed mt-0.5 line-clamp-2">{n.body}</p>}
+        <p className="text-[9px] text-neutral-400 font-bold mt-1">{ago}</p>
+      </div>
+    </div>
+  );
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface DashboardHeaderProps {
@@ -125,13 +150,26 @@ interface DashboardHeaderProps {
   userImage: string | null;
 }
 
+type Notification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  isRead: boolean;
+  createdAt: string;
+};
+
 export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
   const pathname = usePathname();
-  if (pathname === "/client/dashboard") return null;
   const [stats, setStats] = useState<HeaderStats>({ type: "unknown" });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
+  const [notifs, setNotifs] = useState<Notification[]>([]);
+  const [notifLoading, setNotifLoading] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const bellRef = useRef<HTMLDivElement>(null);
 
   const title        = getPageTitle(pathname);
   const portalLabel  = getPortalLabel(pathname);
@@ -167,10 +205,29 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
+      if (bellRef.current && !bellRef.current.contains(e.target as Node)) setBellOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  // Fetch notifications when bell opens (client & editor portals)
+  useEffect(() => {
+    if (!bellOpen) return;
+    if (!pathname.startsWith("/client") && !pathname.startsWith("/editor")) return;
+    setNotifLoading(true);
+    fetch("/api/client/notifications?limit=8")
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setNotifs(d as Notification[]))
+      .catch(() => {})
+      .finally(() => setNotifLoading(false));
+  }, [bellOpen, pathname]);
+
+  const markAllRead = async () => {
+    await fetch("/api/client/notifications", { method: "PATCH" }).catch(() => {});
+    setNotifs(n => n.map(x => ({ ...x, isRead: true })));
+    setStats(s => ({ ...s, unreadNotifications: 0 }));
+  };
 
   // Availability toggle (editor)
   const toggleAvailability = async () => {
@@ -274,7 +331,7 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
           {/* Quick action — client only */}
           {pathname.startsWith("/client") && (
             <Link
-              href="/find-editor"
+              href="/browse"
               className="flex items-center gap-1.5 h-8 px-4 rounded-full bg-black text-white text-[10px] font-bold uppercase tracking-wider hover:bg-neutral-900 transition-all shadow-sm"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -282,21 +339,94 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
             </Link>
           )}
 
-          {/* Notifications bell */}
-          <Link
-            href={notifHref}
-            aria-label="Notifications"
-            className="relative w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-50 transition-colors"
-          >
-            <Bell className="w-4 h-4" />
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 min-w-[15px] h-[15px] bg-black text-white text-[9px] font-bold rounded-full flex items-center justify-center px-[3px] leading-none border border-white">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </Link>
+          {/* Upgrade to Pro — client only */}
+          {pathname.startsWith("/client") && (
+            <Link
+              href="/client/membership"
+              className="flex items-center gap-1.5 h-8 px-3.5 rounded-full text-white text-[10px] font-black uppercase tracking-wider transition-all shadow-sm hover:opacity-90 bg-[#1e40af] hover:bg-brand-primary"
+            >
+              <Crown className="w-3 h-3 fill-amber-400 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline">Upgrade</span>
+            </Link>
+          )}
 
-          <div className="w-px h-5 bg-neutral-200 mx-0.5" />
+          {/* Upgrade to Premium — editor only */}
+          {pathname.startsWith("/editor") && (
+            <Link
+              href="/editor/membership"
+              className="flex items-center gap-1.5 h-8 px-4 rounded-full text-white text-[10px] font-black uppercase tracking-wider transition-all shadow-sm bg-[#1e40af] hover:bg-brand-primary"
+            >
+              <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+              <span>Upgrade</span>
+            </Link>
+          )}
+
+          {/* Bell — client & editor portals only */}
+          {(pathname.startsWith("/client") || pathname.startsWith("/editor")) && (
+            <div className="relative" ref={bellRef}>
+              <button
+                onClick={() => setBellOpen((v) => !v)}
+                className="relative flex items-center justify-center w-8 h-8 rounded-full hover:bg-neutral-100 transition-colors"
+                aria-label="Notifications"
+              >
+                <Bell className="w-4 h-4 text-neutral-500" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center leading-none">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {bellOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-80 bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-neutral-200/60 z-50 overflow-hidden">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
+                    <span className="text-xs font-black text-black uppercase tracking-wider">Notifications</span>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllRead}
+                        className="text-[10px] font-bold text-neutral-400 hover:text-black transition-colors uppercase tracking-wider"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  {/* List */}
+                  <div className="max-h-80 overflow-y-auto divide-y divide-neutral-50">
+                    {notifLoading ? (
+                      <div className="px-4 py-8 text-center text-xs text-neutral-400 font-semibold">Loading…</div>
+                    ) : notifs.length === 0 ? (
+                      <div className="px-4 py-8 text-center text-xs text-neutral-400 font-semibold">No notifications yet</div>
+                    ) : notifs.map((n) => (
+                      <Link
+                        key={n.id}
+                        href={n.link ?? notifHref}
+                        onClick={() => setBellOpen(false)}
+                        className={cn(
+                          "block px-4 py-3 hover:bg-neutral-50 transition-colors",
+                          !n.isRead && "bg-blue-50/40"
+                        )}
+                      >
+                        <NotifRow n={n} />
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="border-t border-neutral-100 px-4 py-2.5">
+                    <Link
+                      href={notifHref}
+                      onClick={() => setBellOpen(false)}
+                      className="text-[10px] font-bold text-neutral-400 hover:text-black transition-colors uppercase tracking-wider"
+                    >
+                      View all notifications →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* User menu */}
           <div className="relative" ref={userMenuRef}>
@@ -341,17 +471,11 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
                   <Settings className="w-3.5 h-3.5 text-neutral-400" /> Settings
                 </Link>
                 <Link
-                  href={notifHref}
+                  href="/"
                   onClick={() => setUserMenuOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 text-xs text-neutral-600 hover:text-black hover:bg-neutral-50 rounded-xl transition-colors font-semibold"
                 >
-                  <Bell className="w-3.5 h-3.5 text-neutral-400" />
-                  Notifications
-                  {unreadCount > 0 && (
-                    <span className="ml-auto text-[9px] font-mono font-bold bg-neutral-100 text-neutral-800 border border-neutral-200/55 rounded-full px-1.5 py-px">
-                      {unreadCount}
-                    </span>
-                  )}
+                  <ArrowLeft className="w-3.5 h-3.5 text-neutral-400" /> Back to website
                 </Link>
 
                 <div className="h-px bg-neutral-100 my-1" />

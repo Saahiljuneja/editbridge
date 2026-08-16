@@ -30,7 +30,7 @@ function Skel({w,h="h-3"}:{w:string;h?:string}){return <div className={`animate-
 function SkeletonRow(){return <div className="flex items-center gap-4 px-4 py-3 border-b border-gray-50 last:border-0"><Skel w="w-16" h="h-4"/><Skel w="flex-1"/><Skel w="w-24"/><Skel w="w-20"/></div>;}
 
 const RECIPIENT_BADGE: Record<string, string> = {
-  "Client":       "bg-sky-100 text-sky-700",
+  "Client":       "bg-blue-100 text-blue-900",
   "Editor":       "bg-violet-100 text-violet-700",
   "Both parties": "bg-amber-100 text-amber-700",
   "All users":    "bg-emerald-100 text-emerald-700",
@@ -197,7 +197,7 @@ function OverviewTab({totalTemplates,activeTemplates,suppressedCount,broadcasts,
     { icon: FlaskConical,color: "bg-pink-50 text-pink-600",     title: "A/B testing & languages", body: "Every template supports a Variant B — an alternate subject and body you can draft and switch between. There is also a Hindi (हिंदी) variant per template. Switch variants using the toggle at the top of each template card. Broadcast always sends the currently saved Variant A body." },
     { icon: Users,       color: "bg-emerald-50 text-emerald-600",title: "Broadcasts", body: "Send a template to a whole segment — All Clients, All Editors, or Inactive Clients (no order in 90+ days). Before sending you see a recipient preview showing the first 5 eligible addresses and the total count. Broadcasts respect the suppression list, the send-window restriction, and the per-send throttle. You can also schedule a broadcast for a future time." },
     { icon: Shield,      color: "bg-red-50 text-red-600",        title: "Suppression & compliance", body: `Emails on the suppression list are silently skipped by every broadcast. Addresses are added automatically when Resend reports a hard bounce or spam complaint via webhook (POST /api/webhooks/resend). You can also add or remove addresses manually in Settings → Suppression List. Currently ${suppressedCount} address${suppressedCount!==1?"es are":"is"} suppressed.` },
-    { icon: BarChart2,   color: "bg-sky-50 text-sky-600",        title: "Delivery tracking", body: "The Delivery tab shows up to 100 recent emails from Resend with their latest event status (sent, delivered, opened, clicked, bounced, failed). A 14-day sparkline shows volume trends. Bounced emails have a one-click Suppress button. Resend automatically fires the webhook on hard bounces and spam complaints to keep the suppression list current." },
+    { icon: BarChart2,   color: "bg-blue-50 text-brand-primary",        title: "Delivery tracking", body: "The Delivery tab shows up to 100 recent emails from Resend with their latest event status (sent, delivered, opened, clicked, bounced, failed). A 14-day sparkline shows volume trends. Bounced emails have a one-click Suppress button. Resend automatically fires the webhook on hard bounces and spam complaints to keep the suppression list current." },
     { icon: Globe,       color: "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300",       title: "Global settings", body: "Settings → Global Settings controls the default sender name, the unsubscribe footer appended to marketing emails, the broadcast throttle (ms between sends), and the send window (allowed IST hours for broadcasts). The Pause all emails kill switch immediately halts all outgoing email until toggled off. These settings take effect on the next send." },
   ];
 

@@ -1,4 +1,4 @@
-﻿import { PageHero } from "@/components/public/page-animations";
+import { PageHero } from "@/components/public/page-animations";
 
 const SECTIONS = [
   {
@@ -29,7 +29,7 @@ const SECTIONS = [
     num: "5",
     title: "Commission and Fees",
     content:
-      "EditBridge charges a 15% commission on the gross value of each completed order, deducted from the editor's payout. Clients pay a 4% payment processing fee on the total order value at checkout. The commission and processing fee apply only to completed orders. Cancelled orders before delivery are refunded in full with no commission charged. EditBridge reserves the right to change its commission or fee rates with 30 days' notice to affected users.",
+      "EditBridge charges a 20% commission on the gross value of each completed order, deducted from the editor's payout. Clients pay a 10% payment processing fee on the total order value at checkout. The commission and processing fee apply only to completed orders. Cancelled orders before delivery are refunded in full with no commission charged. EditBridge reserves the right to change its commission or fee rates with 30 days' notice to affected users.",
   },
   {
     num: "6",

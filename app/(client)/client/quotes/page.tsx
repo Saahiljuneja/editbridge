@@ -20,6 +20,7 @@ import {
 import { QuoteCountdown } from "@/components/quotes/quote-countdown";
 import { QuoteDeclineButton } from "./quote-decline-button";
 import { getPlatformSettings } from "@/lib/platform-settings";
+import { TopoBackground } from "@/components/common/topo-background";
 
 const STATUS_CONFIG: Record<
   string,
@@ -63,28 +64,29 @@ export default async function ClientQuotesPage() {
   const processingFeePct = platformConfig.processingFeePct / 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-3xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-3xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        {/* Header card */}
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Quote Requests</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Editors typically respond within 48 hours</p>
+            <h1 className="text-xl font-bold text-neutral-900">Quote Requests</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Editors typically respond within 48 hours</p>
           </div>
           <Link
             href="/browse"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" /> New request
           </Link>
         </div>
-      </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-6">
+        <div>
         {quotes.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center mb-4">
-              <MessageSquare className="w-7 h-7 text-[#0EA5E9]" />
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
+              <MessageSquare className="w-7 h-7 text-[#1e40af]" />
             </div>
             <p className="font-semibold text-gray-800">No quote requests yet</p>
             <p className="text-sm text-gray-400 mt-1 mb-5">
@@ -92,7 +94,7 @@ export default async function ClientQuotesPage() {
             </p>
             <Link
               href="/browse"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors"
             >
               Browse editors
             </Link>
@@ -128,7 +130,7 @@ export default async function ClientQuotesPage() {
                     <div className="px-5 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Editor avatar */}
-                        <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-bold text-[#0EA5E9] shrink-0 uppercase select-none">
+                        <div className="w-8 h-8 rounded-full bg-[#1e40af]/10 flex items-center justify-center text-xs font-bold text-[#1e40af] shrink-0 uppercase select-none">
                           {editorInitials || "?"}
                         </div>
                         <div className="min-w-0">
@@ -195,7 +197,7 @@ export default async function ClientQuotesPage() {
                           <div className="flex gap-2 pt-0.5">
                             <Link
                               href={`/client/quotes/${quote.id}/pay`}
-                              className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+                              className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors"
                             >
                               Accept &amp; Pay{" "}
                               {formatCurrency(
@@ -235,6 +237,7 @@ export default async function ClientQuotesPage() {
             })}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

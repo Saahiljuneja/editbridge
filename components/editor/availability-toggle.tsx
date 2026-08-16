@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Zap, Moon, Loader2 } from "lucide-react";
@@ -38,25 +38,25 @@ export function AvailabilityToggle({ initial, kycApproved }: AvailabilityToggleP
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
+    <div className="bg-white rounded-3xl border border-gray-150 shadow-xl shadow-gray-100/5 overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
         {isAvailable
-          ? <Zap className="w-4 h-4 text-[var(--brand-client)]" />
-          : <Moon className="w-4 h-4 text-gray-400" />}
-        <span className="font-semibold text-gray-900 text-sm">Availability</span>
+          ? <Zap className="w-4 h-4 text-brand-primary" />
+          : <Moon className="w-4 h-4 text-neutral-400" />}
+        <span className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Availability</span>
       </div>
 
       <div className="p-5">
         <div className={cn(
-          "flex items-center justify-between rounded-xl border px-4 py-3 transition-colors",
-          isAvailable ? "border-[var(--brand-client)]/20 bg-[var(--brand-client)]/5" : "border-gray-200 bg-gray-50"
+          "flex items-center justify-between rounded-2xl border px-4 py-3 transition-colors",
+          isAvailable ? "border-brand-primary/20 bg-blue-50/30" : "border-gray-200 bg-gray-50/50"
         )}>
           <div>
-            <p className={cn("text-sm font-semibold", isAvailable ? "text-[var(--brand-client)]" : "text-gray-500")}>
-              {isAvailable ? "Available for orders" : "Paused"}
+            <p className={cn("text-xs font-bold uppercase tracking-wider", isAvailable ? "text-brand-primary" : "text-neutral-500")}>
+              {isAvailable ? "Active" : "Paused"}
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              {isAvailable ? "Clients can place new orders" : "Hidden from browse"}
+            <p className="text-[11px] text-neutral-400 mt-0.5 font-semibold">
+              {isAvailable ? "Open for new orders" : "Hidden from browse"}
             </p>
           </div>
 
@@ -66,7 +66,7 @@ export function AvailabilityToggle({ initial, kycApproved }: AvailabilityToggleP
             title={!kycApproved ? "Complete KYC first" : undefined}
             className={cn(
               "relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 disabled:opacity-40",
-              isAvailable ? "bg-[var(--brand-client)]" : "bg-gray-300"
+              isAvailable ? "bg-brand-primary" : "bg-gray-300"
             )}
           >
             {saving
@@ -79,8 +79,12 @@ export function AvailabilityToggle({ initial, kycApproved }: AvailabilityToggleP
           </button>
         </div>
 
+        <p className="text-[11px] text-neutral-450 font-medium leading-relaxed mt-3">
+          This switch controls your profile status. When **Active**, clients can find you and purchase packages. When **Paused**, you are temporarily hidden.
+        </p>
+
         {!kycApproved && (
-          <p className="text-xs text-amber-600 mt-2">Complete KYC to toggle availability.</p>
+          <p className="text-xs text-amber-600 font-bold mt-2.5">Complete KYC to toggle availability.</p>
         )}
       </div>
     </div>

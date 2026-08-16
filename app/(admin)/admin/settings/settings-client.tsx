@@ -166,14 +166,14 @@ export function SettingsClient({ initial }: { initial: Settings }) {
       <Section title="Commission & Fees">
         <Field label="Editor commission (%)" sub="Deducted from editor payout on every completed order">
           <div className="flex items-center gap-2">
-            <input type="number" min="0" max="100" value={settings.commission_rate_pct ?? "15"}
+            <input type="number" min="0" max="100" value={settings.commission_rate_pct ?? "20"}
               onChange={e => set("commission_rate_pct", e.target.value)} className={inputCls} />
             <span className="text-gray-400 text-sm shrink-0">%</span>
           </div>
         </Field>
         <Field label="Client processing fee (%)" sub="Charged to client on top of the package price at checkout">
           <div className="flex items-center gap-2">
-            <input type="number" min="0" max="100" value={settings.processing_fee_pct ?? "4"}
+            <input type="number" min="0" max="100" value={settings.processing_fee_pct ?? "10"}
               onChange={e => set("processing_fee_pct", e.target.value)} className={inputCls} />
             <span className="text-gray-400 text-sm shrink-0">%</span>
           </div>

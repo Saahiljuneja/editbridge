@@ -29,26 +29,41 @@ export default async function EditorLayout({
   // editors.kycStatus defaults to "pending" even before submission — not reliable
   let kycGuardStatus: KYCStatus | "not_submitted" = "not_submitted";
 
-  if (editorId) {
-    const [application] = await db
-      .select({ status: kycApplications.status })
-      .from(kycApplications)
-      .where(eq(kycApplications.editorId, editorId))
-      .orderBy(desc(kycApplications.createdAt))
-      .limit(1);
+  try {
+    if (editorId) {
+      const [application] = await db
+        .select({ status: kycApplications.status })
+        .from(kycApplications)
+        .where(eq(kycApplications.editorId, editorId))
+        .orderBy(desc(kycApplications.createdAt))
+        .limit(1);
 
-    if (application) {
-      kycGuardStatus = application.status;
+      if (application) {
+        kycGuardStatus = application.status;
+      }
     }
+  } catch (err) {
+    console.warn("[EditorLayout] Database connection failed querying KYC applications, using offline fallback:", err);
   }
 
-  const [featuredPlacementEnabled, editorMembershipPricingEnabled, xpRow] = await Promise.all([
-    isFeatureEnabled("featured_placement"),
-    isFeatureEnabled("editor_membership_pricing"),
-    session.user.userId
-      ? db.select({ total: userPoints.total }).from(userPoints).where(eq(userPoints.userId, session.user.userId)).limit(1).then(r => r[0])
-      : Promise.resolve(null),
-  ]);
+  let featuredPlacementEnabled = false;
+  let editorMembershipPricingEnabled = false;
+  let xpRow: { total: number } | null = null;
+
+  try {
+    const [fEnabled, mEnabled, xpResult] = await Promise.all([
+      isFeatureEnabled("featured_placement"),
+      isFeatureEnabled("editor_membership_pricing"),
+      session.user.userId
+        ? db.select({ total: userPoints.total }).from(userPoints).where(eq(userPoints.userId, session.user.userId)).limit(1).then(r => r[0])
+        : Promise.resolve(null),
+    ]);
+    featuredPlacementEnabled = fEnabled;
+    editorMembershipPricingEnabled = mEnabled;
+    xpRow = xpResult || null;
+  } catch (err) {
+    console.warn("[EditorLayout] Database connection failed querying features and XP, using offline fallback:", err);
+  }
 
   const xpLevel = calcLevel(xpRow?.total ?? 0);
 

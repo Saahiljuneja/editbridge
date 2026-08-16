@@ -67,7 +67,7 @@ export function OfflineMessagesEmailTemplate({
                             style={{
                               display: "inline-block",
                               padding: "12px 24px",
-                              backgroundColor: "#0EA5E9",
+                              backgroundColor: "#1e40af",
                               color: "#ffffff",
                               fontSize: 14,
                               fontWeight: 700,

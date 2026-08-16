@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -89,7 +89,7 @@ const FAQ = [
   { q: "How long does KYC take for editors?",
     a: "KYC applications are typically reviewed within 1–2 business days. You'll receive an email as soon as a decision is made." },
   { q: "What percentage does EditBridge take?",
-    a: "EditBridge charges a 15% platform fee on each order. Editors receive 85% of every payment. Clients pay a small processing fee on top of the package price." },
+    a: "EditBridge charges a 20% platform fee on each order. Editors receive 80% of every payment. Clients pay a small processing fee on top of the package price." },
   { q: "Can I cancel an order?",
     a: "Orders can be cancelled before the editor begins work. Once work has started, our dispute team will assess the situation and decide on a fair resolution." },
 ];
@@ -125,30 +125,30 @@ export default function HowItWorksPage() {
     <div className="flex flex-col">
 
       {/* ── Hero ── */}
-      <section className="relative bg-[#06040f] pt-28 pb-24 px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.6) 1px,transparent 1px)", backgroundSize: "48px 48px" }} />
-        <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-[120px] opacity-20 pointer-events-none" style={{ background: "#7c6ff7" }} />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none" style={{ background: "#34d399" }} />
+      <section className="relative bg-slate-50/50 border-b border-neutral-200/50 pt-28 pb-24 px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.6) 1px,transparent 1px)", backgroundSize: "48px 48px" }} />
+        <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-[120px] opacity-[0.08] pointer-events-none" style={{ background: "#7c6ff7" }} />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-[0.05] pointer-events-none" style={{ background: "#34d399" }} />
 
         <div className="relative z-10 px-8 text-center">
           <Reveal>
-            <div className="inline-flex items-center gap-2 border border-[#7c6ff7]/30 bg-[#7c6ff7]/10 text-[#7c6ff7] text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
+            <div className="inline-flex items-center gap-2 border border-violet-200 bg-violet-50 text-violet-750 text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-8">
               How it works
             </div>
-            <h1 className="text-5xl sm:text-7xl font-black text-white tracking-tight leading-[0.95] mb-6">
+            <h1 className="text-5xl sm:text-7xl font-black text-neutral-900 tracking-tight leading-[0.95] mb-6">
               Simple. Safe.<br />
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg,#7c6ff7,#34d399)" }}>
                 Built for creators.
               </span>
             </h1>
-            <p className="text-white/40 text-lg px-8 py-6 leading-relaxed mb-10">
+            <p className="text-neutral-500 text-lg px-8 py-6 leading-relaxed mb-10">
               A transparent process for clients and editors — with verified payment protection and verified identities at every step.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link href="/browse" className="inline-flex items-center gap-2 bg-[#7c6ff7] hover:bg-[#6a5ef0] text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-[0_8px_24px_rgba(124,111,247,0.4)]">
                 Find an editor <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/signup/editor" className="inline-flex items-center gap-2 border border-white/10 text-white/60 hover:text-white hover:border-white/20 font-medium px-6 py-3 rounded-xl text-sm transition-all">
+              <Link href="/signup/editor" className="inline-flex items-center gap-2 border border-neutral-200 hover:border-neutral-300 text-neutral-600 hover:text-neutral-900 bg-white shadow-sm font-bold px-6 py-3 rounded-xl text-sm transition-all">
                 Join as editor
               </Link>
             </div>
@@ -287,21 +287,21 @@ export default function HowItWorksPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="relative bg-[#06040f] py-14 md:py-24 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(124,111,247,0.15),transparent)]" />
+      <section className="relative bg-slate-50/50 border-t border-neutral-200/60 py-14 md:py-24 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(124,111,247,0.05),transparent)]" />
         <div className="relative z-10 px-8 text-center">
           <Reveal>
-            <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-5">
+            <h2 className="text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-tight mb-5">
               Ready to get started?
             </h2>
-            <p className="text-white/35 text-base mb-10 leading-relaxed">
+            <p className="text-neutral-500 text-base mb-10 leading-relaxed">
               Browse verified editors and place your first order in minutes. Your payment is protected until you approve.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link href="/browse" className="inline-flex items-center gap-2 bg-[#7c6ff7] hover:bg-[#6a5ef0] text-white font-bold px-8 py-4 rounded-xl text-sm transition-all shadow-[0_8px_32px_rgba(124,111,247,0.45)]">
                 Browse editors <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/signup/editor" className="inline-flex items-center gap-2 border border-white/10 text-white/50 hover:text-white hover:border-white/20 font-medium px-8 py-4 rounded-xl text-sm transition-all">
+              <Link href="/signup/editor" className="inline-flex items-center gap-2 border border-neutral-200 hover:border-neutral-300 text-neutral-600 hover:text-neutral-900 bg-white shadow-sm font-bold px-8 py-4 rounded-xl text-sm transition-all">
                 Join as editor
               </Link>
             </div>

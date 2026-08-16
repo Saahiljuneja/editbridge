@@ -35,6 +35,12 @@ body {
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading);
 
+  /* Brand Semantic Theme Color Mapping */
+  --color-brand-primary: var(--brand-client);
+  --color-brand-primary-hover: var(--brand-client-hover);
+  --color-brand-editor: var(--brand-editor);
+  --color-brand-editor-hover: var(--brand-editor-hover);
+
 
 
   /* ── Layered shadow scale ──────────────────────────────────────────────── */
@@ -101,12 +107,12 @@ body {
 
 :root {
   /* EditBridge brand */
-  --brand-editor: #7C3AED;
-  --brand-client: #0EA5E9;
+  --brand-editor: #1e40af;
+  --brand-client: #1e40af;
   --brand-teal: #0F6E56;
   /* Derived hover shades — auto-darken 15% regardless of which color is set */
-  --brand-client-hover: #0284C7;
-  --brand-editor-hover: #6D28D9;
+  --brand-client-hover: #1e3a8a;
+  --brand-editor-hover: #1e3a8a;
   --brand-teal-hover: #0D7C66;
 
   --background: #ffffff;
@@ -141,6 +147,13 @@ body {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+.admin-portal-theme {
+  --brand-client: #1e40af;
+  --brand-client-hover: #1e3a8a;
+  --brand-editor: #1e40af;
+  --brand-editor-hover: #1e3a8a;
 }
 
 .dark {
@@ -201,7 +214,7 @@ body {
   .a-input {
     @apply bg-white border border-gray-200 rounded-xl text-sm text-gray-900
            placeholder:text-gray-400 focus:outline-none focus:ring-2
-           focus:ring-sky-500/30 focus:border-sky-400 transition-colors;
+           focus:ring-brand-primary/30 focus:border-blue-400 transition-colors;
   }
 
   /* Dividers */
@@ -221,11 +234,11 @@ body {
 
   /* Buttons */
   .a-btn-ghost   { @apply text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg px-3 py-1.5 transition-colors; }
-  .a-btn-primary { @apply flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 disabled:opacity-50 transition-colors shadow-sm; }
+  .a-btn-primary { @apply flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-primary text-white text-sm font-medium hover:bg-brand-primary disabled:opacity-50 transition-colors shadow-sm; }
   .a-btn-danger  { @apply flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 disabled:opacity-50 transition-colors shadow-sm; }
 
   /* Links */
-  .a-link { @apply text-xs font-semibold text-sky-500 hover:text-sky-600 hover:underline underline-offset-2 transition-colors; }
+  .a-link { @apply text-xs font-semibold text-brand-primary hover:text-brand-primary hover:underline underline-offset-2 transition-colors; }
 
   /* Empty state */
   .a-empty { @apply text-sm text-gray-400 text-center py-10; }

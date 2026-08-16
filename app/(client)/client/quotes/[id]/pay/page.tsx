@@ -72,7 +72,7 @@ export default async function QuotePayPage({ params }: { params: Promise<{ id: s
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           {/* Editor row */}
           <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-sm font-bold text-[#0EA5E9] uppercase select-none shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#1e40af]/10 flex items-center justify-center text-sm font-bold text-[#1e40af] uppercase select-none shrink-0">
               {editorInitials || "?"}
             </div>
             <div>
@@ -116,7 +116,7 @@ export default async function QuotePayPage({ params }: { params: Promise<{ id: s
           </div>
           <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
             <span className="text-sm font-bold text-gray-900">Total</span>
-            <span className="text-xl font-bold text-[#0EA5E9] tabular-nums">
+            <span className="text-xl font-bold text-[#1e40af] tabular-nums">
               {formatCurrency(total)}
             </span>
           </div>

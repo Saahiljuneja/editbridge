@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Gift, Copy, Check, Users, IndianRupee, Clock } from "lucide-react";
+import { TopoBackground } from "@/components/common/topo-background";
 import { cn, formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -39,20 +40,21 @@ export default function ReferralsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
-        <div className="px-6 py-5 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
-            <Gift className="w-5 h-5 text-[var(--brand-client)]" />
-          </div>
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-3xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Refer & Earn</h1>
-            <p className="text-sm text-gray-400">Share EditBridge, earn ₹100 credits per referral</p>
+            <h1 className="text-xl font-bold text-neutral-900">Refer &amp; Earn</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Share EditBridge, earn ₹100 credits per referral</p>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-[#1e40af]/10 flex items-center justify-center shrink-0">
+            <Gift className="w-5 h-5 text-[#1e40af]" />
           </div>
         </div>
-      </div>
 
-      <div className="px-6 py-6 space-y-6">
+        <div className="space-y-6">
 
         {/* How it works */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -91,7 +93,7 @@ export default function ReferralsPage() {
                     "px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors shrink-0",
                     copied
                       ? "bg-green-100 text-green-700"
-                      : "bg-[var(--brand-client)] text-white hover:bg-sky-600"
+                      : "bg-[var(--brand-client)] text-white hover:bg-brand-primary"
                   )}
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -141,6 +143,7 @@ export default function ReferralsPage() {
         <p className="text-xs text-gray-400 text-center">
           Credits expire 90 days from award · One reward per referred user · No limit on referrals
         </p>
+        </div>
       </div>
     </div>
   );

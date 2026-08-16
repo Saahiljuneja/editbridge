@@ -106,16 +106,17 @@ function setLabel(key: string) {
 
 export function PackagesManager({
   initialPackages,
-  maxPackages = 3,
-  level = "bronze",
+  maxSets = 2,
+  packagesPerSet = 3,
+  membershipTier = "Hobby",
 }: {
   initialPackages: Package[];
-  maxPackages?: number;
-  level?: string;
+  maxSets?: number | null; // null = unlimited (Agency)
+  packagesPerSet?: number;
+  membershipTier?: string;
 }) {
   const [sets, setSets] = useState<Record<string, Package[]>>(() => groupPackages(initialPackages));
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  // editingKey: which set is open, editingPkg: null = new, Package = editing existing
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingPkg, setEditingPkg] = useState<Package | null | undefined>(undefined);
 
@@ -129,6 +130,9 @@ export function PackagesManager({
 
   const totalCreated = Object.values(sets).flat().length;
   const canAdd = pickerCat !== "" || pickerFmt !== "";
+
+  // Set limit reached (null = Agency = unlimited)
+  const setsAtLimit = maxSets !== null && setKeys.length >= maxSets;
 
   function openForm(key: string, pkg: Package | null) {
     if (editingKey === key && editingPkg === pkg) {
@@ -146,6 +150,10 @@ export function PackagesManager({
   }
 
   function addSet() {
+    if (setsAtLimit) {
+      toast.error(`Your ${membershipTier} plan allows up to ${maxSets} service sets. Upgrade to add more.`);
+      return;
+    }
     const cat = pickerCat === "other" && pickerCatCustom.trim()
       ? pickerCatCustom.trim()
       : pickerCat || "__none__";
@@ -229,32 +237,35 @@ export function PackagesManager({
             </div>
             <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Active</span>
           </div>
-          <div className="flex flex-col items-center px-7 py-4">
-            <span className="text-3xl font-black text-gray-900 leading-none">{setKeys.length}</span>
-            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Sets</span>
-          </div>
-          <div className={cn("flex flex-col items-center px-7 py-4", totalCreated >= maxPackages ? "bg-red-50/50" : "")}>
+          <div className={cn("flex flex-col items-center px-7 py-4", setsAtLimit ? "bg-red-50/50" : "")}>
             <span className="leading-none">
               <span className={cn(
                 "text-3xl font-black",
-                totalCreated >= maxPackages ? "text-red-600"
-                  : totalCreated >= maxPackages - 1 ? "text-amber-500"
-                  : "text-violet-600"
-              )}>{totalCreated}</span>
-              <span className="text-xl font-bold text-gray-300">/{maxPackages}</span>
+                setsAtLimit ? "text-red-600"
+                  : maxSets !== null && setKeys.length >= maxSets - 1 ? "text-amber-500"
+                  : "text-gray-900"
+              )}>{setKeys.length}</span>
+              {maxSets !== null && (
+                <span className="text-xl font-bold text-gray-300">/{maxSets}</span>
+              )}
             </span>
             <div className="flex items-center gap-1 mt-1.5">
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">Slots</span>
-              {totalCreated >= maxPackages && (
-                <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize ml-1">{level}</span>
+              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">Sets</span>
+              {setsAtLimit && (
+                <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize ml-1">{membershipTier}</span>
               )}
             </div>
           </div>
         </div>
         <button
-          onClick={() => setShowPicker((v) => !v)}
-          className="flex items-center gap-2 text-sm font-bold px-5 py-3.5 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] transition-all active:scale-[0.98]"
-          style={{ boxShadow: "0 4px 16px rgba(14,165,233,0.30)" }}
+          onClick={() => setsAtLimit ? toast.error(`Upgrade from ${membershipTier} to add more service sets.`) : setShowPicker((v) => !v)}
+          className={cn(
+            "flex items-center gap-2 text-sm font-bold px-5 py-3.5 rounded-xl transition-all active:scale-[0.98]",
+            setsAtLimit
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-[var(--brand-client)] text-white hover:opacity-90"
+          )}
+          style={setsAtLimit ? {} : { boxShadow: "0 4px 16px rgba(14,165,233,0.30)" }}
         >
           <Plus className="w-4 h-4" />
           New service set
@@ -402,9 +413,9 @@ export function PackagesManager({
 
           {/* Bottom hint strip */}
           <div className="border-t border-gray-100 bg-white px-6 py-3 flex items-center justify-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1e40af] shrink-0" />
             <p className="text-xs text-gray-400">
-              You can create up to <span className="font-semibold text-gray-600">{maxPackages} services</span> on your current plan. <span className="text-violet-600 font-semibold">Upgrade</span> to unlock more slots.
+              {maxSets !== null ? <>Up to <span className="font-semibold text-gray-600">{maxSets} sets</span>, {packagesPerSet} packages each on {membershipTier}.</> : <>{packagesPerSet} packages per set — unlimited sets on {membershipTier}.</>} <a href="/editor/membership" className="text-[#1e40af] font-semibold">Upgrade</a> to unlock more.
             </p>
           </div>
         </div>
@@ -466,168 +477,159 @@ export function PackagesManager({
               </div>
             </div>
 
-            {/* Services list */}
+            {/* Services list — 3-column grid (one row per set) */}
             {!isCollapsed && (
               <div className="p-4 space-y-3 bg-gray-50/50">
 
-                {pkgs.map((pkg) => {
-                  const isThisEditing = isEditingHere && editingPkg?.id === pkg.id;
-                  return (
-                    <div key={pkg.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-                      {/* Main content */}
-                      <div className="px-4 pt-4 pb-3">
-                        {/* Title + Price */}
-                        <div className="flex items-start justify-between gap-3 mb-3">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[15px] font-semibold text-gray-900 leading-snug">{pkg.title}</p>
-                            <p className="text-xs text-gray-400 mt-0.5 line-clamp-2 leading-relaxed">{pkg.description}</p>
+                {/* Package cards */}
+                <div className="grid grid-cols-3 gap-3">
+                  {pkgs.map((pkg) => {
+                    const isThisEditing = isEditingHere && editingPkg?.id === pkg.id;
+                    return (
+                      <div
+                        key={pkg.id}
+                        className={cn(
+                          "rounded-xl border bg-white overflow-hidden shadow-sm flex flex-col",
+                          isThisEditing
+                            ? "border-[var(--brand-client)]/40 ring-1 ring-[var(--brand-client)]/20"
+                            : "border-gray-200"
+                        )}
+                      >
+                        {/* Main content */}
+                        <div className="px-4 pt-4 pb-3 flex-1 space-y-2">
+                          {/* Title + Price */}
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm font-semibold text-gray-900 leading-snug">{pkg.title}</p>
+                            <p className="text-xl font-black text-gray-900 shrink-0 leading-none">{formatCurrency(pkg.price)}</p>
                           </div>
-                          <p className="text-2xl font-black text-gray-900 shrink-0 leading-none">{formatCurrency(pkg.price)}</p>
-                        </div>
+                          <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{pkg.description}</p>
 
-                        {/* Spec chips */}
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-lg">
-                            <Clock className="w-3 h-3" /> {pkg.deliveryDays}d delivery
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
-                            <RefreshCw className="w-3 h-3 text-gray-400" /> {pkg.revisionCount === -1 ? "Unlimited" : pkg.revisionCount} revision{pkg.revisionCount !== 1 ? "s" : ""}
-                          </span>
-                          {pkg.videoCount > 1 && (
+                          {/* Spec chips */}
+                          <div className="flex flex-wrap gap-1.5">
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-900 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg">
+                              <Clock className="w-3 h-3" /> {pkg.deliveryDays}d delivery
+                            </span>
                             <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
-                              <Video className="w-3 h-3 text-gray-400" /> {pkg.videoCount} videos
+                              <RefreshCw className="w-3 h-3 text-gray-400" /> {pkg.revisionCount === -1 ? "∞" : pkg.revisionCount} rev
                             </span>
-                          )}
-                          {pkg.videoLengthLimit && (
-                            <span className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
-                              {pkg.videoLengthLimit}
-                            </span>
-                          )}
-                          {pkg.resolution && (
-                            <span className="text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded-lg uppercase tracking-wide">
-                              {pkg.resolution}
-                            </span>
-                          )}
-                          {pkg.maxRawFootage && (
-                            <span className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
-                              Raw: {pkg.maxRawFootage}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Add-on pills */}
-                        {((pkg.addons?.length ?? 0) > 0 || pkg.includesSourceFiles || pkg.includesCommercialRights) && (
-                          <div className="flex flex-wrap gap-1.5 mt-2">
-                            {pkg.addons?.map((a) => (
-                              <span key={a} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/20">
-                                {ADDON_LABELS[a] ?? a.replace(/_/g, " ")}
-                              </span>
-                            ))}
-                            {pkg.includesSourceFiles && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                <FileArchive className="w-2.5 h-2.5" /> Source files
+                            {pkg.videoLengthLimit && (
+                              <span className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                                {pkg.videoLengthLimit}
                               </span>
                             )}
-                            {pkg.includesCommercialRights && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                <Briefcase className="w-2.5 h-2.5" /> Commercial rights
+                            {pkg.resolution && (
+                              <span className="text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded-lg uppercase tracking-wide">
+                                {pkg.resolution}
                               </span>
                             )}
                           </div>
-                        )}
 
-                        {/* Software + delivery format tags */}
-                        {((pkg.softwareUsed?.length ?? 0) > 0 || (pkg.deliveryFormats?.length ?? 0) > 0) && (
-                          <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-gray-100">
-                            {pkg.softwareUsed?.map((s) => (
-                              <span key={s} className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
-                                {SOFTWARE_LABELS[s] ?? s}
-                              </span>
-                            ))}
-                            {pkg.deliveryFormats?.map((f) => (
-                              <span key={f} className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
-                                {FORMAT_LABELS[f] ?? f}
-                              </span>
-                            ))}
+                          {/* Add-on pills */}
+                          {((pkg.addons?.length ?? 0) > 0 || pkg.includesSourceFiles || pkg.includesCommercialRights) && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {pkg.addons?.map((a) => (
+                                <span key={a} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/20">
+                                  {ADDON_LABELS[a] ?? a.replace(/_/g, " ")}
+                                </span>
+                              ))}
+                              {pkg.includesSourceFiles && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                  <FileArchive className="w-2.5 h-2.5" /> Source files
+                                </span>
+                              )}
+                              {pkg.includesCommercialRights && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                  <Briefcase className="w-2.5 h-2.5" /> Commercial rights
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Software + delivery format tags */}
+                          {((pkg.softwareUsed?.length ?? 0) > 0 || (pkg.deliveryFormats?.length ?? 0) > 0) && (
+                            <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
+                              {pkg.softwareUsed?.map((s) => (
+                                <span key={s} className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
+                                  {SOFTWARE_LABELS[s] ?? s}
+                                </span>
+                              ))}
+                              {pkg.deliveryFormats?.map((f) => (
+                                <span key={f} className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
+                                  {FORMAT_LABELS[f] ?? f}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Footer action bar */}
+                        <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 mt-auto">
+                          <div className="flex items-center gap-2">
+                            <Switch checked={pkg.isActive} onCheckedChange={() => toggleActive(pkg)} className="scale-[0.8]" />
+                            <span className={cn("text-xs font-semibold", pkg.isActive ? "text-emerald-600" : "text-amber-600")}>
+                              {pkg.isActive ? "Active" : "Paused"}
+                            </span>
                           </div>
-                        )}
-                      </div>
-
-                      {/* Footer action bar */}
-                      <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-100 bg-gray-50/60">
-                        <div className="flex items-center gap-2">
-                          <Switch checked={pkg.isActive} onCheckedChange={() => toggleActive(pkg)} className="scale-[0.8]" />
-                          <span className={cn(
-                            "text-xs font-semibold",
-                            pkg.isActive ? "text-emerald-600" : "text-amber-600"
-                          )}>
-                            {pkg.isActive ? "Active" : "Paused"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => openForm(key, pkg)}
-                            className={cn(
-                              "flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors",
-                              isThisEditing
-                                ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
-                                : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
-                            )}
-                            title="Edit"
-                          >
-                            <Pencil className="w-3 h-3" /> Edit
-                          </button>
-                          <button
-                            onClick={() => deletePackage(pkg)}
-                            className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => openForm(key, pkg)}
+                              className={cn(
+                                "flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors",
+                                isThisEditing
+                                  ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
+                                  : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
+                              )}
+                            >
+                              <Pencil className="w-3 h-3" /> Edit
+                            </button>
+                            <button
+                              onClick={() => deletePackage(pkg)}
+                              className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
 
-                      {/* Inline edit form */}
-                      {isThisEditing && (
-                        <div className="border-t border-gray-100 p-5 bg-[var(--brand-client)]/[0.02]">
-                          <PackageBuilderForm
-                            existing={pkg}
-                            lockedCategory={category === "__none__" ? null : category}
-                            lockedFormat={format === "__none__" ? null : format}
-                            onSaved={handleSaved}
-                            onCancel={closeForm}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-
-                {/* Add service button / inline create form */}
-                {isEditingHere && editingPkg === null ? (
+                {/* Full-width edit / create form */}
+                {isEditingHere && (
                   <div className="rounded-xl border border-[var(--brand-client)]/25 bg-white p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <p className="text-sm font-semibold text-gray-800">
-                        New service — {setLabel(key)}
+                        {editingPkg !== null ? `Edit — ${editingPkg?.title}` : `New service — ${setLabel(key)}`}
                       </p>
                       <button onClick={closeForm} className="ml-auto p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                     <PackageBuilderForm
+                      existing={editingPkg ?? undefined}
                       lockedCategory={category === "__none__" ? null : category}
                       lockedFormat={format === "__none__" ? null : format}
                       onSaved={handleSaved}
                       onCancel={closeForm}
                     />
                   </div>
-                ) : (
-                  <button
-                    onClick={() => openForm(key, null)}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-3.5 text-sm font-semibold text-gray-400 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/[0.02] transition-all"
-                  >
-                    <Plus className="w-4 h-4" /> Add a service to this set
-                  </button>
+                )}
+
+                {/* Add service / full indicator */}
+                {!isEditingHere && (
+                  pkgs.length >= packagesPerSet ? (
+                    <div className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-100 py-3.5 text-sm font-semibold text-gray-300 cursor-not-allowed select-none">
+                      <Plus className="w-4 h-4" /> {packagesPerSet}/{packagesPerSet} packages — set is full
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => openForm(key, null)}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-3.5 text-sm font-semibold text-gray-400 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/[0.02] transition-all"
+                    >
+                      <Plus className="w-4 h-4" /> Add a service to this set ({pkgs.length}/{packagesPerSet})
+                    </button>
+                  )
                 )}
               </div>
             )}

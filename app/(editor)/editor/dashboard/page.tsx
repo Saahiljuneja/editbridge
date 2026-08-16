@@ -38,8 +38,8 @@ export default async function EditorDashboardPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
-          <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-7 h-7 text-[#0EA5E9]" />
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-7 h-7 text-[#1e40af]" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">Complete your setup</h2>
           <p className="text-sm text-gray-500 mb-6">
@@ -47,7 +47,7 @@ export default async function EditorDashboardPage() {
           </p>
           <Link
             href="/editor/kyc"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors"
           >
             Complete setup <ArrowRight className="w-4 h-4" />
           </Link>
@@ -233,21 +233,19 @@ export default async function EditorDashboardPage() {
 
   const LEVEL_COLORS: Record<Level, string> = {
     bronze: "#D97706", silver: "#6B7280", gold: "#CA8A04", platinum: "#4F46E5",
-    diamond: "#0891B2", master: "#9333EA", legend: "#DC2626",
   };
   const LEVEL_EMOJIS: Record<Level, string> = {
     bronze: "🥉", silver: "🥈", gold: "🥇", platinum: "💎",
-    diamond: "💠", master: "👑", legend: "🔥",
   };
   const xpColor = LEVEL_COLORS[xpLevel];
   const RING_R = 28;
   const RING_C = +(2 * Math.PI * RING_R).toFixed(2);
 
   const STATUS_STYLES: Record<string, { label: string; dot: string; badge: string }> = {
-    pending:            { label: "Pending",     dot: "bg-gray-400",    badge: "bg-gray-100 text-gray-600"   },
-    in_progress:        { label: "In Progress", dot: "bg-[#0EA5E9]",   badge: "bg-sky-100 text-sky-700"     },
-    delivered:          { label: "Delivered",   dot: "bg-[#0EA5E9]",   badge: "bg-sky-100 text-sky-700"     },
-    revision_requested: { label: "Revision",    dot: "bg-amber-500",   badge: "bg-amber-100 text-amber-700" },
+    pending:            { label: "Pending",     dot: "bg-gray-400",    badge: "bg-gray-100 text-gray-600 border border-gray-200/50"   },
+    in_progress:        { label: "In Progress", dot: "bg-brand-primary", badge: "bg-blue-50 text-brand-primary border border-blue-100/50" },
+    delivered:          { label: "Delivered",   dot: "bg-brand-primary", badge: "bg-blue-50 text-brand-primary border border-blue-100/50" },
+    revision_requested: { label: "Revision",    dot: "bg-amber-500",   badge: "bg-amber-50 text-amber-700 border border-amber-200/50" },
   };
 
   const profileHref  = `/editor/${editorId}`;
@@ -259,25 +257,25 @@ export default async function EditorDashboardPage() {
       label: "This Month", value: formatCurrency(monthEarnings),
       sub: `${formatCurrency(totalEarnings)} lifetime`,
       icon: IndianRupee, topBorder: "border-t-2 border-emerald-500",
-      iconBg: "bg-emerald-50", iconCls: "text-emerald-600", numCls: "text-gray-900",
+      iconBg: "bg-emerald-50/70 border border-emerald-100/50", iconCls: "text-emerald-600", numCls: "text-gray-900",
     },
     {
       label: "Active Orders", value: String(activeOrders.length),
       sub: needsAction.length > 0 ? `${needsAction.length} need action` : "All on track",
-      icon: ShoppingBag, topBorder: "border-t-2 border-[#0EA5E9]",
-      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]", numCls: "text-[#0EA5E9]",
+      icon: ShoppingBag, topBorder: "border-t-2 border-brand-primary",
+      iconBg: "bg-blue-50/70 border border-blue-100/50", iconCls: "text-brand-primary", numCls: "text-brand-primary",
     },
     {
       label: "Pending Payout", value: formatCurrency(pendingPayout),
       sub: "From active orders",
       icon: Banknote, topBorder: "border-t-2 border-amber-400",
-      iconBg: "bg-amber-50", iconCls: "text-amber-600", numCls: "text-gray-900",
+      iconBg: "bg-amber-50/70 border border-amber-100/50", iconCls: "text-amber-600", numCls: "text-gray-900",
     },
     {
       label: "Avg Rating", value: avgRating ? `${avgRating} ★` : "—",
       sub: `${totalReviews} review${totalReviews !== 1 ? "s" : ""}`,
       icon: Star, topBorder: "border-t-2 border-amber-300",
-      iconBg: "bg-amber-50", iconCls: "text-amber-500", numCls: "text-gray-900",
+      iconBg: "bg-amber-50/70 border border-amber-100/50", iconCls: "text-amber-500", numCls: "text-gray-900",
     },
   ];
 
@@ -287,41 +285,49 @@ export default async function EditorDashboardPage() {
       value: editorRow?.avgResponseTime
         ? editorRow.avgResponseTime < 60 ? `${editorRow.avgResponseTime}m` : `${Math.round(editorRow.avgResponseTime / 60)}h`
         : "—",
-      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]",
+      iconBg: "bg-blue-50/50", iconCls: "text-brand-primary",
     },
     {
       icon: CheckCircle2, label: "Completion",
       value: editorRow?.completionRate != null ? `${editorRow.completionRate}%` : "—",
-      iconBg: "bg-emerald-50", iconCls: "text-emerald-600",
+      iconBg: "bg-emerald-50/50", iconCls: "text-emerald-600",
     },
     {
       icon: ShoppingBag, label: "Completed",
       value: String(editorRow?.totalOrders ?? 0),
-      iconBg: "bg-amber-50", iconCls: "text-amber-600",
+      iconBg: "bg-amber-50/50", iconCls: "text-amber-600",
     },
     {
       icon: ImageIcon, label: "Portfolio",
       value: String(portCount),
-      iconBg: "bg-sky-50", iconCls: "text-[#0EA5E9]",
+      iconBg: "bg-blue-50/50", iconCls: "text-brand-primary",
     },
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#ffffff] pb-12 overflow-hidden">
-      {/* Topographic backdrop */}
-      <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
+    <div className="relative min-h-screen bg-[#F8FAFC] pb-12 overflow-hidden">
+      {/* Ambient background glows */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-blue-100/30 blur-3xl opacity-50" />
+        <div className="absolute top-1/2 -left-40 w-96 h-96 rounded-full bg-blue-100/20 blur-3xl opacity-40" />
+      </div>
 
+      {/* Topographic backdrop */}
+      <TopoBackground background="#F8FAFC" strokeColor="#e2e8f0" opacity={0.45} />
+ 
       <div className="max-w-5xl mx-auto px-6 pt-6 space-y-6 relative z-10">
         {/* Dashboard Header */}
-        <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-gray-150 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-gray-100/10 relative z-10">
           <div className="flex items-center gap-4">
             {session.user.image ? (
-              <img
-                src={session.user.image} alt="" width={44} height={44}
-                className="w-11 h-11 rounded-xl object-cover shrink-0 ring-2 ring-neutral-200/20"
-              />
+              <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-primary-hover shadow-md shrink-0">
+                <img
+                  src={session.user.image} alt="" width={44} height={44}
+                  className="w-11 h-11 rounded-[14px] object-cover bg-white shrink-0"
+                />
+              </div>
             ) : (
-              <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center shrink-0 text-white font-black text-lg">
+              <div className="w-12 h-12 rounded-2xl bg-neutral-900 flex items-center justify-center shrink-0 text-white font-black text-lg shadow-sm">
                 {(session.user.name ?? "E")[0].toUpperCase()}
               </div>
             )}
@@ -329,32 +335,32 @@ export default async function EditorDashboardPage() {
               <h1 className="text-xl font-black text-neutral-900 tracking-tight leading-none">
                 Good {greeting}, {firstName}
               </h1>
-              <div className="flex items-center gap-2 mt-1.5">
+              <div className="flex items-center gap-2 mt-2.5">
                 <span className={cn(
-                  "inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider",
-                  isAvailable ? "bg-emerald-50 text-emerald-700 border border-emerald-200/35" : "bg-neutral-100 text-neutral-500 border border-neutral-200/35"
+                  "inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider",
+                  isAvailable ? "bg-emerald-50 text-emerald-700 border border-emerald-200/50" : "bg-neutral-100 text-neutral-500 border border-neutral-200/50"
                 )}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", isAvailable ? "bg-emerald-500" : "bg-neutral-400")} />
                   {isAvailable ? "Available" : "Paused"}
                 </span>
                 {kycApproved && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-black text-brand-primary bg-blue-50 border border-blue-200/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
                     <BadgeCheck className="w-3.5 h-3.5" /> Verified
                   </span>
                 )}
               </div>
             </div>
           </div>
-
+  
           {/* Right side info links */}
           <div className="flex items-center gap-4 w-full sm:w-auto">
-            <div className="text-right hidden sm:block">
-              <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">This month</p>
-              <p className="text-lg font-black text-neutral-900 tabular-nums">{formatCurrency(monthEarnings)}</p>
+            <div className="text-right hidden sm:block mr-2">
+              <p className="text-[10px] text-neutral-450 font-bold uppercase tracking-wider">This month</p>
+              <p className="text-xl font-black text-neutral-900 tabular-nums mt-0.5">{formatCurrency(monthEarnings)}</p>
             </div>
             <Link
               href={profileHref}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-neutral-200 bg-[#ffffff] hover:bg-neutral-50 text-xs font-bold text-neutral-700 transition-colors shadow-sm"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-xs font-bold text-neutral-700 transition-all hover:scale-[1.01] hover:border-gray-300 shadow-sm"
             >
               <Share2 className="w-3.5 h-3.5 text-neutral-400" /> Public profile
             </Link>
@@ -391,7 +397,7 @@ export default async function EditorDashboardPage() {
                 </p>
               </div>
             ) : (
-              <div className="flex items-center gap-3 rounded-2xl bg-[#ffffff] border border-neutral-200/50 px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-3 rounded-2xl bg-white border border-gray-150 px-4 py-3 shadow-sm">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                 <p className="text-xs text-neutral-400 font-semibold">
                   KYC verified {formatDate(approvedAt)} · valid until {formatDate(expiryDate)}
@@ -400,10 +406,10 @@ export default async function EditorDashboardPage() {
             );
           })()}
           {kycApproved && activeOrders.length === 0 && totalEarnings === 0 && (
-            <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/50 border border-indigo-200 px-4 py-3 shadow-sm">
-              <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />
-              <p className="text-xs text-indigo-800 font-bold uppercase tracking-wider flex-1">Your profile is live! Share it to start receiving orders.</p>
-              <Link href={profileHref} className="text-xs font-bold text-indigo-600 whitespace-nowrap">
+            <div className="flex items-center gap-3 rounded-2xl bg-blue-50/50 border border-blue-200 px-4 py-3 shadow-sm">
+              <CheckCircle2 className="w-4 h-4 text-brand-primary shrink-0" />
+              <p className="text-xs text-blue-800 font-bold uppercase tracking-wider flex-1">Your profile is live! Share it to start receiving orders.</p>
+              <Link href={profileHref} className="text-xs font-bold text-brand-primary whitespace-nowrap">
                 Share profile →
               </Link>
             </div>
@@ -469,7 +475,7 @@ export default async function EditorDashboardPage() {
                 {needsAction.length}
               </span>
             </div>
-            <div className="divide-y divide-amber-100/40 bg-[#ffffff]/60">
+            <div className="divide-y divide-amber-100/40 bg-white/60">
               {needsAction.map(order => (
                 <Link key={order.id} href={`/editor/orders/${order.id}`}
                   className="flex items-center justify-between px-5 py-3.5 hover:bg-amber-50/30 transition-colors group">
@@ -493,17 +499,17 @@ export default async function EditorDashboardPage() {
         {/* KPI cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
           {KPI_CARDS.map(({ label, value, sub, icon: Icon, topBorder, iconBg, iconCls, numCls }) => (
-            <div key={label} className={cn("bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-5 shadow-sm", topBorder)}>
+            <div key={label} className={cn("bg-white/80 backdrop-blur-md rounded-3xl border border-gray-150 p-5 shadow-xl shadow-gray-100/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-gray-200/10 hover:border-gray-250", topBorder)}>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{label}</p>
-                <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center", iconBg)}>
+                <p className="text-[10px] font-bold text-neutral-450 uppercase tracking-wider">{label}</p>
+                <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shadow-inner", iconBg)}>
                   <Icon className={cn("w-4 h-4", iconCls)} />
                 </div>
               </div>
-              <p className={cn("text-2xl font-black leading-none mb-1.5 tabular-nums", numCls)}>{value}</p>
+              <p className={cn("text-2xl font-black leading-none mb-1.5 tabular-nums text-neutral-900", numCls)}>{value}</p>
               <p className={cn(
                 "text-xs font-semibold",
-                label === "Active Orders" && needsAction.length > 0 ? "text-amber-600" : "text-neutral-400"
+                label === "Active Orders" && needsAction.length > 0 ? "text-amber-600 font-bold" : "text-neutral-400"
               )}>{sub}</p>
             </div>
           ))}
@@ -511,41 +517,46 @@ export default async function EditorDashboardPage() {
 
         {/* XP widget */}
         <Link href="/editor/rewards"
-          className="block bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm px-5 py-4 hover:border-neutral-300 transition-colors relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 shrink-0">
+          className="block relative bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 border border-neutral-850 rounded-3xl shadow-xl px-5 py-4 hover:border-neutral-700 transition-all duration-300 hover:-translate-y-0.5 z-10 overflow-hidden text-white">
+          
+          {/* Ambient level glow */}
+          <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-25 pointer-events-none" style={{ background: xpColor }} />
+          <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full blur-3xl opacity-15 pointer-events-none" style={{ background: xpColor }} />
+
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="relative w-14 h-14 shrink-0 bg-neutral-950/60 p-0.5 rounded-full border border-white/5 shadow-inner">
               <svg viewBox="0 0 64 64" className="w-full h-full" style={{ transform: "rotate(-90deg)" }}>
-                <circle cx="32" cy="32" r={RING_R} fill="none" stroke="currentColor" strokeWidth="5" className="text-neutral-100" />
-                <circle cx="32" cy="32" r={RING_R} fill="none" stroke={xpColor} strokeWidth="5" strokeLinecap="round"
+                <circle cx="32" cy="32" r={RING_R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4.5" />
+                <circle cx="32" cy="32" r={RING_R} fill="none" stroke={xpColor} strokeWidth="4.5" strokeLinecap="round"
                   strokeDasharray={RING_C} strokeDashoffset={RING_C * (1 - xpPct / 100)} />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xl select-none">
+              <div className="absolute inset-0 flex items-center justify-center text-xl select-none drop-shadow-md">
                 {LEVEL_EMOJIS[xpLevel]}
               </div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-1.5">
-                <span className="text-lg font-black text-neutral-900 tabular-nums">{xpTotal.toLocaleString()}</span>
-                <span className="text-xs text-neutral-450 font-bold">XP</span>
-                <span className="text-[9px] font-extrabold uppercase tracking-wider ml-1 px-2 py-0.5 rounded-full text-white"
-                  style={{ background: xpColor }}>
+                <span className="text-lg font-black text-white tabular-nums">{xpTotal.toLocaleString()}</span>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">XP</span>
+                <span className="text-[9px] font-black uppercase tracking-wider ml-1 px-2.5 py-0.5 rounded-full text-white shadow-sm"
+                  style={{ background: `linear-gradient(135deg, ${xpColor}, ${xpColor}aa)` }}>
                   {xpLevel}
                 </span>
               </div>
               {nextLevel ? (
-                <p className="text-xs text-neutral-400 mt-0.5 font-semibold">
+                <p className="text-xs text-neutral-405 mt-0.5 font-medium">
                   {(nextLevel.min - xpTotal).toLocaleString()} XP to {nextLevel.name.charAt(0).toUpperCase() + nextLevel.name.slice(1)}
                 </p>
               ) : (
                 <p className="text-xs font-bold mt-0.5" style={{ color: xpColor }}>Max level reached 🎉</p>
               )}
             </div>
-            <div className="hidden sm:flex flex-col items-center gap-0.5 shrink-0 border-l border-neutral-100 pl-4">
-              <span className="text-2xl select-none">{weekOrders > 0 ? "🔥" : "💤"}</span>
-              <p className="text-sm font-black text-neutral-900 tabular-nums">{weekOrders}/5</p>
-              <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">this week</p>
+            <div className="hidden sm:flex flex-col items-center gap-0.5 shrink-0 border-l border-neutral-800/80 pl-4">
+              <span className="text-2xl select-none drop-shadow-sm">{weekOrders > 0 ? "🔥" : "💤"}</span>
+              <p className="text-sm font-black text-white tabular-nums">{weekOrders}/5</p>
+              <p className="text-[9px] text-neutral-405 font-bold uppercase tracking-wider">this week</p>
             </div>
-            <ArrowRight className="w-4 h-4 text-neutral-300 shrink-0" />
+            <ArrowRight className="w-4 h-4 text-neutral-500 hover:text-white shrink-0 transition-colors" />
           </div>
         </Link>
 
@@ -561,50 +572,48 @@ export default async function EditorDashboardPage() {
               responseTimeData={finalResponseTimeData}
               clientRepeatData={clientRepeatData.rows.map(r => ({ client_type: String(r.client_type), client_count: Number(r.client_count) }))}
             />
-
-            {/* Active orders */}
-            <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+            <div className="bg-white rounded-3xl border border-gray-150 shadow-xl shadow-gray-100/5 overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4.5 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Active Orders</h2>
                   {activeOrders.length > 0 && (
-                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-black text-white">
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-neutral-900 text-white shadow-sm">
                       {activeOrders.length}
                     </span>
                   )}
                 </div>
                 <Link href="/editor/orders"
-                  className="text-xs font-bold text-neutral-500 hover:text-neutral-900 flex items-center gap-1 transition-colors">
+                  className="text-xs font-bold text-neutral-450 hover:text-neutral-900 flex items-center gap-1 transition-colors">
                   View all <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
 
               {activeOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-neutral-50 border border-neutral-200/30 flex items-center justify-center mb-3">
-                    <ShoppingBag className="w-5 h-5 text-neutral-300" />
+                <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
+                  <div className="w-12 h-12 rounded-2xl bg-neutral-50 border border-neutral-200/40 flex items-center justify-center mb-3">
+                    <ShoppingBag className="w-5 h-5 text-neutral-350" />
                   </div>
                   <p className="font-bold text-neutral-800 text-sm">No active orders</p>
-                  <p className="text-xs text-neutral-400 mt-1 max-w-xs font-semibold">
+                  <p className="text-xs text-neutral-400 mt-1 max-w-xs font-semibold leading-relaxed">
                     {kycApproved ? "Share your profile link to start receiving orders." : "Complete KYC to start receiving orders."}
                   </p>
                   <Link href={kycApproved ? profileHref : "/editor/kyc"}
-                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-black hover:bg-neutral-900 transition-colors shadow-sm">
+                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-brand-primary hover:bg-brand-primary-hover transition-all hover:scale-[1.02] shadow-md shadow-blue-800/10">
                     {kycApproved ? "View public profile" : "Complete KYC"} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-neutral-100">
+                <div className="divide-y divide-gray-100">
                   {[...needsAction, ...inProgress].slice(0, 6).map(order => {
                     const s = STATUS_STYLES[order.status];
                     return (
                       <Link key={order.id} href={`/editor/orders/${order.id}`}
-                        className="flex items-center gap-4 px-5 py-4 hover:bg-neutral-50/50 transition-colors group">
+                        className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors group">
                         <span className={cn("w-2 h-2 rounded-full shrink-0", s.dot)} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-neutral-900 truncate mb-0.5">{order.packageTitle}</p>
+                          <p className="text-sm font-bold text-neutral-900 truncate mb-0.5 group-hover:text-black transition-colors">{order.packageTitle}</p>
                           <div className="flex items-center gap-2">
-                            <span className={cn("text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider", s.badge)}>
+                            <span className={cn("text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm", s.badge)}>
                               {s.label}
                             </span>
                             <span className="text-xs text-neutral-400 font-semibold">{displayNameFromFull(order.clientName ?? "Client")}</span>
@@ -620,7 +629,7 @@ export default async function EditorDashboardPage() {
                           <span className="text-sm font-black text-neutral-900 tabular-nums">
                             {formatCurrency(order.totalAmount - order.commissionAmount)}
                           </span>
-                          <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-black transition-colors" />
+                          <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-neutral-800 transition-colors" />
                         </div>
                       </Link>
                     );
@@ -632,13 +641,13 @@ export default async function EditorDashboardPage() {
             {/* Performance row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {PERF_CARDS.map(({ icon: Icon, label, value, iconBg, iconCls }) => (
-                <div key={label} className="bg-[#ffffff] rounded-2xl border border-neutral-200/50 p-4 flex items-center gap-3 shadow-sm">
-                  <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shrink-0", iconBg)}>
+                <div key={label} className="bg-white rounded-3xl border border-gray-150 p-4.5 flex items-center gap-3.5 shadow-xl shadow-gray-100/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-gray-200/10 hover:border-gray-250">
+                  <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-inner", iconBg)}>
                     <Icon className={cn("w-4 h-4", iconCls)} />
                   </div>
                   <div>
                     <p className="text-base font-black text-neutral-900 leading-none mb-0.5 tabular-nums">{value}</p>
-                    <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">{label}</p>
+                    <p className="text-[9px] text-neutral-405 font-bold uppercase tracking-wider">{label}</p>
                   </div>
                 </div>
               ))}
@@ -646,14 +655,14 @@ export default async function EditorDashboardPage() {
 
             {/* Recent reviews */}
             {recentReviews.length > 0 && (
-              <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+              <div className="bg-white rounded-3xl border border-gray-150 shadow-xl shadow-gray-100/5 overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                   <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Recent Reviews</h2>
                   {avgRating && (
                     <div className="flex items-center gap-1.5">
                       <div className="flex">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <Star key={i} className={cn("w-3 h-3 select-none", i < Math.round(avgRating) ? "fill-amber-400 text-amber-400" : "text-neutral-200")} />
+                           <Star key={i} className={cn("w-3 h-3 select-none", i < Math.round(avgRating) ? "fill-amber-400 text-amber-400" : "text-neutral-200")} />
                         ))}
                       </div>
                       <span className="text-xs font-bold text-neutral-700">{avgRating}</span>
@@ -661,10 +670,10 @@ export default async function EditorDashboardPage() {
                     </div>
                   )}
                 </div>
-                <div className="divide-y divide-neutral-100">
+                <div className="divide-y divide-gray-100">
                   {recentReviews.map(review => (
-                    <div key={review.id} className="px-5 py-4">
-                      <div className="flex items-center gap-2 mb-1.5">
+                    <div key={review.id} className="px-5 py-4.5 hover:bg-gray-50/10 transition-colors">
+                      <div className="flex items-center gap-2 mb-2">
                         <div className="flex">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star key={i} className={cn("w-3 h-3 select-none", i < review.rating ? "fill-amber-400 text-amber-400" : "text-neutral-200")} />
@@ -686,40 +695,40 @@ export default async function EditorDashboardPage() {
             <AvailabilityToggle initial={isAvailable} kycApproved={kycApproved} />
 
             {/* Earnings */}
-            <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 border-t-2 border-t-emerald-500 shadow-sm p-5">
+            <div className="bg-white rounded-3xl border border-gray-150 border-t-2 border-t-emerald-500 shadow-xl shadow-gray-100/5 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-gray-200/10 hover:border-gray-250">
               <p className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider mb-4">Earnings</p>
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#0EA5E9] shrink-0" />
-                    <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">This month</span>
+                    <span className="w-2 h-2 rounded-full bg-brand-primary shrink-0 shadow-sm" />
+                    <span className="text-[10px] text-neutral-455 font-bold uppercase tracking-wider">This month</span>
                   </div>
                   <span className="text-sm font-black text-neutral-900 tabular-nums">{formatCurrency(monthEarnings)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                    <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">Pending</span>
+                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 shadow-sm" />
+                    <span className="text-[10px] text-neutral-455 font-bold uppercase tracking-wider">Pending</span>
                   </div>
-                  <span className="text-sm font-black text-amber-600 tabular-nums">{formatCurrency(pendingPayout)}</span>
+                  <span className="text-sm font-black text-amber-650 tabular-nums">{formatCurrency(pendingPayout)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-neutral-305 shrink-0" />
-                    <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">All-time</span>
+                    <span className="w-2 h-2 rounded-full bg-neutral-300 shrink-0 shadow-sm" />
+                    <span className="text-[10px] text-neutral-455 font-bold uppercase tracking-wider">All-time</span>
                   </div>
                   <span className="text-sm font-black text-neutral-900 tabular-nums">{formatCurrency(totalEarnings)}</span>
                 </div>
               </div>
               <Link href="/editor/payouts"
-                className="mt-4 flex items-center justify-between text-xs font-bold text-indigo-650 hover:underline">
-                View payouts <ArrowRight className="w-3 h-3" />
+                className="mt-5 flex items-center justify-between text-xs font-bold text-brand-primary hover:text-brand-primary-hover transition-colors">
+                View payouts <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             {/* Quick links */}
-            <div className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b border-neutral-100">
+            <div className="bg-white rounded-3xl border border-gray-150 shadow-xl shadow-gray-100/5 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100">
                 <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Quick Access</h2>
               </div>
               <div className="p-3 space-y-1">
@@ -731,15 +740,15 @@ export default async function EditorDashboardPage() {
                   { href: "/editor/rewards",   icon: Zap,           label: "Rewards",    sub: "XP & badges" },
                 ].map(({ href, icon: Icon, label, sub }) => (
                   <Link key={href} href={href}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-neutral-50/50 transition-colors group">
-                    <div className="w-8 h-8 rounded-xl bg-neutral-100 border border-neutral-200/30 flex items-center justify-center shrink-0">
-                      <Icon className="w-4 h-4 text-neutral-500" />
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-neutral-50/70 transition-all duration-300 hover:translate-x-0.5 group">
+                    <div className="w-8.5 h-8.5 rounded-xl bg-neutral-100/80 border border-neutral-250/20 flex items-center justify-center shrink-0 shadow-sm group-hover:bg-white group-hover:border-neutral-200 transition-colors">
+                      <Icon className="w-4 h-4 text-neutral-500 group-hover:text-neutral-800 transition-colors" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-neutral-800">{label}</p>
-                      <p className="text-xs text-neutral-400 font-semibold">{sub}</p>
+                      <p className="text-sm font-bold text-neutral-800 group-hover:text-black transition-colors">{label}</p>
+                      <p className="text-xs text-neutral-405 font-semibold">{sub}</p>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-black transition-colors shrink-0" />
+                    <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-neutral-800 group-hover:translate-x-0.5 transition-all shrink-0" />
                   </Link>
                 ))}
               </div>

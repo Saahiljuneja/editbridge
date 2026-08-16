@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
   pending:            { label: "Pending",    dot: "bg-gray-400"    },
-  in_progress:        { label: "Active",     dot: "bg-[#0EA5E9]"   },
+  in_progress:        { label: "Active",     dot: "bg-[#1e40af]"   },
   delivered:          { label: "Delivered",  dot: "bg-violet-500"  },
   revision_requested: { label: "Revision",   dot: "bg-amber-500"   },
   completed:          { label: "Completed",  dot: "bg-emerald-500" },
@@ -103,17 +103,17 @@ export default async function EditorMessagesPage() {
     return (
       <Link
         href={`/editor/messages/${row.orderId}`}
-        className={cn("flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors", unread > 0 && "bg-sky-50/40")}
+        className={cn("flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors", unread > 0 && "bg-blue-50/40")}
       >
         <div className="relative shrink-0">
           <div className={cn(
             "w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold",
-            unread > 0 ? "bg-[#0EA5E9] text-white" : "bg-[#0EA5E9]/10 text-[#0EA5E9]"
+            unread > 0 ? "bg-[#1e40af] text-white" : "bg-[#1e40af]/10 text-[#1e40af]"
           )}>
             {initials}
           </div>
           {unread > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#0EA5E9] border-2 border-white text-white text-[9px] font-bold flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#1e40af] border-2 border-white text-white text-[9px] font-bold flex items-center justify-center">
               {unread > 9 ? "9+" : unread}
             </span>
           )}
@@ -141,7 +141,7 @@ export default async function EditorMessagesPage() {
 
         <div className="flex flex-col items-end gap-2 shrink-0">
           {unread > 0 ? (
-            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#0EA5E9] text-white text-[10px] font-bold flex items-center justify-center">
+            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#1e40af] text-white text-[10px] font-bold flex items-center justify-center">
               {unread > 99 ? "99+" : unread}
             </span>
           ) : (
@@ -168,8 +168,8 @@ export default async function EditorMessagesPage() {
                 : `${rows.length} conversation${rows.length !== 1 ? "s" : ""}${totalUnread > 0 ? ` · ${totalUnread} unread` : ""}`}
             </p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
-            <MessageSquare className="w-4 h-4 text-[#0EA5E9]" />
+          <div className="w-9 h-9 rounded-xl bg-[#1e40af]/10 flex items-center justify-center">
+            <MessageSquare className="w-4 h-4 text-[#1e40af]" />
           </div>
         </div>
       </div>
@@ -177,8 +177,8 @@ export default async function EditorMessagesPage() {
       <div className="max-w-3xl mx-auto px-6 py-6 space-y-5">
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
-              <MessageSquare className="w-7 h-7 text-[#0EA5E9]" />
+            <div className="w-14 h-14 rounded-2xl bg-[#1e40af]/10 flex items-center justify-center mb-4">
+              <MessageSquare className="w-7 h-7 text-[#1e40af]" />
             </div>
             <p className="font-semibold text-gray-800">No conversations yet</p>
             <p className="text-sm text-gray-400 mt-1 max-w-xs">When a client places an order, you can chat with them here.</p>
@@ -189,7 +189,7 @@ export default async function EditorMessagesPage() {
               <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
                 <div className="px-5 py-3 border-b border-gray-50 flex items-center justify-between">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active</p>
-                  <span className="text-xs font-medium text-[#0EA5E9] bg-[#0EA5E9]/10 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-medium text-[#1e40af] bg-[#1e40af]/10 px-2 py-0.5 rounded-full">
                     {active.length}
                   </span>
                 </div>

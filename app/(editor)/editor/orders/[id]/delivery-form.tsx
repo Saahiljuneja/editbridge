@@ -54,8 +54,8 @@ export function DeliveryForm({ orderId, versionNumber }: DeliveryFormProps) {
       className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden"
     >
       <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-          <Upload className="w-4 h-4 text-[#0EA5E9]" />
+        <div className="w-7 h-7 rounded-lg bg-[#1e40af]/10 flex items-center justify-center shrink-0">
+          <Upload className="w-4 h-4 text-[#1e40af]" />
         </div>
         <h2 className="font-semibold text-gray-900">
           Submit delivery{versionNumber > 1 ? ` (v${versionNumber})` : ""}
@@ -93,7 +93,7 @@ export function DeliveryForm({ orderId, versionNumber }: DeliveryFormProps) {
         <button
           type="submit"
           disabled={submitting || !fileKey}
-          className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {submitting ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</>

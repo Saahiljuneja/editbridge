@@ -11,6 +11,7 @@ import { getActiveBoosts } from "@/lib/xp-shop";
 import { PROFILE_FRAMES } from "@/lib/xp-shop-config";
 import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
 import { getPlatformSettings } from "@/lib/platform-settings";
+import { getEffectiveTier } from "@/lib/membership";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -40,6 +41,9 @@ export default async function ProfilePage() {
       maxActiveOrders: editors.maxActiveOrders,
       coverImage: editors.coverImage,
       featuredVideoUrl: editors.featuredVideoUrl,
+      featuredVideoUrls: editors.featuredVideoUrls,
+      membershipTier: editors.membershipTier,
+      membershipExpiresAt: editors.membershipExpiresAt,
       totalOrders: editors.totalOrders,
       completionRate: editors.completionRate,
       avgResponseTime: editors.avgResponseTime,
@@ -69,7 +73,7 @@ export default async function ProfilePage() {
       hasPhoto: !!userRow?.image,
       bio: editor?.bio ?? null,
       avgResponseTime: editor?.avgResponseTime ?? null,
-      featuredVideoUrl: editor?.featuredVideoUrl ?? null,
+      featuredVideoUrl: (editor?.featuredVideoUrls as string[] | null)?.[0] ?? editor?.featuredVideoUrl ?? null,
       bankAccountNumber: editor?.bankAccountNumber ?? null,
     },
     packageRows,
@@ -82,6 +86,8 @@ export default async function ProfilePage() {
     if (!raw) return fallback;
     try { return JSON.parse(raw) as T; } catch { return fallback; }
   };
+
+  const tier = getEffectiveTier(editor?.membershipTier, editor?.membershipExpiresAt);
 
   return (
     <ProfileClient
@@ -110,7 +116,8 @@ export default async function ProfilePage() {
       initialPreviousClients={editor?.previousClients ?? ""}
       initialMaxActiveOrders={editor?.maxActiveOrders ?? null}
       initialCoverImage={editor?.coverImage ?? null}
-      initialFeaturedVideoUrl={editor?.featuredVideoUrl ?? ""}
+      initialFeaturedVideoUrls={(editor?.featuredVideoUrls as string[] | null) ?? (editor?.featuredVideoUrl ? [editor.featuredVideoUrl] : [])}
+      maxFeaturedVideos={tier.maxFeaturedVideos}
       initialPortfolio={portfolioRows.map((p) => {
         const r2Base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
         const toProxy = (raw: string | null) => toPortfolioProxyUrl(raw, r2Base);

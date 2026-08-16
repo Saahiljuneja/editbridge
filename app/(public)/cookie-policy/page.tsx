@@ -1,5 +1,6 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
+import { PageHero } from "@/components/public/page-animations";
 
 export const metadata: Metadata = {
   title: "Cookie Policy — EditBridge",
@@ -64,14 +65,12 @@ const SECTIONS = [
 export default function CookiePolicyPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-[#07050f] px-4 py-16">
-        <div className="px-8 py-6">
-          <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Legal</p>
-          <h1 className="text-3xl font-extrabold text-white mb-3">Cookie Policy</h1>
-          <p className="text-white/40 text-sm">Last updated: June 2025</p>
-        </div>
-      </div>
+      <PageHero
+        badge="Legal"
+        title="Cookie Policy"
+        subtitle="Last updated: June 2025"
+        accentColor="var(--brand-client)"
+      />
 
       {/* Content */}
       <div className="px-8 py-6 space-y-10">

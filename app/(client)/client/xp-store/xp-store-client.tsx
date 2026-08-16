@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { CLIENT_STORE_ITEMS, PATRON_BADGES } from "@/lib/client-xp-store-config";
 import type { ClientItemType, PatronBadgeKey } from "@/lib/client-xp-store-config";
 
-const ACCENT = "#0EA5E9";
+const ACCENT = "#1e40af";
 
 interface Props {
   currentXp:          number;
@@ -174,7 +174,7 @@ export function XpStoreClient({
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-bold text-gray-900">{item.label}</p>
                         {item.tag && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-600">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-blue-100 text-brand-primary">
                             {item.tag}
                           </span>
                         )}
@@ -216,7 +216,7 @@ export function XpStoreClient({
                       )}
                     </div>
                     {item.isToken && (
-                      <div className="flex items-start gap-1.5 px-2.5 py-2 rounded-lg bg-sky-50 border border-sky-100 text-[10px] text-sky-700 leading-snug">
+                      <div className="flex items-start gap-1.5 px-2.5 py-2 rounded-lg bg-blue-50 border border-blue-100 text-[10px] text-blue-900 leading-snug">
                         <Info className="w-3 h-3 shrink-0 mt-px" />
                         This token applies automatically when you place your next qualifying order. No action needed.
                       </div>
@@ -352,7 +352,7 @@ export function XpStoreClient({
                   <div className="w-full space-y-1 text-left">
                     {badge.perks.map(perk => (
                       <div key={perk} className="flex items-start gap-1.5 text-[10px] text-gray-500">
-                        <span className="w-1 h-1 rounded-full bg-sky-400 shrink-0 mt-1.5" />
+                        <span className="w-1 h-1 rounded-full bg-blue-400 shrink-0 mt-1.5" />
                         <span>{perk}</span>
                       </div>
                     ))}

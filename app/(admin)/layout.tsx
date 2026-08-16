@@ -25,7 +25,7 @@ export default async function AdminLayout({
 
   return (
     <AdminThemeProvider>
-      <div className="h-screen overflow-hidden bg-gray-50 flex">
+      <div className="h-screen overflow-hidden bg-gray-50 flex admin-portal-theme">
         <AdminSidebar />
         <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
           <DashboardHeader

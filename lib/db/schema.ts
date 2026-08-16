@@ -112,6 +112,7 @@ export const users = pgTable("users", {
   twoFactorVerifiedAt: timestamp("two_factor_verified_at", { mode: "date" }), // internal single-use gate consumed by the jwt callback right after a successful /2fa check — never read or set by client code
   loginStreakDays: integer("login_streak_days").notNull().default(0),
   lastLoginDate: text("last_login_date"), // "YYYY-MM-DD" UTC — used for 7-day login streak
+  customProcessingFeeRate: integer("custom_processing_fee_rate"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
@@ -186,10 +187,12 @@ export const editors = pgTable("editors", {
   revisionScopeNote: text("revision_scope_note"), // editor-defined scope: what is/isn't a revision
   coverImage: text("cover_image"),
   featuredVideoUrl: text("featured_video_url"),
+  featuredVideoUrls: jsonb("featured_video_urls").$type<string[]>().default([]),
   isFeatured: boolean("is_featured").notNull().default(false),
   featuredUntil: timestamp("featured_until", { mode: "date" }),
   membershipTier: text("membership_tier").notNull().default("hobby"), // hobby | starter | pro | agency
   membershipExpiresAt: timestamp("membership_expires_at", { mode: "date" }),
+  customCommissionRate: integer("custom_commission_rate"),
   razorpayAccountId: text("razorpay_account_id"),
   bankAccountName: text("bank_account_name"),
   bankAccountNumber: text("bank_account_number"),
@@ -379,8 +382,8 @@ export const orders = pgTable("orders", {
     .references(() => packages.id), // nullable for quote-based orders
   status: orderStatusEnum("status").notNull().default("pending"),
   totalAmount: integer("total_amount").notNull(), // paise — package price + processing fee
-  commissionAmount: integer("commission_amount").notNull(), // paise — 15% of package price
-  processingFee: integer("processing_fee").notNull().default(0), // paise — 4% of package price
+  commissionAmount: integer("commission_amount").notNull(), // paise — 20% of package price
+  processingFee: integer("processing_fee").notNull().default(0), // paise — 10% of package price
   brief: text("brief").notNull(),
   deadline: timestamp("deadline", { mode: "date" }),
   briefData: jsonb("brief_data"),
@@ -624,6 +627,29 @@ export const featureFlags = pgTable("feature_flags", {
   updatedBy: uuid("updated_by").references(() => users.id),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
+
+export const userFeatureFlags = pgTable("user_feature_flags", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  featureKey: text("feature_key").notNull(),
+  enabled: boolean("enabled").notNull().default(true),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+}, (t) => [
+  index("user_feature_flags_user_idx").on(t.userId),
+]);
+
+export const userCoupons = pgTable("user_coupons", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  code: text("code").notNull().unique(),
+  discountPct: integer("discount_pct").notNull(),
+  maxDiscountAmount: integer("max_discount_amount").notNull(), // paise
+  isUsed: boolean("is_used").notNull().default(false),
+  expiresAt: timestamp("expires_at", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+}, (t) => [
+  index("user_coupons_user_idx").on(t.userId),
+]);
 
 // ─── Blog ─────────────────────────────────────────────────────────────────────
 
@@ -980,4 +1006,35 @@ export const userPreferences = pgTable("user_preferences", {
 }, (t) => [
   index("user_preferences_user_id_idx").on(t.userId),
 ]);
+
+
+// ─── Support Ticket System ───────────────────────────────────────────────────
+
+export const supportTicketStatusEnum = pgEnum("support_ticket_status", ["open", "in_progress", "resolved"]);
+export const supportTicketPriorityEnum = pgEnum("support_ticket_priority", ["low", "medium", "high"]);
+
+export const supportTickets = pgTable("support_tickets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // "billing", "technical", "order", "general"
+  status: supportTicketStatusEnum("status").notNull().default("open"),
+  priority: supportTicketPriorityEnum("priority").notNull().default("medium"),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const supportMessages = pgTable("support_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  ticketId: uuid("ticket_id")
+    .notNull()
+    .references(() => supportTickets.id, { onDelete: "cascade" }),
+  senderId: uuid("sender_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
 

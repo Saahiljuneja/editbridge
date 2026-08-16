@@ -7,8 +7,8 @@ import { bustMaintenanceCache } from "@/lib/maintenance-cache";
 import { bustPlatformSettingsCache } from "@/lib/platform-settings";
 
 const DEFAULTS: Record<string, string> = {
-  commission_rate_pct: "15",
-  processing_fee_pct: "4",
+  commission_rate_pct: "20",
+  processing_fee_pct: "10",
   min_revisions: "0",
   max_revisions: "3",
   max_delivery_days: "30",

@@ -45,8 +45,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ status: "ok" });
   } catch (err) {
-    console.error("[check-email]", err);
-    // On any unexpected error, fall through to signIn
-    return NextResponse.json({ status: "ok" });
+    console.warn("[check-email] Database connection failed:", err);
+    return NextResponse.json({ error: "database_error", message: "Failed to connect to the database." }, { status: 503 });
   }
 }

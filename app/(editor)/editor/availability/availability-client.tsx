@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -99,14 +99,14 @@ export function AvailabilityClient({
 
       {/* Status card */}
       <div className={cn(
-        "rounded-2xl border-2 p-6 transition-colors",
-        isAvailable ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/5" : "border-gray-200 bg-gray-50"
+        "rounded-3xl border-2 p-6 transition-colors",
+        isAvailable ? "border-brand-primary/30 bg-blue-50/30" : "border-gray-200 bg-gray-50/50"
       )}>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className={cn(
-              "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0",
-              isAvailable ? "bg-[var(--brand-client)]" : "bg-gray-200"
+              "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm",
+              isAvailable ? "bg-brand-primary" : "bg-gray-200"
             )}>
               {isAvailable
                 ? <Zap className="w-6 h-6 text-white" />
@@ -114,10 +114,10 @@ export function AvailabilityClient({
               }
             </div>
             <div>
-              <p className="font-bold text-gray-900 text-lg">
+              <p className="font-extrabold text-neutral-900 text-lg">
                 {isAvailable ? "Available for orders" : "Paused"}
               </p>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-neutral-450 mt-0.5 font-semibold">
                 {isAvailable
                   ? "Clients can discover your profile and place new orders."
                   : "Your profile is hidden from browse. Existing orders are unaffected."}
@@ -131,7 +131,7 @@ export function AvailabilityClient({
             disabled={saving}
             className={cn(
               "relative w-14 h-7 rounded-full transition-colors duration-200 shrink-0 disabled:opacity-50 flex-none",
-              isAvailable ? "bg-[var(--brand-client)]" : "bg-gray-300"
+              isAvailable ? "bg-brand-primary" : "bg-gray-300"
             )}
           >
             <span className={cn(
@@ -147,13 +147,13 @@ export function AvailabilityClient({
         <button
           onClick={() => !isAvailable && !saving && toggle(true)}
           className={cn(
-            "rounded-2xl border p-5 text-left transition-all",
+            "rounded-3xl border p-5 text-left transition-all",
             isAvailable
-              ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/5 ring-2 ring-[var(--brand-client)]/20"
-              : "border-gray-200 bg-white hover:border-[var(--brand-client)]/20 hover:bg-[var(--brand-client)]/5"
+              ? "border-brand-primary/30 bg-blue-50/40 ring-2 ring-brand-primary/20"
+              : "border-gray-200 bg-white hover:border-brand-primary/20 hover:bg-blue-50/20"
           )}
         >
-          <CheckCircle2 className={cn("w-6 h-6 mb-3", isAvailable ? "text-[var(--brand-client)]" : "text-gray-400")} />
+          <CheckCircle2 className={cn("w-6 h-6 mb-3", isAvailable ? "text-brand-primary" : "text-gray-400")} />
           <p className="font-semibold text-gray-900 text-sm">Available</p>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">
             Profile visible in browse. Clients can place orders.
@@ -162,9 +162,9 @@ export function AvailabilityClient({
         <button
           onClick={() => isAvailable && !saving && toggle(false)}
           className={cn(
-            "rounded-2xl border p-5 text-left transition-all",
+            "rounded-3xl border p-5 text-left transition-all",
             !isAvailable
-              ? "border-gray-400 bg-gray-100 ring-2 ring-gray-300"
+              ? "border-gray-450 bg-gray-100 ring-2 ring-gray-300"
               : "border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50"
           )}
         >
@@ -177,7 +177,7 @@ export function AvailabilityClient({
       </div>
 
       {/* Vacation mode */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5 space-y-3">
+      <div className="rounded-3xl border border-gray-150 bg-white shadow-xl shadow-gray-100/5 p-5 space-y-3">
         <div className="flex items-center gap-2 mb-1">
           <CalendarRange className="w-4 h-4 text-amber-500" />
           <p className="font-semibold text-gray-900 text-sm">Vacation mode</p>
@@ -206,7 +206,7 @@ export function AvailabilityClient({
             value={vacationDate}
             min={new Date().toISOString().slice(0, 10)}
             onChange={(e) => setVacationDate(e.target.value)}
-            className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
+            className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
           />
           <button
             onClick={setVacation}

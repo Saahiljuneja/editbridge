@@ -19,7 +19,7 @@ export default function ClientDashboardLoading() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { border: "border-t-2 border-emerald-200", icon: IndianRupee },
-            { border: "border-t-2 border-sky-200", icon: Clock },
+            { border: "border-t-2 border-blue-200", icon: Clock },
             { border: "border-t-2 border-teal-200", icon: CheckCircle2 },
             { border: "border-t-2 border-amber-250", icon: MessageSquare },
           ].map((card, i) => (

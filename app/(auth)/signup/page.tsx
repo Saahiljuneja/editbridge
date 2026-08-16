@@ -35,8 +35,8 @@ export default function SignupPage() {
           href="/signup/client"
           className="group flex items-center gap-4 p-5 rounded-2xl bg-neutral-50 border border-neutral-200 hover:bg-neutral-100 hover:border-neutral-300 transition-all duration-200"
         >
-          <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-400/20 group-hover:bg-sky-500/20 flex items-center justify-center shrink-0 transition-all duration-200">
-            <MonitorPlay className="w-6 h-6 text-sky-600" />
+          <div className="w-12 h-12 rounded-xl bg-brand-primary/10 border border-blue-400/20 group-hover:bg-brand-primary/20 flex items-center justify-center shrink-0 transition-all duration-200">
+            <MonitorPlay className="w-6 h-6 text-brand-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-neutral-900 text-[14.5px]">I need videos edited</p>

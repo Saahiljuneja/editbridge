@@ -198,7 +198,7 @@ export function OrderActions({
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="Describe the changes needed in detail…"
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                   maxLength={2000}
                 />
                 <div className="flex justify-between items-center">
@@ -294,7 +294,7 @@ export function OrderActions({
                   {CANCEL_REASONS.map((r) => (
                     <label
                       key={r}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors has-[:checked]:border-[#0EA5E9]/40 has-[:checked]:bg-sky-50/50"
+                      className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors has-[:checked]:border-[#1e40af]/40 has-[:checked]:bg-blue-50/50"
                     >
                       <input
                         type="radio"
@@ -302,7 +302,7 @@ export function OrderActions({
                         value={r}
                         checked={cancelReason === r}
                         onChange={() => setCancelReason(r)}
-                        className="accent-[#0EA5E9]"
+                        className="accent-[#1e40af]"
                       />
                       <span className="text-sm text-gray-700">{r}</span>
                     </label>
@@ -321,7 +321,7 @@ export function OrderActions({
                     maxLength={500}
                     rows={3}
                     placeholder="Any further details…"
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 resize-none"
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 resize-none"
                   />
                 </div>
               )}

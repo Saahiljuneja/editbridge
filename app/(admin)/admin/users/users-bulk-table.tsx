@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils";
 import { downloadCSV } from "@/lib/csv";
-import { Download } from "lucide-react";
+import { Download, Eye, Slash, CheckCircle2 } from "lucide-react";
 
 const ROLE_COLORS: Record<string, string> = {
   client: "bg-blue-100 text-blue-700",
@@ -44,6 +44,69 @@ export function UsersBulkTable({
   const [reason, setReason] = useState("");
   const [showReason, setShowReason] = useState(false);
   const [pendingAction, setPendingAction] = useState<"suspend" | "unsuspend" | null>(null);
+
+  const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [suspendingUser, setSuspendingUser] = useState<string | null>(null);
+
+  async function handleImpersonate(userId: string) {
+    if (!confirm("This will open a new tab where you are logged in AS this user. Continue?")) return;
+    setImpersonating(userId);
+    try {
+      const res = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error ?? "Failed."); return; }
+      const newTab = window.open("", "_blank");
+      if (newTab) {
+        const form = newTab.document.createElement("form");
+        form.method = "POST";
+        form.action = "/api/auth/impersonate-switch";
+        const input = newTab.document.createElement("input");
+        input.type = "hidden";
+        input.name = "token";
+        input.value = data.token;
+        form.appendChild(input);
+        newTab.document.body.appendChild(form);
+        form.submit();
+      }
+      toast.success("Impersonation tab opened.");
+    } catch {
+      toast.error("Something went wrong.");
+    } finally {
+      setImpersonating(null);
+    }
+  }
+
+  async function handleToggleSuspend(userId: string, currentActive: boolean) {
+    const action = currentActive ? "suspend" : "unsuspend";
+    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    setSuspendingUser(userId);
+    try {
+      const res = await fetch("/api/admin/users/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ids: [userId],
+          action,
+          reason: `Quick ${action} from users list`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Action failed.");
+        return;
+      }
+      toast.success(`User ${currentActive ? "suspended" : "reactivated"}.`);
+      router.refresh();
+    } catch {
+      toast.error("Something went wrong.");
+    } finally {
+      setSuspendingUser(null);
+    }
+  }
 
   const toggleAll = () => {
     if (selected.size === rows.length) {
@@ -245,10 +308,37 @@ export function UsersBulkTable({
                     {row.isActive ? "Active" : "Suspended"}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right">
-                  <Link href={`/admin/users/${row.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline underline-offset-2">
-                    View →
-                  </Link>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    {row.id !== currentUserId && (
+                      <>
+                        <button
+                          disabled={impersonating !== null}
+                          onClick={() => handleImpersonate(row.id)}
+                          title="Impersonate User"
+                          className="p-1 rounded-lg border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 disabled:opacity-50 transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          disabled={suspendingUser !== null}
+                          onClick={() => handleToggleSuspend(row.id, row.isActive)}
+                          title={row.isActive ? "Suspend User" : "Reactivate User"}
+                          className={cn(
+                            "p-1 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer",
+                            row.isActive
+                              ? "border-red-200 bg-red-50 text-red-650 hover:bg-red-100"
+                              : "border-green-200 bg-green-50 text-green-650 hover:bg-green-100"
+                          )}
+                        >
+                          {row.isActive ? <Slash className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                        </button>
+                      </>
+                    )}
+                    <Link href={`/admin/users/${row.id}`} className="text-xs font-semibold text-[var(--brand-client)] hover:underline bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 px-2 py-1 rounded-md">
+                      View
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}

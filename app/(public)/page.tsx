@@ -11,7 +11,6 @@ import {
   AnimatedScrollingReviews,
   ScrollProgressBar,
   AnimatedFAQ,
-  StickyCtaBar,
   ForEditorsSection,
   ComparisonSection,
   LeaderboardTeaser,
@@ -19,8 +18,16 @@ import {
   GuaranteeBar,
   BackToTopButton,
   EscrowFlowSection,
-  AnimatedFindEditorCTA,
 } from "@/components/home/animated-sections";
+import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
+import { CategoryBrowseSection } from "@/components/home/category-browse-section";
+import { isFeatureEnabled } from "@/lib/feature-flags";
+import { db } from "@/lib/db";
+import { editors, orders, users, blogPosts } from "@/lib/db/schema";
+import { count, eq, desc, and, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { displayNameFromFull } from "@/lib/utils";
+import { unstable_cache } from "next/cache";
 
 export const metadata: Metadata = {
   title: "EditBridge — Hire KYC-Verified Video Editors in India",
@@ -37,14 +44,6 @@ export const metadata: Metadata = {
     description: "India's trusted marketplace for video editing. Escrow-protected. Government ID verified.",
   },
 };
-import { CategoryBrowseSection } from "@/components/home/category-browse-section";
-import { isFeatureEnabled } from "@/lib/feature-flags";
-import { db } from "@/lib/db";
-import { editors, orders, users, blogPosts } from "@/lib/db/schema";
-import { count, eq, desc, and, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import { displayNameFromFull } from "@/lib/utils";
-import { unstable_cache } from "next/cache";
 
 const getHomepageData = unstable_cache(
   async () => {
@@ -122,7 +121,7 @@ const getHomepageData = unstable_cache(
       db.select({ value: count() }).from(editors).where(and(eq(editors.kycStatus, "approved"), eq(editors.isAvailable, true))),
       db.select({ value: sql<number>`COALESCE(SUM(total_amount), 0)::bigint` }).from(orders).where(eq(orders.status, "completed")),
     ]);
-
+    const r2Base = process.env.R2_PUBLIC_BASE_URL ?? "";
     const featuredEditors = editorRows.map(r => ({
       ...r,
       name: r.name ?? "",
@@ -132,6 +131,8 @@ const getHomepageData = unstable_cache(
       totalOrders: Number(r.totalOrders ?? 0),
       activeFrame: r.activeFrame ?? null,
       hasHighlight: Boolean(r.hasHighlight),
+      videoUrl: toPortfolioProxyUrl(r.videoUrl, r2Base),
+      thumbnailUrl: toPortfolioProxyUrl(r.thumbnailUrl, r2Base),
     }));
 
     const availableCount = Number(availableCountResult[0]?.value ?? 0);
@@ -250,7 +251,7 @@ export default async function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <BackToTopButton />
-      <StickyCtaBar />
+
       <div className="flex flex-col">
         <ScrollProgressBar />
         {/* 1. Hero */}
@@ -259,8 +260,6 @@ export default async function HomePage() {
         <AnimatedEditorCards editors={featuredEditors.length > 0 ? featuredEditors : undefined} editorCount={editorCount} />
         {/* 3. Categories — browse by type right away */}
         <CategoryBrowseSection />
-        {/* Find Editor CTA Quiz */}
-        {quizEnabled && <AnimatedFindEditorCTA />}
         {/* Escrow flow — builds payment trust */}
         <EscrowFlowSection />
         {/* Stats */}

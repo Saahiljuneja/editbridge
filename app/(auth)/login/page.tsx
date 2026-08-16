@@ -44,7 +44,20 @@ function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailVal }),
       });
+
+      if (pre.status === 503) {
+        toast.error("Could not connect to the database. Please try again later.");
+        setLoading(false);
+        return;
+      }
+
       const preData = await pre.json();
+
+      if (preData.error === "database_error") {
+        toast.error("Could not connect to the database. Please try again later.");
+        setLoading(false);
+        return;
+      }
 
       if (preData.status === "unverified") {
         await fetch("/api/auth/resend-verification", {
@@ -64,7 +77,9 @@ function LoginForm() {
         return;
       }
     } catch {
-      // fall through
+      toast.error("Could not connect to the server. Please check your connection.");
+      setLoading(false);
+      return;
     }
 
     const result = await signIn("credentials", { email: emailVal, password: passwordVal, redirect: false });

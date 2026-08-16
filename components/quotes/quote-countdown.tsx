@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function QuoteCountdown({ expiresAt }: { expiresAt: Date | string }) {
+  const pathname = usePathname();
+  const isClient = pathname?.startsWith("/client");
   const [remaining, setRemaining] = useState<string | null>(null);
   const [isUrgent, setIsUrgent] = useState(false);
 
@@ -39,7 +42,9 @@ export function QuoteCountdown({ expiresAt }: { expiresAt: Date | string }) {
         ? "bg-gray-100 text-gray-400"
         : isUrgent
           ? "bg-red-50 text-red-600 animate-pulse"
-          : "bg-violet-50 text-violet-600"
+          : isClient
+            ? "bg-blue-50 text-brand-primary"
+            : "bg-violet-50 text-violet-600"
     }`}>
       <Clock className="w-3 h-3" />
       {remaining}

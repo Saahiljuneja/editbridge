@@ -46,10 +46,10 @@ export function ReviewForm({ orderId, editorName }: ReviewFormProps) {
   }
 
   return (
-    <section className="rounded-xl border border-sky-200 bg-sky-50 p-5">
+    <section className="rounded-xl border border-blue-200 bg-blue-50 p-5">
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-7 h-7 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-          <Star className="w-3.5 h-3.5 text-[#0EA5E9]" />
+        <div className="w-7 h-7 rounded-lg bg-[#1e40af]/10 flex items-center justify-center shrink-0">
+          <Star className="w-3.5 h-3.5 text-[#1e40af]" />
         </div>
         <h2 className="font-semibold text-gray-900">Leave a review</h2>
       </div>
@@ -91,7 +91,7 @@ export function ReviewForm({ orderId, editorName }: ReviewFormProps) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Share your experience (optional)…"
-          className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-400"
+          className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 placeholder:text-gray-400"
           rows={3}
           maxLength={1000}
         />
@@ -99,7 +99,7 @@ export function ReviewForm({ orderId, editorName }: ReviewFormProps) {
         <button
           type="submit"
           disabled={submitting || rating === 0}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-50"
         >
           {submitting ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</>

@@ -127,7 +127,7 @@ Worth it once your channel generates ad revenue, or when professional quality is
 
 ## Platform Fees
 
-When you hire through EditBridge, the package price is what the editor earns (minus our 15% platform commission). A flat ₹99 processing fee is added at checkout — this covers escrow protection and KYC verification.
+When you hire through EditBridge, the package price is what the editor earns (minus our 20% platform commission). A 10% processing fee is added at checkout — this covers escrow protection and KYC verification.
 
 ## Is Cheaper Always Worse?
 
@@ -503,7 +503,7 @@ Once you approve, the editor's payout is scheduled for 7 days later. This window
 
 ### Step 6: Editor Receives Payment
 
-After the 7-day window, the editor receives their payout: the package price minus our 15% platform commission.
+After the 7-day window, the editor receives their payout: the package price minus our 20% platform commission.
 
 ## What Happens in a Dispute
 
@@ -516,7 +516,7 @@ If you open a dispute, our support team reviews the case within 3–5 business d
 
 Resolutions can include a full refund, partial refund, or release of funds to the editor.
 
-## Why the 15% Commission Exists
+## Why the 20% Commission Exists
 
 The commission funds:
 - KYC verification of every editor on the platform

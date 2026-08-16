@@ -18,6 +18,8 @@ export async function GET() {
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
 
+  const cutoffDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
   if (role === "client") {
     const [activeRow, notifRow] = await Promise.all([
       db
@@ -33,7 +35,13 @@ export async function GET() {
       db
         .select({ c: count() })
         .from(notifications)
-        .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)))
+        .where(
+          and(
+            eq(notifications.userId, userId),
+            eq(notifications.isRead, false),
+            gte(notifications.createdAt, cutoffDate)
+          )
+        )
         .then((r) => r[0]),
     ]);
     return NextResponse.json({
@@ -68,7 +76,13 @@ export async function GET() {
       db
         .select({ c: count() })
         .from(notifications)
-        .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)))
+        .where(
+          and(
+            eq(notifications.userId, userId),
+            eq(notifications.isRead, false),
+            gte(notifications.createdAt, cutoffDate)
+          )
+        )
         .then((r) => r[0]),
     ]);
     return NextResponse.json({
@@ -94,7 +108,13 @@ export async function GET() {
       db
         .select({ c: count() })
         .from(notifications)
-        .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)))
+        .where(
+          and(
+            eq(notifications.userId, userId),
+            eq(notifications.isRead, false),
+            gte(notifications.createdAt, cutoffDate)
+          )
+        )
         .then((r) => r[0]),
     ]);
     return NextResponse.json({

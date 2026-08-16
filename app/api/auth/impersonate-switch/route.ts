@@ -102,6 +102,18 @@ export async function POST(req: NextRequest) {
   const dest = DASHBOARD[user.role] ?? "/";
   const res = NextResponse.redirect(new URL(dest, req.url));
 
+  // Save current admin session token to allow switching back later
+  const currentSessionToken = req.cookies.get(cookieName)?.value;
+  if (currentSessionToken) {
+    res.cookies.set(`${isSecure ? "__Secure-" : ""}authjs.original-admin-token`, currentSessionToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: isSecure,
+      path: "/",
+      maxAge: 60 * 60, // 1 hour session
+    });
+  }
+
   res.cookies.set(cookieName, jwt, {
     httpOnly: true,
     sameSite: "lax",

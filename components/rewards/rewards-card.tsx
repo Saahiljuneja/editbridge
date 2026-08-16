@@ -30,13 +30,10 @@ const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; bo
   silver:   { label: "Silver",   color: "text-slate-600",  bg: "bg-slate-50",   border: "border-slate-200",  bar: "bg-slate-400"  },
   gold:     { label: "Gold",     color: "text-yellow-600", bg: "bg-yellow-50",  border: "border-yellow-200", bar: "bg-yellow-500" },
   platinum: { label: "Platinum", color: "text-indigo-700", bg: "bg-indigo-50",  border: "border-indigo-200", bar: "bg-indigo-500" },
-  diamond:  { label: "Diamond",  color: "text-cyan-700",   bg: "bg-cyan-50",    border: "border-cyan-200",   bar: "bg-cyan-500"   },
-  master:   { label: "Master",   color: "text-purple-700", bg: "bg-purple-50",  border: "border-purple-200", bar: "bg-purple-500" },
-  legend:   { label: "Legend",   color: "text-orange-700", bg: "bg-orange-50",  border: "border-orange-200", bar: "bg-orange-500" },
 };
 
-const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000, diamond: 10000, master: 25000, legend: 50000 };
-const LEVEL_MAX: Record<Level, number>   = { bronze: 500, silver: 2000, gold: 5000, platinum: 10000, diamond: 25000, master: 50000, legend: Infinity };
+const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000 };
+const LEVEL_MAX: Record<Level, number>   = { bronze: 500, silver: 2000, gold: 5000, platinum: Infinity };
 
 // Each milestone: { badge key, emoji, label, what triggers it, current count fn, target }
 type Milestone = {

@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { CreditCard, Shield, ExternalLink, Info } from "lucide-react";
+import { TopoBackground } from "@/components/common/topo-background";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
 
@@ -32,13 +33,21 @@ export default async function PaymentMethodsPage() {
     .limit(10);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <h1 className="text-xl font-bold text-gray-900">Payment Methods</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Manage how you pay on EditBridge</p>
-      </div>
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
 
-      <div className="px-6 py-6 space-y-5">
+      <div className="max-w-3xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
+          <div>
+            <h1 className="text-xl font-bold text-neutral-900">Payment Methods</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Manage how you pay on EditBridge</p>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+            <CreditCard className="w-5 h-5 text-[#1e40af]" />
+          </div>
+        </div>
+
+        <div className="space-y-5">
         {/* Info banner */}
         <div className="rounded-2xl bg-blue-50 border border-blue-100 p-5 flex gap-4">
           <Shield className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
@@ -84,7 +93,7 @@ export default async function PaymentMethodsPage() {
         <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-5 flex gap-3">
           <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-sm text-amber-800 leading-relaxed">
-            A <strong>4% platform fee</strong> is added to all orders to cover payment processing and platform costs.
+            A <strong>10% platform fee</strong> is added to all orders to cover payment processing and platform costs.
             This is shown transparently at checkout before you pay.
           </p>
         </div>
@@ -129,6 +138,7 @@ export default async function PaymentMethodsPage() {
             <li>Orders cancelled after the editor has started work are handled on a case-by-case basis via dispute.</li>
             <li>Refunds are processed to the original payment method within 5–7 business days.</li>
           </ul>
+        </div>
         </div>
       </div>
     </div>

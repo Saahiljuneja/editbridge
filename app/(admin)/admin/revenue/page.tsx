@@ -80,7 +80,7 @@ export default async function AdminRevenuePage() {
 
       <div className="grid sm:grid-cols-5 gap-5 mb-10">
         {[
-          { label: "Platform Revenue", value: formatCurrency(totalRevenue), sub: "Commission collected (15%)", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Platform Revenue", value: formatCurrency(totalRevenue), sub: "Commission collected (20%)", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
           { label: "Gross GMV", value: formatCurrency(totalGmv), sub: "Total completed order value", icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-50" },
           { label: "Editor Payouts", value: formatCurrency(totalPayouts), sub: "Total paid to editors", icon: Wallet, color: "text-purple-600", bg: "bg-purple-50" },
           { label: "TDS Collected", value: formatCurrency(totalTdsCollected), sub: "Sec. 194J - deposit with IT dept", icon: Landmark, color: "text-orange-600", bg: "bg-orange-50" },

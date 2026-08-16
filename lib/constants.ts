@@ -1,6 +1,6 @@
 import type { OrderStatus, UserRole } from "@/types";
 
-export const COMMISSION_RATE = 0.15;
+export const COMMISSION_RATE = 0.20;
 
 export const AUTO_APPROVE_DAYS = 7;
 

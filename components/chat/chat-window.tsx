@@ -22,8 +22,8 @@ interface ChatWindowProps {
   currentUserId: string;
   initialMessages: ChatMessage[];
   otherPartyName: string;
-  // Response-template "/" picker is editor-only — client chat input is unchanged.
   isEditor?: boolean;
+  containerClassName?: string;
 }
 
 export function ChatWindow({
@@ -32,6 +32,7 @@ export function ChatWindow({
   initialMessages,
   otherPartyName,
   isEditor = false,
+  containerClassName,
 }: ChatWindowProps) {
   const [msgs, setMsgs] = useState<ChatMessage[]>(initialMessages);
   const [content, setContent] = useState("");
@@ -199,7 +200,10 @@ export function ChatWindow({
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] rounded-[24px] border border-neutral-200/60 bg-white overflow-hidden relative shadow-none">
+    <div className={cn(
+      "flex flex-col rounded-[24px] border border-neutral-200/60 bg-white overflow-hidden relative shadow-none",
+      containerClassName ?? "h-[calc(100vh-12rem)]"
+    )}>
       {/* Header */}
       <div className="px-5 py-4 border-b border-neutral-200/60 flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-[10px] font-bold text-white uppercase select-none">

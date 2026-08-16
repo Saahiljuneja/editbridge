@@ -176,7 +176,7 @@ function WhoLikedModal({ itemId, onClose }: { itemId: string; onClose: () => voi
                 <Image src={u.userImage} alt={u.userName ?? ""} width={32} height={32}
                   className="rounded-full object-cover shrink-0" unoptimized />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center shrink-0">
                   <span className="text-white text-xs font-bold">{(u.userName ?? "?").slice(0, 1).toUpperCase()}</span>
                 </div>
               )}
@@ -707,7 +707,7 @@ function ReelCard({
               <Image src={item.editorUserImage} alt={item.editorDisplayName} width={36} height={36}
                 className="rounded-full border-2 border-white/80 object-cover shrink-0" unoptimized />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-sky-500 flex items-center justify-center border-2 border-white/80 shrink-0">
+              <div className="w-9 h-9 rounded-full bg-brand-primary flex items-center justify-center border-2 border-white/80 shrink-0">
                 <span className="text-white text-sm font-bold">{item.editorDisplayName.slice(0, 1).toUpperCase()}</span>
               </div>
             )}
@@ -755,7 +755,7 @@ function ReelCard({
 
         <div className="flex items-center gap-2 flex-wrap">
           {item.orderId && (
-            <span className="flex items-center gap-1 bg-sky-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
+            <span className="flex items-center gap-1 bg-brand-primary/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">
               <ShieldCheck className="w-2.5 h-2.5" /> Verified
             </span>
           )}
@@ -934,7 +934,7 @@ function CommentsDrawer({
                 <Image src={c.userImage} alt={c.userName ?? ""} width={isReply ? 22 : 28} height={isReply ? 22 : 28}
                   className="rounded-full object-cover shrink-0 mt-0.5" unoptimized />
               ) : (
-                <div className={cn("rounded-full bg-sky-600 flex items-center justify-center shrink-0 mt-0.5", isReply ? "w-[22px] h-[22px]" : "w-7 h-7")}>
+                <div className={cn("rounded-full bg-brand-primary flex items-center justify-center shrink-0 mt-0.5", isReply ? "w-[22px] h-[22px]" : "w-7 h-7")}>
                   <span className="text-white text-[10px] font-bold">{(c.userName ?? "?").slice(0, 1).toUpperCase()}</span>
                 </div>
               )}
@@ -946,7 +946,7 @@ function CommentsDrawer({
                   </div>
                   <div className="flex items-center gap-2">
                     {currentUserId && !isReply && (
-                      <button onClick={() => onReply(c)} className="text-white/30 hover:text-sky-400 transition-colors" title="Reply">
+                      <button onClick={() => onReply(c)} className="text-white/30 hover:text-blue-400 transition-colors" title="Reply">
                         <Reply className="w-3 h-3" />
                       </button>
                     )}
@@ -979,7 +979,7 @@ function CommentsDrawer({
 
       {replyingTo && (
         <div className="flex items-center justify-between px-4 py-1.5 bg-white/5 border-t border-white/10">
-          <span className="text-white/50 text-xs">Replying to <span className="text-sky-400">@{replyingTo.userName}</span></span>
+          <span className="text-white/50 text-xs">Replying to <span className="text-blue-400">@{replyingTo.userName}</span></span>
           <button onClick={onCancelReply} className="text-white/30 hover:text-white transition-colors">
             <X className="w-3.5 h-3.5" />
           </button>
@@ -1008,7 +1008,7 @@ function CommentsDrawer({
         <button
           onClick={onPost}
           disabled={!commentText.trim() || posting || !currentUserId}
-          className="shrink-0 text-sky-400 disabled:opacity-30 transition-opacity"
+          className="shrink-0 text-blue-400 disabled:opacity-30 transition-opacity"
         >
           {posting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
         </button>
@@ -1230,16 +1230,16 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
               : `No items in "${activeCategory}" yet.`}
         </p>
         {feedTab === "following" && (
-          <button onClick={() => setFeedTab("foryou")} className="text-sky-400 text-sm hover:underline">
+          <button onClick={() => setFeedTab("foryou")} className="text-blue-400 text-sm hover:underline">
             Browse all →
           </button>
         )}
         {feedTab !== "following" && activeCategory !== "All" && (
-          <button onClick={() => setActiveCategory("All")} className="text-sky-400 text-sm hover:underline">
+          <button onClick={() => setActiveCategory("All")} className="text-blue-400 text-sm hover:underline">
             Show all →
           </button>
         )}
-        <Link href="/browse" className="text-sky-400 text-sm hover:underline">Browse editors →</Link>
+        <Link href="/browse" className="text-blue-400 text-sm hover:underline">Browse editors →</Link>
       </div>
     );
   }
@@ -1310,7 +1310,7 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
         {!currentUserId && (
           <div className="mt-auto pt-4">
             <Link href="/login"
-              className="block text-center text-xs bg-sky-500 text-white px-3 py-2 rounded-xl font-semibold hover:bg-[var(--brand-client-hover)] transition-colors">
+              className="block text-center text-xs bg-brand-primary text-white px-3 py-2 rounded-xl font-semibold hover:bg-[var(--brand-client-hover)] transition-colors">
               Sign in
             </Link>
           </div>
@@ -1346,7 +1346,7 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
                 </button>
               </div>
               {!currentUserId && (
-                <Link href="/login" className="text-xs bg-sky-500 text-white px-3 py-1.5 rounded-full font-semibold hover:bg-[var(--brand-client-hover)] transition-colors">
+                <Link href="/login" className="text-xs bg-brand-primary text-white px-3 py-1.5 rounded-full font-semibold hover:bg-[var(--brand-client-hover)] transition-colors">
                   Sign in
                 </Link>
               )}
@@ -1376,7 +1376,7 @@ export function FeedClient({ currentUserId, currentUserName: _currentUserName, c
           <div className="absolute top-24 md:top-4 inset-x-0 z-30 flex justify-center pointer-events-none">
             <button
               onClick={handleShowNewItems}
-              className="pointer-events-auto flex items-center gap-2 bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl hover:bg-[var(--brand-client-hover)] transition-colors animate-bounce"
+              className="pointer-events-auto flex items-center gap-2 bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl hover:bg-[var(--brand-client-hover)] transition-colors animate-bounce"
             >
               <RefreshCw className="w-3.5 h-3.5" /> New items available
             </button>

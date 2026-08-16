@@ -9,16 +9,16 @@ import { notFound } from "next/navigation";
 
 // ── Category metadata ─────────────────────────────────────────────────────────
 const CATEGORY_META: Record<string, { pill: string; accent: string; heroBg: string; description: string }> = {
-  "Hiring guide":     { pill: "bg-purple-100 text-purple-700",  accent: "#7c3aed", heroBg: "from-purple-950", description: "How to find, vet, and hire the perfect video editor for your channel."   },
-  "Pricing":          { pill: "bg-blue-100 text-blue-700",      accent: "#1d4ed8", heroBg: "from-blue-950",   description: "Understand video editing rates, packages, and what you should pay."        },
-  "YouTube":          { pill: "bg-red-100 text-red-700",        accent: "#dc2626", heroBg: "from-red-950",    description: "Grow your YouTube channel with better editing, thumbnails, and strategy."  },
-  "Reels & Shorts":   { pill: "bg-pink-100 text-pink-700",      accent: "#db2777", heroBg: "from-pink-950",   description: "Short-form video editing tips for Instagram Reels and YouTube Shorts."   },
-  "Client guide":     { pill: "bg-green-100 text-green-700",    accent: "#16a34a", heroBg: "from-green-950",  description: "Guides for clients on working effectively with video editors."             },
-  "Thumbnails":       { pill: "bg-amber-100 text-amber-700",    accent: "#d97706", heroBg: "from-amber-950",  description: "Design thumbnails that get clicks — tips, tools, and best practices."    },
-  "Podcast":          { pill: "bg-indigo-100 text-indigo-700",  accent: "#4338ca", heroBg: "from-indigo-950", description: "Editing and production tips for podcast creators."                        },
-  "Creator workflow": { pill: "bg-teal-100 text-teal-700",      accent: "#0d9488", heroBg: "from-teal-950",   description: "Streamline your content creation workflow from script to upload."        },
-  "Platform news":    { pill: "bg-violet-100 text-violet-700",  accent: "#7c3aed", heroBg: "from-violet-950", description: "Latest news and updates from YouTube, Instagram, and other platforms."   },
-  "General":          { pill: "bg-gray-100 text-gray-600",      accent: "#6b7280", heroBg: "from-gray-900",   description: "General guides and resources for content creators."                      },
+  "Hiring guide":     { pill: "bg-purple-100 text-purple-700",  accent: "#7c3aed", heroBg: "from-purple-50",  description: "How to find, vet, and hire the perfect video editor for your channel."   },
+  "Pricing":          { pill: "bg-blue-100 text-blue-700",      accent: "#1d4ed8", heroBg: "from-blue-50",    description: "Understand video editing rates, packages, and what you should pay."        },
+  "YouTube":          { pill: "bg-red-100 text-red-700",        accent: "#dc2626", heroBg: "from-red-50",     description: "Grow your YouTube channel with better editing, thumbnails, and strategy."  },
+  "Reels & Shorts":   { pill: "bg-pink-100 text-pink-700",      accent: "#db2777", heroBg: "from-pink-50",    description: "Short-form video editing tips for Instagram Reels and YouTube Shorts."   },
+  "Client guide":     { pill: "bg-green-100 text-green-700",    accent: "#16a34a", heroBg: "from-green-50",   description: "Guides for clients on working effectively with video editors."             },
+  "Thumbnails":       { pill: "bg-amber-100 text-amber-700",    accent: "#d97706", heroBg: "from-amber-50",   description: "Design thumbnails that get clicks — tips, tools, and best practices."    },
+  "Podcast":          { pill: "bg-indigo-100 text-indigo-700",  accent: "#4338ca", heroBg: "from-indigo-50",  description: "Editing and production tips for podcast creators."                        },
+  "Creator workflow": { pill: "bg-teal-100 text-teal-700",      accent: "#0d9488", heroBg: "from-teal-50",    description: "Streamline your content creation workflow from script to upload."        },
+  "Platform news":    { pill: "bg-violet-100 text-violet-700",  accent: "#7c3aed", heroBg: "from-violet-50",  description: "Latest news and updates from YouTube, Instagram, and other platforms."   },
+  "General":          { pill: "bg-gray-100 text-gray-600",      accent: "#6b7280", heroBg: "from-slate-50",   description: "General guides and resources for content creators."                      },
 };
 
 function getCatMeta(cat: string) {
@@ -107,13 +107,13 @@ export default async function CategoryPage({
   if (posts.length === 0) notFound();
 
   return (
-    <div className="min-h-screen bg-[#07050f]">
+    <div className="min-h-screen bg-slate-50/50">
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className={`bg-gradient-to-b ${meta.heroBg} via-[#07050f] to-[#07050f] pt-20 pb-14 px-4 sm:px-8`}>
+      <section className={`bg-gradient-to-b ${meta.heroBg} via-slate-50/50 to-slate-50/50 pt-20 pb-14 px-4 sm:px-8 border-b border-neutral-200/50`}>
         <div className="max-w-5xl mx-auto">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors mb-8"
+            className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 transition-colors mb-8"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Blog
           </Link>
@@ -128,21 +128,18 @@ export default async function CategoryPage({
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-black text-neutral-900 mb-4 leading-tight tracking-tight">
             {category}
           </h1>
-          <p className="text-white/50 text-base max-w-xl leading-relaxed mb-4">
+          <p className="text-neutral-500 text-base max-w-xl leading-relaxed mb-4">
             {meta.description}
           </p>
-          <p className="text-xs text-white/30">{posts.length} article{posts.length !== 1 ? "s" : ""}</p>
+          <p className="text-xs text-neutral-450">{posts.length} article{posts.length !== 1 ? "s" : ""}</p>
         </div>
       </section>
 
-      {/* ── Gradient bridge ───────────────────────────────────────────────── */}
-      <div className="h-16 bg-gradient-to-b from-[#07050f] to-[#f8f7ff]" />
-
       {/* ── Posts ─────────────────────────────────────────────────────────── */}
-      <div className="bg-[#f8f7ff] min-h-[60vh]">
+      <div className="bg-slate-50/50 min-h-[60vh]">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10">
           <div className="space-y-3">
             {posts.map((post) => {

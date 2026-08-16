@@ -93,15 +93,22 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           </div>
 
           {/* Invoice meta */}
-          <div className="grid grid-cols-3 gap-4 bg-gray-50 rounded-xl p-4">
+          <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-xl p-4">
             {[
-              { label: "Invoice Date",  value: formatDate(order.createdAt) },
-              { label: "Order Status",  value: order.status.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()) },
-              { label: "Payment Ref",   value: order.razorpayPaymentId ? order.razorpayPaymentId.slice(0, 12) + "…" : "—" },
+              { label: "Invoice Date",    value: formatDate(order.createdAt) },
+              { label: "Payment Status",  value: order.razorpayPaymentId ? "Paid" : "Processing" },
+              { label: "Payment Ref",     value: order.razorpayPaymentId ? order.razorpayPaymentId.slice(0, 14) + "…" : "—" },
+              { label: "Order Status",    value: order.status.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()) },
             ].map(({ label, value }) => (
               <div key={label}>
                 <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">{label}</p>
-                <p className="text-sm font-semibold text-gray-800 mt-0.5">{value}</p>
+                {label === "Payment Status" ? (
+                  <span className={`inline-block mt-0.5 text-xs font-semibold px-2 py-0.5 rounded-full ${order.razorpayPaymentId ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                    {value}
+                  </span>
+                ) : (
+                  <p className="text-sm font-semibold text-gray-800 mt-0.5">{value}</p>
+                )}
               </div>
             ))}
           </div>
@@ -129,7 +136,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </tr>
                 {processingFee > 0 && (
                   <tr className="border-b border-gray-50">
-                    <td className="py-3 text-gray-500 text-xs">Processing fee</td>
+                    <td className="py-3 text-gray-500 text-xs">Payment gateway fee (Razorpay)</td>
                     <td className="py-3 text-right text-gray-500 text-xs">{formatCurrency(processingFee)}</td>
                   </tr>
                 )}

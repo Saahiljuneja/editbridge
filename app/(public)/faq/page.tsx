@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,7 +33,7 @@ const SECTIONS = [
     title: "Payments & fees",
     faqs: [
       { q: "Is my payment secure?", a: "Yes. Payments are processed by Razorpay and held securely until you approve the delivery. Your money is never transferred to the editor until you explicitly approve the work." },
-      { q: "What does EditBridge charge?", a: "Clients pay a 4% processing fee on the package price at checkout. Editors pay a 15% platform commission on each completed delivery. There are no hidden charges." },
+      { q: "What does EditBridge charge?", a: "Clients pay a 10% processing fee on the package price at checkout. Editors pay a 20% platform commission on each completed delivery. There are no hidden charges." },
       { q: "When does the editor get paid?", a: "The editor's payout is released 7 days after you approve the delivery. This window gives you time to flag any final issues before funds are transferred." },
       { q: "What payment methods are accepted?", a: "We accept all major credit and debit cards, UPI, net banking, and wallets via Razorpay." },
     ],
@@ -67,7 +67,7 @@ const SECTIONS = [
     title: "For editors",
     faqs: [
       { q: "How do I become an editor on EditBridge?", a: "Sign up as an editor, complete your profile, and submit your KYC documents. Once verified, your profile goes live and clients can place orders with you." },
-      { q: "What commission does EditBridge take?", a: "EditBridge takes a 15% commission on each order. The remaining 85% of the package price is credited to your payout, released 7 days after client approval." },
+      { q: "What commission does EditBridge take?", a: "EditBridge takes a 20% commission on each order. The remaining 80% of the package price is credited to your payout, released 7 days after client approval." },
       { q: "How do I receive my payouts?", a: "Payouts are processed 7 days after client approval via Razorpay. Ensure your bank account details are up to date in your payout settings." },
     ],
   },
@@ -143,37 +143,37 @@ export default function FAQPage() {
     <div className="flex flex-col min-h-screen bg-white">
 
       {/* ══ HERO ══ */}
-      <section className="relative bg-[#06040f] pt-24 pb-20 px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-[130px] opacity-15 pointer-events-none" style={{ background: "#7c6ff7" }} />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none" style={{ background: "#34d399" }} />
+      <section className="relative bg-slate-50/50 border-b border-neutral-200/50 pt-24 pb-20 px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: "radial-gradient(rgba(0,0,0,0.8) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
+        <div className="absolute top-0 left-1/3 w-96 h-96 rounded-full blur-[130px] opacity-[0.08] pointer-events-none" style={{ background: "#7c6ff7" }} />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full blur-[100px] opacity-[0.05] pointer-events-none" style={{ background: "#34d399" }} />
 
         <div className="relative z-10 px-8 py-6 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-            <div className="w-14 h-14 rounded-2xl bg-[#7c6ff7]/15 border border-[#7c6ff7]/25 flex items-center justify-center mx-auto mb-7">
+            <div className="w-14 h-14 rounded-2xl bg-[#7c6ff7]/10 border border-[#7c6ff7]/20 flex items-center justify-center mx-auto mb-7">
               <HelpCircle className="w-7 h-7 text-[#7c6ff7]" />
             </div>
-            <div className="inline-flex items-center gap-2 border border-[#7c6ff7]/30 bg-[#7c6ff7]/10 text-[#7c6ff7] text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-7">
+            <div className="inline-flex items-center gap-2 border border-violet-200 bg-violet-50 text-violet-750 text-[11px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-7">
               Help centre
             </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight leading-[0.93] mb-5">
+            <h1 className="text-5xl sm:text-6xl font-black text-neutral-900 tracking-tight leading-[0.93] mb-5">
               How can we<br />
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg,#7c6ff7,#34d399)" }}>
                 help you?
               </span>
             </h1>
-            <p className="text-white/35 text-lg mb-10 px-8 py-6 leading-relaxed">
+            <p className="text-neutral-500 text-lg mb-10 px-8 py-6 leading-relaxed">
               {SECTIONS.reduce((t, s) => t + s.faqs.length, 0)} answers to the most common questions about EditBridge.
             </p>
 
             {/* Search */}
-            <div className="relative px-8 py-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/25 pointer-events-none" />
+            <div className="relative px-8 py-6 max-w-xl mx-auto">
+              <Search className="absolute left-12 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-450 pointer-events-none" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search questions…"
-                className="w-full bg-white/[0.06] border border-white/10 text-white placeholder-white/25 rounded-2xl pl-12 pr-12 py-4 text-sm font-medium outline-none focus:border-[#7c6ff7]/50 focus:bg-white/[0.08] transition-all" />
+                className="w-full bg-white border border-neutral-200 text-neutral-800 placeholder-neutral-400 rounded-2xl pl-12 pr-12 py-4 text-sm font-medium outline-none focus:border-[#7c6ff7]/55 transition-all shadow-sm" />
               {search && (
-                <button onClick={() => setSearch("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                <button onClick={() => setSearch("")} className="absolute right-12 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               )}

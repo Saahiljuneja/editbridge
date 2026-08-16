@@ -8,13 +8,10 @@ export const LEVELS = [
   { name: "bronze",   min: 0,      max: 499   },
   { name: "silver",   min: 500,    max: 1999  },
   { name: "gold",     min: 2000,   max: 4999  },
-  { name: "platinum", min: 5000,   max: 9999  },
-  { name: "diamond",  min: 10000,  max: 24999 },
-  { name: "master",   min: 25000,  max: 49999 },
-  { name: "legend",   min: 50000,  max: Infinity },
+  { name: "platinum", min: 5000,   max: Infinity },
 ] as const;
 
-export type Level = "bronze" | "silver" | "gold" | "platinum" | "diamond" | "master" | "legend";
+export type Level = "bronze" | "silver" | "gold" | "platinum";
 
 export function calcLevel(totalXp: number): Level {
   for (const l of [...LEVELS].reverse()) {
@@ -82,7 +79,7 @@ async function awardBadge(userId: string, badge: string) {
   });
 }
 
-const LEVEL_RANK: Record<Level, number> = { bronze: 0, silver: 1, gold: 2, platinum: 3, diamond: 4, master: 5, legend: 6 };
+const LEVEL_RANK: Record<Level, number> = { bronze: 0, silver: 1, gold: 2, platinum: 3 };
 
 async function addPoints(userId: string, amount: number, reason: string, metadata: Record<string, unknown> = {}) {
   const pts = await getOrCreatePoints(userId);
@@ -109,10 +106,7 @@ async function addPoints(userId: string, amount: number, reason: string, metadat
         bronze:   "",
         silver:   "You can now offer 4 packages. Clients also get a discount on orders with you.",
         gold:     "You're featured in browse results! Clients get a bigger discount.",
-        platinum: "You've unlocked priority support and a custom profile banner.",
-        diamond:  "You've reached Diamond rank — 15% client discount and diamond placement in search.",
-        master:   "Master rank achieved — top-10 placement and 20% client discount. You're elite.",
-        legend:   "🔥 Legend status. You're in the top tier — top-3 spotlight, 25% discount, and a dedicated account manager.",
+        platinum: "You've unlocked priority support, custom profile banner, and 10% client discount.",
       };
       await db.insert(notifications).values({
         userId,
@@ -774,7 +768,7 @@ export async function getUserProgress(userId: string, role: "editor" | "client",
   return result;
 }
 
-const LEVEL_ORDER_ALL: Level[] = ["bronze", "silver", "gold", "platinum", "diamond", "master", "legend"];
+const LEVEL_ORDER_ALL: Level[] = ["bronze", "silver", "gold", "platinum"];
 
 /** Perks unlocked by level */
 export function getLevelPerks(level: Level) {
@@ -782,9 +776,9 @@ export function getLevelPerks(level: Level) {
   return {
     maxPackages: idx < 1 ? 3 : idx < 2 ? 4 : 5,
     featuredInBrowse: idx >= 2,
-    clientDiscountPercent: ([0, 2, 5, 10, 15, 20, 25] as const)[idx] ?? 0,
+    clientDiscountPercent: ([0, 2, 5, 10] as const)[idx] ?? 0,
     prioritySupport: idx >= 3,
     customBanner: idx >= 3,
-    accountManager: idx >= 6,
+    accountManager: idx >= 3,
   };
 }

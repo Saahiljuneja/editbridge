@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { editors, users, packages, skills, tools, portfolioItems, reviews, savedEditors, profileEvents } from "@/lib/db/schema";
+import { editors, users, packages, skills, tools, portfolioItems, reviews, savedEditors, profileEvents, userPoints, orders } from "@/lib/db/schema";
 
 
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, sql, inArray } from "drizzle-orm";
 import { displayNameFromFull } from "@/lib/utils";
 import { auth } from "@/lib/auth";
 import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
@@ -15,7 +15,12 @@ export const dynamic = "force-dynamic";
 
 async function getEditorProfileData(id: string) {
   // Allow editor to preview their own profile regardless of KYC status
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch (err) {
+    console.warn("[profile] Auth session query failed in getEditorProfileData, proceeding anonymously:", err);
+  }
   const isOwnProfile = session?.user?.role === "editor" && session.user.editorId === id;
 
   const editorRows = await db
@@ -34,6 +39,7 @@ async function getEditorProfileData(id: string) {
       isFeatured: editors.isFeatured,
       coverImage: editors.coverImage,
       featuredVideoUrl: editors.featuredVideoUrl,
+      featuredVideoUrls: editors.featuredVideoUrls,
       languages: editors.languages,
       workStyleTags: editors.workStyleTags,
       previousClients: editors.previousClients,
@@ -45,10 +51,12 @@ async function getEditorProfileData(id: string) {
       createdAt: editors.createdAt,
       kycApprovedAt: editors.kycApprovedAt,
       activeFrame: editors.activeFrame,
+      membershipTier: editors.membershipTier,
+      level: userPoints.level,
     })
     .from(editors)
-
     .innerJoin(users, eq(editors.userId, users.id))
+    .leftJoin(userPoints, eq(editors.userId, userPoints.userId))
     .where(
       isOwnProfile
         ? eq(editors.id, id)
@@ -90,7 +98,7 @@ async function getEditorProfileData(id: string) {
     isBookmarked = !!saved;
   }
 
-  const [packageRows, skillRows, toolRows, portfolioRows, reviewRows] = await Promise.all([
+  const [packageRows, skillRows, toolRows, portfolioRows, reviewRows, activeOrdersRow] = await Promise.all([
     db
       .select()
       .from(packages)
@@ -114,6 +122,15 @@ async function getEditorProfileData(id: string) {
       .innerJoin(users, eq(reviews.reviewerId, users.id))
       .where(and(eq(reviews.revieweeId, editor.userId), eq(reviews.role, "client")))
       .orderBy(reviews.createdAt),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(orders)
+      .where(
+        and(
+          eq(orders.editorId, id),
+          inArray(orders.status, ["pending", "in_progress", "delivered", "revision_requested", "disputed"])
+        )
+      ),
   ]);
 
   const avgRating =
@@ -157,6 +174,8 @@ async function getEditorProfileData(id: string) {
     reviewerImage: r.reviewerImage,
   }));
 
+  const activeOrdersCount = activeOrdersRow[0]?.count ?? 0;
+
   return {
     ...editor,
     createdAt: editor.createdAt.toISOString(),
@@ -172,6 +191,8 @@ async function getEditorProfileData(id: string) {
     viewCount,
     isBookmarked,
     ratingDistribution,
+    level: editor.level || "bronze",
+    activeOrdersCount,
   };
 }
 
@@ -181,27 +202,35 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const editor = await getEditorProfileData(id);
-  if (!editor) {
+  try {
+    const editor = await getEditorProfileData(id);
+    if (!editor) {
+      return {
+        title: "Editor Profile Not Found — EditBridge",
+        description: "The requested editor profile could not be found.",
+      };
+    }
+
+    const name = editor.displayName || displayNameFromFull(editor.name);
+    const title = editor.title || "Video Editor";
+    const bio = editor.bio ? editor.bio.slice(0, 160) : `Check out ${name}'s portfolio and video editing services on EditBridge.`;
+
     return {
-      title: "Editor Profile Not Found — EditBridge",
-      description: "The requested editor profile could not be found.",
-    };
-  }
-
-  const name = editor.displayName || displayNameFromFull(editor.name);
-  const title = editor.title || "Video Editor";
-  const bio = editor.bio ? editor.bio.slice(0, 160) : `Check out ${name}'s portfolio and video editing services on EditBridge.`;
-
-  return {
-    title: `${name} — ${title} | EditBridge`,
-    description: bio,
-    openGraph: {
       title: `${name} — ${title} | EditBridge`,
       description: bio,
-      images: editor.image ? [{ url: editor.image }] : [],
-    },
-  };
+      openGraph: {
+        title: `${name} — ${title} | EditBridge`,
+        description: bio,
+        images: editor.image ? [{ url: editor.image }] : [],
+      },
+    };
+  } catch (err) {
+    console.warn("[profile] generateMetadata failed due to connection/database offline:", err);
+    return {
+      title: "Video Editor Profile — EditBridge",
+      description: "Browse video editors portfolio and packages on EditBridge.",
+    };
+  }
 }
 
 export default async function EditorPublicProfilePage({
@@ -210,7 +239,33 @@ export default async function EditorPublicProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const editor = await getEditorProfileData(id);
+  let editor = null;
+  let isDbOffline = false;
+  try {
+    editor = await getEditorProfileData(id);
+  } catch (err) {
+    console.error("[profile] Failed fetching editor profile data:", err);
+    isDbOffline = true;
+  }
+
+  if (isDbOffline) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <div className="max-w-md bg-white border border-neutral-200/80 p-8 rounded-2xl shadow-sm">
+          <h2 className="text-lg font-black text-neutral-900 uppercase tracking-wider mb-2">Temporary Connection Issue</h2>
+          <p className="text-xs text-neutral-500 font-semibold leading-relaxed mb-6">
+            We are having trouble connecting to the database. This profile is temporarily unavailable. Please try reloading the page in a few moments.
+          </p>
+          <a 
+            href="" 
+            className="inline-flex items-center justify-center px-6 py-2.5 bg-black hover:bg-neutral-900 text-white text-xs font-black rounded-xl transition-all shadow-sm active:scale-[0.98]"
+          >
+            Try Reloading
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (!editor) notFound();
 
@@ -235,7 +290,12 @@ export default async function EditorPublicProfilePage({
     }
   };
 
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch (err) {
+    console.warn("[profile] Auth session query failed in EditorPublicProfilePage:", err);
+  }
 
   return (
     <>
@@ -246,5 +306,4 @@ export default async function EditorPublicProfilePage({
       <EditorProfileClient editor={editor as any} isLoggedIn={!!session} />
     </>
   );
-
 }

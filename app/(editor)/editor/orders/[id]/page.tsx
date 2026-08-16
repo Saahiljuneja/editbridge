@@ -53,7 +53,7 @@ type BriefData = {
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; icon: React.ElementType }> = {
   pending:            { label: "Pending",     badge: "bg-amber-50 text-amber-700 border border-amber-200",     icon: Clock },
-  in_progress:        { label: "In Progress", badge: "bg-sky-50 text-sky-700 border border-sky-200",           icon: Loader },
+  in_progress:        { label: "In Progress", badge: "bg-blue-50 text-blue-900 border border-blue-200",           icon: Loader },
   revision_requested: { label: "Revision",    badge: "bg-orange-50 text-orange-700 border border-orange-200",  icon: RotateCcw },
   delivered:          { label: "Delivered",   badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",icon: CheckCircle2 },
   completed:          { label: "Completed",   badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",icon: CheckCircle2 },
@@ -175,7 +175,7 @@ export default async function EditorOrderDetailPage({
       <div className="max-w-4xl mx-auto px-6 py-6">
         {/* Client card */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center text-base font-bold text-[#0EA5E9] uppercase select-none shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-[#1e40af]/10 flex items-center justify-center text-base font-bold text-[#1e40af] uppercase select-none shrink-0">
             {clientInitials || "?"}
           </div>
           <div className="flex-1 min-w-0">
@@ -197,8 +197,8 @@ export default async function EditorOrderDetailPage({
             {/* Client brief */}
             <section className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4 text-[#0EA5E9]" />
+                <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-[#1e40af]" />
                 </div>
                 <h2 className="font-semibold text-gray-900">Client brief</h2>
               </div>
@@ -218,7 +218,7 @@ export default async function EditorOrderDetailPage({
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                           {briefData.mood.map((m: string) => (
-                            <span key={m} className="text-xs font-medium px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                            <span key={m} className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-100">
                               {m}
                             </span>
                           ))}
@@ -269,7 +269,7 @@ export default async function EditorOrderDetailPage({
                               href={url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-sm text-[#0EA5E9] hover:underline truncate"
+                              className="flex items-center gap-2 text-sm text-[#1e40af] hover:underline truncate"
                             >
                               <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                               <span className="truncate">{url}</span>
@@ -389,7 +389,7 @@ export default async function EditorOrderDetailPage({
 
           {/* Sidebar */}
           <div className="sticky top-6 space-y-4">
-            <div className="bg-white rounded-2xl border border-gray-100 border-t-2 border-t-[#0EA5E9] shadow-sm p-5 space-y-4">
+            <div className="bg-white rounded-2xl border border-gray-100 border-t-2 border-t-[#1e40af] shadow-sm p-5 space-y-4">
               {/* Package */}
               <div>
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Package</p>
@@ -428,11 +428,11 @@ export default async function EditorOrderDetailPage({
                   <span className="tabular-nums">−{formatCurrency(order.commissionAmount)}</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-gray-100 pt-2">
-                  <div className="flex items-center gap-1.5 text-sm font-bold text-[#0EA5E9]">
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-[#1e40af]">
                     <Banknote className="w-4 h-4" />
                     Your payout
                   </div>
-                  <span className="text-base font-bold text-[#0EA5E9] tabular-nums">
+                  <span className="text-base font-bold text-[#1e40af] tabular-nums">
                     {formatCurrency(payout)}
                   </span>
                 </div>
@@ -447,7 +447,7 @@ export default async function EditorOrderDetailPage({
                     href={`/api/orders/${order.id}/invoice`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-sky-700 border border-sky-200 bg-sky-50 hover:bg-sky-100 transition-colors"
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-blue-900 border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors"
                   >
                     <FileText className="w-4 h-4" /> Download Invoice
                   </a>

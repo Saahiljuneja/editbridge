@@ -9,6 +9,7 @@ import { OrderStatusBadge } from "@/components/orders/order-status-badge";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
+import { Search, X, Download, FileQuestion } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -101,144 +102,192 @@ export default async function AdminOrdersPage({
   ];
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-8 py-8 relative min-h-screen">
+      
+      {/* Background ambient glowing gradient */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+      {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="a-h1">Orders</h1>
-          <p className="a-muted mt-0.5">{totalCount} order{totalCount !== 1 ? "s" : ""}</p>
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-primary mb-1">Operations Desk</p>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none">Orders</h1>
+          <p className="text-xs text-gray-400 mt-1.5 font-medium">{totalCount} total order{totalCount !== 1 ? "s" : ""}</p>
         </div>
         {session.user.role === "admin" && (
-          <a href="/api/admin/export/orders"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            Export CSV
+          <a
+            href="/api/admin/export/orders"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" /> Export CSV
           </a>
         )}
       </div>
 
-      <form method="GET" className="mb-5 space-y-3">
-        {status && <input type="hidden" name="status" value={status} />}
-        <div className="flex gap-2">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Search by client, editor, or package title..."
-            className="flex-1 a-input rounded-xl px-3 py-2"
-          />
-          <button type="submit" className="px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white text-sm font-medium hover:bg-[var(--brand-client-hover)] transition-colors">
-            Search
-          </button>
-          {(q || hasAdvancedFilter) && (
-            <Link href={`/admin/orders${status ? `?status=${status}` : ""}`}
-              className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-              Clear
-            </Link>
-          )}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-          <input name="orderId" defaultValue={orderId} placeholder="Order ID (partial)" className="a-input rounded-lg px-3 py-1.5 text-xs" />
-          <input name="paymentId" defaultValue={paymentId} placeholder="Payment ID (Razorpay)" className="a-input rounded-lg px-3 py-1.5 text-xs" />
-          <input name="from" type="date" defaultValue={from} className="a-input rounded-lg px-3 py-1.5 text-xs" />
-          <input name="to" type="date" defaultValue={to} className="a-input rounded-lg px-3 py-1.5 text-xs" />
-          <input name="minAmount" type="number" defaultValue={minAmount} placeholder="Min ₹" min="0" className="a-input rounded-lg px-3 py-1.5 text-xs" />
-          <input name="maxAmount" type="number" defaultValue={maxAmount} placeholder="Max ₹" min="0" className="a-input rounded-lg px-3 py-1.5 text-xs" />
-        </div>
-      </form>
-
-      <div className="flex gap-1.5 mb-5 flex-wrap">
-        {tabs.map((tab) => (
-          <Link key={tab.value}
-            href={tab.value ? `/admin/orders?status=${tab.value}${q ? `&q=${q}` : ""}` : `/admin/orders${q ? `?q=${q}` : ""}`}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-              (status ?? "") === tab.value
-                ? "bg-[var(--brand-client)] text-white"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-            )}>
-            {tab.label}
-          </Link>
-        ))}
-      </div>
-
-      <div className="a-card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-              <th className="text-left px-5 py-3 font-medium text-gray-500 dark:text-gray-400">Package</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Client</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Editor</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Amount</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Date</th>
-              <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition-colors">
-                <td className="px-5 py-3.5 font-medium text-gray-900 dark:text-white truncate max-w-[160px]">
-                  {row.packageTitle ?? "Custom order"}
-                </td>
-                <td className="px-4 py-3.5">
-                  <p className="text-gray-700 dark:text-gray-200">{row.clientName ?? "-"}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">{row.clientEmail}</p>
-                </td>
-                <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300">{row.editorName ?? "-"}</td>
-                <td className="px-4 py-3.5 text-right tabular-nums font-medium text-gray-900 dark:text-white">{formatCurrency(row.totalAmount)}</td>
-                <td className="px-4 py-3.5 text-center">
-                  <OrderStatusBadge status={row.status as Parameters<typeof OrderStatusBadge>[0]["status"]} />
-                </td>
-                <td className="px-4 py-3.5 text-gray-400 dark:text-gray-500 text-xs">
-                  <p>{formatDate(row.createdAt)}</p>
-                  {row.razorpayPaymentId && (
-                    <p className="font-mono text-[10px] text-gray-300 dark:text-gray-600 truncate max-w-[100px]" title={row.razorpayPaymentId}>
-                      {row.razorpayPaymentId}
-                    </p>
-                  )}
-                </td>
-                <td className="px-4 py-3.5 text-right">
-                  <Link href={`/admin/orders/${row.id}`} className="a-link">View</Link>
-                </td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={7} className="a-empty">No orders found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (() => {
-        const base = {
-          ...(status ? { status } : {}), ...(q ? { q } : {}),
-          ...(orderId ? { orderId } : {}), ...(paymentId ? { paymentId } : {}),
-          ...(from ? { from } : {}), ...(to ? { to } : {}),
-          ...(minAmount ? { minAmount } : {}), ...(maxAmount ? { maxAmount } : {}),
-        };
-        return (
-          <div className="flex items-center justify-between mt-4 text-sm">
-            <p className="text-gray-400 dark:text-gray-500">
-              Page {page} of {totalPages} &middot; showing {offset + 1}–{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
-            </p>
+      {/* Search and Advanced Filters Card */}
+      <div className="bg-white rounded-3xl border border-gray-150 p-5 shadow-xl shadow-gray-100/20 mb-6 space-y-4">
+        
+        {/* Search row */}
+        <form method="GET" className="space-y-3">
+          {status && <input type="hidden" name="status" value={status} />}
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                name="q"
+                defaultValue={q}
+                placeholder="Search by client, editor, or package title…"
+                className="w-full rounded-2xl border border-gray-200 pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all"
+              />
+            </div>
+            
             <div className="flex gap-2">
-              {page > 1 && (
-                <Link href={`/admin/orders?${new URLSearchParams({ ...base, page: String(page - 1) }).toString()}`}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  &larr; Prev
-                </Link>
-              )}
-              {page < totalPages && (
-                <Link href={`/admin/orders?${new URLSearchParams({ ...base, page: String(page + 1) }).toString()}`}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  Next &rarr;
+              <button type="submit" className="px-5 py-2.5 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary-hover transition-all shadow-md shadow-blue-800/15 cursor-pointer">
+                Search
+              </button>
+              {(q || hasAdvancedFilter) && (
+                <Link
+                  href={`/admin/orders${status ? `?status=${status}` : ""}`}
+                  className="px-4 py-2.5 rounded-2xl border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <X className="w-3.5 h-3.5" /> Clear
                 </Link>
               )}
             </div>
           </div>
-        );
-      })()}
+
+          {/* Advanced filters inputs row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-2 border-t border-gray-100">
+            <input name="orderId" defaultValue={orderId} placeholder="Order ID (partial)" className="rounded-xl border border-gray-250 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all" />
+            <input name="paymentId" defaultValue={paymentId} placeholder="Payment ID (Razorpay)" className="rounded-xl border border-gray-250 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all" />
+            <input name="from" type="date" defaultValue={from} className="rounded-xl border border-gray-250 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all text-gray-500 font-bold" />
+            <input name="to" type="date" defaultValue={to} className="rounded-xl border border-gray-250 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all text-gray-500 font-bold" />
+            <input name="minAmount" type="number" defaultValue={minAmount} placeholder="Min ₹" min="0" className="rounded-xl border border-gray-250 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all" />
+            <input name="maxAmount" type="number" defaultValue={maxAmount} placeholder="Max ₹" min="0" className="rounded-xl border border-gray-250 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm transition-all" />
+          </div>
+        </form>
+
+        {/* Status Tab buttons segment */}
+        <div className="flex items-center gap-3 border-t border-gray-100 pt-4 flex-wrap">
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status filter:</span>
+          <div className="inline-flex p-1 bg-gray-100/80 rounded-2xl gap-1 flex-wrap">
+            {tabs.map((tab) => (
+              <Link
+                key={tab.value}
+                href={tab.value ? `/admin/orders?status=${tab.value}${q ? `&q=${q}` : ""}` : `/admin/orders${q ? `?q=${q}` : ""}`}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer",
+                  (status ?? "") === tab.value
+                    ? "bg-white text-brand-primary shadow-sm"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-white/50"
+                )}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Main Table or Empty state */}
+      {rows.length === 0 ? (
+        <div className="rounded-3xl border border-gray-100 bg-white p-16 text-center shadow-xl shadow-gray-100/30 flex flex-col items-center justify-center min-h-[340px]">
+          <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4 border border-blue-100 animate-pulse">
+            <FileQuestion className="w-8 h-8 text-brand-primary" />
+          </div>
+          <h3 className="text-base font-bold text-gray-900">No orders found</h3>
+          <p className="text-xs text-gray-455 max-w-sm mt-2 leading-relaxed">
+            There are currently no orders registered on the platform matching your search criteria or selected status filters.
+          </p>
+          {(q || hasAdvancedFilter) && (
+            <Link href="/admin/orders" className="mt-4 text-xs font-bold text-brand-primary bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl transition-all">
+              Reset search & filters
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="rounded-3xl border border-gray-150 overflow-hidden bg-white shadow-xl shadow-gray-100/25">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/70">
+                  <th className="text-left px-5 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Package</th>
+                  <th className="text-left px-4 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Client</th>
+                  <th className="text-left px-4 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Editor</th>
+                  <th className="text-right px-4 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Amount</th>
+                  <th className="text-center px-4 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Date</th>
+                  <th className="text-right px-5 py-4 font-bold text-gray-500 text-xs uppercase tracking-wider">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                    <td className="px-5 py-4.5 font-semibold text-gray-900 truncate max-w-[160px]">
+                      {row.packageTitle ?? "Custom order"}
+                    </td>
+                    <td className="px-4 py-4.5">
+                      <p className="text-gray-800 font-medium">{row.clientName ?? "-"}</p>
+                      <p className="text-xs text-gray-400">{row.clientEmail}</p>
+                    </td>
+                    <td className="px-4 py-4.5 text-gray-600 font-medium">{row.editorName ?? "-"}</td>
+                    <td className="px-4 py-4.5 text-right tabular-nums font-bold text-gray-900">{formatCurrency(row.totalAmount)}</td>
+                    <td className="px-4 py-4.5 text-center">
+                      <OrderStatusBadge status={row.status as Parameters<typeof OrderStatusBadge>[0]["status"]} />
+                    </td>
+                    <td className="px-4 py-4.5 text-gray-400 text-xs">
+                      <p className="font-medium text-gray-650">{formatDate(row.createdAt)}</p>
+                      {row.razorpayPaymentId && (
+                        <p className="font-mono text-[9px] text-gray-350 truncate max-w-[110px] mt-0.5" title={row.razorpayPaymentId}>
+                          {row.razorpayPaymentId}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-5 py-4.5 text-right">
+                      <Link href={`/admin/orders/${row.id}`} className="text-xs font-bold text-brand-primary hover:underline bg-blue-50 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-xl transition-all">
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (() => {
+            const base = {
+              ...(status ? { status } : {}), ...(q ? { q } : {}),
+              ...(orderId ? { orderId } : {}), ...(paymentId ? { paymentId } : {}),
+              ...(from ? { from } : {}), ...(to ? { to } : {}),
+              ...(minAmount ? { minAmount } : {}), ...(maxAmount ? { maxAmount } : {}),
+            };
+            return (
+              <div className="flex items-center justify-between px-1 py-2 text-sm">
+                <p className="text-gray-400 font-medium">
+                  Page {page} of {totalPages} · showing {offset + 1}–{Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}
+                </p>
+                <div className="flex gap-2">
+                  {page > 1 && (
+                    <Link href={`/admin/orders?${new URLSearchParams({ ...base, page: String(page - 1) }).toString()}`}
+                      className="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-xs font-semibold">
+                      ← Prev
+                    </Link>
+                  )}
+                  {page < totalPages && (
+                    <Link href={`/admin/orders?${new URLSearchParams({ ...base, page: String(page + 1) }).toString()}`}
+                      className="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-xs font-semibold">
+                      Next →
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
     </div>
   );
 }

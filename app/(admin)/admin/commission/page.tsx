@@ -17,7 +17,7 @@ const KEYS = [
 ];
 
 const DEFAULTS: Record<string, string> = {
-  commission_rate_pct: "15",
+  commission_rate_pct: "20",
   tds_rate_pct: "10",
   featured_listing_price: "49900",
   referral_credit_amount: "10000",

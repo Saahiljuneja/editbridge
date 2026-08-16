@@ -35,7 +35,14 @@ const TTL = 5_000;
 async function loadFlags(): Promise<Record<string, boolean>> {
   if (_cache && Date.now() - _cache.ts < TTL) return _cache.map;
 
-  const rows = await db.select({ key: featureFlags.key, enabled: featureFlags.enabled }).from(featureFlags);
+  let rows: { key: string; enabled: boolean }[] = [];
+  try {
+    rows = await db.select({ key: featureFlags.key, enabled: featureFlags.enabled }).from(featureFlags);
+  } catch (err) {
+    console.error("[loadFlags] Failed to load feature flags from database, using defaults:", err);
+    if (_cache) return _cache.map;
+  }
+
   const map: Record<string, boolean> = {};
   for (const row of rows) map[row.key] = row.enabled;
 

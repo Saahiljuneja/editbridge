@@ -123,7 +123,8 @@ interface Props {
   initialPreviousClients: string;
   initialMaxActiveOrders: number | null;
   initialCoverImage: string | null;
-  initialFeaturedVideoUrl: string;
+  initialFeaturedVideoUrls: string[];
+  maxFeaturedVideos: number;
   initialPortfolio: PortfolioItemType[];
   kycStatus: string | null;
   profileScore: number;
@@ -145,7 +146,8 @@ export function ProfileClient({
   initialNiches, initialExperienceLevel, initialYearsOfExperience,
   initialWorkStyleTags, initialTurnaround,
   initialSkills, initialTools, initialIsAvailable, initialVacationUntil,
-  initialLocation, initialPreviousClients, initialMaxActiveOrders, initialCoverImage, initialFeaturedVideoUrl,
+  initialLocation, initialPreviousClients, initialMaxActiveOrders, initialCoverImage,
+  initialFeaturedVideoUrls, maxFeaturedVideos,
   initialPortfolio, kycStatus,
   profileScore, profileMaxScore, profileScoreItems,
   totalOrders, completionRate,
@@ -177,7 +179,7 @@ export function ProfileClient({
   const [location, setLocation] = useState(initialLocation);
   const [previousClients, setPreviousClients] = useState(initialPreviousClients);
   const [maxActiveOrders, setMaxActiveOrders] = useState<number | null>(initialMaxActiveOrders);
-  const [featuredVideoUrl, setFeaturedVideoUrl] = useState(initialFeaturedVideoUrl);
+  const [featuredVideoUrls, setFeaturedVideoUrls] = useState<string[]>(initialFeaturedVideoUrls);
   const [saving, setSaving] = useState(false);
   const { update: updateSession } = useSession();
   const searchParams = useSearchParams();
@@ -345,10 +347,11 @@ export function ProfileClient({
         return;
       }
       if (featuredVideoInvalid) {
-        toast.error("Featured video must be a valid YouTube, Vimeo, or Google Drive URL.");
+        toast.error("All featured videos must be valid YouTube, Vimeo, or Google Drive URLs.");
         setSaving(false);
         return;
       }
+      const validVideoUrls = featuredVideoUrls.map(u => u.trim()).filter(Boolean);
       const res = await fetch("/api/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -368,7 +371,8 @@ export function ProfileClient({
           location: location.trim() || null,
           previousClients: previousClients.trim() || null,
           maxActiveOrders: maxActiveOrders ?? null,
-          featuredVideoUrl: featuredVideoUrl.trim() || null,
+          featuredVideoUrl: validVideoUrls[0] || null,
+          featuredVideoUrls: validVideoUrls,
         }),
       });
       if (!res.ok) { toast.error("Failed to save profile."); return; }
@@ -427,9 +431,9 @@ export function ProfileClient({
   const customWorkStyleHasContact = hasContactInfo(customWorkStyleInput);
   const turnaroundHasContact = turnaround.some(t => hasContactInfo(t.type));
 
-  // ── Featured video preview/validation ──
-  const featuredVideoEmbedUrl = featuredVideoUrl.trim() ? getEmbedUrl(featuredVideoUrl.trim()) : null;
-  const featuredVideoInvalid = !!featuredVideoUrl.trim() && !featuredVideoEmbedUrl;
+  // ── Featured videos preview/validation ──
+  const featuredVideoEmbedUrls = featuredVideoUrls.map(u => u.trim() ? getEmbedUrl(u.trim()) : null);
+  const featuredVideoInvalid = featuredVideoUrls.some((u, i) => !!u.trim() && !featuredVideoEmbedUrls[i]);
 
   // ── Portfolio tab breakdown (view/like/comment performance now lives on Analytics) ──
   const portfolioFeaturedCount = initialPortfolio.filter(p => p.isFeatured).length;
@@ -519,7 +523,7 @@ export function ProfileClient({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingPhoto}
-                    className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[var(--brand-client)] flex items-center justify-center border-2 border-white shadow-sm hover:bg-indigo-500 transition-colors disabled:opacity-60"
+                    className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#1e40af] flex items-center justify-center border-2 border-white shadow-sm hover:bg-brand-primary transition-colors disabled:opacity-60"
                   >
                     <Camera className={cn("w-2.5 h-2.5 text-white", uploadingPhoto && "animate-pulse")} />
                   </button>
@@ -648,59 +652,6 @@ export function ProfileClient({
             {/* ══ PROFILE TAB ══ */}
             {activeTab === "profile" && (
               <div className="space-y-4">
-
-                {/* Cover image */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="relative h-36 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-800 group">
-                    {coverImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                        <Camera className="w-8 h-8 text-white" />
-                      </div>
-                    )}
-                    {/* overlay on hover */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                      <button
-                        type="button"
-                        onClick={() => coverInputRef.current?.click()}
-                        disabled={uploadingCover}
-                        className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60"
-                      >
-                        <Camera className={cn("w-3.5 h-3.5", uploadingCover && "animate-pulse")} />
-                        {uploadingCover ? "Uploading…" : coverImage ? "Change cover" : "Add cover"}
-                      </button>
-                      {coverImage && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveCover}
-                          className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-red-500 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          <X className="w-3.5 h-3.5" />Remove
-                        </button>
-                      )}
-                    </div>
-                    <input
-                      ref={coverInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCoverUpload(f); e.target.value = ""; }}
-                    />
-                  </div>
-                  <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between">
-                    <p className="text-xs text-gray-400">Cover image — shown at the top of your public profile</p>
-                    <button
-                      type="button"
-                      onClick={() => coverInputRef.current?.click()}
-                      disabled={uploadingCover}
-                      className="text-xs font-medium text-[var(--brand-client)] hover:underline disabled:opacity-50"
-                    >
-                      {uploadingCover ? "Uploading…" : coverImage ? "Change" : "Upload"}
-                    </button>
-                  </div>
-                </div>
 
                 {/* Bio */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -896,24 +847,75 @@ export function ProfileClient({
                   </Section>
                 </div>
 
-                {/* Featured video */}
+                {/* Featured videos */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <Section icon={Video} title="Featured Video" description="Paste a YouTube, Vimeo, or Google Drive link — it plays directly on your public profile.">
-                    <input
-                      type="url"
-                      value={featuredVideoUrl}
-                      onChange={(e) => setFeaturedVideoUrl(e.target.value)}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      className={cn(inputClass, featuredVideoInvalid && "border-red-300 focus:border-red-400 focus:ring-red-100")}
-                    />
-                    {featuredVideoUrl.trim() && (
-                      featuredVideoEmbedUrl ? (
-                        <div className="mt-3 rounded-xl overflow-hidden border border-gray-200 aspect-video">
-                          <iframe src={featuredVideoEmbedUrl} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
-                        </div>
-                      ) : (
-                        <p className="text-xs text-red-500 mt-1.5">Not a valid YouTube, Vimeo, or Google Drive URL — it won&apos;t be saved.</p>
-                      )
+                  <Section
+                    icon={Video}
+                    title="Featured Videos"
+                    description={`Paste YouTube, Vimeo, or Google Drive links — they play directly on your public profile. Your plan allows ${maxFeaturedVideos} featured video${maxFeaturedVideos === 1 ? "" : "s"}.`}
+                    action={
+                      featuredVideoUrls.length < maxFeaturedVideos ? (
+                        <button
+                          type="button"
+                          onClick={() => setFeaturedVideoUrls([...featuredVideoUrls, ""])}
+                          className="flex items-center gap-1 text-xs font-semibold text-[var(--brand-client)] px-2.5 py-1.5 rounded-lg bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors"
+                        >
+                          <Plus className="w-3 h-3" /> Add video
+                        </button>
+                      ) : undefined
+                    }
+                  >
+                    {featuredVideoUrls.length === 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setFeaturedVideoUrls([""])}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 text-xs font-semibold text-gray-400 hover:border-[var(--brand-client)]/40 hover:text-[var(--brand-client)] transition-colors"
+                      >
+                        <Plus className="w-4 h-4" /> Add featured video
+                      </button>
+                    ) : (
+                      <div className="space-y-4">
+                        {featuredVideoUrls.map((url, idx) => {
+                          const embedUrl = url.trim() ? getEmbedUrl(url.trim()) : null;
+                          const invalid = !!url.trim() && !embedUrl;
+                          return (
+                            <div key={idx} className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-gray-400 w-5 text-center">{idx + 1}</span>
+                                <input
+                                  type="url"
+                                  value={url}
+                                  onChange={(e) => {
+                                    const next = [...featuredVideoUrls];
+                                    next[idx] = e.target.value;
+                                    setFeaturedVideoUrls(next);
+                                  }}
+                                  placeholder="https://www.youtube.com/watch?v=..."
+                                  className={cn(inputClass, "flex-1", invalid && "border-red-300 focus:border-red-400 focus:ring-red-100")}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setFeaturedVideoUrls(featuredVideoUrls.filter((_, i) => i !== idx))}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                  aria-label="Remove video"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                              {url.trim() && (
+                                embedUrl ? (
+                                  <div className="ml-7 rounded-xl overflow-hidden border border-gray-200 aspect-video">
+                                    <iframe src={embedUrl} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+                                  </div>
+                                ) : (
+                                  <p className="ml-7 text-xs text-red-500">Not a valid YouTube, Vimeo, or Google Drive URL — it won&apos;t be saved.</p>
+                                )
+                              )}
+                            </div>
+                          );
+                        })}
+                        <p className="text-xs text-gray-400">{featuredVideoUrls.length} / {maxFeaturedVideos} slots used</p>
+                      </div>
                     )}
                   </Section>
                 </div>
@@ -1059,7 +1061,7 @@ export function ProfileClient({
                     )}
                     {portfolioImageCount > 0 && (
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-100 rounded-full px-3 py-1 shadow-sm">
-                        <ImageIcon className="w-3 h-3 text-violet-500" /> {portfolioImageCount} image{portfolioImageCount !== 1 ? "s" : ""}
+                        <ImageIcon className="w-3 h-3 text-[#1e40af]" /> {portfolioImageCount} image{portfolioImageCount !== 1 ? "s" : ""}
                       </span>
                     )}
                     {portfolioFeaturedCount > 0 && (
@@ -1075,11 +1077,11 @@ export function ProfileClient({
 
                 {/* Tips — shown only when portfolio is small */}
                 {initialPortfolio.length < 3 && (
-                  <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex gap-3">
-                    <Lightbulb className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
-                    <div className="space-y-1.5 text-sm text-indigo-800">
+                  <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3">
+                    <Lightbulb className="w-4 h-4 text-[#1e40af] shrink-0 mt-0.5" />
+                    <div className="space-y-1.5 text-sm text-blue-800">
                       <p className="font-semibold">Tips to make your portfolio stand out</p>
-                      <ul className="text-xs text-indigo-700 space-y-1 list-disc list-inside">
+                      <ul className="text-xs text-blue-900 space-y-1 list-disc list-inside">
                         <li>Add at least 3 items — editors with more portfolio items get 2× more inquiries</li>
                         <li>Feature your best work using the ★ button so it appears first on your profile</li>
                         <li>Use Before / After sliders for image edits — clients love the comparison</li>
@@ -1109,7 +1111,7 @@ export function ProfileClient({
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-gray-900">Profile Frame</h3>
-                <Link href="/editor/xp-shop" className="text-[11px] text-sky-500 hover:underline font-medium">
+                <Link href="/editor/xp-shop" className="text-[11px] text-brand-primary hover:underline font-medium">
                   Unlock more →
                 </Link>
               </div>
@@ -1122,7 +1124,7 @@ export function ProfileClient({
                   </p>
                   <Link
                     href="/editor/xp-shop"
-                    className="inline-block mt-1 text-xs font-semibold text-white bg-sky-500 hover:bg-[var(--brand-client-hover)] px-3 py-1.5 rounded-lg transition-colors"
+                    className="inline-block mt-1 text-xs font-semibold text-white bg-brand-primary hover:bg-[var(--brand-client-hover)] px-3 py-1.5 rounded-lg transition-colors"
                   >
                     Browse XP Shop
                   </Link>
@@ -1133,11 +1135,11 @@ export function ProfileClient({
                   {currentFrame && (() => {
                     const f = PROFILE_FRAMES.find(fr => fr.key === currentFrame);
                     return f ? (
-                      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-sky-50 border border-sky-100 text-xs">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 shrink-0" style={f.style} />
+                      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 border border-blue-100 text-xs">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 shrink-0" style={f.style} />
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sky-700">{f.emoji} {f.label}</p>
-                          <p className="text-sky-500 text-[10px]">Active on your profile</p>
+                          <p className="font-semibold text-blue-900">{f.emoji} {f.label}</p>
+                          <p className="text-brand-primary text-[10px]">Active on your profile</p>
                         </div>
                         <button
                           onClick={() => handleSetFrame(null)}
@@ -1163,12 +1165,12 @@ export function ProfileClient({
                           title={frame.label}
                           className={`flex flex-col items-center gap-1 p-2 rounded-xl border transition-all ${
                             isActive
-                              ? "bg-sky-50 border-sky-200"
+                              ? "bg-blue-50 border-blue-200"
                               : "bg-gray-50 border-gray-100 hover:border-gray-300"
                           }`}
                         >
                           <div
-                            className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 text-base flex items-center justify-center"
+                            className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-base flex items-center justify-center"
                             style={frame.style}
                           >
                             {frame.emoji}

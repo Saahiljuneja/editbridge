@@ -73,6 +73,8 @@ export interface PortfolioVideoPlayerProps {
   className?: string;
   /** Called when user presses the share button. Defaults to navigator.clipboard. */
   onShare?: () => void;
+  /** Whether to hide overlay branding (platform logo and editor name overlay). */
+  hideBranding?: boolean;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -100,7 +102,7 @@ function PlatformBadge({ source }: { source: VideoSource }) {
   if (!source || source === "direct") return null;
   const map: Record<string, { label: string; color: string }> = {
     youtube: { label: "YouTube",      color: "bg-red-600" },
-    vimeo:   { label: "Vimeo",        color: "bg-sky-500" },
+    vimeo:   { label: "Vimeo",        color: "bg-brand-primary" },
     gdrive:  { label: "Google Drive", color: "bg-green-600" },
   };
   const cfg = map[source];
@@ -393,10 +395,11 @@ interface IframeThumbnailOverlayProps {
   source: VideoSource;
   onPlay: () => void;
   onShare?: () => void;
+  hideBranding?: boolean;
 }
 
 function IframeThumbnailOverlay({
-  thumbnail, title, editorName, editorVerified, source, onPlay, onShare,
+  thumbnail, title, editorName, editorVerified, source, onPlay, onShare, hideBranding,
 }: IframeThumbnailOverlayProps) {
   const [copied, setCopied] = useState(false);
   const [thumbError, setThumbError] = useState(false);
@@ -429,9 +432,9 @@ function IframeThumbnailOverlay({
       {/* Top bar */}
       <div className="relative z-10 flex items-start justify-between p-3">
         <div className="flex flex-col gap-0.5">
-          <PlatformBadge source={source} />
+          {!hideBranding && <PlatformBadge source={source} />}
           {title && <p className="text-white text-sm font-semibold drop-shadow mt-1 line-clamp-1">{title}</p>}
-          {editorName && (
+          {!hideBranding && editorName && (
             <p className="text-white/80 text-xs flex items-center gap-1">
               {editorName}
               {editorVerified && (
@@ -504,6 +507,7 @@ export function PortfolioVideoPlayer({
   aspectRatio = "16/9",
   className,
   onShare,
+  hideBranding = false,
 }: PortfolioVideoPlayerProps) {
   const source: VideoSource = getVideoSource(url);
   const isNative = source === "direct";
@@ -604,6 +608,7 @@ export function PortfolioVideoPlayer({
                   source={source}
                   onPlay={() => setShowEmbed(true)}
                   onShare={onShare}
+                  hideBranding={hideBranding}
                 />
               )
             )}
@@ -626,7 +631,7 @@ export function PortfolioVideoPlayer({
             )}
 
             {/* Branding bar shown over embed when autoplay (no overlay) */}
-            {autoplay && editorName && (
+            {autoplay && editorName && !hideBranding && (
               <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-2
                               bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
                 <div className="flex flex-col gap-0.5">

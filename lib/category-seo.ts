@@ -251,7 +251,7 @@ export const CATEGORY_PAGES: CategoryPage[] = [
     heroDescription:
       "Property walkthroughs and listing videos need to feel spacious, bright, and professional — our editors know how to make a property's best features stand out.",
     icon: "🏠",
-    accentColor: "#0ea5e9",
+    accentColor: "#1e40af",
     matchField: "niche",
     matchKeywords: ["Real Estate"],
     faqs: [
@@ -389,7 +389,7 @@ export const CATEGORY_PAGES: CategoryPage[] = [
     heroDescription:
       "Course and tutorial videos need clarity above all — clean pacing, legible on-screen text, and edits that never leave a learner confused about what to do next.",
     icon: "📚",
-    accentColor: "#0284c7",
+    accentColor: "#1e3a8a",
     matchField: "packageCategory",
     matchKeywords: ["education"],
     faqs: [

@@ -8,6 +8,12 @@ import { cn } from "@/lib/utils";
 
 const LABELS = ["", "Poor", "Fair", "Good", "Great", "Excellent"];
 
+const CATEGORY_ASPECTS = [
+  { key: "communication", label: "Communication" },
+  { key: "quality", label: "Quality" },
+  { key: "timeliness", label: "Timeliness" },
+] as const;
+
 interface Props {
   orderId: string;
   editorName: string;
@@ -31,6 +37,8 @@ export function ReviewClient({
   const [text, setText]           = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(alreadyReviewed);
+  const [catRatings, setCatRatings] = useState<Record<string, number>>({});
+  const [catHovered, setCatHovered] = useState<Record<string, number>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +48,12 @@ export function ReviewClient({
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, rating, text: text.trim() || undefined }),
+        body: JSON.stringify({
+          orderId,
+          rating,
+          text: text.trim() || undefined,
+          ...(Object.keys(catRatings).length > 0 && { categoryRatings: catRatings }),
+        }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -79,7 +92,7 @@ export function ReviewClient({
   if (submitted && alreadyReviewed) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-        <div className="w-16 h-16 rounded-2xl bg-sky-100 flex items-center justify-center mb-5">
+        <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-5">
           <CheckCircle className="w-8 h-8 text-[var(--brand-client)]" />
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Already reviewed</h2>
@@ -152,6 +165,44 @@ export function ReviewClient({
                   {LABELS[active]}
                 </span>
               )}
+            </div>
+          </div>
+
+          {/* Optional category ratings */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-gray-600">
+              Rate specific aspects <span className="text-gray-400 font-normal">(optional)</span>
+            </p>
+            <div className="rounded-xl border border-gray-100 bg-gray-50/50 px-4 py-3 space-y-2.5">
+              {CATEGORY_ASPECTS.map(({ key, label }) => {
+                const val = catRatings[key] ?? 0;
+                const hov = catHovered[key] ?? 0;
+                const active = hov || val;
+                return (
+                  <div key={key} className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-gray-600 w-28 shrink-0">{label}</span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setCatRatings(prev => ({ ...prev, [key]: prev[key] === star ? 0 : star }))}
+                          onMouseEnter={() => setCatHovered(prev => ({ ...prev, [key]: star }))}
+                          onMouseLeave={() => setCatHovered(prev => ({ ...prev, [key]: 0 }))}
+                          className="transition-transform hover:scale-110 active:scale-95"
+                        >
+                          <Star
+                            className={cn(
+                              "w-5 h-5 transition-colors",
+                              active >= star ? "fill-amber-400 text-amber-400" : "fill-none text-gray-200"
+                            )}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

@@ -137,9 +137,9 @@ export function PreOrderQA({
                 <p className="text-sm text-gray-700">{q.question}</p>
               </div>
             </div>
-            <div className="ml-10 bg-sky-50 border border-sky-100 rounded-xl px-3.5 py-3">
-              <p className="text-xs font-bold text-sky-700 mb-1">{editorName} replied · {formatDateTime(q.answeredAt)}</p>
-              <p className="text-sm text-sky-900 leading-relaxed">{q.answer}</p>
+            <div className="ml-10 bg-blue-50 border border-blue-100 rounded-xl px-3.5 py-3">
+              <p className="text-xs font-bold text-blue-900 mb-1">{editorName} replied · {formatDateTime(q.answeredAt)}</p>
+              <p className="text-sm text-blue-900 leading-relaxed">{q.answer}</p>
             </div>
           </div>
         ))}

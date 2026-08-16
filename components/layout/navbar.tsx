@@ -16,10 +16,9 @@ import { NotificationBell } from "@/components/layout/notification-bell";
 /* ── data ── */
 
 // Row 2: pure in-app navigation only
-const NAV_LINKS = [
+const NAV_LINKS: { href: string; label: string; icon?: any; flag?: any }[] = [
   { href: "/browse",      label: "Browse Editors" },
   { href: "/feed",        label: "Feed" },
-  { href: "/find-editor", label: "Match Me", icon: Sparkles, flag: "find_editor_quiz" as const },
 ];
 
 const RESOURCES = [

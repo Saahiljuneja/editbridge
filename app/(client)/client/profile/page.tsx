@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Camera, User, Mail, CalendarDays, Settings, ExternalLink, CheckCircle } from "lucide-react";
+import { TopoBackground } from "@/components/common/topo-background";
 import { ImageCropModal } from "@/components/common/image-crop-modal";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -106,30 +107,34 @@ export default function ClientProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8 space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 bg-white rounded-2xl border border-gray-100 animate-pulse" />
-        ))}
+      <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+        <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+        <div className="max-w-xl mx-auto px-6 pt-6 space-y-4 relative z-10">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 bg-white rounded-2xl border border-gray-100 animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Page header */}
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <div className="flex items-center justify-between">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-xl mx-auto px-6 pt-6 space-y-5 relative z-10">
+        {/* Page header */}
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">My Profile</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Manage your name and avatar</p>
+            <h1 className="text-xl font-bold text-neutral-900">My Profile</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Manage your name and avatar</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
-            <User className="w-4 h-4 text-[var(--brand-client)]" />
+          <div className="w-10 h-10 rounded-2xl bg-[#1e40af]/10 flex items-center justify-center shrink-0">
+            <User className="w-5 h-5 text-[#1e40af]" />
           </div>
         </div>
-      </div>
 
-      <div className="max-w-xl mx-auto px-6 py-8 space-y-5">
+        <div className="space-y-5">
 
         {/* Avatar card */}
         <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6">
@@ -242,14 +247,14 @@ export default function ClientProfilePage() {
             )}
             <div>
               <p className="text-xs font-medium text-gray-500 mb-1">Account type</p>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-100 text-sky-700">Client</span>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-900">Client</span>
             </div>
           </div>
         </div>
 
         {/* Security link */}
         <Link
-          href="/settings"
+          href="/client/settings"
           className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white shadow-sm px-6 py-4 hover:bg-gray-50 transition-colors group"
         >
           <div className="flex items-center gap-3">
@@ -264,6 +269,7 @@ export default function ClientProfilePage() {
           <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-gray-400 transition-colors" />
         </Link>
 
+        </div>
       </div>
 
       {/* Crop modal */}

@@ -91,14 +91,14 @@ export function EditorReviewForm({ orderId, clientName }: EditorReviewFormProps)
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={`Notes about working with ${clientName} (optional)…`}
-          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm min-h-[90px] resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-400"
+          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm min-h-[90px] resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 placeholder:text-gray-400"
           maxLength={1000}
         />
 
         <button
           type="submit"
           disabled={submitting || rating === 0}
-          className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+          className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-50 flex items-center gap-2"
         >
           {submitting ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</>

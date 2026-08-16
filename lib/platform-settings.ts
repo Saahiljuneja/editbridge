@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { platformSettings } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
+import { platformSettings, users } from "@/lib/db/schema";
+import { inArray, eq } from "drizzle-orm";
 
 export type PlatformConfig = {
   name: string;
@@ -67,7 +67,7 @@ export async function getPlatformSettings(): Promise<PlatformConfig> {
       .from(platformSettings)
       .where(inArray(platformSettings.key, ALL_KEYS));
   } catch (err) {
-    console.error("[getPlatformSettings] Database connection failed, using default configuration:", err);
+    console.warn("[getPlatformSettings] Database connection failed, using offline fallback settings.");
     if (_cache) {
       const { ts: _ts, ...rest } = _cache;
       return rest;
@@ -80,12 +80,12 @@ export async function getPlatformSettings(): Promise<PlatformConfig> {
   const cfg: PlatformConfig = {
     name: map.platform_name || "EditBridge",
     supportEmail: map.support_email || "support@editbridge.com",
-    commissionRatePct: Math.max(0, Math.min(100, Number(map.commission_rate_pct ?? 15))),
-    processingFeePct: Math.max(0, Math.min(100, Number(map.processing_fee_pct ?? 4))),
+    commissionRatePct: Math.max(0, Math.min(100, Number(map.commission_rate_pct ?? 20))),
+    processingFeePct: Math.max(0, Math.min(100, Number(map.processing_fee_pct ?? 10))),
     minRevisions: Math.max(0, Number(map.min_revisions ?? 0)),
     maxRevisions: Math.max(0, Number(map.max_revisions ?? 3)),
     maxDeliveryDays: Math.max(1, Number(map.max_delivery_days ?? 30)),
-    allowedFileTypes: (map.allowed_file_types || "mp4,mov,avi,mkv,zip,rar,pdf")
+    allowedFileTypes: (map.allowed_file_types || "mp4,mov,avi,mkv,zip,rar,pdf,jpg,jpeg,png,gif,webp")
       .split(",")
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean),
@@ -94,7 +94,7 @@ export async function getPlatformSettings(): Promise<PlatformConfig> {
     fontBody:            map.font_body              || "",
     brandPrimary:        map.brand_primary          || "#7C3AED",
     brandEditor:         map.brand_editor           || "#7C3AED",
-    brandClient:         map.brand_client           || "#0EA5E9",
+    brandClient:         map.brand_client           || "#1e40af",
     brandTeal:           map.brand_teal             || "#0F6E56",
     siteRadius:          map.site_radius            || "0.625rem",
     logoUrl:             map.logo_url               || "",
@@ -118,4 +118,19 @@ export async function getPlatformSettings(): Promise<PlatformConfig> {
 
 export function bustPlatformSettingsCache() {
   _cache = null;
+}
+
+export async function getClientProcessingFeeRate(clientId: string): Promise<number> {
+  const [user] = await db
+    .select({ customProcessingFeeRate: users.customProcessingFeeRate })
+    .from(users)
+    .where(eq(users.id, clientId))
+    .limit(1);
+
+  if (user && user.customProcessingFeeRate !== null) {
+    return user.customProcessingFeeRate;
+  }
+
+  const { processingFeePct } = await getPlatformSettings();
+  return processingFeePct;
 }

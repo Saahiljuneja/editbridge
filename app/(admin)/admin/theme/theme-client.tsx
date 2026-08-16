@@ -9,7 +9,7 @@ import { Save, Upload, X } from "lucide-react";
 const COLOR_PRESETS = [
   { label: "Violet",  value: "#7C3AED" },
   { label: "Blue",    value: "#3B82F6" },
-  { label: "Sky",     value: "#0EA5E9" },
+  { label: "Sky",     value: "#1e40af" },
   { label: "Rose",    value: "#F43F5E" },
   { label: "Emerald", value: "#10B981" },
   { label: "Orange",  value: "#F97316" },
@@ -152,7 +152,7 @@ export function ThemeClient({ settings: initial }: { settings: Record<string, st
   // Convenience getters
   const brandPrimary  = settings.brand_primary          || "#7C3AED";
   const brandEditor   = settings.brand_editor           || "#7C3AED";
-  const brandClient   = settings.brand_client           || "#0EA5E9";
+  const brandClient   = settings.brand_client           || "#1e40af";
   const brandTeal     = settings.brand_teal             || "#0F6E56";
   const siteRadius    = settings.site_radius            || "0.625rem";
   const fontHeading   = settings.font_heading           || "Rubik";

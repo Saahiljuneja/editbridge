@@ -104,7 +104,7 @@ export default async function AdminDisputesPage({
                 const editorResponded = row.evidenceText && row.evidenceText.trim().length > 0;
                 if (editorResponded) {
                   statusLabel = "Ready for Review";
-                  badgeStyle = "bg-sky-100 text-sky-700";
+                  badgeStyle = "bg-blue-100 text-blue-900";
                 } else {
                   statusLabel = "Awaiting Editor";
                   badgeStyle = "bg-amber-100 text-amber-700";
@@ -128,7 +128,7 @@ export default async function AdminDisputesPage({
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/admin/disputes/${row.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--brand-client)] hover:text-sky-700 transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[var(--brand-client)] hover:text-blue-900 transition-colors"
                     >
                       Arbitrate &rarr;
                     </Link>
@@ -185,7 +185,7 @@ export default async function AdminDisputesPage({
               className={cn(
                 "px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide transition-all border",
                 filter === st.value
-                  ? "bg-sky-50 border-sky-200 text-[#0EA5E9]"
+                  ? "bg-blue-50 border-blue-200 text-[#1e40af]"
                   : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
               )}
             >

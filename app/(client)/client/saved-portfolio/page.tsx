@@ -106,7 +106,7 @@ export default async function SavedPortfolioPage() {
                         <Image src={row.editorUserImage} alt={row.editorDisplayName ?? ""} width={16} height={16}
                           className="rounded-full object-cover shrink-0" unoptimized />
                       ) : (
-                        <div className="w-4 h-4 rounded-full bg-sky-500 flex items-center justify-center shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-brand-primary flex items-center justify-center shrink-0">
                           <span className="text-white text-[8px] font-bold">{(row.editorDisplayName ?? row.editorUserName ?? "?").slice(0,1).toUpperCase()}</span>
                         </div>
                       )}

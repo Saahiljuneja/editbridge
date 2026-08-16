@@ -51,7 +51,7 @@ export default async function OGImage() {
             width: 560,
             height: 560,
             borderRadius: "50%",
-            background: "#0EA5E9",
+            background: "#1e40af",
             opacity: 0.12,
           }}
         />
@@ -76,7 +76,7 @@ export default async function OGImage() {
               width: 48,
               height: 48,
               borderRadius: 14,
-              background: "#0EA5E9",
+              background: "#1e40af",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -118,7 +118,7 @@ export default async function OGImage() {
               style={{
                 fontSize: 88,
                 fontWeight: 700,
-                color: "#0EA5E9",
+                color: "#1e40af",
                 lineHeight: 1.05,
                 letterSpacing: -3,
               }}
@@ -176,7 +176,7 @@ export default async function OGImage() {
             left: 0,
             right: 0,
             height: 4,
-            background: "#0EA5E9",
+            background: "#1e40af",
           }}
         />
       </div>

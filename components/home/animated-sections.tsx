@@ -25,7 +25,7 @@ export function ScrollProgressBar() {
   return (
     <motion.div
       className="fixed top-0 left-0 right-0 z-[9999] origin-left pointer-events-none"
-      style={{ height: 2, scaleX, background: "linear-gradient(90deg, #F59E0B, #0EA5E9)" }}
+      style={{ height: 2, scaleX, background: "linear-gradient(90deg, #F59E0B, #1e40af)" }}
     />
   );
 }
@@ -136,58 +136,58 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
   }, [prefersReduced]);
 
   return (
-    <section ref={heroRef} className="relative min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden bg-[#080E1A] overflow-x-hidden flex flex-col">
+    <section ref={heroRef} className="relative min-h-[100dvh] max-h-[950px] lg:h-[100dvh] lg:min-h-[750px] lg:max-h-[950px] lg:overflow-hidden bg-[#F8FAFC] overflow-x-hidden flex flex-col">
 
       {/* Film-cut flash on page load */}
-      <motion.div className="absolute inset-0 bg-black z-50 pointer-events-none"
+      <motion.div className="absolute inset-0 bg-white z-50 pointer-events-none"
         initial={{ opacity: 0.85 }} animate={{ opacity: 0 }}
         transition={{ duration: 0.07, ease: "linear" }} />
 
       {/* Subtle dot grid */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-        style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.015]"
+        style={{ backgroundImage: "radial-gradient(#000000 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
 
       {/* Ambient glow blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div animate={{ x: ["0%","10%","0%"], y: ["0%","8%","0%"], scale:[1,1.08,1] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-1/3 -left-1/4 w-[900px] h-[700px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.38), transparent 60%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.15), transparent 60%)" }} />
         <motion.div animate={{ x: ["0%","-8%","0%"], y: ["0%","10%","0%"] }}
           transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
           className="absolute -bottom-1/4 -right-1/4 w-[800px] h-[700px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.32), transparent 60%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.12), transparent 60%)" }} />
         <motion.div animate={{ x: ["0%","6%","0%"], y: ["0%","-8%","0%"] }}
           transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 10 }}
           className="absolute top-1/3 left-1/2 w-[600px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.18), transparent 60%)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(14,165,233,0.08), transparent 60%)" }} />
       </div>
 
       {/* Mouse-tracking gradient orb — desktop only */}
       <motion.div
         className="absolute pointer-events-none hidden lg:block rounded-full z-0"
         style={{ top: 0, left: 0, x: orbXPos, y: orbYPos, opacity: orbOpacity, width: 600, height: 600,
-          background: "radial-gradient(ellipse at center, rgba(14,165,233,0.35) 0%, rgba(124,58,237,0.15) 45%, transparent 68%)",
+          background: "radial-gradient(ellipse at center, rgba(14,165,233,0.12) 0%, rgba(124,58,237,0.06) 45%, transparent 68%)",
           filter: "blur(32px)" }}
       />
 
 
 
       {/* Main content — centered */}
-      <div className="relative z-10 flex-1 flex items-start lg:items-center px-5 sm:px-8 lg:px-16">
+      <div className="relative z-10 flex-1 flex items-center px-5 sm:px-8 lg:px-16">
         <div className="max-w-5xl mx-auto w-full pt-8 pb-4 lg:pt-[15px] lg:pb-[15px] text-center">
 
           {/* Live badge */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-[11px] text-white/50 font-medium max-w-[90vw]">
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-5 rounded-full border border-neutral-200 bg-neutral-100/80 backdrop-blur-sm text-[11px] text-neutral-500 font-medium max-w-[90vw]">
             <motion.span animate={{ scale: [1, 1.8, 1] }} transition={{ duration: 1.8, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
+              className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
             <span className="truncate">{availableCount > 0 ? `${availableCount} editors live` : "Editors online"} · KYC-verified · ₹0 fraud, ever</span>
           </motion.div>
 
           {/* Headline */}
           <motion.div style={{ y: headY }} className="mb-5">
-            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white" style={{ fontSize: "clamp(2.1rem, 8vw, 7rem)" }}>
+            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-neutral-900" style={{ fontSize: "clamp(2.1rem, 8vw, 7rem)" }}>
               Hire the perfect<br />
               video editor for<br />
               <div className="overflow-hidden mt-1" style={{ height: "1.05em" }}>
@@ -197,7 +197,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                     animate={{ clipPath: "inset(0 0% 0 0)" }}
                     exit={{ clipPath: "inset(0 0% 0 100%)", transition: { duration: 0.16, ease: [0.4, 0, 1, 0] } }}
                     transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
-                    className="block bg-gradient-to-r from-sky-400 via-violet-400 to-teal-400 bg-clip-text text-transparent">
+                    className="block bg-gradient-to-r from-blue-800 via-violet-500 to-emerald-500 bg-clip-text text-transparent">
                     {NICHES[idx]}
                   </motion.span>
                 </AnimatePresence>
@@ -207,7 +207,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
 
           {/* Description */}
           <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.7 }}
-            className="text-white/45 text-sm sm:text-base md:text-lg leading-relaxed font-medium mb-6 max-w-xl mx-auto">
+            className="text-neutral-500 text-sm sm:text-base md:text-lg leading-relaxed font-medium mb-6 max-w-xl mx-auto">
             Browse portfolios, compare packages, and hire KYC-verified editors — every payment held safely in escrow until you approve.
           </motion.p>
 
@@ -215,7 +215,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
           <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.75 }}
             className="mb-4">
             <form action="/browse" method="get"
-              className="flex items-center gap-2 bg-white rounded-2xl p-1.5 shadow-2xl shadow-black/50 max-w-2xl mx-auto">
+              className="flex items-center gap-2 bg-white rounded-2xl p-1.5 shadow-xl shadow-neutral-200 border border-neutral-200/80 max-w-2xl mx-auto">
               <Search className="w-5 h-5 text-gray-400 ml-3 shrink-0" />
               <input
                 name="q"
@@ -233,7 +233,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
           {/* Niche quick-search chips */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.6 }}
             className="mb-6">
-            <p className="text-[10px] text-white/25 font-bold mb-2 uppercase tracking-widest">Popular searches</p>
+            <p className="text-[10px] text-neutral-400 font-bold mb-2 uppercase tracking-widest">Popular searches</p>
             <div className="flex flex-wrap items-center justify-center gap-2">
             {[
               { label: "YouTube Videos", emoji: "▶️", q: "youtube" },
@@ -251,7 +251,7 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
                 transition={{ delay: 0.75 + ci * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ scale: 1.06, y: -1 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-1.5 text-xs text-white/60 font-semibold bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/20 rounded-full px-3.5 py-1.5 transition-all cursor-pointer select-none"
+                className="inline-flex items-center gap-1.5 text-xs text-neutral-600 font-semibold bg-white hover:bg-neutral-50 border border-neutral-200 hover:border-neutral-300 rounded-full px-3.5 py-1.5 transition-all cursor-pointer select-none shadow-sm"
               >
                 <span className="text-[11px]">{chip.emoji}</span>
                 {chip.label}
@@ -266,18 +266,18 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
             <div className="flex items-center gap-4 flex-wrap justify-center">
               <div className="flex -space-x-2.5">
                 {[["AK","var(--brand-editor)"],["PS","#059669"],["RK","#ea580c"],["VD","#2563eb"]].map(([i, bg], k) => (
-                  <div key={k} className="w-8 h-8 rounded-full border-2 border-white/20 flex items-center justify-center text-[9px] font-bold text-white" style={{ background: bg }}>{i}</div>
+                  <div key={k} className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white" style={{ background: bg }}>{i}</div>
                 ))}
               </div>
-              <p className="text-white/40 text-xs"><span className="text-white/70 font-semibold">Creators across India</span> trust EditBridge</p>
-              <div className="flex items-center gap-1 pl-4 border-l border-white/10">
+              <p className="text-neutral-500 text-xs"><span className="text-neutral-800 font-semibold">Creators across India</span> trust EditBridge</p>
+              <div className="flex items-center gap-1 pl-4 border-l border-neutral-200">
                 {[1,2,3,4,5].map(j => <Star key={j} className="w-3 h-3 text-amber-400 fill-amber-400" />)}
-                <span className="text-white/40 text-xs ml-1">Loved by creators</span>
+                <span className="text-neutral-500 text-xs ml-1">Loved by creators</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-              <Link href="/find-editor" className="inline-flex items-center gap-1 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors">
-                Not sure? Let us match you <ArrowRight className="w-3 h-3" />
+              <Link href="/browse" className="inline-flex items-center gap-1 text-xs font-semibold text-brand-primary hover:text-blue-900 transition-colors">
+                Browse verified editors <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
           </motion.div>
@@ -286,13 +286,13 @@ export function AnimatedHero({ availableCount = 0 }: { availableCount?: number }
       </div>
 
       {/* Ticker */}
-      <div className="relative z-10 border-t border-white/8 overflow-hidden py-3 bg-white/5 backdrop-blur-sm">
+      <div className="relative z-10 border-t border-neutral-200 overflow-hidden py-3 bg-white/60 backdrop-blur-sm">
         <motion.div className="flex whitespace-nowrap" animate={{ x: ["0%","-50%"] }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
           {[...Array(2)].map((_, k) => (
             <div key={k} className="flex">
               {["KYC-Verified Editors","Verified Payment Protection","Revisions Included","Real-time Collaboration","Identity Verified","Dispute Resolution","Fast Delivery","India-Native Platform"].map(s => (
-                <span key={s} className="inline-flex items-center gap-3 text-[10px] text-white/25 font-bold uppercase tracking-[0.18em] px-8">
-                  <span className="w-1 h-1 rounded-full bg-sky-400/60 inline-block" />{s}
+                <span key={s} className="inline-flex items-center gap-3 text-[10px] text-neutral-500 font-bold uppercase tracking-[0.18em] px-8">
+                  <span className="w-1 h-1 rounded-full bg-brand-primary inline-block" />{s}
                 </span>
               ))}
             </div>
@@ -314,23 +314,23 @@ export function AnimatedFindEditorCTA() {
           <div className="absolute inset-0 opacity-[0.15] pointer-events-none" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
           <div
             className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(ellipse,#0EA5E9,transparent 70%)", opacity: 0.35 }}
+            style={{ background: "radial-gradient(ellipse,#1e40af,transparent 70%)", opacity: 0.35 }}
           />
           <div className="relative z-10 text-center sm:text-left">
-            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.28em] mb-3">Not sure where to start?</p>
+            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.28em] mb-3">Ready to get started?</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight mb-2">
-              Find your editor in 60 seconds
+              Browse verified video editors
             </h2>
             <p className="text-white/40 text-sm max-w-md">
-              Answer 5 quick questions about your style, budget, and deadline — we'll match you with the 3 best-fit editors.
+              Filter by niche, software, rating, or budget, and place your first escrow-protected order in minutes.
             </p>
           </div>
           <MagBtn className="relative z-10 shrink-0">
             <Link
-              href="/find-editor"
+              href="/browse"
               className="inline-flex items-center gap-2.5 bg-white text-[var(--brand-client)] hover:bg-white/92 font-black px-8 py-4 text-sm rounded-2xl shadow-2xl transition-all whitespace-nowrap"
             >
-              Take the quiz <ArrowRight className="w-4 h-4" />
+              Browse editors <ArrowRight className="w-4 h-4" />
             </Link>
           </MagBtn>
         </div>
@@ -715,15 +715,15 @@ const MOCKUP_CONTENT = [
     </div>
     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2.5">
       <div className="flex justify-between items-center"><span className="text-xs text-gray-500">Package price</span><span className="text-sm font-bold text-gray-900">₹4,500</span></div>
-      <div className="flex justify-between items-center"><span className="text-xs text-gray-400">Platform fee (4%)</span><span className="text-xs text-gray-400">₹180</span></div>
+      <div className="flex justify-between items-center"><span className="text-xs text-gray-400">Platform fee (10%)</span><span className="text-xs text-gray-400">₹450</span></div>
       <div className="h-px bg-gray-200" />
-      <div className="flex justify-between items-center"><span className="text-xs font-bold text-gray-900">Total charged</span><span className="text-base font-black text-gray-900">₹4,680</span></div>
+      <div className="flex justify-between items-center"><span className="text-xs font-bold text-gray-900">Total charged</span><span className="text-base font-black text-gray-900">₹4,950</span></div>
     </div>
-    <div className="flex items-start gap-2.5 bg-sky-50 border border-sky-100 rounded-xl p-3">
-      <Lock className="w-4 h-4 text-sky-500 mt-0.5 shrink-0"/>
+    <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl p-3">
+      <Lock className="w-4 h-4 text-brand-primary mt-0.5 shrink-0"/>
       <div>
-        <p className="text-sky-800 text-[11px] font-semibold">Payment held — not released yet</p>
-        <p className="text-sky-500 text-[10px] mt-0.5">Released to editor only after you approve</p>
+        <p className="text-blue-800 text-[11px] font-semibold">Payment held — not released yet</p>
+        <p className="text-brand-primary text-[10px] mt-0.5">Released to editor only after you approve</p>
       </div>
     </div>
     <motion.div animate={{boxShadow:["0 0 0 rgba(124,111,247,0)","0 0 20px rgba(124,111,247,0.5)","0 0 0 rgba(124,111,247,0)"]}} transition={{duration:2,repeat:Infinity}}
@@ -854,7 +854,7 @@ export function AnimatedHowItWorks() {
                       <div className="shrink-0 relative z-10 mt-0.5">
                         <motion.div animate={{ background: isActive ? accent : isDone ? "#1e1b4b" : "rgba(255,255,255,0.04)" }}
                           className="w-11 h-11 rounded-full flex items-center justify-center border transition-all"
-                          style={{ borderColor: isActive ? `${accent}60` : isDone ? "#0EA5E960" : "rgba(255,255,255,0.08)" }}>
+                          style={{ borderColor: isActive ? `${accent}60` : isDone ? "#1e40af60" : "rgba(255,255,255,0.08)" }}>
                           {isDone
                             ? <CheckCircle className="w-4 h-4 text-[#7c6ff7]" />
                             : <Icon className="w-4 h-4" style={{ color: isActive ? "white" : "rgba(255,255,255,0.2)" }} />
@@ -1023,13 +1023,13 @@ function EditorCard({ e, i }: { e: any; i: number }) {
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "group relative rounded-2xl border transition-premium overflow-hidden flex flex-col backdrop-blur-md bg-white/5 border-white/10 transition-shadow duration-300",
-        e.hasHighlight ? "border-sky-400/60 ring-1 ring-sky-400/30" : ""
+        "group relative rounded-2xl border transition-premium overflow-hidden flex flex-col bg-white border-neutral-200/80 transition-shadow duration-300",
+        e.hasHighlight ? "border-brand-primary/65 ring-1 ring-blue-800/35" : ""
       )}
       style={{
         boxShadow: isHovered
-          ? `${-shadowOffset.x}px ${-shadowOffset.y}px 25px rgba(0, 0, 0, 0.45)`
-          : "0 4px 20px rgba(0, 0, 0, 0.25)"
+          ? `${-shadowOffset.x}px ${-shadowOffset.y}px 25px rgba(0, 0, 0, 0.12)`
+          : "0 4px 20px rgba(0, 0, 0, 0.05)"
       }}
     >
       {/* Dynamic Cursor Light Source Overlay */}
@@ -1037,13 +1037,13 @@ function EditorCard({ e, i }: { e: any; i: number }) {
         <div
           className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300 z-10"
           style={{
-            background: `radial-gradient(350px circle at ${coords.x}px ${coords.y}px, rgba(255,255,255,0.06), transparent 80%)`,
+            background: `radial-gradient(350px circle at ${coords.x}px ${coords.y}px, rgba(0,0,0,0.02), transparent 80%)`,
           }}
         />
       )}
 
       {/* Visual Preview Header (16:9 ratio) */}
-      <div className="relative aspect-video w-full bg-gray-950 border-b border-white/5 overflow-hidden flex items-center justify-center shrink-0">
+      <div className="relative aspect-video w-full bg-neutral-100 border-b border-neutral-200/50 overflow-hidden flex items-center justify-center shrink-0">
         <PortfolioPreview
           videoUrl={e.videoUrl}
           thumbnailUrl={e.thumbnailUrl}
@@ -1069,41 +1069,41 @@ function EditorCard({ e, i }: { e: any; i: number }) {
             )}
           </div>
           {e.isFeatured
-            ? <span className="text-[9px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-full px-2.5 py-1">Featured</span>
-            : <span className="text-[9px] font-bold bg-sky-500/10 text-sky-300 border border-sky-500/20 rounded-full px-2.5 py-1 flex items-center gap-1">
+            ? <span className="text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-200/60 rounded-full px-2.5 py-1">Featured</span>
+            : <span className="text-[9px] font-bold bg-blue-50 text-brand-primary border border-blue-200/60 rounded-full px-2.5 py-1 flex items-center gap-1">
                 <ShieldCheck className="w-2.5 h-2.5" /> KYC Verified
               </span>
           }
         </div>
-        <h3 className="font-black text-white text-lg leading-tight mb-0.5">{e.name}</h3>
-        <p className="text-sm text-white/60 mb-2">{e.role}</p>
+        <h3 className="font-black text-neutral-900 text-lg leading-tight mb-0.5">{e.name}</h3>
+        <p className="text-sm text-neutral-500 mb-2">{e.role}</p>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
             <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-            <span className="text-xs font-bold text-white/90">{e.rating.toFixed(1)}</span>
-            {e.reviews > 0 && <span className="text-xs text-white/40">({e.reviews})</span>}
+            <span className="text-xs font-bold text-neutral-800">{e.rating.toFixed(1)}</span>
+            {e.reviews > 0 && <span className="text-xs text-neutral-400">({e.reviews})</span>}
           </div>
-          <span className="text-white/20">·</span>
-          <span className="text-xs text-white/45">{e.loc}</span>
+          <span className="text-neutral-200">·</span>
+          <span className="text-xs text-neutral-500">{e.loc}</span>
         </div>
       </div>
 
       {/* Skills */}
-      <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-white/5">
+      <div className="px-6 py-4 flex flex-wrap gap-1.5 border-b border-neutral-100">
         {e.skills.map((s: string) => (
-          <span key={s} className="text-[11px] font-medium bg-white/10 text-white/80 rounded-lg px-2.5 py-1 transition-premium">{s}</span>
+          <span key={s} className="text-[11px] font-medium bg-neutral-150/70 text-neutral-600 rounded-lg px-2.5 py-1 transition-premium bg-neutral-100">{s}</span>
         ))}
       </div>
 
       {/* Stats row */}
-      <div className="px-6 py-4 flex items-center gap-4 border-b border-white/5">
-        <div className="flex items-center gap-1.5 text-xs text-white/60">
-          <Package className="w-3.5 h-3.5 text-white/30" />
-          {e.orders > 0 ? `${e.orders} orders` : <span className="text-white/30">New</span>}
+      <div className="px-6 py-4 flex items-center gap-4 border-b border-neutral-100">
+        <div className="flex items-center gap-1.5 text-xs text-neutral-600">
+          <Package className="w-3.5 h-3.5 text-neutral-400" />
+          {e.orders > 0 ? `${e.orders} orders` : <span className="text-neutral-400">New</span>}
         </div>
-        <span className="text-white/20">·</span>
-        <div className="flex items-center gap-1.5 text-xs text-white/60">
-          <Clock className="w-3.5 h-3.5 text-white/30" />
+        <span className="text-neutral-200">·</span>
+        <div className="flex items-center gap-1.5 text-xs text-neutral-600">
+          <Clock className="w-3.5 h-3.5 text-neutral-400" />
           {e.time} delivery
         </div>
       </div>
@@ -1111,12 +1111,12 @@ function EditorCard({ e, i }: { e: any; i: number }) {
       {/* Price + CTA */}
       <div className="px-6 py-5 flex items-center justify-between mt-auto">
         <div>
-          <p className="text-[10px] text-white/40 font-medium mb-0.5">Starting from</p>
-          <p className="text-xl font-black text-white">{e.price}</p>
+          <p className="text-[10px] text-neutral-400 font-medium mb-0.5">Starting from</p>
+          <p className="text-xl font-black text-neutral-900">{e.price}</p>
         </div>
         <Link href={editorHref}
           className="inline-flex items-center gap-1.5 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all hover:opacity-90 hover:scale-[1.03]"
-          style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}40` }}>
+          style={{ background: e.col, boxShadow: `0 6px 20px ${e.col}20` }}>
           Book now <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -1161,11 +1161,11 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
       });
 
   return (
-    <section className="bg-[#080E1A] py-10 md:py-16 px-6 text-white border-y border-white/5 relative overflow-hidden">
+    <section className="bg-white py-10 md:py-16 px-6 text-neutral-900 border-y border-neutral-200/60 relative overflow-hidden">
       {/* Background soft glowing blobbies */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div className="absolute -left-1/4 top-1/4 w-96 h-96 rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="absolute -right-1/4 bottom-1/4 w-96 h-96 rounded-full bg-sky-600/20 blur-3xl" />
+      <div className="absolute inset-0 pointer-events-none opacity-40">
+        <div className="absolute -left-1/4 top-1/4 w-96 h-96 rounded-full bg-violet-100/50 blur-3xl" />
+        <div className="absolute -right-1/4 bottom-1/4 w-96 h-96 rounded-full bg-blue-100/50 blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -1176,11 +1176,11 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
               <div className="h-px w-10 bg-[var(--brand-client)]"/>
               <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.28em]">Our editors</span>
             </div>
-            <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-none">
-              Verified talent.<br /><span className="text-white/20">Ready now.</span>
+            <h2 className="text-4xl sm:text-6xl font-black text-neutral-900 tracking-tight leading-none">
+              Verified talent.<br /><span className="text-neutral-300">Ready now.</span>
             </h2>
           </Reveal>
-          <Link href="/browse" className="inline-flex items-center gap-2 border border-white/10 text-white/60 hover:text-white hover:border-white/30 text-sm font-medium px-5 py-2.5 rounded-xl transition-all">
+          <Link href="/browse" className="inline-flex items-center gap-2 border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 text-sm font-medium px-5 py-2.5 rounded-xl transition-all shadow-sm bg-white">
             All editors <ArrowUpRight className="w-4 h-4"/>
           </Link>
         </div>
@@ -1193,7 +1193,7 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
                 "text-xs font-semibold px-4 py-2 rounded-full border transition-all cursor-pointer",
                 activeFilter === label
                   ? "bg-[var(--brand-client)] text-white border-[var(--brand-client)] shadow-sm"
-                  : "bg-white/5 text-white/60 border-white/10 hover:border-white/20 hover:text-white"
+                  : "bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300 hover:text-neutral-900"
               )}>
               {label}
             </button>
@@ -1213,17 +1213,17 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: filteredEditors.length * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02] hover:border-[var(--brand-client)]/40 hover:bg-[var(--brand-client)]/5 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
+              className="relative rounded-2xl border-2 border-dashed border-neutral-200 bg-neutral-50/50 hover:border-[var(--brand-client)]/40 hover:bg-[var(--brand-client)]/5 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center text-center p-8 min-h-[300px] group"
             >
               <div className="w-14 h-14 rounded-2xl bg-[var(--brand-client)]/10 flex items-center justify-center mb-4 group-hover:bg-[var(--brand-client)]/15 transition-colors">
                 <ArrowUpRight className="w-6 h-6 text-[var(--brand-client)]" />
               </div>
-              <h3 className="font-black text-white text-lg mb-2">Become a verified editor</h3>
-              <p className="text-sm text-white/40 mb-6 leading-relaxed max-w-[200px]">
+              <h3 className="font-black text-neutral-900 text-lg mb-2">Become a verified editor</h3>
+              <p className="text-sm text-neutral-500 mb-6 leading-relaxed max-w-[200px]">
                 Join EditBridge, get KYC verified, and start earning from clients across India.
               </p>
               <Link href="/signup/editor"
-                className="inline-flex items-center gap-2 bg-white text-black text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-neutral-100 hover:scale-[1.02] transition-all"
+                className="inline-flex items-center gap-2 bg-black text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-neutral-800 hover:scale-[1.02] transition-all"
                 style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.15)" }}>
                 Apply now <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -1233,7 +1233,7 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
 
         {/* View all */}
         <div className="mt-10 flex justify-center">
-          <Link href="/browse" className="inline-flex items-center gap-2 border border-white/15 text-white hover:bg-white/5 font-semibold px-6 py-3 rounded-xl text-sm transition-all">
+          <Link href="/browse" className="inline-flex items-center gap-2 border border-neutral-200 text-neutral-850 hover:bg-neutral-50 font-semibold px-6 py-3 rounded-xl text-sm transition-all shadow-sm bg-white">
             View all {editorCount > 0 ? `${editorCount}+` : ""} editors <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -1362,9 +1362,9 @@ export function BeforeAfterSection() {
                   <div className="flex gap-1 items-center">
                     <div className="w-7 text-[7px] text-white/25 text-right shrink-0 font-mono">V1</div>
                     <div className="flex-1 h-3.5 bg-white/[0.04] rounded overflow-hidden relative flex gap-0.5 p-0.5">
-                      <motion.div initial={{ width: 0 }} whileInView={{ width: "32%" }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.1, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "linear-gradient(90deg,#0EA5E9,#38bdf8)" }} />
-                      <motion.div initial={{ width: 0 }} whileInView={{ width: "28%" }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.25, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "linear-gradient(90deg,#0EA5E9,#0284c7)" }} />
-                      <motion.div initial={{ width: 0 }} whileInView={{ width: "30%" }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.38, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "linear-gradient(90deg,#0EA5E9,#38bdf8)" }} />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: "32%" }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.1, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "linear-gradient(90deg,#1e40af,#38bdf8)" }} />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: "28%" }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.25, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "linear-gradient(90deg,#1e40af,#1e3a8a)" }} />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: "30%" }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.38, ease: [0.22,1,0.36,1] }} className="h-full rounded-sm shrink-0" style={{ background: "linear-gradient(90deg,#1e40af,#38bdf8)" }} />
                     </div>
                   </div>
                   {/* A1 — normalized audio waveform */}
@@ -1637,7 +1637,7 @@ export function AnimatedAbout() {
     <section className="bg-[#06040f] py-10 md:py-16 px-6 overflow-hidden relative">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div animate={{ x:["0%","14%","0%"],y:["0%","8%","0%"] }} transition={{ duration:20,repeat:Infinity,ease:"easeInOut" }}
-          className="absolute -top-1/3 -right-1/4 w-[700px] h-[600px] rounded-full opacity-25" style={{background:"radial-gradient(ellipse,#0EA5E9,transparent 65%)"}}/>
+          className="absolute -top-1/3 -right-1/4 w-[700px] h-[600px] rounded-full opacity-25" style={{background:"radial-gradient(ellipse,#1e40af,transparent 65%)"}}/>
         <motion.div animate={{ x:["0%","-10%","0%"],y:["0%","12%","0%"] }} transition={{ duration:25,repeat:Infinity,ease:"easeInOut",delay:5 }}
           className="absolute bottom-0 left-0 w-[600px] h-[500px] rounded-full opacity-18" style={{background:"radial-gradient(ellipse,#0F6E56,transparent 65%)"}}/>
       </div>
@@ -2069,19 +2069,19 @@ export function ComparisonSection() {
     <section className="relative bg-[#060A14] py-10 md:py-16 px-6 overflow-hidden">
       {/* ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-sky-500/[0.04] rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-brand-primary/[0.04] rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-5xl mx-auto relative">
         {/* ── Heading ── */}
         <Reveal className="text-center mb-10 md:mb-20">
-          <div className="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/20 rounded-full px-4 py-1.5 mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse inline-block" />
-            <span className="text-xs font-semibold text-sky-400 uppercase tracking-[0.18em]">Why EditBridge</span>
+          <div className="inline-flex items-center gap-2 bg-brand-primary/10 border border-brand-primary/20 rounded-full px-4 py-1.5 mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse inline-block" />
+            <span className="text-xs font-semibold text-blue-400 uppercase tracking-[0.18em]">Why EditBridge</span>
           </div>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.05]">
             Every edge.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300">In one platform.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">In one platform.</span>
           </h2>
           <p className="mt-5 text-gray-500 text-base max-w-sm mx-auto leading-relaxed">
             A clear-eyed look at how we stack up against your other options.
@@ -2095,7 +2095,7 @@ export function ComparisonSection() {
               <button key={tab.key} onClick={() => setMobileTab(tab.key)}
                 className={cn("flex-1 py-3 text-xs font-bold transition-colors",
                   mobileTab === tab.key
-                    ? tab.highlight ? "bg-sky-500 text-white" : "bg-white/10 text-white"
+                    ? tab.highlight ? "bg-brand-primary text-white" : "bg-white/10 text-white"
                     : "text-gray-500 hover:text-gray-400"
                 )}>
                 {tab.label}
@@ -2133,13 +2133,13 @@ export function ComparisonSection() {
             })}
           </div>
           <div className={cn("mt-4 rounded-2xl p-4 text-center border",
-            mobileTab === "eb" ? "bg-sky-500/10 border-sky-500/30" : "bg-white/[0.02] border-white/[0.06]"
+            mobileTab === "eb" ? "bg-brand-primary/10 border-brand-primary/30" : "bg-white/[0.02] border-white/[0.06]"
           )}>
-            <div className={cn("text-xl font-black tabular-nums", mobileTab === "eb" ? "text-sky-400" : "text-gray-500")}>
+            <div className={cn("text-xl font-black tabular-nums", mobileTab === "eb" ? "text-blue-400" : "text-gray-500")}>
               {mobileTab === "eb" ? ebCount : mobileTab === "diy" ? diyCount : agCount}
-              <span className={cn("text-sm font-medium", mobileTab === "eb" ? "text-sky-600" : "text-gray-700")}>/{total} features</span>
+              <span className={cn("text-sm font-medium", mobileTab === "eb" ? "text-brand-primary" : "text-gray-700")}>/{total} features</span>
             </div>
-            <div className={cn("text-xs mt-0.5", mobileTab === "eb" ? "text-sky-500 font-semibold" : "text-gray-700")}>
+            <div className={cn("text-xs mt-0.5", mobileTab === "eb" ? "text-brand-primary font-semibold" : "text-gray-700")}>
               {MOBILE_TABS.find(t => t.key === mobileTab)?.label}
             </div>
           </div>
@@ -2170,15 +2170,15 @@ export function ComparisonSection() {
 
                 {/* EditBridge header — elevated card top */}
                 <div className="relative flex flex-col items-center">
-                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gradient-to-r from-sky-500 to-cyan-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full shadow-lg shadow-sky-500/40 z-20">
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gradient-to-r from-blue-800 to-cyan-400 text-white text-[10px] font-black uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full shadow-lg shadow-blue-800/40 z-20">
                     Best Pick
                   </div>
                   <div
-                    className="w-full rounded-t-2xl border-t border-x border-sky-500/30 bg-gradient-to-b from-sky-500/[0.18] to-sky-500/[0.06] px-4 py-5 text-center relative z-10"
+                    className="w-full rounded-t-2xl border-t border-x border-brand-primary/30 bg-gradient-to-b from-blue-800/[0.18] to-blue-800/[0.06] px-4 py-5 text-center relative z-10"
                     style={{ boxShadow: "0 -12px 48px rgba(14,165,233,0.18), inset 0 1px 0 rgba(14,165,233,0.4)" }}
                   >
                     <span className="text-base font-black text-white">EditBridge</span>
-                    <div className="text-[11px] text-sky-400 mt-0.5 font-semibold tabular-nums">{ebCount}/{total} match</div>
+                    <div className="text-[11px] text-blue-400 mt-0.5 font-semibold tabular-nums">{ebCount}/{total} match</div>
                   </div>
                 </div>
               </div>
@@ -2237,8 +2237,8 @@ export function ComparisonSection() {
 
                       {/* EditBridge — always ✓, glowing column */}
                       <div className={cn(
-                        "py-4 flex items-center justify-center border-x border-sky-500/20 transition-colors duration-150 bg-sky-500/[0.05] group-hover:bg-sky-500/[0.09]",
-                        isLast && "rounded-b-2xl border-b border-sky-500/20",
+                        "py-4 flex items-center justify-center border-x border-brand-primary/20 transition-colors duration-150 bg-brand-primary/[0.05] group-hover:bg-brand-primary/[0.09]",
+                        isLast && "rounded-b-2xl border-b border-brand-primary/20",
                       )}>
                         <motion.div
                           initial={{ scale: 0, rotate: -10 }}
@@ -2269,14 +2269,14 @@ export function ComparisonSection() {
             <div key={col.label} className={cn(
               "rounded-2xl p-4 text-center border",
               col.highlight
-                ? "bg-sky-500/10 border-sky-500/30"
+                ? "bg-brand-primary/10 border-brand-primary/30"
                 : "bg-white/[0.02] border-white/[0.06]",
             )}>
-              <div className={cn("text-2xl font-black tabular-nums", col.highlight ? "text-sky-400" : "text-gray-600")}>
+              <div className={cn("text-2xl font-black tabular-nums", col.highlight ? "text-blue-400" : "text-gray-600")}>
                 {col.count}
-                <span className={cn("text-sm font-medium", col.highlight ? "text-sky-600" : "text-gray-700")}>/{total}</span>
+                <span className={cn("text-sm font-medium", col.highlight ? "text-brand-primary" : "text-gray-700")}>/{total}</span>
               </div>
-              <div className={cn("text-xs mt-0.5 font-medium", col.highlight ? "text-sky-500" : "text-gray-700")}>{col.label}</div>
+              <div className={cn("text-xs mt-0.5 font-medium", col.highlight ? "text-brand-primary" : "text-gray-700")}>{col.label}</div>
             </div>
           ))}
         </Reveal>
@@ -2343,12 +2343,12 @@ export function PricingPreviewSection() {
               <div className={cn(
                 "relative rounded-3xl p-8 flex flex-col h-full border transition-all",
                 tier.popular
-                  ? "border-[var(--brand-client)]/30 shadow-xl shadow-sky-500/10"
+                  ? "border-[var(--brand-client)]/30 shadow-xl shadow-blue-800/10"
                   : "border-gray-100 hover:border-gray-200"
               )}>
                 {tier.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-[var(--brand-client)] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-sky-500/30">
+                    <span className="bg-[var(--brand-client)] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-blue-800/30">
                       Most popular
                     </span>
                   </div>
@@ -2380,7 +2380,7 @@ export function PricingPreviewSection() {
         </div>
 
         <Reveal className="text-center mt-10">
-          <p className="text-xs text-gray-400">4% processing fee charged to clients · 15% commission deducted from editor payout · All prices in INR</p>
+          <p className="text-xs text-gray-400">10% processing fee charged to clients · 20% commission deducted from editor payout · All prices in INR</p>
         </Reveal>
       </div>
     </section>
@@ -2396,7 +2396,7 @@ export function ForEditorsSection() {
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border border-white/[0.06]">
         {/* Client side */}
         <Reveal from="left">
-          <div className="relative p-7 lg:p-14 h-full flex flex-col justify-between overflow-hidden" style={{ background: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)" }}>
+          <div className="relative p-7 lg:p-14 h-full flex flex-col justify-between overflow-hidden" style={{ background: "linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)" }}>
             <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20" style={{ background: "radial-gradient(ellipse, #ffffff, transparent 70%)" }} />
             <div className="relative">
@@ -2417,7 +2417,7 @@ export function ForEditorsSection() {
               </ul>
             </div>
             <Link href="/browse"
-              className="inline-flex items-center gap-2 self-start bg-white text-[#0284C7] font-black px-7 py-3.5 rounded-2xl text-sm hover:bg-blue-50 transition-colors shadow-xl">
+              className="inline-flex items-center gap-2 self-start bg-white text-[#1e3a8a] font-black px-7 py-3.5 rounded-2xl text-sm hover:bg-blue-50 transition-colors shadow-xl">
               Find your editor <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -2465,14 +2465,14 @@ export function EditorEarningsCalculator() {
   const reduced = useReducedMotion();
 
   const gross = ordersPerMonth * avgPrice;
-  const commission = Math.round(gross * 0.15);
+  const commission = Math.round(gross * 0.20);
   const net = gross - commission;
   const annual = net * 12;
   const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
   const rows = [
     { label: "Gross monthly",      val: fmt(gross),       sub: `${ordersPerMonth} × ₹${avgPrice.toLocaleString("en-IN")}`,  col: "#ffffff",  bg: "rgba(255,255,255,0.04)",  border: "rgba(255,255,255,0.08)"  },
-    { label: "Platform fee (15%)", val: `-${fmt(commission)}`, sub: "Kept by EditBridge",                                   col: "#f87171",  bg: "rgba(239,68,68,0.06)",    border: "rgba(239,68,68,0.12)"    },
+    { label: "Platform fee (20%)", val: `-${fmt(commission)}`, sub: "Kept by EditBridge",                                   col: "#f87171",  bg: "rgba(239,68,68,0.06)",    border: "rgba(239,68,68,0.12)"    },
     { label: "You keep",           val: fmt(net),          sub: "Net monthly payout",                                        col: "#a78bfa",  bg: "rgba(124,58,237,0.08)",   border: "rgba(124,58,237,0.20)"   },
     { label: "Annual projection",  val: fmt(annual),       sub: "At this pace, per year",                                    col: "#34d399",  bg: "rgba(15,110,86,0.08)",    border: "rgba(15,110,86,0.20)"    },
   ];
@@ -2490,7 +2490,7 @@ export function EditorEarningsCalculator() {
             See what you&apos;d<br /><span style={{ color: "#a78bfa" }}>take home.</span>
           </h2>
           <p className="text-white/40 text-base max-w-xs mx-auto">
-            Set your rates, see your net payout after our 15% platform commission.
+            Set your rates, see your net payout after our 20% platform commission.
           </p>
         </Reveal>
 
@@ -2784,7 +2784,7 @@ export function AnimatedCTA() {
         animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         className="absolute inset-0 pointer-events-none opacity-[0.18]"
-        style={{ backgroundImage: "linear-gradient(135deg, #0EA5E9 0%, var(--brand-editor) 25%, #0F6E56 50%, #F59E0B 75%, #0EA5E9 100%)", backgroundSize: "400% 400%" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #1e40af 0%, var(--brand-editor) 25%, #0F6E56 50%, #F59E0B 75%, #1e40af 100%)", backgroundSize: "400% 400%" }}
       />
       <motion.div animate={{scale:[1,1.2,1],opacity:[0.3,0.55,0.3]}} transition={{duration:8,repeat:Infinity,ease:"easeInOut"}}
         className="absolute top-0 right-0 w-[700px] h-[600px] rounded-full pointer-events-none"
@@ -3020,19 +3020,19 @@ const ESCROW_STEPS = [
 
 export function EscrowFlowSection() {
   return (
-    <section className="bg-[#06040f] py-10 px-6 overflow-hidden">
+    <section className="bg-[#F8FAFC] py-10 px-6 overflow-hidden relative border-y border-neutral-200/60">
       {/* Subtle grid */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.7) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.7) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.7) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.7) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
       <div className="max-w-6xl mx-auto relative z-10">
         <Reveal className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-[var(--brand-client)]/10 border border-[var(--brand-client)]/20 rounded-full px-4 py-1.5 mb-5">
             <Lock className="w-3 h-3 text-[var(--brand-client)]" />
             <span className="text-[10px] font-black text-[var(--brand-client)] uppercase tracking-[0.2em]">How your money is protected</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-4">
-            Every rupee protected.<br /><span className="text-white/25">Every step of the way.</span>
+          <h2 className="text-3xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-tight mb-4">
+            Every rupee protected.<br /><span className="text-neutral-400">Every step of the way.</span>
           </h2>
-          <p className="text-white/40 text-base max-w-xl mx-auto">
+          <p className="text-neutral-500 text-base max-w-xl mx-auto">
             EditBridge uses escrow — your payment is held securely until YOU decide the work is good enough to pay for.
           </p>
         </Reveal>
@@ -3041,22 +3041,22 @@ export function EscrowFlowSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
           {/* Connector line — desktop only */}
           <div className="absolute top-8 left-[12.5%] right-[12.5%] h-px hidden lg:block"
-            style={{ background: "linear-gradient(90deg, #0EA5E9, var(--brand-editor), #0F6E56, #F59E0B)" }} />
+            style={{ background: "linear-gradient(90deg, #1e40af, var(--brand-editor), #0F6E56, #F59E0B)" }} />
 
           {ESCROW_STEPS.map(({ n, icon: Icon, color, title, desc }, i) => (
             <Reveal key={n} delay={i * 0.1}>
-              <div className="relative flex flex-col items-start gap-4 bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 h-full hover:border-white/[0.14] transition-colors">
+              <div className="relative flex flex-col items-start gap-4 bg-white border border-neutral-200/80 shadow-sm rounded-2xl p-6 h-full hover:border-neutral-300 transition-colors">
                 {/* Step number + icon */}
                 <div className="flex items-center gap-3 w-full">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 relative z-10 bg-[#06040f]"
-                    style={{ border: `2px solid ${color}`, boxShadow: `0 0 16px ${color}40` }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 relative z-10 bg-white"
+                    style={{ border: `2px solid ${color}`, boxShadow: `0 0 16px ${color}15` }}>
                     <Icon className="w-[18px] h-[18px]" style={{ color }} />
                   </div>
-                  <span className="text-[10px] font-black tracking-[0.2em] text-white/20">{n}</span>
+                  <span className="text-[10px] font-black tracking-[0.2em] text-neutral-300">{n}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-black text-white leading-snug mb-2" style={{ color }}>{title}</p>
-                  <p className="text-xs text-white/40 leading-relaxed">{desc}</p>
+                  <p className="text-sm font-black leading-snug mb-2" style={{ color }}>{title}</p>
+                  <p className="text-xs text-neutral-500 leading-relaxed">{desc}</p>
                 </div>
               </div>
             </Reveal>
@@ -3065,10 +3065,10 @@ export function EscrowFlowSection() {
 
         {/* Guarantee callout */}
         <Reveal delay={0.4}>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left bg-white/[0.04] border border-white/[0.08] rounded-2xl px-8 py-5">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left bg-white border border-neutral-200/80 shadow-sm rounded-2xl px-8 py-5">
             <ShieldCheck className="w-7 h-7 text-[var(--brand-teal)] shrink-0" />
-            <p className="text-white/60 text-sm leading-relaxed max-w-xl">
-              <span className="text-white font-bold">Still unhappy after revisions?</span> Raise a dispute. Our team reviews both sides and issues a full refund if the work genuinely misses the brief. Zero questions asked.
+            <p className="text-neutral-600 text-sm leading-relaxed max-w-xl">
+              <span className="text-neutral-850 font-bold text-neutral-800">Still unhappy after revisions?</span> Raise a dispute. Our team reviews both sides and issues a full refund if the work genuinely misses the brief. Zero questions asked.
             </p>
             <Link href="/how-it-works"
               className="shrink-0 text-[var(--brand-client)] text-xs font-bold hover:underline whitespace-nowrap">

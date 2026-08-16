@@ -1178,7 +1178,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
             <button
               onClick={() => save("in-review")}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-sky-700 border border-sky-200 bg-sky-50/80 hover:bg-sky-100 transition-all disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-blue-900 border border-blue-200 bg-blue-50/80 hover:bg-blue-100 transition-all disabled:opacity-40"
             >
               <FileClock className="w-3 h-3" />
               For review
@@ -1582,7 +1582,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                               href={twitterShareHref}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-extrabold uppercase tracking-wider text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-100 transition-colors shadow-xs"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-extrabold uppercase tracking-wider text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-100 transition-colors shadow-xs"
                             >
                               Share X
                             </a>
@@ -1795,8 +1795,8 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                   <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-sky-100/60 flex items-center justify-center">
-                        <Zap className="w-3.5 h-3.5 text-sky-500" />
+                      <div className="w-6 h-6 rounded-lg bg-blue-100/60 flex items-center justify-center">
+                        <Zap className="w-3.5 h-3.5 text-brand-primary" />
                       </div>
                       <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.1em]">SEO Score</span>
                     </div>

@@ -74,7 +74,7 @@ export default async function EditorDisputesPage() {
 
         {/* Info banner */}
         <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4">
-          <p className="text-sm font-medium text-blue-800 mb-0.5">How disputes work</p>
+          <p className="text-sm font-medium text-brand-primary mb-0.5">How disputes work</p>
           <p className="text-xs text-blue-700 leading-relaxed">
             A client may open a dispute if they're unhappy with a delivery. You can submit your response below and our team will review within 3 business days. Keep communication professional.
           </p>

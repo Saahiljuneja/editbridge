@@ -8,6 +8,7 @@ import { and, eq, sql, desc } from "drizzle-orm";
 import { formatCurrency } from "@/lib/utils";
 import { BarChart2 } from "lucide-react";
 import nextDynamic from "next/dynamic";
+import { TopoBackground } from "@/components/common/topo-background";
 
 const SpendingCharts = nextDynamic(
   () => import("./spending-charts").then((m) => m.SpendingCharts)
@@ -73,20 +74,20 @@ export default async function ClientAnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-6xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Spending Analytics</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Your EditBridge spending at a glance</p>
+            <h1 className="text-xl font-bold text-neutral-900">Spending Analytics</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">Your EditBridge spending at a glance</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
-            <BarChart2 className="w-4 h-4 text-[var(--brand-client)]" />
+          <div className="w-10 h-10 rounded-2xl bg-[#1e40af]/10 flex items-center justify-center shrink-0">
+            <BarChart2 className="w-5 h-5 text-[#1e40af]" />
           </div>
         </div>
-      </div>
 
-      <div className="px-6 py-6 space-y-6">
         {/* KPI cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map(({ label, value }) => (

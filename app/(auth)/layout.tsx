@@ -239,8 +239,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                   </div>
 
                   {/* Audio Track */}
-                  <div style={{ display: "flex", height: "14px", background: "rgba(14, 165, 233, 0.15)", border: "1px solid rgba(14, 165, 233, 0.25)", borderRadius: "4px", overflow: "hidden", alignItems: "center", padding: "0 6px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: 700, color: "#7dd3fc", whiteSpace: "nowrap" }}>A1 - Stereo Music Mix</span>
+                  <div style={{ display: "flex", height: "14px", background: "rgba(30, 64, 175, 0.15)", border: "1px solid rgba(30, 64, 175, 0.25)", borderRadius: "4px", overflow: "hidden", alignItems: "center", padding: "0 6px" }}>
+                    <span style={{ fontSize: "8px", fontWeight: 700, color: "#93c5fd", whiteSpace: "nowrap" }}>A1 - Stereo Music Mix</span>
                   </div>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <div style={{ display: "flex", gap: "10px", marginBottom: "16px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "14px", padding: "10px 12px" }}>
                 <div style={{
                   width: "28px", height: "28px", borderRadius: "50%",
-                  background: "linear-gradient(135deg, #0ea5e9, #8b5cf6)",
+                  background: "linear-gradient(135deg, #1e40af, #8b5cf6)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "11px", fontWeight: 800, color: "white", flexShrink: 0,
                   boxShadow: "0 4px 10px rgba(14,165,233,0.25)",

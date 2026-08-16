@@ -26,7 +26,7 @@ const STATUS_CONFIG: Record<
   { label: string; stripe: string; badge: string; icon: LucideIcon }
 > = {
   pending:  { label: "Awaiting your reply", stripe: "bg-amber-400",   badge: "bg-amber-50 text-amber-700 border border-amber-200",     icon: Clock },
-  offered:  { label: "Offer sent",          stripe: "bg-[#0EA5E9]",   badge: "bg-sky-50 text-sky-700 border border-sky-200",           icon: Sparkles },
+  offered:  { label: "Offer sent",          stripe: "bg-[#1e40af]",   badge: "bg-blue-50 text-blue-900 border border-blue-200",           icon: Sparkles },
   accepted: { label: "Accepted",            stripe: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",icon: CheckCircle2 },
   paid:     { label: "Accepted & paid",     stripe: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",icon: CheckCircle2 },
   declined: { label: "Declined by client",  stripe: "bg-red-400",     badge: "bg-red-50 text-red-600 border border-red-200",            icon: XCircle },
@@ -89,8 +89,8 @@ export default async function EditorQuotesPage() {
       <div className="max-w-3xl mx-auto px-6 py-6">
         {quotes.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-sky-50 flex items-center justify-center mb-4">
-              <MessageSquare className="w-7 h-7 text-[#0EA5E9]" />
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
+              <MessageSquare className="w-7 h-7 text-[#1e40af]" />
             </div>
             <p className="font-semibold text-gray-800">No quote requests yet</p>
             <p className="text-sm text-gray-400 mt-1 max-w-xs">
@@ -131,7 +131,7 @@ export default async function EditorQuotesPage() {
                     <div className="px-5 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Client avatar */}
-                        <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-bold text-[#0EA5E9] shrink-0 uppercase select-none">
+                        <div className="w-8 h-8 rounded-full bg-[#1e40af]/10 flex items-center justify-center text-xs font-bold text-[#1e40af] shrink-0 uppercase select-none">
                           {clientInitials || "?"}
                         </div>
                         <p className="text-sm font-semibold text-gray-900 truncate">
@@ -177,7 +177,7 @@ export default async function EditorQuotesPage() {
                             href={quote.referenceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
+                            className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-blue-50 text-brand-primary hover:bg-blue-100 transition-colors"
                           >
                             <ExternalLink className="w-3 h-3" /> Reference
                           </a>
@@ -199,17 +199,17 @@ export default async function EditorQuotesPage() {
 
                       {/* Offer sent */}
                       {quote.status === "offered" && quote.offeredPrice && (
-                        <div className="rounded-xl border border-sky-200 bg-sky-50/60 px-4 py-3 space-y-1.5">
+                        <div className="rounded-xl border border-blue-200 bg-blue-50/60 px-4 py-3 space-y-1.5">
                           <div className="flex items-center justify-between">
-                            <p className="text-xs font-semibold text-sky-700 uppercase tracking-wider">
+                            <p className="text-xs font-semibold text-blue-900 uppercase tracking-wider">
                               Your offer
                             </p>
-                            <p className="text-lg font-bold text-sky-700 tabular-nums">
+                            <p className="text-lg font-bold text-blue-900 tabular-nums">
                               {formatCurrency(quote.offeredPrice)}
                             </p>
                           </div>
                           {quote.offerMessage && (
-                            <p className="text-sm text-sky-800 border-t border-sky-100 pt-2">
+                            <p className="text-sm text-blue-800 border-t border-blue-100 pt-2">
                               &ldquo;{quote.offerMessage}&rdquo;
                             </p>
                           )}

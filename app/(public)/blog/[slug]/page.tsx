@@ -19,16 +19,16 @@ import { BookmarkButton } from "./bookmark-button";
 
 // ── Category styling ──────────────────────────────────────────────────────────
 const CATEGORY_META: Record<string, { pill: string; accent: string; heroBg: string }> = {
-  "Hiring guide":     { pill: "bg-purple-100 text-purple-700",  accent: "#7c3aed", heroBg: "from-purple-950 via-[#07050f] to-[#07050f]" },
-  "Pricing":          { pill: "bg-blue-100 text-blue-700",      accent: "#1d4ed8", heroBg: "from-blue-950 via-[#07050f] to-[#07050f]"   },
-  "YouTube":          { pill: "bg-red-100 text-red-700",        accent: "#dc2626", heroBg: "from-red-950 via-[#07050f] to-[#07050f]"    },
-  "Reels & Shorts":   { pill: "bg-pink-100 text-pink-700",      accent: "#db2777", heroBg: "from-pink-950 via-[#07050f] to-[#07050f]"   },
-  "Client guide":     { pill: "bg-green-100 text-green-700",    accent: "#16a34a", heroBg: "from-green-950 via-[#07050f] to-[#07050f]"  },
-  "Thumbnails":       { pill: "bg-amber-100 text-amber-700",    accent: "#d97706", heroBg: "from-amber-950 via-[#07050f] to-[#07050f]"  },
-  "Podcast":          { pill: "bg-indigo-100 text-indigo-700",  accent: "#4338ca", heroBg: "from-indigo-950 via-[#07050f] to-[#07050f]" },
-  "Creator workflow": { pill: "bg-teal-100 text-teal-700",      accent: "#0d9488", heroBg: "from-teal-950 via-[#07050f] to-[#07050f]"   },
-  "Platform news":    { pill: "bg-violet-100 text-violet-700",  accent: "#7c3aed", heroBg: "from-violet-950 via-[#07050f] to-[#07050f]" },
-  "General":          { pill: "bg-gray-100 text-gray-600",      accent: "#6b7280", heroBg: "from-gray-900 via-[#07050f] to-[#07050f]"   },
+  "Hiring guide":     { pill: "bg-purple-100 text-purple-700",  accent: "#7c3aed", heroBg: "from-purple-50 via-slate-50/50 to-slate-50/50" },
+  "Pricing":          { pill: "bg-blue-100 text-blue-700",      accent: "#1d4ed8", heroBg: "from-blue-50 via-slate-50/50 to-slate-50/50"   },
+  "YouTube":          { pill: "bg-red-100 text-red-700",        accent: "#dc2626", heroBg: "from-red-50 via-slate-50/50 to-slate-50/50"    },
+  "Reels & Shorts":   { pill: "bg-pink-100 text-pink-700",      accent: "#db2777", heroBg: "from-pink-50 via-slate-50/50 to-slate-50/50"   },
+  "Client guide":     { pill: "bg-green-100 text-green-700",    accent: "#16a34a", heroBg: "from-green-50 via-slate-50/50 to-slate-50/50"  },
+  "Thumbnails":       { pill: "bg-amber-100 text-amber-700",    accent: "#d97706", heroBg: "from-amber-50 via-slate-50/50 to-slate-50/50"  },
+  "Podcast":          { pill: "bg-indigo-100 text-indigo-700",  accent: "#4338ca", heroBg: "from-indigo-50 via-slate-50/50 to-slate-50/50" },
+  "Creator workflow": { pill: "bg-teal-100 text-teal-700",      accent: "#0d9488", heroBg: "from-teal-50 via-slate-50/50 to-slate-50/50"   },
+  "Platform news":    { pill: "bg-violet-100 text-violet-700",  accent: "#7c3aed", heroBg: "from-violet-50 via-slate-50/50 to-slate-50/50" },
+  "General":          { pill: "bg-gray-100 text-gray-600",      accent: "#6b7280", heroBg: "from-slate-50 via-slate-50/50 to-slate-50/50"   },
 };
 
 function getCategoryMeta(cat: string) {
@@ -205,23 +205,23 @@ export default async function BlogPostPage({
   const catSlug = categorySlug(post.category);
 
   return (
-    <div className="min-h-screen bg-[#f8f7ff]">
+    <div className="min-h-screen bg-slate-50/50">
       {/* Fixed UI chrome */}
       <ReadingProgressBar />
       <BackToTop />
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className={`bg-gradient-to-b ${meta.heroBg} pt-20 pb-16 px-4 sm:px-8`}>
+      <section className={`bg-gradient-to-b ${meta.heroBg} pt-20 pb-16 px-4 sm:px-8 border-b border-neutral-200/50`}>
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-white/40 flex-wrap">
-            <Link href="/blog" className="hover:text-white transition-colors inline-flex items-center gap-1">
+          <nav className="flex items-center gap-2 text-xs text-neutral-500 flex-wrap">
+            <Link href="/blog" className="hover:text-neutral-900 transition-colors inline-flex items-center gap-1 font-medium">
               <ArrowLeft className="w-3 h-3" /> Blog
             </Link>
             <span>/</span>
             <Link
               href={`/blog/category/${catSlug}`}
-              className="hover:text-white transition-colors"
+              className="hover:text-neutral-900 transition-colors font-medium"
             >
               {post.category}
             </Link>
@@ -233,36 +233,32 @@ export default async function BlogPostPage({
                 {post.category}
               </span>
             </Link>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-black text-neutral-900 leading-tight tracking-tight">
               {post.title}
             </h1>
-            <p className="text-white/60 text-base sm:text-lg leading-relaxed">
+            <p className="text-neutral-550 text-base sm:text-lg leading-relaxed">
               {post.excerpt}
             </p>
           </div>
 
           {/* Meta row: author + date + read time + views */}
-          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-white/10">
+          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-neutral-200/60">
 
             {post.publishedAt && (
-              <span className="flex items-center gap-1.5 text-xs text-white/40">
+              <span className="flex items-center gap-1.5 text-xs text-neutral-450">
                 <Calendar className="w-3.5 h-3.5" /> {formatDate(post.publishedAt)}
               </span>
             )}
-            <span className="flex items-center gap-1.5 text-xs text-white/40">
+            <span className="flex items-center gap-1.5 text-xs text-neutral-450">
               <BookOpen className="w-3.5 h-3.5" />
-              <strong className="text-white/70 font-semibold">{post.readTime}</strong>
+              <strong className="text-neutral-600 font-semibold">{post.readTime}</strong>
             </span>
             {/* Live view counter — fires API, counts once per session */}
             <ViewCounter slug={post.slug} initialViews={post.views ?? 0} />
           </div>
 
-
         </div>
       </section>
-
-      {/* ── Gradient bridge ───────────────────────────────────────────────── */}
-      <div className="h-10 bg-gradient-to-b from-[#07050f] to-[#f8f7ff]" />
 
       {/* ── Article + sidebar layout ──────────────────────────────────────── */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">

@@ -100,14 +100,14 @@ export function ArticleEditor({ categories, initialData = {}, mode }: ArticleEdi
             onChange={(e) => handleTitleChange(e.target.value)}
             required
             placeholder="e.g., How Escrow Works on EditBridge"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#1e40af] focus:ring-2 focus:ring-[#1e40af]/10 transition-all"
           />
         </div>
 
         {/* Slug */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">URL Slug *</label>
-          <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#0EA5E9] focus-within:ring-2 focus-within:ring-[#0EA5E9]/10 transition-all">
+          <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#1e40af] focus-within:ring-2 focus-within:ring-[#1e40af]/10 transition-all">
             <span className="px-3 py-3 text-xs text-gray-400 border-r border-gray-200 bg-gray-50">/help/article/</span>
             <input
               type="text"
@@ -125,7 +125,7 @@ export function ArticleEditor({ categories, initialData = {}, mode }: ArticleEdi
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#0EA5E9] transition-all"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#1e40af] transition-all"
           >
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -141,7 +141,7 @@ export function ArticleEditor({ categories, initialData = {}, mode }: ArticleEdi
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
             placeholder="One-sentence description shown in search results and category pages"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#1e40af] focus:ring-2 focus:ring-[#1e40af]/10 transition-all"
           />
         </div>
 
@@ -156,7 +156,7 @@ export function ArticleEditor({ categories, initialData = {}, mode }: ArticleEdi
             required
             rows={20}
             placeholder={`## Section Title\n\nYour policy content here.\n\n* Bullet point 1\n* Bullet point 2`}
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 font-mono outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all resize-y leading-relaxed"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 font-mono outline-none focus:border-[#1e40af] focus:ring-2 focus:ring-[#1e40af]/10 transition-all resize-y leading-relaxed"
           />
           <p className="text-xs text-gray-400">Use Markdown: ## Heading, **Bold**, * List item, ---</p>
         </div>
@@ -169,7 +169,7 @@ export function ArticleEditor({ categories, initialData = {}, mode }: ArticleEdi
             value={readTime}
             onChange={(e) => setReadTime(e.target.value)}
             placeholder="e.g., 3 min read"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/10 transition-all"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-[#1e40af] focus:ring-2 focus:ring-[#1e40af]/10 transition-all"
           />
         </div>
 
@@ -203,7 +203,7 @@ export function ArticleEditor({ categories, initialData = {}, mode }: ArticleEdi
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors shadow-sm disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors shadow-sm disabled:opacity-60"
         >
           {saving ? "Saving..." : mode === "create" ? "Create Article" : "Save Changes"}
         </button>

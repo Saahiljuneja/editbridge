@@ -6,7 +6,7 @@ import { and, eq, desc, sql } from "drizzle-orm";
 import { createOrderSchema } from "@/lib/validations";
 import { createOrder } from "@/lib/razorpay";
 import { getAvailableCredits } from "@/lib/rewards";
-import { getPlatformSettings } from "@/lib/platform-settings";
+import { getPlatformSettings, getClientProcessingFeeRate } from "@/lib/platform-settings";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
 
   const basePriceWithAddons = pkg.price + addOnsCost;
 
-  const { processingFeePct } = await getPlatformSettings();
+  const processingFeePct = await getClientProcessingFeeRate(session.user.userId!);
   const PROCESSING_FEE = Math.round(basePriceWithAddons * (processingFeePct / 100));
   // Clamp discount: cannot exceed package price (with add-ons), must not be negative
   const discount = Math.max(0, Math.min(rewardDiscountAmount, basePriceWithAddons));

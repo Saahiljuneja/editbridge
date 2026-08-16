@@ -38,13 +38,13 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     paddingBottom: 20,
     borderBottomWidth: 1.5,
-    borderBottomColor: "#0EA5E9",
+    borderBottomColor: "#1e40af",
     borderBottomStyle: "solid",
   },
   brandName: {
     fontSize: 20,
     fontFamily: "Helvetica-Bold",
-    color: "#0EA5E9",
+    color: "#1e40af",
     letterSpacing: -0.5,
   },
   brandSub: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 10,
     borderTopWidth: 1.5,
-    borderTopColor: "#0EA5E9",
+    borderTopColor: "#1e40af",
     borderTopStyle: "solid",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 14,
     fontFamily: "Helvetica-Bold",
-    color: "#0EA5E9",
+    color: "#1e40af",
   },
   // ── Footer ──────────────────────────────────────────────────────────────────
   footer: {
@@ -274,7 +274,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         {/* Processing fee */}
         <View style={styles.row}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.rowDesc}>Platform processing fee (4%)</Text>
+            <Text style={styles.rowDesc}>Platform processing fee (10%)</Text>
             <Text style={styles.rowSubDesc}>Covers payment gateway and escrow handling</Text>
           </View>
           <Text style={styles.rowAmount}>{paise(data.processingFee)}</Text>

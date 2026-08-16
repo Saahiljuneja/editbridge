@@ -446,16 +446,16 @@ export default async function AdminDashboardPage() {
   return (
     <div>
       {/* ── Header ── */}
-      <div className="bg-gray-950 px-8 py-7 border-b border-white/[0.06]">
+      <div className="bg-white px-8 py-7 border-b border-gray-150">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-1">Admin Panel</p>
-            <h1 className="text-2xl font-black text-white tracking-tight">{greeting}, {actorName}.</h1>
-            <p className="text-sm text-gray-400 mt-1">Platform overview — live stats across users, orders, revenue, and disputes.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-400 mb-1">Admin Panel</p>
+            <h1 className="text-2xl font-black text-neutral-900 tracking-tight">{greeting}, {actorName}.</h1>
+            <p className="text-sm text-neutral-500 mt-1">Platform overview — live stats across users, orders, revenue, and disputes.</p>
           </div>
           <div className="text-right shrink-0 ml-8">
-            <p className="text-sm font-semibold text-white">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{new Date().toLocaleDateString("en-IN", { weekday: "long" })}</p>
+            <p className="text-sm font-bold text-neutral-900">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</p>
+            <p className="text-xs text-neutral-400 mt-0.5 font-semibold">{new Date().toLocaleDateString("en-IN", { weekday: "long" })}</p>
           </div>
         </div>
         <div className="mt-6">
@@ -508,7 +508,7 @@ export default async function AdminDashboardPage() {
                   <p className="font-bold text-gray-900 dark:text-white">Orders</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Daily count — last 30 days</p>
                 </div>
-                <span className="text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10 px-2.5 py-1 rounded-full">{thisMonthOrders} this month</span>
+                <span className="text-xs font-bold text-brand-primary dark:text-blue-400 bg-blue-50 dark:bg-brand-primary/10 px-2.5 py-1 rounded-full">{thisMonthOrders} this month</span>
               </div>
               <OrdersLineChart data={ordersChartData} />
             </div>

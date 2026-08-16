@@ -41,7 +41,7 @@ const STATUS_CONFIG: Record<
   { label: string; stripe: string; badge: string; icon: LucideIcon }
 > = {
   pending:            { label: "Pending",      stripe: "bg-amber-400",   badge: "bg-amber-50 text-amber-700 border border-amber-200",     icon: Clock },
-  in_progress:        { label: "In Progress",  stripe: "bg-[#0EA5E9]",   badge: "bg-sky-50 text-sky-700 border border-sky-200",           icon: Loader },
+  in_progress:        { label: "In Progress",  stripe: "bg-[#1e40af]",   badge: "bg-blue-50 text-blue-900 border border-blue-200",           icon: Loader },
   revision_requested: { label: "Revision",     stripe: "bg-orange-400",  badge: "bg-orange-50 text-orange-700 border border-orange-200",  icon: RotateCcw },
   delivered:          { label: "Delivered",    stripe: "bg-emerald-400", badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",icon: CheckCircle2 },
   completed:          { label: "Completed",    stripe: "bg-emerald-600", badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",icon: CheckCircle2 },
@@ -57,7 +57,7 @@ const TIER_LABELS: Record<string, string> = {
 
 const STAT_CONFIG = [
   { label: "Total Orders", iconCls: "text-gray-500", iconBg: "bg-gray-100",    topBorder: "border-t-2 border-gray-300",      icon: ShoppingBag,   numCls: "text-gray-900" },
-  { label: "Active",       iconCls: "text-[#0EA5E9]",iconBg: "bg-sky-50",      topBorder: "border-t-2 border-[#0EA5E9]",     icon: Loader,        numCls: "text-[#0EA5E9]" },
+  { label: "Active",       iconCls: "text-[#1e40af]",iconBg: "bg-blue-50",      topBorder: "border-t-2 border-[#1e40af]",     icon: Loader,        numCls: "text-[#1e40af]" },
   { label: "Completed",    iconCls: "text-emerald-600",iconBg:"bg-emerald-50", topBorder: "border-t-2 border-emerald-500",   icon: CheckCircle2,  numCls: "text-emerald-700" },
   { label: "Total Earned", iconCls: "text-amber-600", iconBg: "bg-amber-50",   topBorder: "border-t-2 border-amber-400",     icon: Banknote,      numCls: "text-amber-700" },
 ];
@@ -179,7 +179,7 @@ export default async function EditorOrdersPage({
               className={cn(
                 "px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors shrink-0",
                 statusFilter === tab.value
-                  ? "bg-[#0EA5E9] text-white"
+                  ? "bg-[#1e40af] text-white"
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               )}
             >
@@ -191,8 +191,8 @@ export default async function EditorOrdersPage({
         {/* Order cards */}
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-sky-50 flex items-center justify-center mb-3">
-              <ShoppingBag className="w-6 h-6 text-[#0EA5E9]" />
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-3">
+              <ShoppingBag className="w-6 h-6 text-[#1e40af]" />
             </div>
             <p className="font-semibold text-gray-800 text-sm">No orders found</p>
             <p className="text-xs text-gray-400 mt-1">
@@ -203,7 +203,7 @@ export default async function EditorOrdersPage({
             {!statusFilter && (
               <Link
                 href="/editor/profile"
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0EA5E9] text-white text-xs font-semibold hover:bg-sky-600 transition-colors"
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e40af] text-white text-xs font-semibold hover:bg-brand-primary transition-colors"
               >
                 Share your profile <ArrowRight className="w-3 h-3" />
               </Link>
@@ -238,7 +238,7 @@ export default async function EditorOrdersPage({
                     <div className="px-5 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Client avatar */}
-                        <div className="w-8 h-8 rounded-full bg-[#0EA5E9]/10 flex items-center justify-center text-xs font-bold text-[#0EA5E9] shrink-0 uppercase select-none">
+                        <div className="w-8 h-8 rounded-full bg-[#1e40af]/10 flex items-center justify-center text-xs font-bold text-[#1e40af] shrink-0 uppercase select-none">
                           {clientInitials || "?"}
                         </div>
                         <div className="min-w-0">
@@ -287,7 +287,7 @@ export default async function EditorOrdersPage({
                         </div>
 
                         {/* Payout */}
-                        <p className="text-base font-bold text-[#0EA5E9] tabular-nums">
+                        <p className="text-base font-bold text-[#1e40af] tabular-nums">
                           {formatCurrency(payout)}
                         </p>
 

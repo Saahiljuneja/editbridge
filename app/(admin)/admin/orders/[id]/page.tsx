@@ -14,6 +14,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { OrderInterveneForm } from "./order-intervene-form";
+import { AdminRefundButton } from "./admin-refund-button";
 import { OrderEventTimeline } from "@/components/order/order-event-timeline";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types";
@@ -129,6 +130,7 @@ export default async function AdminOrderDetailPage({
 
           {/* Intervention */}
           <OrderInterveneForm orderId={id} currentStatus={order.status} />
+          <AdminRefundButton orderId={id} status={order.status} />
 
           {/* Dispute link */}
           {openDispute && (

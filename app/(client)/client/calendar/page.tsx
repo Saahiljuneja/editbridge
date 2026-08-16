@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { orders, packages, editors, users } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { CalendarClient } from "./calendar-client";
+import { TopoBackground } from "@/components/common/topo-background";
+import { CalendarDays } from "lucide-react";
 
 export default async function CalendarPage() {
   const session = await auth();
@@ -35,12 +37,20 @@ export default async function CalendarPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100 px-6 py-5">
-        <h1 className="text-xl font-bold text-gray-900">Order Calendar</h1>
-        <p className="text-sm text-gray-400 mt-0.5">All your order deadlines at a glance</p>
-      </div>
-      <div className="px-6 py-6">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
+      <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
+
+      <div className="max-w-6xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+        <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
+          <div>
+            <h1 className="text-xl font-bold text-neutral-900">Order Calendar</h1>
+            <p className="text-xs text-neutral-400 font-semibold mt-1">All your order deadlines at a glance</p>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+            <CalendarDays className="w-5 h-5 text-brand-primary" />
+          </div>
+        </div>
+
         <CalendarClient
           orders={activeOrders.map((o) => ({
             id: o.id,

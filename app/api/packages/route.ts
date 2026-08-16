@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { editors, packages, userPoints } from "@/lib/db/schema";
-import { eq, count } from "drizzle-orm";
+import { editors, packages } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { createPackageSchema } from "@/lib/validations";
 import { revalidatePublicPagesCache } from "@/lib/revalidate";
 import { getPlatformSettings } from "@/lib/platform-settings";
-import { getLevelPerks, calcLevel } from "@/lib/rewards";
-import type { Level } from "@/lib/rewards";
+import { getEffectiveTier } from "@/lib/membership";
 
 export async function GET() {
   const session = await auth();
@@ -47,31 +46,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  // Enforce package limit based on editor's XP level
-  const [editorUser] = await db
-    .select({ userId: editors.userId })
+  // Enforce set + package limits based on membership tier
+  const [editorRow] = await db
+    .select({ membershipTier: editors.membershipTier, membershipExpiresAt: editors.membershipExpiresAt })
     .from(editors)
     .where(eq(editors.id, editorId))
     .limit(1);
 
-  if (editorUser) {
-    const [pts] = await db
-      .select({ total: userPoints.total })
-      .from(userPoints)
-      .where(eq(userPoints.userId, editorUser.userId))
-      .limit(1);
+  if (editorRow) {
+    const tier = getEffectiveTier(editorRow.membershipTier, editorRow.membershipExpiresAt);
+    const { maxSets, packagesPerSet } = tier;
 
-    const level = calcLevel(pts?.total ?? 0) as Level;
-    const { maxPackages } = getLevelPerks(level);
-
-    const [countRow] = await db
-      .select({ total: count() })
+    // Fetch all existing packages for this editor
+    const existing = await db.select({ videoCategory: packages.videoCategory, videoFormat: packages.videoFormat })
       .from(packages)
       .where(eq(packages.editorId, editorId));
 
-    if ((countRow?.total ?? 0) >= maxPackages) {
+    // Group into sets by category+format key
+    const setMap = new Map<string, number>();
+    for (const pkg of existing) {
+      const key = `${pkg.videoCategory ?? "__none__"}||${pkg.videoFormat ?? "__none__"}`;
+      setMap.set(key, (setMap.get(key) ?? 0) + 1);
+    }
+
+    const incomingKey = `${parsed.data.videoCategory ?? "__none__"}||${parsed.data.videoFormat ?? "__none__"}`;
+    const existingCountInSet = setMap.get(incomingKey) ?? 0;
+
+    // Check per-set limit (always 3)
+    if (existingCountInSet >= packagesPerSet) {
       return NextResponse.json(
-        { error: `You can create up to ${maxPackages} packages on your current ${level} level. Complete more orders to level up and unlock more slots.` },
+        { error: `Each service set can have a maximum of ${packagesPerSet} packages. Delete an existing package in this set to add a new one.` },
+        { status: 403 }
+      );
+    }
+
+    // Check set limit (new set only)
+    if (!setMap.has(incomingKey) && maxSets !== Infinity && setMap.size >= maxSets) {
+      return NextResponse.json(
+        { error: `Your ${tier.name} plan allows up to ${maxSets} service set${maxSets === 1 ? "" : "s"}. Upgrade your membership to add more sets.` },
         { status: 403 }
       );
     }

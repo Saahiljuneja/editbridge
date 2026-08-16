@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { unstable_cache } from "next/cache";
 import { CATEGORY_PAGES, type CategoryPage as CategoryConfig } from "@/lib/category-seo";
+import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
 import { db } from "@/lib/db";
 import { editors, users, packages, skills, reviews } from "@/lib/db/schema";
 import { and, eq, ilike, or, sql, inArray } from "drizzle-orm";
@@ -145,8 +146,11 @@ async function getCategoryEditors(category: CategoryConfig) {
     skillsByEditor[s.editorId].push(s.name);
   }
 
+  const r2Base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
   return rows.map((e) => ({
     ...e,
+    videoUrl: toPortfolioProxyUrl(e.videoUrl, r2Base),
+    thumbnailUrl: toPortfolioProxyUrl(e.thumbnailUrl, r2Base),
     skills: skillsByEditor[e.id] ?? [],
     isAvailable: true,
   }));
@@ -182,30 +186,30 @@ export default async function CategoryPage({
     <div className="min-h-screen bg-gray-50 pb-16">
       {/* Dynamic Hero Section */}
       <div 
-        className="relative overflow-hidden py-16 sm:py-20 text-white"
+        className="relative overflow-hidden py-16 sm:py-20 text-neutral-900 border-b border-neutral-200/60"
         style={{ 
-          background: `linear-gradient(135deg, ${category.accentColor} 0%, #07050f 100%)` 
+          background: `linear-gradient(135deg, ${category.accentColor}08 0%, #f8fafc 100%)` 
         }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
           <Link 
             href="/browse"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/70 hover:text-white transition-colors mb-6 group"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors mb-6 group"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Browse all categories
           </Link>
           
           <div className="flex items-start gap-4 sm:gap-6">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl sm:text-4xl border border-white/15 shadow-inner">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white flex items-center justify-center text-2xl sm:text-4xl border border-neutral-200/60 shadow-sm">
               {category.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-none mb-3">
+              <h1 className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight leading-none mb-3">
                 {category.h1}
               </h1>
-              <p className="text-white/80 text-sm sm:text-base max-w-2xl leading-relaxed">
+              <p className="text-neutral-550 text-sm sm:text-base max-w-2xl leading-relaxed">
                 {category.heroDescription}
               </p>
             </div>

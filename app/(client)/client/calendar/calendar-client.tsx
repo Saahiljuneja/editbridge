@@ -17,7 +17,7 @@ type OrderEvent = {
 const STATUS_DOT: Record<string, string> = {
   pending:            "bg-gray-400",
   in_progress:        "bg-blue-500",
-  delivered:          "bg-violet-500",
+  delivered:          "bg-indigo-500",
   revision_requested: "bg-amber-500",
   disputed:           "bg-red-500",
   completed:          "bg-emerald-500",
@@ -97,7 +97,7 @@ export function CalendarClient({ orders }: { orders: OrderEvent[] }) {
                   className={cn(
                     "relative rounded-xl p-1.5 text-center transition-all min-h-[52px] flex flex-col items-center",
                     isSelected ? "bg-[var(--brand-client)]/10 ring-1 ring-[var(--brand-client)]/30" : "hover:bg-gray-50",
-                    events.length > 0 && !isSelected ? "bg-sky-50/50" : "",
+                    events.length > 0 && !isSelected ? "bg-blue-50/50" : "",
                   )}>
                   <span className={cn(
                     "text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full",
@@ -123,7 +123,7 @@ export function CalendarClient({ orders }: { orders: OrderEvent[] }) {
       <div className="flex flex-wrap gap-4 px-1">
         {[
           { label: "In progress", dot: "bg-blue-500" },
-          { label: "Delivered", dot: "bg-violet-500" },
+          { label: "Delivered", dot: "bg-indigo-500" },
           { label: "Revision", dot: "bg-amber-500" },
           { label: "Completed", dot: "bg-emerald-500" },
           { label: "Disputed", dot: "bg-red-500" },

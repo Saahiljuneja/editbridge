@@ -232,7 +232,7 @@ export function SystemHealthClient({
       {/* Business Pulse strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Orders Today", value: loading ? "—" : pulse.ordersToday.toString(), icon: ShoppingBag, color: "text-sky-600 border-sky-100 bg-sky-50/40", sub: "New orders placed" },
+          { label: "Orders Today", value: loading ? "—" : pulse.ordersToday.toString(), icon: ShoppingBag, color: "text-brand-primary border-blue-100 bg-blue-50/40", sub: "New orders placed" },
           { label: "Revenue Today", value: loading ? "—" : fmtRupees(pulse.revenueToday), icon: TrendingUp, color: "text-emerald-600 border-emerald-100 bg-emerald-50/40", sub: "Gross collected" },
           { label: "New Signups", value: loading ? "—" : pulse.signupsToday.toString(), icon: Users, color: "text-violet-600 border-violet-100 bg-violet-50/40", sub: "Users registered today" },
           { label: "Messages Today", value: loading ? "—" : pulse.messagesToday.toString(), icon: MessageSquare, color: "text-orange-500 border-orange-100 bg-orange-50/40", sub: "Chat activity" },
@@ -249,7 +249,7 @@ export function SystemHealthClient({
       {/* Process Metrics Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Uptime */}
-        <div className="rounded-2xl border text-sky-600 border-sky-100 bg-sky-50/40 p-4 hover:shadow-md transition-all duration-300">
+        <div className="rounded-2xl border text-brand-primary border-blue-100 bg-blue-50/40 p-4 hover:shadow-md transition-all duration-300">
           <Clock className="w-4 h-4 mb-2 opacity-80" />
           <p className="text-lg font-black tracking-tight">{uptime > 0 ? fmtUptime(uptime) : "Calculating..."}</p>
           <p className="text-[11px] text-gray-400 font-medium mt-0.5 uppercase tracking-wide">Server uptime</p>
@@ -377,7 +377,7 @@ export function SystemHealthClient({
             {[
               { label: "KYC Pending Review", count: queues.kycPending, icon: FileCheck, href: "/admin/kyc", color: queues.kycPending > 0 ? "text-amber-600 bg-amber-50" : "text-gray-500 bg-gray-100 dark:bg-gray-800" },
               { label: "Open Disputes", count: queues.openDisputes, icon: Scale, href: "/admin/disputes", color: queues.openDisputes > 0 ? "text-red-600 bg-red-50" : "text-gray-500 bg-gray-100 dark:bg-gray-800" },
-              { label: "Pending Payouts", count: queues.pendingPayouts, icon: Wallet, href: "/admin/payouts", color: queues.pendingPayouts > 0 ? "text-sky-600 bg-sky-50" : "text-gray-500 bg-gray-100 dark:bg-gray-800" },
+              { label: "Pending Payouts", count: queues.pendingPayouts, icon: Wallet, href: "/admin/payouts", color: queues.pendingPayouts > 0 ? "text-brand-primary bg-blue-50" : "text-gray-500 bg-gray-100 dark:bg-gray-800" },
             ].map(item => (
               <Link
                 key={item.label}
@@ -429,7 +429,7 @@ export function SystemHealthClient({
       </div>
 
       {/* Diagnostic Operations Panel */}
-      <div className="rounded-2xl border border-[var(--brand-client)]/10 bg-sky-50/20 p-5">
+      <div className="rounded-2xl border border-[var(--brand-client)]/10 bg-blue-50/20 p-5">
         <div className="flex items-center gap-2 mb-4">
           <Terminal className="w-4 h-4 text-[var(--brand-client)]" />
           <p className="font-bold text-sm text-gray-900 dark:text-white">Diagnostic Operations</p>

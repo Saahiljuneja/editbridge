@@ -1,39 +1,37 @@
 "use client";
-// v6 — two-panel: icon rail + contextual fly-out
 
 import Link from "next/link";
-import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
 import {
-  LayoutDashboard, ShoppingBag, DollarSign, Shield,
-  Server, TrendingUp, Film, Settings,
-  ExternalLink, LogOut, Menu, X,
-  UserCheck, Scale, Wallet, Users,
-  Pin, Copy, Check, AlertTriangle,
-  Search, ChevronDown, ChevronUp,
-  Briefcase, Newspaper,
-  BarChart2, Award, Share2,
-  CreditCard, RefreshCw, RotateCcw,
-  MessageSquare, Eye, Flag, Activity,
-  BookOpen, Bell, Radio, Mail,
-  UserCog, List, Percent, ToggleLeft, Paintbrush,
+  LayoutDashboard, ShoppingBag, Users, MessageSquare, UserCheck, Scale,
+  Wallet, TrendingUp, DollarSign, CreditCard, RefreshCw, RotateCcw,
+  Shield, Eye, Flag, AlertTriangle, BookOpen, Award, Bell, Radio,
+  Server, Settings, UserCog, List, Activity, Percent, ToggleLeft, Paintbrush,
+  Search, Film, X, LogOut, ExternalLink, Menu, Copy, Check, Pin,
+  ChevronUp, ChevronDown, Award as PinnedAward, Briefcase, Mail, Newspaper, ArrowLeft,
+  BarChart2, Share2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { UserRole } from "@/types";
+import React from "react";
 import { AdminGlobalSearch } from "./admin-global-search";
+import { toast } from "sonner";
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 
 type SidebarThemeId = "gray" | "navy" | "forest" | "violet" | "slate";
 const SIDEBAR_THEMES: { id: SidebarThemeId; label: string; bg: string; accent: string }[] = [
-  { id: "gray",   label: "Default", bg: "#030712", accent: "#f43f5e" },
-  { id: "navy",   label: "Navy",    bg: "#0a1628", accent: "#3b82f6" },
-  { id: "forest", label: "Forest",  bg: "#041f12", accent: "#22c55e" },
-  { id: "violet", label: "Violet",  bg: "#120920", accent: "#a855f7" },
-  { id: "slate",  label: "Slate",   bg: "#0b1120", accent: "#06b6d4" },
+  { id: "navy",   label: "Default", bg: "#ffffff", accent: "#1e40af" },
+  { id: "gray",   label: "Rose",    bg: "#ffffff", accent: "#f43f5e" },
+  { id: "forest", label: "Forest",  bg: "#ffffff", accent: "#22c55e" },
+  { id: "violet", label: "Violet",  bg: "#ffffff", accent: "#a855f7" },
+  { id: "slate",  label: "Slate",   bg: "#ffffff", accent: "#1e40af" },
 ];
+
+type UserRole = "admin" | "staff_kyc" | "staff_support" | "staff_dispute" | "staff_moderation";
 
 // ─── Nav data ─────────────────────────────────────────────────────────────────
 
@@ -45,6 +43,8 @@ const NAV_GROUPS = [
       { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, section: null, roles: ["admin","staff_kyc","staff_support","staff_dispute","staff_moderation"], badgeKey: null },
       { href: "/admin/orders",   label: "Orders",    icon: ShoppingBag, section: null, roles: ["admin","staff_support","staff_dispute"],                   badgeKey: null },
       { href: "/admin/users",    label: "Users",     icon: Users,       section: null, roles: ["admin","staff_support","staff_dispute","staff_moderation"], badgeKey: null },
+      { href: "/admin/editors",  label: "Editors",   icon: Film,        section: null, roles: ["admin","staff_kyc","staff_support","staff_dispute"],         badgeKey: null },
+      { href: "/admin/support",  label: "Support Tickets", icon: MessageSquare, section: null, roles: ["admin","staff_support"],                             badgeKey: null },
       { href: "/admin/kyc",      label: "KYC Queue", icon: UserCheck,   section: null, roles: ["admin","staff_kyc"],                                       badgeKey: "pendingKyc"     as const },
       { href: "/admin/disputes", label: "Disputes",  icon: Scale,       section: null, roles: ["admin","staff_dispute"],                                   badgeKey: "openDisputes"   as const },
       { href: "/admin/payouts",  label: "Payouts",   icon: Wallet,      section: null, roles: ["admin"],                                                   badgeKey: "pendingPayouts" as const },
@@ -131,8 +131,8 @@ function RailTooltip({ label, children, accent }: { label: string; children: Rea
       {children}
       {show && (
         <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2.5 z-[200] pointer-events-none flex items-center">
-          <div className="w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[5px] border-r-gray-800" />
-          <div className="bg-gray-800 border border-white/10 text-white text-[11.5px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
+          <div className="w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[5px] border-r-neutral-800" />
+          <div className="bg-neutral-800 border border-neutral-700 text-white text-[11.5px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
             {label}
           </div>
         </div>
@@ -156,17 +156,17 @@ function ContextMenuPortal({ menu, isPinned, copied, onOpenTab, onCopy, onPin, o
   const left = Math.min(menu.x, window.innerWidth  - 184);
   const top  = Math.min(menu.y, window.innerHeight - 130);
   return createPortal(
-    <div ref={ref} style={{ top, left }} className="fixed z-[9999] w-44 bg-gray-900 border border-white/10 rounded-xl shadow-2xl py-1.5">
-      <button onClick={onOpenTab} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12.5px] text-white/80 hover:text-white hover:bg-white/[0.06] transition-colors text-left">
-        <ExternalLink className="w-3.5 h-3.5 shrink-0" /> Open in new tab
+    <div ref={ref} style={{ top, left }} className="fixed z-[9999] w-44 bg-white border border-neutral-200 shadow-xl rounded-xl py-1.5 select-none">
+      <button onClick={onOpenTab} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12.5px] text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-bold">
+        <ExternalLink className="w-3.5 h-3.5 shrink-0 text-neutral-450" /> Open in new tab
       </button>
-      <button onClick={onCopy} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12.5px] text-white/80 hover:text-white hover:bg-white/[0.06] transition-colors text-left">
-        {copied ? <Check className="w-3.5 h-3.5 shrink-0 text-green-400" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
+      <button onClick={onCopy} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12.5px] text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-bold">
+        {copied ? <Check className="w-3.5 h-3.5 shrink-0 text-green-600" /> : <Copy className="w-3.5 h-3.5 shrink-0 text-neutral-455" />}
         {copied ? "Copied!" : "Copy link"}
       </button>
-      <div className="border-t border-white/[0.06] my-1" />
-      <button onClick={onPin} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12.5px] text-white/80 hover:text-white hover:bg-white/[0.06] transition-colors text-left">
-        <Pin className={cn("w-3.5 h-3.5 shrink-0", isPinned ? "text-amber-400" : "")} />
+      <div className="border-t border-neutral-100 my-1" />
+      <button onClick={onPin} className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12.5px] text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-bold">
+        <Pin className={cn("w-3.5 h-3.5 shrink-0", isPinned ? "text-amber-500" : "text-neutral-455")} />
         {isPinned ? "Unpin" : "Pin to panel"}
       </button>
     </div>,
@@ -200,7 +200,6 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
 
   const visibleItems = group.items.filter(it => it.roles.includes(role));
 
-
   // Pinned items for this group
   const groupPinned = pinned
     .filter(href => group.items.some(it => it.href === href))
@@ -214,22 +213,22 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
       <Link key={href} href={href} onClick={onNavigate}
         onContextMenu={e => { e.preventDefault(); onContextMenu(e, href, label); }}
         className={cn(
-          "flex items-center justify-between px-2.5 py-[10px] rounded-lg text-[12.5px] font-medium transition-all mb-0.5 group",
-          active ? "bg-white/[0.08] text-white" : "text-white/55 hover:text-white hover:bg-white/[0.05]"
+          "flex items-center justify-between px-3 py-[9px] rounded-xl text-[12.5px] font-bold transition-all mb-0.5 group",
+          active ? "bg-neutral-100 text-neutral-900" : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
         )}>
         <span className="flex items-center gap-2.5 min-w-0">
           {ItemIcon && (
-            <span className={cn("w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors",
-              active ? "bg-white/10" : "bg-white/[0.04] group-hover:bg-white/[0.07]")}
-              style={active ? { background: theme.accent + "28" } : {}}>
+            <span className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+              active ? "bg-neutral-200/50" : "bg-neutral-100 group-hover:bg-neutral-200/50")}
+              style={active ? { color: theme.accent } : {}}>
               <ItemIcon className="w-3.5 h-3.5" style={active ? { color: theme.accent } : {}} />
             </span>
           )}
           <span className="truncate">{label}</span>
         </span>
         {count > 0 && (
-          <span className={cn("text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none ml-1 shrink-0",
-            active ? "text-white" : "bg-white/10 text-white",
+          <span className={cn("text-[10px] font-bold rounded-full px-2 py-0.5 leading-none ml-1 shrink-0",
+            active ? "text-white" : "bg-neutral-100 text-neutral-700",
             badgeKey && pulsing.has(badgeKey) && "badge-pop")}
             style={active ? { background: theme.accent } : {}}>
             {count > 99 ? "99+" : count}
@@ -240,44 +239,43 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
   }
 
   return (
-    <div className="w-[240px] h-full flex flex-col border-r border-white/[0.05]"
-      style={{ background: "rgba(255,255,255,0.028)" }}>
+    <div className="w-[240px] h-full flex flex-col border-r border-neutral-200/60 bg-white select-none">
       <style>{`
         @keyframes badge-pop{0%{transform:scale(1)}35%{transform:scale(1.55)}65%{transform:scale(.88)}100%{transform:scale(1)}}
         .badge-pop{animation:badge-pop .55s cubic-bezier(.36,.07,.19,.97) both}
         .sb-scroll::-webkit-scrollbar{width:3px}
         .sb-scroll::-webkit-scrollbar-track{background:transparent}
-        .sb-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px}
-        .sb-scroll::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
+        .sb-scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:99px}
+        .sb-scroll::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.15)}
       `}</style>
 
       {/* Header */}
       <div className="px-4 pt-5 pb-4 shrink-0">
-        <p className="text-[10.5px] font-semibold uppercase tracking-widest mb-2" style={{ color: theme.accent + "99" }}>Admin</p>
-        <p className="text-[17px] font-bold text-white tracking-tight leading-tight">{group.label}</p>
+        <p className="text-[10.5px] font-black uppercase tracking-widest mb-1" style={{ color: theme.accent }}>Admin Desk</p>
+        <p className="text-[17px] font-black text-neutral-800 tracking-tight leading-tight">{group.label}</p>
         {(() => {
           const active = group.items.find(it => pathname.startsWith(it.href));
           return active ? (
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full mt-2"
-              style={{ background: theme.accent + "20", color: theme.accent }}>
-              ↳ {active.label}
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full mt-2 border"
+              style={{ background: theme.accent + "12", color: theme.accent, borderColor: theme.accent + "20" }}>
+              {active.label}
             </span>
           ) : null;
         })()}
       </div>
 
-{/* Items */}
+      {/* Items */}
       <div className="relative flex-1 min-h-0">
         <div className={cn("absolute top-0 inset-x-0 h-4 z-10 pointer-events-none transition-opacity", showTopFade ? "opacity-100" : "opacity-0")}
-          style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.028), transparent)" }} />
+          style={{ background: "linear-gradient(to bottom, #ffffff, transparent)" }} />
 
         <div ref={navRef} onScroll={checkScroll} className="h-full overflow-y-auto sb-scroll px-2 pb-3">
           {/* Pinned items */}
           {groupPinned.length > 0 && (
-            <div className="mb-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-white/25 px-3 pb-1.5 pt-1">Pinned</p>
+            <div className="mb-2">
+              <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 px-3 pb-1.5 pt-1">Pinned</p>
               {groupPinned.map(it => itemLink(it.href, it.label, it.badgeKey, it.icon))}
-              <div className="mx-3 my-2 h-px bg-white/[0.06]" />
+              <div className="mx-3 my-2 h-px bg-neutral-100" />
             </div>
           )}
 
@@ -285,30 +283,30 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
         </div>
 
         <div className={cn("absolute bottom-0 inset-x-0 h-4 z-10 pointer-events-none transition-opacity", showBottomFade ? "opacity-100" : "opacity-0")}
-          style={{ background: "linear-gradient(to top, rgba(255,255,255,0.028), transparent)" }} />
+          style={{ background: "linear-gradient(to top, #ffffff, transparent)" }} />
       </div>
 
       {/* Quick actions */}
-      <div className="shrink-0 border-t border-white/[0.06] px-3 pt-2.5 pb-1">
+      <div className="shrink-0 border-t border-neutral-100 px-3 pt-2.5 pb-1">
         <Link href="/admin/settings"
-          className={cn("flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium transition-colors mb-0.5",
-            pathname.startsWith("/admin/settings") ? "text-white bg-white/[0.07]" : "text-white/45 hover:text-white hover:bg-white/[0.05]")}>
-          <Settings className="w-3.5 h-3.5 shrink-0" />
+          className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-bold transition-colors mb-0.5",
+            pathname.startsWith("/admin/settings") ? "text-neutral-900 bg-neutral-100" : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50")}>
+          <Settings className="w-3.5 h-3.5 shrink-0 text-neutral-450" />
           Settings
         </Link>
         <Link href="/" target="_blank"
-          className="flex items-center gap-2.5 px-2 py-2 rounded-lg text-[12.5px] font-medium text-white/45 hover:text-white hover:bg-white/[0.05] transition-colors mb-0.5">
-          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors mb-0.5">
+          <ExternalLink className="w-3.5 h-3.5 shrink-0 text-neutral-450" />
           Open website
         </Link>
-        <div className="flex items-center gap-2.5 px-2 py-2 mb-0.5">
-          <div className="w-3.5 h-3.5 rounded-full shrink-0 border border-white/20" style={{ background: theme.accent }} />
-          <span className="text-[12.5px] font-medium text-white/45 mr-auto">Theme</span>
+        <div className="flex items-center gap-2.5 px-2.5 py-2 mb-0.5 select-none">
+          <div className="w-3.5 h-3.5 rounded-full shrink-0 border border-neutral-200" style={{ background: theme.accent }} />
+          <span className="text-[12.5px] font-bold text-neutral-500 mr-auto">Theme</span>
           <div className="flex items-center gap-1.5">
             {SIDEBAR_THEMES.map(t => (
               <button key={t.id} title={t.label}
                 className={cn("w-3.5 h-3.5 rounded-full border transition-transform hover:scale-110",
-                  themeId === t.id ? "border-white/60 scale-110" : "border-transparent")}
+                  themeId === t.id ? "border-neutral-400 scale-110" : "border-transparent")}
                 style={{ background: t.accent }}
                 onClick={() => { try { localStorage.setItem("admin-sidebar-theme", t.id); } catch {} onThemeChange(t.id); }} />
             ))}
@@ -317,22 +315,21 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
       </div>
 
       {/* User footer */}
-      <div className="shrink-0 border-t border-white/[0.06] px-3 py-3">
+      <div className="shrink-0 border-t border-neutral-100 px-3 py-3">
         <div className="flex items-center gap-2.5 px-1">
           <div className="relative shrink-0">
             <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-[11px] font-bold"
               style={{ background: `linear-gradient(135deg, ${theme.accent}, #f97316)` }}>
               {userImage ? <img src={userImage} alt={userName} className="w-full h-full object-cover" /> : initials}
             </div>
-            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border-2"
-              style={{ borderColor: "rgba(255,255,255,0.028)" }} />
+            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border-2 border-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[12.5px] font-semibold text-white truncate leading-tight">{userName || "Admin"}</p>
-            <p className="text-[10.5px] text-white/40 truncate leading-tight">{roleLabel}</p>
+            <p className="text-[12.5px] font-black text-neutral-800 truncate leading-tight">{userName || "Admin"}</p>
+            <p className="text-[10.5px] text-neutral-450 truncate leading-tight">{roleLabel}</p>
           </div>
           <button onClick={() => signOut({ callbackUrl: "/login" })} title="Sign out"
-            className="shrink-0 p-1.5 rounded-lg text-white/25 hover:text-red-400 hover:bg-red-400/10 transition-colors">
+            className="shrink-0 p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors">
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -360,12 +357,12 @@ function Rail({ pathname, role, counts, pulsing, activePanel, onTogglePanel,
   function railIconCls(active: boolean) {
     return cn(
       "relative flex items-center justify-center w-10 h-10 rounded-xl mx-auto transition-all duration-150",
-      active ? "text-white" : "text-white/40 hover:text-white/80 hover:bg-white/[0.06]"
+      active ? "text-neutral-800 bg-neutral-100" : "text-neutral-400 hover:text-neutral-850 hover:bg-neutral-100/50"
     );
   }
 
   return (
-    <div className="w-14 flex-shrink-0 flex flex-col h-full relative">
+    <div className="w-14 flex-shrink-0 flex flex-col h-full bg-neutral-50/50 border-r border-neutral-200/50 relative select-none">
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-[2px] z-30 overflow-hidden pointer-events-none">
         <div className="h-full transition-[width] ease-out"
@@ -384,12 +381,12 @@ function Rail({ pathname, role, counts, pulsing, activePanel, onTogglePanel,
         <RailTooltip label="Search  ⌘K" accent={theme.accent}>
           <button onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }))}
             className={railIconCls(false)}>
-            <Search className="w-[15px] h-[15px]" />
+            <Search className="w-4.5 h-4.5" />
           </button>
         </RailTooltip>
       </div>
 
-      <div className="mx-3 my-2 h-px bg-white/[0.06]" />
+      <div className="mx-3 my-2 h-px bg-neutral-200/60" />
 
       {/* Group icons */}
       <div className="px-2 space-y-0.5">
@@ -412,15 +409,15 @@ function Rail({ pathname, role, counts, pulsing, activePanel, onTogglePanel,
                   if (e.key === "Escape" && activePanel) onTogglePanel(activePanel);
                 }}
                 className={railIconCls(active)}
-                style={panelOpen ? { background: theme.accent + "22" } : anyActive ? { background: "rgba(255,255,255,0.07)" } : {}}>
-                <Icon className="w-4 h-4" style={active ? { color: theme.accent } : {}} />
+                style={panelOpen ? { background: "rgba(0,0,0,0.04)" } : anyActive ? { background: "rgba(0,0,0,0.02)" } : {}}>
+                <Icon className="w-4.5 h-4.5" style={active ? { color: theme.accent } : {}} />
                 {isSystem && health && health !== "ok" && (
                   <span className={cn("absolute top-1 right-1 w-1.5 h-1.5 rounded-full",
-                    health === "critical" ? "bg-red-400 animate-pulse" : "bg-amber-400")} />
+                    health === "critical" ? "bg-red-500 animate-pulse" : "bg-amber-500")} />
                 )}
                 {!isSystem && hasBadge && (
-                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full border-[2.5px]"
-                    style={{ background: theme.accent, borderColor: theme.bg }} />
+                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full border-[2px] border-white"
+                    style={{ background: theme.accent }} />
                 )}
                 {panelOpen && (
                   <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 rounded-full"
@@ -439,7 +436,7 @@ function Rail({ pathname, role, counts, pulsing, activePanel, onTogglePanel,
       {sessionWarning && (
         <div className="px-2 pb-2 shrink-0">
           <RailTooltip label="Session expiring — click to extend" accent={theme.accent}>
-            <button onClick={onExtendSession} className="relative flex items-center justify-center w-10 h-10 rounded-xl mx-auto text-amber-400 hover:bg-amber-400/10 transition-all">
+            <button onClick={onExtendSession} className="relative flex items-center justify-center w-10 h-10 rounded-xl mx-auto text-amber-500 hover:bg-amber-550/10 transition-all">
               <AlertTriangle className="w-[15px] h-[15px]" />
             </button>
           </RailTooltip>
@@ -472,8 +469,8 @@ function MobileDrawer({ pathname, role, counts, pulsing, pinned, onPin, onContex
     return (
       <Link key={href} href={href} onClick={onClose}
         onContextMenu={e => { e.preventDefault(); onContextMenu(e, href, label); }}
-        className={cn("flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-colors",
-          active ? "text-white" : "text-white/60 hover:text-white")}>
+        className={cn("flex items-center justify-between px-4 py-2.5 text-[13px] font-bold transition-colors",
+          active ? "text-neutral-900 font-extrabold" : "text-neutral-500 hover:text-neutral-800")}>
         <span className="flex items-center gap-2">
           {active && <span className="w-1.5 h-1.5 rounded-full" style={{ background: theme.accent }} />}
           {label}
@@ -481,7 +478,7 @@ function MobileDrawer({ pathname, role, counts, pulsing, pinned, onPin, onContex
         {count > 0 && (
           <span className={cn("text-[10.5px] font-bold rounded-full px-1.5 py-0.5 leading-none",
             badgeKey && pulsing.has(badgeKey) && "badge-pop")}
-            style={{ background: active ? theme.accent : "rgba(255,255,255,0.1)", color: "white" }}>
+            style={{ background: active ? theme.accent : "rgba(0,0,0,0.06)", color: active ? "white" : "#4b5563" }}>
             {count}
           </span>
         )}
@@ -490,44 +487,41 @@ function MobileDrawer({ pathname, role, counts, pulsing, pinned, onPin, onContex
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: theme.bg }}>
+    <div className="flex flex-col h-full overflow-hidden bg-white select-none">
       <style>{`@keyframes badge-pop{0%{transform:scale(1)}35%{transform:scale(1.55)}65%{transform:scale(.88)}100%{transform:scale(1)}}.badge-pop{animation:badge-pop .55s cubic-bezier(.36,.07,.19,.97) both}`}</style>
       <div className="flex items-center justify-between px-4 pt-5 pb-4 shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: theme.accent }}>
             <Film className="w-4 h-4 text-white" />
           </div>
-          <span className="text-[15px] font-bold text-white">EditBridge</span>
+          <span className="text-[15px] font-black text-neutral-850">EditBridge</span>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.05] transition-colors">
+        <button onClick={onClose} className="p-1.5 rounded-lg text-neutral-450 hover:bg-neutral-50 transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto sb-scroll px-2 pb-4">
-        {/* Groups */}
+      <div className="flex-1 overflow-y-auto px-2 pb-4">
         {NAV_GROUPS.filter(g => g.roles.includes(role)).map(group => {
+          const Icon         = group.icon;
+          const isOpen       = openGroups.has(group.label);
+          const anyActive    = group.items.some(it => pathname.startsWith(it.href));
           const visibleItems = group.items.filter(it => it.roles.includes(role));
-          if (!visibleItems.length) return null;
-          const isOpen    = openGroups.has(group.label);
-          const Icon      = group.icon;
-          const anyActive = visibleItems.some(it => pathname.startsWith(it.href));
           const groupBadgeCount = visibleItems.reduce((sum, it) =>
-            sum + (it.badgeKey ? (counts[it.badgeKey as BadgeKey] ?? 0) : 0), 0);
+            sum + (it.badgeKey ? counts[it.badgeKey as BadgeKey] : 0), 0);
           return (
             <div key={group.label} className="mb-1">
               <button onClick={() => toggleGroup(group.label)}
-                className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-colors",
-                  anyActive ? "text-white" : "text-white/60 hover:text-white hover:bg-white/[0.05]")}>
-                <Icon className={cn("w-4 h-4 shrink-0", anyActive ? "text-white" : "text-white/40")} />
+                className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-bold transition-colors",
+                  anyActive ? "text-neutral-900 bg-neutral-50" : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50")}>
+                <Icon className={cn("w-4 h-4 shrink-0", anyActive ? "" : "text-neutral-450")} style={anyActive ? { color: theme.accent } : {}} />
                 <span className="flex-1 text-left">{group.label}</span>
                 {groupBadgeCount > 0 && (
-                  <span className="text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none mr-0.5"
-                    style={{ background: theme.accent, color: "white" }}>
+                  <span className="text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none mr-0.5 text-white" style={{ background: theme.accent }}>
                     {groupBadgeCount > 99 ? "99+" : groupBadgeCount}
                   </span>
                 )}
-                {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-white/40" /> : <ChevronDown className="w-3.5 h-3.5 text-white/40" />}
+                {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-neutral-400" /> : <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />}
               </button>
               {isOpen && (
                 <div className="ml-7 mt-0.5">
@@ -539,13 +533,13 @@ function MobileDrawer({ pathname, role, counts, pulsing, pinned, onPin, onContex
         })}
       </div>
 
-      <div className="px-4 py-3 border-t border-white/[0.06] shrink-0">
+      <div className="px-4 py-3 border-t border-neutral-100 shrink-0">
         <Link href="/admin/settings" onClick={onClose}
-          className="flex items-center gap-2.5 text-[13px] text-white/60 hover:text-white transition-colors py-2">
+          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-neutral-850 transition-colors py-2 font-bold">
           <Settings className="w-4 h-4" /> Settings
         </Link>
         <button onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex items-center gap-2.5 text-[13px] text-white/60 hover:text-red-400 transition-colors py-2 w-full">
+          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-red-500 transition-colors py-2 w-full font-bold">
           <LogOut className="w-4 h-4" /> Sign out
         </button>
       </div>
@@ -555,72 +549,70 @@ function MobileDrawer({ pathname, role, counts, pulsing, pinned, onPin, onContex
 
 // ─── AdminSidebar ─────────────────────────────────────────────────────────────
 
-export function AdminSidebar() {
-  const pathname = usePathname();
-  const { data: session, status, update: extendSession } = useSession();
-  const role      = (session?.user?.role ?? "") as UserRole;
-  const userName  = session?.user?.name  ?? "";
-  const userImage = session?.user?.image ?? null;
-  const initials  = userName.split(" ").filter(Boolean).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "A";
-  const roleLabel = ROLE_LABELS[role] ?? "Staff";
+interface AdminSidebarProps {
+  userName?: string;
+  userImage?: string | null;
+}
 
-  const [mobileOpen,     setMobileOpen]     = useState(false);
-  const [activePanel,    setActivePanel]    = useState<string | null>(null);
-  const [counts,         setCounts]         = useState<Counts>({ pendingKyc: 0, openDisputes: 0, pendingPayouts: 0 });
-  const [pulsing,        setPulsing]        = useState<Set<string>>(new Set());
-  const [pinned,         setPinned]         = useState<string[]>([]);
-  const [themeId,        setThemeId]        = useState<SidebarThemeId>("gray");
-  const [contextMenu,    setContextMenu]    = useState<CtxMenu>(null);
-  const [ctxCopied,      setCtxCopied]      = useState(false);
-  const [mounted,        setMounted]        = useState(false);
-  const [health,         setHealth]         = useState<HealthStatus>(null);
-  const [sessionWarning, setSessionWarning] = useState(false);
-  const [progress,       setProgress]       = useState(0);
-  const transitioning    = useRef(false);
-  const progressTimer    = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+export function AdminSidebar({
+  userName: propUserName = "",
+  userImage: propUserImage = null,
+}: AdminSidebarProps) {
+  const pathname = usePathname();
+  const { data: session, status, update } = useSession();
+  const role = (session?.user?.role ?? "admin") as UserRole;
+  const userName = session?.user?.name ?? propUserName;
+  const userImage = session?.user?.image ?? propUserImage;
+
+  const [mobileOpen,        setMobileOpen]        = useState(false);
+  const [activePanel,       setActivePanel]       = useState<string | null>(null);
+  const [counts,            setCounts]            = useState<Counts>({ pendingKyc: 0, openDisputes: 0, pendingPayouts: 0 });
+  const [pulsing,           setPulsing]           = useState<Set<string>>(new Set());
+  const [pinned,            setPinned]            = useState<string[]>([]);
+  const [themeId,           setThemeId]           = useState<SidebarThemeId>("navy");
+  const [contextMenu,       setContextMenu]       = useState<CtxMenu>(null);
+  const [ctxCopied,         setCtxCopied]         = useState(false);
+  const [health,            setHealth]            = useState<HealthStatus>(null);
+  const [sessionWarning,    setSessionWarning]    = useState(false);
+  const [progress,          setProgress]          = useState(0);
+  const [mounted,           setMounted]           = useState(false);
+  const transitioning = useRef(false);
+  const progressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const currentTheme = SIDEBAR_THEMES.find(t => t.id === themeId) ?? SIDEBAR_THEMES[0];
-  const activePanelGroup = NAV_GROUPS.find(g => g.label === activePanel) ?? null;
+  const activePanelGroup = NAV_GROUPS.find(g => g.label === activePanel);
+  const initials = userName.split(" ").filter(Boolean).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "A";
+  const roleLabel = ROLE_LABELS[role] ?? "Staff member";
 
-  // Init localStorage + set initial panel
+  useEffect(() => { setMounted(true); }, []);
+
+  // Init theme & pinned
   useEffect(() => {
-    setMounted(true);
     try {
-      const t = localStorage.getItem("admin-sidebar-theme") as SidebarThemeId | null;
-      if (t && SIDEBAR_THEMES.some(th => th.id === t)) setThemeId(t);
-      const pins: string[] = JSON.parse(localStorage.getItem("admin-pinned") || "[]");
-      setPinned(pins);
-      const groupLabel = findActiveGroup(pathname);
-      setActivePanel(groupLabel ?? NAV_GROUPS[0]?.label ?? null);
+      let stored = localStorage.getItem("admin-sidebar-theme") as SidebarThemeId;
+      if (stored === "gray") {
+        stored = "navy";
+        localStorage.setItem("admin-sidebar-theme", "navy");
+      }
+      if (stored && SIDEBAR_THEMES.some(t => t.id === stored)) setThemeId(stored);
+      const storedPinned = localStorage.getItem("admin-pinned");
+      if (storedPinned) setPinned(JSON.parse(storedPinned));
     } catch {}
+  }, []);
+
+  // Init panel group on load
+  useEffect(() => {
+    const groupLabel = findActiveGroup(pathname);
+    setActivePanel(groupLabel ?? NAV_GROUPS[0].label);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-switch panel on navigation
   useEffect(() => {
     const groupLabel = findActiveGroup(pathname);
-    if (groupLabel) {
-      setActivePanel(groupLabel);
-      try { localStorage.setItem("admin-sidebar-panel", groupLabel); } catch {}
-    }
-    // Standalone page — keep whatever panel is already open
+    if (groupLabel) setActivePanel(groupLabel);
   }, [pathname]);
 
-  // Mobile swipe
-  useEffect(() => {
-    let sx = 0, sy = 0;
-    const onStart = (e: TouchEvent) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; };
-    const onEnd   = (e: TouchEvent) => {
-      const dx = e.changedTouches[0].clientX - sx;
-      const dy = Math.abs(e.changedTouches[0].clientY - sy);
-      if (!mobileOpen && sx <= 24 && dx > 60 && dy < 80) setMobileOpen(true);
-      if (mobileOpen  && dx < -60 && dy < 80)            setMobileOpen(false);
-    };
-    document.addEventListener("touchstart", onStart, { passive: true });
-    document.addEventListener("touchend",   onEnd,   { passive: true });
-    return () => { document.removeEventListener("touchstart", onStart); document.removeEventListener("touchend", onEnd); };
-  }, [mobileOpen]);
-
-  // Page transition bar
+  // Loading bar
   useEffect(() => {
     if (transitioning.current) {
       transitioning.current = false;
@@ -638,14 +630,35 @@ export function AdminSidebar() {
     progressTimer.current = setTimeout(() => { if (transitioning.current) setProgress(68); }, 90);
   }
 
-  // Badge refresh
+  // Extend session helper
+  async function extendSession() {
+    try {
+      await update();
+      setSessionWarning(false);
+      toast.success("Session extended successfully");
+    } catch {
+      toast.error("Could not extend session. Please refresh.");
+    }
+  }
+
+  // Real-time unread/counts
   useEffect(() => {
     function fetch_() {
-      fetch("/api/admin/counts").then(r => r.json()).then((next: Counts) => {
+      fetch("/api/admin/sidebar-counts").then(r => r.json()).then(d => {
         setCounts(prev => {
-          const keys: BadgeKey[] = ["pendingKyc", "openDisputes", "pendingPayouts"];
-          const inc = keys.filter(k => next[k] > prev[k]);
-          if (inc.length) { setPulsing(new Set(inc)); setTimeout(() => setPulsing(new Set()), 900); }
+          const next = {
+            pendingKyc: d.pendingKyc ?? 0,
+            openDisputes: d.openDisputes ?? 0,
+            pendingPayouts: d.pendingPayouts ?? 0,
+          };
+          const pulse = new Set<string>();
+          if (next.pendingKyc > prev.pendingKyc) pulse.add("pendingKyc");
+          if (next.openDisputes > prev.openDisputes) pulse.add("openDisputes");
+          if (next.pendingPayouts > prev.pendingPayouts) pulse.add("pendingPayouts");
+          if (pulse.size > 0) {
+            setPulsing(pulse);
+            setTimeout(() => setPulsing(new Set()), 1500);
+          }
           return next;
         });
       }).catch(() => {});
@@ -706,26 +719,25 @@ export function AdminSidebar() {
       <div className="hidden"><AdminGlobalSearch /></div>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center gap-3 px-4 border-b border-white/[0.06]"
-        style={{ background: currentTheme.bg }}>
-        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg text-white hover:bg-white/[0.05] transition-colors">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center gap-3 px-4 border-b border-neutral-200 bg-white">
+        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-50 transition-colors">
           <Menu className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: currentTheme.accent }}>
+          <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-brand-primary" style={{ background: currentTheme.accent }}>
             <Film className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-[14px] font-bold text-white tracking-tight">EditBridge</span>
+          <span className="text-[14px] font-black text-neutral-850 tracking-tight">EditBridge</span>
         </div>
       </div>
 
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div className="relative w-72 h-full shadow-2xl">
             {status === "loading"
-              ? <div className="h-full" style={{ background: currentTheme.bg }} />
+              ? <div className="h-full bg-white" />
               : <MobileDrawer pathname={pathname} role={role} counts={counts} pulsing={pulsing}
                   pinned={pinned} onPin={togglePin} onContextMenu={handleContextMenu}
                   theme={currentTheme} onClose={() => setMobileOpen(false)} />}
@@ -734,8 +746,7 @@ export function AdminSidebar() {
       )}
 
       {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.06]"
-        style={{ background: currentTheme.bg }}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white">
         <div className="flex h-14">
           {NAV_GROUPS.filter(g => g.roles.includes(role)).slice(0, 3).map(group => {
             const Icon      = group.icon;
@@ -745,7 +756,7 @@ export function AdminSidebar() {
             return (
               <Link key={group.label} href={firstHref}
                 className={cn("flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors",
-                  isActive ? "text-white" : "text-white/40")}>
+                  isActive ? "text-neutral-900 font-bold" : "text-neutral-450")}>
                 {isActive && (
                   <span className="absolute top-0 inset-x-3 h-[2px] rounded-full"
                     style={{ background: currentTheme.accent }} />
@@ -753,31 +764,31 @@ export function AdminSidebar() {
                 <div className="relative">
                   <Icon className="w-5 h-5" />
                   {hasBadge && (
-                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border-[2px]"
-                      style={{ background: currentTheme.accent, borderColor: currentTheme.bg }} />
+                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border-[2px] border-white"
+                      style={{ background: currentTheme.accent }} />
                   )}
                 </div>
-                <span className="text-[9.5px] font-medium">{group.label}</span>
+                <span className="text-[9.5px] font-bold">{group.label}</span>
               </Link>
             );
           })}
           <button onClick={() => setMobileOpen(true)}
-            className="flex-1 flex flex-col items-center justify-center gap-0.5 text-white/40 transition-colors">
+            className="flex-1 flex flex-col items-center justify-center gap-0.5 text-neutral-450 transition-colors">
             <Menu className="w-5 h-5" />
-            <span className="text-[9.5px] font-medium">More</span>
+            <span className="text-[9.5px] font-bold">More</span>
           </button>
         </div>
       </nav>
 
       {/* Desktop sidebar */}
       <aside
-        className="hidden md:flex h-full flex-shrink-0 border-r border-white/[0.06] transition-[width] duration-250 ease-in-out overflow-hidden"
+        className="hidden md:flex h-full flex-shrink-0 border-r border-neutral-200/60 transition-[width] duration-250 ease-in-out overflow-hidden"
         style={{ width: activePanel !== null ? 56 + 240 : 56, background: currentTheme.bg }}
       >
         {status === "loading" ? (
-          <div className="w-14 flex flex-col items-center pt-4 gap-3">
-            <div className="w-8 h-8 rounded-xl bg-white/[0.08] animate-pulse" />
-            {[...Array(8)].map((_, i) => <div key={i} className="w-10 h-10 rounded-xl bg-white/[0.05] animate-pulse" style={{ animationDelay: `${i * 60}ms` }} />)}
+          <div className="w-14 flex flex-col items-center pt-4 gap-3 bg-neutral-50/50 h-full border-r border-neutral-200/50">
+            <div className="w-8 h-8 rounded-xl bg-neutral-200 animate-pulse" />
+            {[...Array(8)].map((_, i) => <div key={i} className="w-10 h-10 rounded-xl bg-neutral-100 animate-pulse" style={{ animationDelay: `${i * 60}ms` }} />)}
           </div>
         ) : (
           <>

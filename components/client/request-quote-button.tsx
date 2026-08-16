@@ -36,7 +36,7 @@ const DEADLINES = [
 ];
 
 const INPUT_CLS =
-  "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-400";
+  "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 placeholder:text-gray-400";
 
 export function RequestQuoteButton({ editorId }: { editorId: string }) {
   const router = useRouter();
@@ -102,7 +102,7 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
       {/* Trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 w-full justify-center px-4 py-3 rounded-xl border-2 border-[#0EA5E9] text-[#0EA5E9] font-semibold text-sm transition-colors hover:bg-sky-50"
+        className="flex items-center gap-2 w-full justify-center px-4 py-3 rounded-xl border-2 border-[#1e40af] text-[#1e40af] font-semibold text-sm transition-colors hover:bg-blue-50"
       >
         <MessageSquare className="w-4 h-4" />
         Request a Quote
@@ -118,8 +118,8 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 flex items-center justify-center">
-                  <MessageSquare className="w-4 h-4 text-[#0EA5E9]" />
+                <div className="w-8 h-8 rounded-lg bg-[#1e40af]/10 flex items-center justify-center">
+                  <MessageSquare className="w-4 h-4 text-[#1e40af]" />
                 </div>
                 <div>
                   <h2 className="font-bold text-gray-900 text-sm">Request a Custom Quote</h2>
@@ -138,8 +138,8 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
               {/* Video type */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-md bg-sky-50 flex items-center justify-center">
-                    <Film className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
+                    <Film className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <label className="text-sm font-semibold text-gray-800">
                     What type of video?
@@ -154,7 +154,7 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
                       className={cn(
                         "text-xs py-2 px-2 rounded-xl border transition-colors text-center",
                         form.videoType === value
-                          ? "bg-[#0EA5E9]/10 border-[#0EA5E9]/40 text-[#0EA5E9] font-semibold"
+                          ? "bg-[#1e40af]/10 border-[#1e40af]/40 text-[#1e40af] font-semibold"
                           : "border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
                       )}
                     >
@@ -167,8 +167,8 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
               {/* Brief */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-md bg-sky-50 flex items-center justify-center">
-                    <FileText className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
+                    <FileText className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <label className="text-sm font-semibold text-gray-800">
                     Describe what you need
@@ -197,8 +197,8 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
               {/* Budget */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-md bg-sky-50 flex items-center justify-center">
-                    <Wallet className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
+                    <Wallet className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <label className="text-sm font-semibold text-gray-800">Budget range (₹)</label>
                 </div>
@@ -230,8 +230,8 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
               {/* Deadline */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-md bg-sky-50 flex items-center justify-center">
-                    <Clock className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
+                    <Clock className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <label className="text-sm font-semibold text-gray-800">When do you need it?</label>
                 </div>
@@ -244,7 +244,7 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
                       className={cn(
                         "text-sm py-2 px-4 rounded-xl border transition-colors",
                         form.deadlinePreference === value
-                          ? "bg-[#0EA5E9]/10 border-[#0EA5E9]/40 text-[#0EA5E9] font-semibold"
+                          ? "bg-[#1e40af]/10 border-[#1e40af]/40 text-[#1e40af] font-semibold"
                           : "border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
                       )}
                     >
@@ -257,8 +257,8 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
               {/* Reference URL */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-md bg-sky-50 flex items-center justify-center">
-                    <LinkIcon className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center">
+                    <LinkIcon className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <label className="text-sm font-semibold text-gray-800">
                     Reference video{" "}
@@ -284,7 +284,7 @@ export function RequestQuoteButton({ editorId }: { editorId: string }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl font-semibold text-white text-sm bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl font-semibold text-white text-sm bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

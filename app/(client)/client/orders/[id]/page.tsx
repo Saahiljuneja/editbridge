@@ -12,6 +12,7 @@ import {
   revisionRequests,
   reviews,
   disputes,
+  messages,
 } from "@/lib/db/schema";
 import { and, eq, asc, sql } from "drizzle-orm";
 import { OrderStatusBadge } from "@/components/orders/order-status-badge";
@@ -39,6 +40,7 @@ import { getPublicUrl } from "@/lib/r2";
 import Link from "next/link";
 import { OrderTimeline } from "@/components/client/order-timeline";
 import { OrderEventTimeline } from "@/components/order/order-event-timeline";
+import { ChatWindow } from "@/components/chat/chat-window";
 import { DeliveryComments } from "@/components/orders/delivery-comments";
 import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 import { ExtensionPanel } from "@/components/orders/extension-panel";
@@ -97,6 +99,11 @@ export default async function ClientOrderDetailPage({
       briefData: orders.briefData,
       editorId: editors.id,
       editorUserId: editors.userId,
+      editorBio: editors.bio,
+      editorTotalOrders: editors.totalOrders,
+      editorCompletionRate: editors.completionRate,
+      editorDisplayName: editors.displayName,
+      processingFee: orders.processingFee,
     })
     .from(orders)
     .leftJoin(packages, eq(packages.id, orders.packageId))
@@ -108,7 +115,7 @@ export default async function ClientOrderDetailPage({
 
   if (!order) notFound();
 
-  const [editorUser, orderDeliveries, orderRevisions, clientReview, openDispute] =
+  const [editorUser, orderDeliveries, orderRevisions, clientReview, openDispute, orderMessages] =
     await Promise.all([
       db
         .select({ name: users.name, image: users.image })
@@ -140,11 +147,22 @@ export default async function ClientOrderDetailPage({
         .where(and(eq(disputes.orderId, id), sql`${disputes.status} = 'open'`))
         .limit(1)
         .then((r) => r[0] ?? null),
+
+      db
+        .select()
+        .from(messages)
+        .where(and(eq(messages.orderId, id), eq(messages.isBlocked, false)))
+        .orderBy(asc(messages.createdAt))
+        .limit(100),
     ]);
 
   const editorName = displayNameFromFull(editorUser?.name);
   const latestDelivery = orderDeliveries[orderDeliveries.length - 1];
   const bd = (order.briefData as BriefData | null) ?? {};
+  const processingFee = order.processingFee ?? 0;
+  const packageAmount = order.totalAmount - processingFee;
+  const subtotal = Math.round(packageAmount / 1.18);
+  const gst = packageAmount - subtotal;
   if (bd?.customAddons?.extraRevision && order.packageRevisionCount !== null && order.packageRevisionCount !== -1) {
     order.packageRevisionCount += 1;
   }
@@ -188,7 +206,7 @@ export default async function ClientOrderDetailPage({
                 href={`/api/orders/${order.id}/invoice`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sky-150 bg-sky-50 text-xs font-bold text-sky-700 hover:bg-sky-100 transition-colors shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-100 bg-blue-50 text-xs font-bold text-blue-900 hover:bg-blue-100 transition-colors shadow-sm"
               >
                 <Download className="w-3.5 h-3.5" /> PDF
               </a>
@@ -238,7 +256,11 @@ export default async function ClientOrderDetailPage({
                 bd.mustInclude ||
                 bd.mustAvoid ||
                 bd.additionalNotes ||
-                bd.referenceUrls?.length) ? (
+                bd.referenceUrls?.length ||
+                bd.customAddons?.extraFast ||
+                bd.customAddons?.extraRevision ||
+                bd.customAddons?.sourceFiles ||
+                bd.customAddons?.commercialRights) ? (
                 <div className="space-y-4 border-t border-neutral-100 pt-4">
                   {bd.mood && bd.mood.length > 0 && (
                     <div>
@@ -325,6 +347,26 @@ export default async function ClientOrderDetailPage({
                             {url}
                           </a>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(bd.customAddons?.extraFast || bd.customAddons?.extraRevision || bd.customAddons?.sourceFiles || bd.customAddons?.commercialRights) && (
+                    <div>
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2">Add-ons</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {bd.customAddons?.extraFast && (
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/50 font-bold">⚡ Extra fast</span>
+                        )}
+                        {bd.customAddons?.extraRevision && (
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200/50 font-bold">+1 Revision</span>
+                        )}
+                        {bd.customAddons?.sourceFiles && (
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200/50 font-bold">Source files</span>
+                        )}
+                        {bd.customAddons?.commercialRights && (
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200/50 font-bold">Commercial rights</span>
+                        )}
                       </div>
                     </div>
                   )}
@@ -468,6 +510,21 @@ export default async function ClientOrderDetailPage({
                 );
               })()}
 
+            {/* Inline chat */}
+            <section className="rounded-3xl border border-neutral-200/50 bg-[#ffffff] overflow-hidden shadow-sm">
+              <div className="px-6 py-3.5 border-b border-neutral-100 flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-neutral-400" />
+                <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Chat with editor</h2>
+              </div>
+              <ChatWindow
+                orderId={order.id}
+                currentUserId={order.clientId}
+                initialMessages={orderMessages.map(m => ({ ...m, createdAt: m.createdAt.toISOString() }))}
+                otherPartyName={editorName}
+                containerClassName="h-[440px] rounded-none border-0 shadow-none"
+              />
+            </section>
+
             {/* Order actions */}
             <OrderActions
               orderId={order.id}
@@ -509,6 +566,39 @@ export default async function ClientOrderDetailPage({
 
           {/* Right column — sticky sidebar */}
           <div className="space-y-4">
+            {/* Editor info */}
+            <div className="rounded-3xl border border-neutral-200/50 bg-[#ffffff] p-5 space-y-3 shadow-sm">
+              <p className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider">Your editor</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200/30 flex items-center justify-center text-sm font-bold text-neutral-400 select-none overflow-hidden shrink-0">
+                  {editorUser?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={editorUser.image} alt={editorName} className="w-full h-full object-cover" />
+                  ) : (
+                    editorInitials || "?"
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-neutral-900 text-sm truncate">{editorName}</p>
+                  {order.editorTotalOrders > 0 && (
+                    <p className="text-xs text-neutral-400">
+                      {order.editorTotalOrders} order{order.editorTotalOrders !== 1 ? "s" : ""}
+                      {order.editorCompletionRate != null ? ` · ${order.editorCompletionRate}% completion` : ""}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {order.editorBio && (
+                <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3">{order.editorBio}</p>
+              )}
+              <Link
+                href={`/editor/${order.editorId}`}
+                className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-600 hover:bg-neutral-50 transition-colors"
+              >
+                View profile <ExternalLink className="w-3 h-3" />
+              </Link>
+            </div>
+
             <OrderTimeline
               status={
                 order.status as Parameters<typeof OrderTimeline>[0]["status"]
@@ -553,8 +643,22 @@ export default async function ClientOrderDetailPage({
                 </div>
               </div>
 
-              <div className="border-t border-neutral-100 pt-3">
-                <div className="flex justify-between items-center">
+              <div className="border-t border-neutral-100 pt-3 space-y-1.5">
+                <div className="flex justify-between text-xs text-neutral-500">
+                  <span>Package</span>
+                  <span className="tabular-nums">{formatCurrency(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-neutral-500">
+                  <span>GST (18%)</span>
+                  <span className="tabular-nums">{formatCurrency(gst)}</span>
+                </div>
+                {processingFee > 0 && (
+                  <div className="flex justify-between text-xs text-neutral-500">
+                    <span>Processing fee</span>
+                    <span className="tabular-nums">{formatCurrency(processingFee)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-1.5 border-t border-neutral-100">
                   <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">Total paid</span>
                   <span className="font-black text-neutral-900 tabular-nums">
                     {formatCurrency(order.totalAmount)}
@@ -563,10 +667,10 @@ export default async function ClientOrderDetailPage({
               </div>
 
               <Link
-                href={`/client/messages?editorId=${order.editorId}`}
-                className="w-full bg-black hover:bg-neutral-900 text-white hover:text-white border-transparent text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                href={`/client/messages/${id}`}
+                className="w-full border border-neutral-200 text-neutral-600 hover:bg-neutral-50 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2"
               >
-                <MessageSquare className="w-3.5 h-3.5" /> Message editor
+                <MessageSquare className="w-3.5 h-3.5" /> Open full chat
               </Link>
             </div>
           </div>

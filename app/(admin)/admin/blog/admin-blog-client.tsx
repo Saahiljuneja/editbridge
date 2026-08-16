@@ -74,7 +74,7 @@ interface AdminBlogClientProps {
   comments: Comment[];
 }
 
-const CHART_COLORS = ["#8B7FE8", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"];
+const CHART_COLORS = ["#8B7FE8", "#1e40af", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"];
 
 function PaginationControls({
   currentPage,
@@ -988,7 +988,7 @@ export function AdminBlogClient({ posts, subscribers, comments }: AdminBlogClien
                                 : p.status === "published"
                                 ? "bg-purple-50 text-purple-700 border-purple-100"
                                 : p.status === "in-review"
-                                ? "bg-sky-50 text-sky-700 border-sky-100"
+                                ? "bg-blue-50 text-blue-900 border-blue-100"
                                 : "bg-gray-50 text-gray-700 border-gray-150"
                             )}
                             title={`${p.title} (${isFuture ? "scheduled" : p.status}) — drag to reschedule`}
@@ -1533,7 +1533,7 @@ export function AdminBlogClient({ posts, subscribers, comments }: AdminBlogClien
                               <Eye className="w-3 h-3" /> Published
                             </span>
                           ) : post.status === "in-review" ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-900">
                               <FileClock className="w-3 h-3" /> In Review
                             </span>
                           ) : (

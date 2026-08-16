@@ -50,22 +50,16 @@ const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; bo
   silver:   { label: "Silver",   color: "text-slate-600",   bg: "bg-slate-100",   border: "border-slate-200",   bar: "bg-slate-400",    hex: "#475569" },
   gold:     { label: "Gold",     color: "text-yellow-600",  bg: "bg-yellow-50",   border: "border-yellow-200",  bar: "bg-yellow-500",   hex: "#D97706" },
   platinum: { label: "Platinum", color: "text-indigo-700",  bg: "bg-indigo-50",   border: "border-indigo-200",  bar: "bg-indigo-500",   hex: "#4F46E5" },
-  diamond:  { label: "Diamond",  color: "text-cyan-700",    bg: "bg-cyan-50",     border: "border-cyan-200",    bar: "bg-cyan-500",     hex: "#0891B2" },
-  master:   { label: "Master",   color: "text-purple-700",  bg: "bg-purple-50",   border: "border-purple-200",  bar: "bg-purple-500",   hex: "#9333EA" },
-  legend:   { label: "Legend",   color: "text-orange-700",  bg: "bg-orange-50",   border: "border-orange-200",  bar: "bg-orange-500",   hex: "#DC2626" },
 };
 
-const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000, diamond: 10000, master: 25000, legend: 50000 };
-const LEVEL_MAX:   Record<Level, number> = { bronze: 500, silver: 2000, gold: 5000, platinum: 10000, diamond: 25000, master: 50000, legend: Infinity };
+const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000 };
+const LEVEL_MAX:   Record<Level, number> = { bronze: 500, silver: 2000, gold: 5000, platinum: Infinity };
 
 const LEVEL_PERKS: Record<Level, { title: string; perks: string[] }> = {
   bronze:   { title: "Bronze",   perks: ["Standard visibility"] },
   silver:   { title: "Silver",   perks: ["Silver badge", "2% editor discount"] },
   gold:     { title: "Gold",     perks: ["Featured in browse", "5% editor discount"] },
-  platinum: { title: "Platinum", perks: ["Top placement", "Custom banner", "10% discount"] },
-  diamond:  { title: "Diamond",  perks: ["Diamond placement", "Priority support", "15% discount"] },
-  master:   { title: "Master",   perks: ["Master badge", "Top-10 spotlight", "20% discount"] },
-  legend:   { title: "Legend",   perks: ["Top-3 spotlight", "25% discount", "Account manager"] },
+  platinum: { title: "Platinum", perks: ["Top placement", "Custom banner", "10% discount", "Priority support"] },
 };
 
 const XP_REASON_LABELS: Record<string, string> = {
@@ -131,7 +125,7 @@ function LevelCard({ data }: { data: RewardsData }) {
   const start = LEVEL_START[data.level];
   const max   = LEVEL_MAX[data.level];
   const progress = max === Infinity ? 100 : Math.min(100, ((data.xp - start) / (max - start)) * 100);
-  const levels: Level[] = ["bronze", "silver", "gold", "platinum", "diamond", "master", "legend"];
+  const levels: Level[] = ["bronze", "silver", "gold", "platinum"];
 
   return (
     <div className={cn("rounded-2xl border p-6", cfg.bg, cfg.border)}>
@@ -177,7 +171,7 @@ function LevelCard({ data }: { data: RewardsData }) {
                 )}>
                   {c.label}
                 </div>
-                {i < 6 && <ChevronRight className="w-3 h-3 text-gray-300 shrink-0 mx-0.5" />}
+                {i < levels.length - 1 && <ChevronRight className="w-3 h-3 text-gray-300 shrink-0 mx-0.5" />}
               </div>
             );
           })}
@@ -188,13 +182,13 @@ function LevelCard({ data }: { data: RewardsData }) {
 }
 
 function PerksCard({ level }: { level: Level }) {
-  const levels: Level[] = ["bronze", "silver", "gold", "platinum", "diamond", "master", "legend"];
+  const levels: Level[] = ["bronze", "silver", "gold", "platinum"];
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5">
       <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
         <Zap className="w-4 h-4 text-yellow-500" /> Level perks
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {levels.map((l) => {
           const cfg = LEVEL_CONFIG[l];
           const perkDef = LEVEL_PERKS[l];
@@ -232,7 +226,7 @@ function BadgesGrid({ data }: { data: RewardsData }) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-5">
       <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <Award className="w-4 h-4 text-violet-500" />
+        <Award className={cn("w-4 h-4", data.role === "editor" ? "text-violet-500" : "text-brand-primary")} />
         Badges <span className="text-xs text-gray-400 font-normal ml-1">{data.badges.length}/{badgeKeys.length} earned</span>
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

@@ -1,6 +1,7 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
 import { Shield, Mail, Clock, FileText, CheckCircle } from "lucide-react";
+import { PageHero } from "@/components/public/page-animations";
 
 export const metadata: Metadata = {
   title: "Grievance Redressal Policy — EditBridge",
@@ -10,17 +11,12 @@ export const metadata: Metadata = {
 export default function GrievancePage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-[#07050f] px-4 py-16">
-        <div className="px-8 py-6">
-          <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Legal · India</p>
-          <h1 className="text-3xl font-extrabold text-white mb-3">Grievance Redressal Policy</h1>
-          <p className="text-white/40 text-sm leading-relaxed">
-            As required under Rule 3(2) of the IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 — published under the Information Technology Act, 2000.
-          </p>
-          <p className="text-white/30 text-xs mt-4">Last updated: June 2025</p>
-        </div>
-      </div>
+      <PageHero
+        badge="Legal · India"
+        title="Grievance Redressal Policy"
+        subtitle="As required under Rule 3(2) of the IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021. Last updated: June 2025"
+        accentColor="var(--brand-client)"
+      />
 
       <div className="px-8 py-6 space-y-12">
 

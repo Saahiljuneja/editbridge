@@ -9,6 +9,7 @@ import { getAvailableCredits } from "@/lib/rewards";
 import CheckoutForm from "./checkout-form";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
+import { getPlatformSettings } from "@/lib/platform-settings";
 
 export default async function PackageCheckoutPage({ params }: { params: Promise<{ packageId: string }> }) {
   const session = await auth();
@@ -51,7 +52,7 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
           </p>
           <Link
             href="/browse"
-            className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors"
+            className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors"
           >
             Browse Other Editors
           </Link>
@@ -61,6 +62,7 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
   }
 
   const { total: availableCredits } = await getAvailableCredits(session.user.userId!);
+  const { processingFeePct } = await getPlatformSettings();
 
   const pkgWithDefaultName = {
     ...pkg,
@@ -71,6 +73,7 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
     <CheckoutForm
       pkg={pkgWithDefaultName}
       availableCredits={availableCredits}
+      processingFeePct={processingFeePct}
     />
   );
 }

@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -22,19 +22,19 @@ export default async function EditorAvailabilityPage() {
     .limit(1);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
-        <div className="px-6 py-5 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="bg-white border-b border-gray-150 shadow-sm">
+        <div className="px-6 py-5 flex items-center justify-between max-w-5xl mx-auto">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Availability</h1>
-            <p className="text-sm text-gray-400 mt-0.5">Control whether clients can place new orders</p>
+            <h1 className="text-xl font-black text-neutral-900 tracking-tight">Availability</h1>
+            <p className="text-xs text-neutral-450 mt-0.5 font-semibold">Control whether clients can place new orders</p>
           </div>
-          <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)]/10 flex items-center justify-center">
-            <CalendarClock className="w-4 h-4 text-[var(--brand-client)]" />
+          <div className="w-9 h-9 rounded-xl bg-brand-primary/10 flex items-center justify-center">
+            <CalendarClock className="w-4 h-4 text-brand-primary" />
           </div>
         </div>
       </div>
-      <div className="px-6 py-6">
+      <div className="px-6 py-6 max-w-5xl mx-auto">
         <AvailabilityClient
           editorId={editorId}
           isAvailable={editor?.isAvailable ?? true}

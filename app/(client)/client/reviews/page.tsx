@@ -42,7 +42,7 @@ export default async function ClientReviewsPage() {
     <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
       <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
 
-      <div className="max-w-4xl mx-auto px-6 pt-6 space-y-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-6 pt-6 space-y-6 relative z-10">
         {/* Header Card */}
         <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-10">
           <div>

@@ -6,7 +6,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { verifySignature } from "@/lib/razorpay";
 import { notifyOrderPlacedClient, notifyOrderPlacedEditor, createInAppNotification, editorWantsNotif } from "@/lib/notifications";
 import { consumeCredits } from "@/lib/rewards";
-import { getPlatformSettings } from "@/lib/platform-settings";
+import { getPlatformSettings, getClientProcessingFeeRate } from "@/lib/platform-settings";
 import { getEditorCommissionRate } from "@/lib/membership";
 import { generateBriefText } from "@/lib/brief";
 import { createOrderEvent } from "@/lib/order-events";
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "This editor is not accepting new orders at this time" }, { status: 403 });
   }
 
-  const { processingFeePct } = await getPlatformSettings();
+  const processingFeePct = await getClientProcessingFeeRate(session.user.userId!);
   const commissionRatePct = await getEditorCommissionRate(editor.id);
 
   const addons = briefData.customAddons;

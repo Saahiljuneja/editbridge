@@ -441,23 +441,23 @@ export function BlogClient({ allPosts, featured }: BlogClientProps) {
                 onToggleBookmark={(e) => toggleBookmark(featured[1].slug, e)}
               />
               {/* Sticky author teaser box */}
-              <div className="rounded-2xl bg-gradient-to-br from-[#07050f] to-[#1a0040] p-6 flex flex-col justify-between">
+              <div className="rounded-2xl border border-neutral-200/60 bg-white p-6 flex flex-col justify-between shadow-sm">
                 <div>
-                  <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3">Written by</p>
+                  <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-3">Written by</p>
                   <div className="flex items-center gap-3 mb-4">
                     <AuthorAvatar src={featured[1].authorImage} name={featured[1].authorName} size={10} />
                     <div>
-                      <p className="font-bold text-white text-sm">{featured[1].authorName ?? "EditBridge Team"}</p>
-                      <p className="text-xs text-white/40">Contributor · EditBridge</p>
+                      <p className="font-bold text-neutral-800 text-sm">{featured[1].authorName ?? "EditBridge Team"}</p>
+                      <p className="text-xs text-neutral-450">Contributor · EditBridge</p>
                     </div>
                   </div>
-                  <p className="text-xs text-white/40 leading-relaxed">
+                  <p className="text-xs text-neutral-500 leading-relaxed">
                     Guides and resources to help creators and editors work better together.
                   </p>
                 </div>
                 <Link
                   href="/browse"
-                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#8B7FE8] hover:text-white transition-colors"
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#7c6ff7] hover:text-[#6a5ef0] transition-colors"
                 >
                   Browse editors <ArrowRight className="w-3 h-3" />
                 </Link>

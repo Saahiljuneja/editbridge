@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { messages, orders, notifications } from "@/lib/db/schema";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, ne, sql, gte } from "drizzle-orm";
 
 export async function GET() {
   const session = await auth();
   if (!session || session.user.role !== "editor" || !session.user.editorId)
     return NextResponse.json({ count: 0, notifications: 0 });
+
+  const cutoffDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   const [msgRow, notifRow] = await Promise.all([
     db
@@ -27,7 +29,13 @@ export async function GET() {
     db
       .select({ count: sql<number>`COUNT(*)::int` })
       .from(notifications)
-      .where(and(eq(notifications.userId, session.user.userId!), eq(notifications.isRead, false)))
+      .where(
+        and(
+          eq(notifications.userId, session.user.userId!),
+          eq(notifications.isRead, false),
+          gte(notifications.createdAt, cutoffDate)
+        )
+      )
       .then((r) => r[0]),
   ]);
 

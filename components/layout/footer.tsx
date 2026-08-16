@@ -126,7 +126,7 @@ export function Footer({ logoUrl, platformName, socialTwitter, socialInstagram, 
             © {new Date().getFullYear()} {name}. All rights reserved.
           </p>
           <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">
-            15% commission · Escrow-protected · KYC-verified
+            20% commission · Escrow-protected · KYC-verified
           </p>
         </div>
       </div>

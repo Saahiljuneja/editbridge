@@ -1,5 +1,6 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
+import { PageHero } from "@/components/public/page-animations";
 
 export const metadata: Metadata = {
   title: "Refund & Cancellation Policy — EditBridge",
@@ -15,12 +16,12 @@ const SECTIONS = [
   {
     num: "2",
     title: "Cancellation Before Work Begins",
-    body: `A client may cancel an order before the editor has started work. In such cases, a full refund of the order amount is issued. The 4% processing fee is non-refundable as it covers payment gateway charges incurred at the time of transaction. Requests must be submitted through the dispute system on the order page.`,
+    body: `A client may cancel an order before the editor has started work. In such cases, a full refund of the order amount is issued. The 10% processing fee is non-refundable as it covers payment gateway charges incurred at the time of transaction. Requests must be submitted through the dispute system on the order page.`,
   },
   {
     num: "3",
     title: "Cancellation After Work Has Started",
-    body: `If an order is cancelled after the editor has begun work, a partial refund may be issued at EditBridge's discretion based on the extent of work completed. The editor must provide evidence of work done (drafts, project files, or screen recordings). EditBridge's decision in such cases is final. The 4% processing fee is non-refundable.`,
+    body: `If an order is cancelled after the editor has begun work, a partial refund may be issued at EditBridge's discretion based on the extent of work completed. The editor must provide evidence of work done (drafts, project files, or screen recordings). EditBridge's decision in such cases is final. The 10% processing fee is non-refundable.`,
   },
   {
     num: "4",
@@ -35,7 +36,7 @@ const SECTIONS = [
   {
     num: "6",
     title: "Processing Fee",
-    body: `A 4% processing fee (calculated on the package price) is charged to the client at the time of placing an order. This fee covers Razorpay payment gateway charges and is non-refundable under any circumstances, including cancellations and dispute outcomes.`,
+    body: `A 10% processing fee (calculated on the package price) is charged to the client at the time of placing an order. This fee covers Razorpay payment gateway charges and is non-refundable under any circumstances, including cancellations and dispute outcomes.`,
   },
   {
     num: "7",
@@ -62,14 +63,12 @@ const SECTIONS = [
 export default function RefundPolicyPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="bg-[#07050f] px-4 py-16">
-        <div className="px-8 py-6">
-          <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Legal</p>
-          <h1 className="text-3xl font-extrabold text-white mb-3">Refund & Cancellation Policy</h1>
-          <p className="text-white/40 text-sm">Last updated: June 2025</p>
-        </div>
-      </div>
+      <PageHero
+        badge="Legal"
+        title="Refund & Cancellation Policy"
+        subtitle="Last updated: June 2025"
+        accentColor="var(--brand-client)"
+      />
 
       {/* Content */}
       <div className="px-8 py-6 space-y-10">

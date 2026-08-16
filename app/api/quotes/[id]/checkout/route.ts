@@ -5,7 +5,7 @@ import { quoteRequests, editors, orders } from "@/lib/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { createOrder } from "@/lib/razorpay";
 import { getAvailableCredits } from "@/lib/rewards";
-import { getPlatformSettings } from "@/lib/platform-settings";
+import { getPlatformSettings, getClientProcessingFeeRate } from "@/lib/platform-settings";
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -51,7 +51,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     }
   }
 
-  const { processingFeePct } = await getPlatformSettings();
+  const processingFeePct = await getClientProcessingFeeRate(session.user.userId!);
   const PROCESSING_FEE = Math.round(quote.offeredPrice * (processingFeePct / 100));
   const totalAmount = quote.offeredPrice + PROCESSING_FEE;
 

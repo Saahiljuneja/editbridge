@@ -69,7 +69,7 @@ export default async function EditorSavedPortfolioPage() {
             </div>
             <h3 className="text-base font-semibold text-gray-900 mb-1">No saved items yet</h3>
             <p className="text-sm text-gray-400 mb-5">Bookmark portfolio items from the feed to find them here.</p>
-            <Link href="/feed" className="inline-flex items-center gap-2 bg-[var(--brand-editor)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-violet-700 transition-colors">
+            <Link href="/feed" className="inline-flex items-center gap-2 bg-[#1e40af] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-brand-primary transition-colors">
               <Film className="w-4 h-4" /> Browse Feed
             </Link>
           </div>
@@ -102,7 +102,7 @@ export default async function EditorSavedPortfolioPage() {
                       {row.editorUserImage ? (
                         <Image src={row.editorUserImage} alt={row.editorDisplayName ?? ""} width={16} height={16} className="rounded-full object-cover shrink-0" unoptimized />
                       ) : (
-                        <div className="w-4 h-4 rounded-full bg-sky-500 flex items-center justify-center shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-brand-primary flex items-center justify-center shrink-0">
                           <span className="text-white text-[8px] font-bold">{(row.editorDisplayName ?? row.editorUserName ?? "?").slice(0, 1).toUpperCase()}</span>
                         </div>
                       )}

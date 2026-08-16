@@ -201,8 +201,8 @@ export default async function EditorPayoutsPage({
 
         {/* Commission + TDS info */}
         <div className="rounded-2xl border border-[var(--brand-client)]/15 bg-[var(--brand-client)]/5 px-5 py-4 space-y-1">
-          <p className="text-sm text-[var(--brand-client)] font-medium">Platform commission: 15% · 7-day payout window</p>
-          <p className="text-xs text-[var(--brand-client)]/70">Net payout = order amount − 15% commission − TDS (if applicable). Payment is initiated 7 days after client approves.</p>
+          <p className="text-sm text-[var(--brand-client)] font-medium">Platform commission: 20% · 7-day payout window</p>
+          <p className="text-xs text-[var(--brand-client)]/70">Net payout = order amount − 20% commission − TDS (if applicable). Payment is initiated 7 days after client approves.</p>
           <p className="text-xs text-[var(--brand-client)]/60">TDS (Section 194J) is deducted at 10% once your annual earnings exceed ₹30,000. You can claim this as tax credit when filing your ITR.</p>
         </div>
 

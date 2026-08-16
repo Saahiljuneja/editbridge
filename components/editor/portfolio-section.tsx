@@ -151,6 +151,7 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
   const [showBulkCatPicker, setShowBulkCatPicker] = useState(false);
   const undoQueue = useRef<UndoEntry[]>([]);
   const dragItem  = useRef<string | null>(null);
+  const uploadFilesRef = useRef<Map<string, File>>(new Map());
   const [completedOrders, setCompletedOrders] = useState<CompletedOrderOption[]>([]);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const idCounter = useRef(0);
@@ -395,6 +396,46 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
 
   // ── file upload ───────────────────────────────────────────────────────────
 
+  async function uploadOneFile(qId: string, file: File, sortOrder: number) {
+    const result = await upload(file, "portfolio", pct => {
+      setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, progress: pct, failed: false } : e));
+    });
+    if (!result) {
+      setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, failed: true, progress: 0 } : e));
+      return;
+    }
+    uploadFilesRef.current.delete(qId);
+    const { key } = result;
+    const proxyUrl = `/api/file/${key}`;
+    const type = file.type.startsWith("video/")
+      ? "video"
+      : file.type.startsWith("image/")
+      ? "image"
+      : key.match(/\.(mp4|mov|avi|webm|mkv|flv|wmv|m4v|mts|3gp|ogv|mpe?g)$/i)
+      ? "video"
+      : "image";
+    const tempId = `temp_${qId}`;
+    addPending(tempId);
+    setItems(prev => [...prev, {
+      id: tempId, type, url: proxyUrl,
+      title: null, description: null, category: null, tags: [],
+      isFeatured: false, isHidden: false, sortOrder, beforeUrl: null,
+    }]);
+    createPortfolioItem({ type, url: key, sortOrder })
+      .then(saved => {
+        removePending(tempId);
+        setItems(prev => prev.map(i => i.id === tempId ? { ...i, ...saved, tags: saved.tags ?? [] } : i));
+        setEditingId(saved.id);
+        setUploadQueue(prev => prev.filter(e => e.id !== qId));
+      })
+      .catch((err: Error) => {
+        removePending(tempId);
+        setItems(prev => prev.filter(i => i.id !== tempId));
+        setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, failed: true, progress: 0 } : e));
+        toast.error(err.message || "Failed to save upload.");
+      });
+  }
+
   async function handleDropFiles(files: FileList) {
     const fileArr = Array.from(files);
     const baseSortOrder = items.length;
@@ -402,51 +443,18 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
       id: nextTempId("q"),
       name: file.name, size: file.size, type: file.type, progress: 0, failed: false, file,
     }));
-    setUploadQueue(prev => [...prev, ...queueEntries.map((entry) => {
-      const { file, ...rest } = entry;
-      void file;
-      return rest;
-    })]);
+    queueEntries.forEach(({ id, file }) => uploadFilesRef.current.set(id, file));
+    setUploadQueue(prev => [...prev, ...queueEntries.map(({ file: _f, ...rest }) => rest)]);
+    await Promise.all(queueEntries.map(({ id: qId, file }, index) =>
+      uploadOneFile(qId, file, baseSortOrder + index)
+    ));
+  }
 
-    await Promise.all(queueEntries.map(async ({ id: qId, file }, index) => {
-      const result = await upload(file, "portfolio", pct => {
-        setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, progress: pct, failed: false } : e));
-      });
-      if (!result) {
-        setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, failed: true, progress: 0 } : e));
-        return;
-      }
-      const { key } = result;
-      const proxyUrl = `/api/file/${key}`;
-      const type = file.type.startsWith("video/")
-        ? "video"
-        : file.type.startsWith("image/")
-        ? "image"
-        : key.match(/\.(mp4|mov|avi|webm|mkv|flv|wmv|m4v|mts|3gp|ogv|mpe?g)$/i)
-        ? "video"
-        : "image";
-      const sortOrder = baseSortOrder + index;
-      const tempId = `temp_${qId}`;
-      addPending(tempId);
-      setItems(prev => [...prev, {
-        id: tempId, type, url: proxyUrl,
-        title: null, description: null, category: null, tags: [],
-        isFeatured: false, isHidden: false, sortOrder, beforeUrl: null,
-      }]);
-      createPortfolioItem({ type, url: key, sortOrder })
-        .then(saved => {
-          removePending(tempId);
-          setItems(prev => prev.map(i => i.id === tempId ? { ...i, ...saved, tags: saved.tags ?? [] } : i));
-          setEditingId(saved.id);
-          setUploadQueue(prev => prev.filter(e => e.id !== qId));
-        })
-        .catch((err: Error) => {
-          removePending(tempId);
-          setItems(prev => prev.filter(i => i.id !== tempId));
-          setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, failed: true, progress: 0 } : e));
-          toast.error(err.message || "Failed to save upload.");
-        });
-    }));
+  async function retryUpload(qId: string) {
+    const file = uploadFilesRef.current.get(qId);
+    if (!file) return;
+    setUploadQueue(prev => prev.map(e => e.id === qId ? { ...e, failed: false, progress: 0 } : e));
+    await uploadOneFile(qId, file, items.length);
   }
 
   // ── drag reorder (desktop) ────────────────────────────────────────────────
@@ -854,8 +862,8 @@ export function PortfolioSection({ initialPortfolio, editorId, maxFileSizeMb }: 
             <FileUpload.List>
               {uploadQueue.map(f => (
                 <FileUpload.ListItemProgressBar key={f.id} {...f}
-                  onDelete={() => setUploadQueue(prev => prev.filter(e => e.id !== f.id))}
-                  onRetry={() => setUploadQueue(prev => prev.map(e => e.id === f.id ? { ...e, failed: false, progress: 0 } : e))} />
+                  onDelete={() => { uploadFilesRef.current.delete(f.id); setUploadQueue(prev => prev.filter(e => e.id !== f.id)); }}
+                  onRetry={() => retryUpload(f.id)} />
               ))}
             </FileUpload.List>
           )}

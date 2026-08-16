@@ -25,7 +25,7 @@ const DEFAULTS: Record<string, string> = {
   favicon_url:            "",
   brand_primary:          "#7C3AED",
   brand_editor:           "#7C3AED",
-  brand_client:           "#0EA5E9",
+  brand_client:           "#1e40af",
   brand_teal:             "#0F6E56",
   site_radius:            "0.625rem",
   font_heading:           "Rubik",

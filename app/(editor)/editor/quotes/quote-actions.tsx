@@ -79,7 +79,7 @@ export function EditorQuoteActions({
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             min="500"
-            className="w-full pl-8 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-400 tabular-nums"
+            className="w-full pl-8 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 placeholder:text-gray-400 tabular-nums"
           />
         </div>
       </div>
@@ -95,7 +95,7 @@ export function EditorQuoteActions({
           rows={3}
           maxLength={500}
           placeholder="Explain your approach and why your price is right for this project…"
-          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50 placeholder:text-gray-400"
+          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 placeholder:text-gray-400"
         />
         <div className="flex justify-between items-center mt-1">
           <span className="text-xs text-gray-400">
@@ -111,7 +111,7 @@ export function EditorQuoteActions({
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+        className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
       >
         {loading ? (
           <>

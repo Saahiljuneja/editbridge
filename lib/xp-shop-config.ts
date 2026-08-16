@@ -183,7 +183,7 @@ export const PROFILE_FRAMES: FrameItem[] = [
     emoji: "🌊",
     desc: "A deep teal ocean wave glow.",
     cost: 500,
-    style: { boxShadow: "0 0 0 3px #0EA5E9, 0 0 0 6px rgba(14,165,233,0.3), 0 0 18px rgba(14,165,233,0.4)" },
+    style: { boxShadow: "0 0 0 3px #1e40af, 0 0 0 6px rgba(14,165,233,0.3), 0 0 18px rgba(14,165,233,0.4)" },
   },
   {
     key: "frame_sakura",
@@ -203,6 +203,6 @@ export const FRAME_STYLES: Record<FrameKey, string> = {
   frame_diamond:  "0 0 0 3px #06B6D4, 0 0 0 6px rgba(6,182,212,0.3), 0 0 20px rgba(6,182,212,0.5)",
   frame_fire:     "0 0 0 3px #EF4444, 0 0 0 6px rgba(251,146,60,0.4), 0 0 24px rgba(239,68,68,0.5)",
   frame_electric: "0 0 0 3px #8B5CF6, 0 0 0 6px rgba(139,92,246,0.3), 0 0 20px rgba(99,102,241,0.5)",
-  frame_ocean:    "0 0 0 3px #0EA5E9, 0 0 0 6px rgba(14,165,233,0.3), 0 0 18px rgba(14,165,233,0.4)",
+  frame_ocean:    "0 0 0 3px #1e40af, 0 0 0 6px rgba(14,165,233,0.3), 0 0 18px rgba(14,165,233,0.4)",
   frame_sakura:   "0 0 0 3px #EC4899, 0 0 0 6px rgba(236,72,153,0.25), 0 0 18px rgba(236,72,153,0.35)",
 };

@@ -77,24 +77,36 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-900 shadow-sm">
+    <div className="rounded-3xl border border-gray-150 overflow-hidden bg-white shadow-xl shadow-gray-100/25">
       {/* Bulk action bar */}
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-        <input type="checkbox" checked={selected.size === rows.length && rows.length > 0}
-          onChange={toggleAll} className="rounded border-gray-300" />
-        <span className="text-xs text-gray-400 dark:text-gray-500">{selected.size > 0 ? `${selected.size} selected` : "Select all"}</span>
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50/70">
+        <input
+          type="checkbox"
+          checked={selected.size === rows.length && rows.length > 0}
+          onChange={toggleAll}
+          className="rounded border-gray-300 accent-blue-600 cursor-pointer"
+        />
+        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+          {selected.size > 0 ? `${selected.size} selected` : "Select all"}
+        </span>
         {selected.size > 0 && status === "pending" && (
-          <>
-            <button onClick={() => bulkAction("approve")} disabled={bulkLoading}
-              className="flex items-center gap-1 text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-40">
-              {bulkLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
-              Approve selected
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => bulkAction("approve")}
+              disabled={bulkLoading}
+              className="flex items-center gap-1.5 text-xs font-bold bg-emerald-50 text-emerald-700 px-3.5 py-2 rounded-xl hover:bg-emerald-100 transition-all disabled:opacity-40 cursor-pointer"
+            >
+              {bulkLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+              Approve Selected
             </button>
-            <button onClick={() => bulkAction("reject")} disabled={bulkLoading}
-              className="flex items-center gap-1 text-xs font-semibold bg-red-50 text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-40">
-              <XCircle className="w-3 h-3" /> Reject selected
+            <button
+              onClick={() => bulkAction("reject")}
+              disabled={bulkLoading}
+              className="flex items-center gap-1.5 text-xs font-bold bg-red-50 text-red-700 px-3.5 py-2 rounded-xl hover:bg-red-100 transition-all disabled:opacity-40 cursor-pointer"
+            >
+              <XCircle className="w-3.5 h-3.5" /> Reject Selected
             </button>
-          </>
+          </div>
         )}
         <div className="ml-auto">
           <button onClick={exportCSV}
@@ -118,7 +130,7 @@ export function KycBulkTable({ rows, status }: { rows: KycRow[]; status: string 
         </thead>
         <tbody>
           {rows.map(row => (
-            <tr key={row.id} className={cn("border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors", selected.has(row.id) && "bg-sky-50/50")}>
+            <tr key={row.id} className={cn("border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors", selected.has(row.id) && "bg-blue-50/50")}>
               <td className="px-5 py-3.5">
                 <input type="checkbox" checked={selected.has(row.id)} onChange={() => toggle(row.id)} className="rounded border-gray-300" />
               </td>

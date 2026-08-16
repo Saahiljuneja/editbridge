@@ -48,9 +48,6 @@ const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; bo
   silver:   { label: "Silver",   color: "text-slate-500",  bg: "bg-slate-100",   border: "border-slate-200",  icon: Medal  },
   gold:     { label: "Gold",     color: "text-yellow-600", bg: "bg-yellow-100",  border: "border-yellow-200", icon: Crown  },
   platinum: { label: "Platinum", color: "text-indigo-600", bg: "bg-indigo-100",  border: "border-indigo-200", icon: Zap    },
-  diamond:  { label: "Diamond",  color: "text-cyan-600",   bg: "bg-cyan-100",    border: "border-cyan-200",   icon: Zap    },
-  master:   { label: "Master",   color: "text-purple-600", bg: "bg-purple-100",  border: "border-purple-200", icon: Crown  },
-  legend:   { label: "Legend",   color: "text-orange-700", bg: "bg-orange-100",  border: "border-orange-200", icon: Crown  },
 };
 
 const RANK_META = {
@@ -269,7 +266,7 @@ function ShareModal({ rank, name, score, onClose }: { rank: number; name: string
             <X className="w-4 h-4 text-gray-500" />
           </button>
         </div>
-        <div className="rounded-2xl bg-gradient-to-br from-[#1a1060] via-[#2d1b8e] to-[#0ea5e9] p-5 mb-5 text-center">
+        <div className="rounded-2xl bg-gradient-to-br from-[#1a1060] via-[#2d1b8e] to-[#1e40af] p-5 mb-5 text-center">
           <p className="text-white/60 text-xs mb-1">EditBridge Leaderboard</p>
           <div className="text-5xl font-black text-white mb-1">#{rank}</div>
           <p className="text-white/80 font-semibold text-sm">{name}</p>

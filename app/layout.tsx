@@ -29,6 +29,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import { cookies } from "next/headers";
+import { StickyImpersonationBar } from "@/components/admin/sticky-impersonation-bar";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -37,12 +40,18 @@ export default async function RootLayout({
   const { siteDarkMode, brandClient, brandEditor, brandTeal, customCss } = await getPlatformSettings();
   const themeClass = siteDarkMode === "dark" ? "dark" : "";
   const platformCss = `:root{--brand-client:${brandClient};--brand-editor:${brandEditor};--brand-teal:${brandTeal};}${customCss ? `\n${customCss}` : ""}`;
+  
+  const cookieStore = await cookies();
+  const isSecure = process.env.NODE_ENV === "production";
+  const hasOriginalAdmin = cookieStore.has(`${isSecure ? "__Secure-" : ""}authjs.original-admin-token`);
+
   return (
     <html lang="en" className={`${rubik.variable} ${dmSans.variable} ${GeistMono.variable} h-full antialiased${themeClass ? ` ${themeClass}` : ""}`}>
       <body className="min-h-full flex flex-col">
         {/* React 19 hoists <style precedence> to <head> automatically */}
         <style href="platform-vars" precedence="high" dangerouslySetInnerHTML={{ __html: platformCss }} />
         <Providers>
+          {hasOriginalAdmin && <StickyImpersonationBar />}
           {children}
           <Toaster richColors position="top-right" />
         </Providers>

@@ -50,7 +50,7 @@ export default async function AdminHelpPage() {
           </div>
           <Link
             href="/admin/help/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" /> New Article
           </Link>
@@ -61,7 +61,7 @@ export default async function AdminHelpPage() {
         {/* Stats strip */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Total Articles", value: articles.length, icon: BookOpen, color: "text-sky-600", bg: "bg-sky-50" },
+            { label: "Total Articles", value: articles.length, icon: BookOpen, color: "text-brand-primary", bg: "bg-blue-50" },
             { label: "Published", value: publishedCount, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
             { label: "Categories", value: categories.length, icon: BookOpen, color: "text-violet-600", bg: "bg-violet-50" },
           ].map(({ label, value, icon: Icon, color, bg }) => (
@@ -116,7 +116,7 @@ export default async function AdminHelpPage() {
                       <Link
                         href={`/help/article/${art.slug}`}
                         target="_blank"
-                        className="text-xs text-[#0EA5E9] hover:underline font-medium"
+                        className="text-xs text-[#1e40af] hover:underline font-medium"
                       >
                         Preview
                       </Link>

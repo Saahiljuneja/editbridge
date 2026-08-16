@@ -56,8 +56,8 @@ export default async function HelpCategoryPage({
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Help Center
           </Link>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
-              <IconComponent className="w-6 h-6 text-[#0EA5E9]" />
+            <div className="w-12 h-12 rounded-2xl bg-[#1e40af]/10 flex items-center justify-center shrink-0">
+              <IconComponent className="w-6 h-6 text-[#1e40af]" />
             </div>
             <div>
               <h1 className="text-2xl font-black text-gray-900 tracking-tight">{category.name}</h1>
@@ -84,10 +84,10 @@ export default async function HelpCategoryPage({
               <Link
                 key={article.id}
                 href={`/help/article/${article.slug}`}
-                className="flex items-center justify-between gap-4 bg-white border border-gray-100 rounded-2xl px-6 py-5 hover:border-[#0EA5E9]/30 hover:shadow-md transition-all group"
+                className="flex items-center justify-between gap-4 bg-white border border-gray-100 rounded-2xl px-6 py-5 hover:border-[#1e40af]/30 hover:shadow-md transition-all group"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-gray-900 text-base group-hover:text-[#0EA5E9] transition-colors mb-1">
+                  <p className="font-semibold text-gray-900 text-base group-hover:text-[#1e40af] transition-colors mb-1">
                     {article.title}
                   </p>
                   {article.excerpt && (
@@ -99,7 +99,7 @@ export default async function HelpCategoryPage({
                     </span>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0EA5E9] shrink-0 transition-colors" />
+                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#1e40af] shrink-0 transition-colors" />
               </Link>
             ))}
           </div>

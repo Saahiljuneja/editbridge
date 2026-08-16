@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Activity, Users, ShoppingBag, FileCheck, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LiveData {
   activeOrders: number;
@@ -74,16 +75,16 @@ export function LiveStats({ initial }: { initial: LiveData }) {
   }, []);
 
   return (
-    <div className="rounded-2xl bg-gray-950 p-5 shadow-lg">
+    <div className="rounded-3xl bg-white border border-gray-150 p-5 shadow-xl shadow-gray-100/5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className={`absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 ${pulse ? "animate-ping" : "animate-pulse"}`} />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            <span className={`absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 ${pulse ? "animate-ping" : "animate-pulse"}`} />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          <p className="text-sm font-semibold text-white">Live Platform Stats</p>
+          <p className="text-xs font-extrabold text-neutral-900 uppercase tracking-wider">Live Platform Stats</p>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-[10px] text-neutral-455 font-bold uppercase tracking-wider">
           Refreshes every 30s{lastUpdatedStr ? ` · ${lastUpdatedStr}` : ""}
         </p>
       </div>
@@ -91,25 +92,47 @@ export function LiveStats({ initial }: { initial: LiveData }) {
         {STATS_CONFIG.map(({ key, label, sub, icon: Icon, bg, ring, urgent }) => {
           const val = data[key];
           const isAlert = urgent && val > 0;
+          
+          const textValCls = isAlert 
+            ? "text-neutral-950 font-black" 
+            : "text-neutral-900 font-black";
+
+          const subtextCls = isAlert 
+            ? "text-neutral-600 font-medium" 
+            : "text-neutral-400 font-semibold";
+
+          const detailCls = isAlert 
+            ? "text-neutral-500" 
+            : "text-neutral-450";
+
+          const alertColorMap: Record<string, string> = {
+            "bg-amber-500": "border-amber-200/60 bg-amber-50/60 text-amber-850",
+            "bg-red-600": "border-red-200/60 bg-red-50/60 text-red-850",
+          };
+          
+          const computedCardStyle = isAlert
+            ? alertColorMap[bg] ?? "border-gray-200 bg-gray-50"
+            : "border-gray-150 bg-gray-50/50 text-neutral-800";
+
           return (
             <div
               key={key}
-              className={`rounded-xl p-4 ring-1 transition-all duration-300 ${
-                isAlert
-                  ? `${bg} ring-white/10`
-                  : "bg-gray-900 ring-white/5"
-              }`}
+              className={cn(
+                "rounded-2xl p-4 transition-all duration-300 border shadow-[inset_0_1px_2px_rgba(0,0,0,0.015)]",
+                computedCardStyle
+              )}
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
-                isAlert ? "bg-white/20" : `${bg} bg-opacity-20`
-              }`}>
-                <Icon className={`w-4 h-4 ${isAlert ? "text-white" : "text-white/70"}`} strokeWidth={1.8} />
+              <div className={cn(
+                "w-8 h-8 rounded-lg flex items-center justify-center mb-3 shadow-inner",
+                isAlert ? "bg-white/80 border border-white" : `${bg} bg-opacity-10`
+              )}>
+                <Icon className={cn("w-4 h-4", isAlert ? "text-neutral-900" : "text-neutral-600")} strokeWidth={1.8} />
               </div>
-              <p className={`text-3xl font-black tabular-nums transition-all duration-300 ${isAlert ? "text-white" : "text-white"}`}>
+              <p className={cn("text-3xl font-black tabular-nums tracking-tight", textValCls)}>
                 {val}
               </p>
-              <p className={`text-xs font-semibold mt-1 ${isAlert ? "text-white/90" : "text-gray-400"}`}>{label}</p>
-              <p className={`text-[11px] mt-0.5 ${isAlert ? "text-white/60" : "text-gray-600"}`}>{sub}</p>
+              <p className={cn("text-xs font-bold mt-1", subtextCls)}>{label}</p>
+              <p className={cn("text-[10px] mt-0.5", detailCls)}>{sub}</p>
             </div>
           );
         })}

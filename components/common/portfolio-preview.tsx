@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { PlayCircle } from "lucide-react";
-import { getYouTubeId, getVimeoId, getVideoSource } from "@/lib/portfolio-media";
+import { getYouTubeId, getVimeoId, getVideoSource, getThumbnailUrl } from "@/lib/portfolio-media";
 
 interface PortfolioPreviewProps {
   videoUrl: string | null;
@@ -28,14 +28,18 @@ export function PortfolioPreview({ videoUrl, thumbnailUrl, altText }: PortfolioP
     return () => clearTimeout(timer);
   }, [isHovered]);
 
+  // Determine active thumbnail (either user-uploaded or YouTube derived)
+  const ytThumbnail = videoUrl ? getThumbnailUrl(videoUrl) : null;
+  const activeThumbnail = thumbnailUrl || ytThumbnail;
+
   // If there is no video URL, just render the static cover image
   if (!videoUrl) {
     return (
       <div className="w-full h-full relative">
-        {thumbnailUrl ? (
+        {activeThumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={thumbnailUrl}
+            src={activeThumbnail}
             alt={altText}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
@@ -59,14 +63,29 @@ export function PortfolioPreview({ videoUrl, thumbnailUrl, altText }: PortfolioP
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background static cover image */}
-      {thumbnailUrl && !shouldPlay && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={thumbnailUrl}
-          alt={altText}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+      {/* Background static cover image or video first frame */}
+      {!shouldPlay && (
+        <div className="absolute inset-0 w-full h-full bg-neutral-100">
+          {activeThumbnail ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={activeThumbnail}
+              alt={altText}
+              className="w-full h-full object-cover transition-transform duration-350 group-hover:scale-105"
+            />
+          ) : source === "direct" && videoUrl ? (
+            <video
+              src={videoUrl}
+              preload="metadata"
+              className="w-full h-full object-cover pointer-events-none"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full h-full bg-gray-50 text-gray-300">
+              <PlayCircle className="w-8 h-8 stroke-[1.25] mb-1.5" />
+              <span className="text-[10px] font-medium tracking-wide uppercase">Portfolio Preview</span>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Placeholder with play icon when not hovered / before delay */}
@@ -102,7 +121,7 @@ export function PortfolioPreview({ videoUrl, thumbnailUrl, altText }: PortfolioP
               loop
               muted
               playsInline
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover pointer-events-none"
             />
           ) : (
             // Fallback back to thumbnail if type is unsupported or Google Drive

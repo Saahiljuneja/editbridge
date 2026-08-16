@@ -214,10 +214,10 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
           <h1 className="text-xl font-bold text-gray-900 dark:text-white leading-none">XP Shop</h1>
           <p className="text-sm text-gray-400 mt-1">Spend your XP on boosts and profile frames</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800">
-          <Zap className="w-4 h-4 text-sky-500" />
-          <span className="text-sm font-bold text-sky-600 dark:text-sky-400 tabular-nums">{xp.toLocaleString()} XP</span>
-          <span className="text-[10px] text-sky-400 font-medium">available</span>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+          <Zap className="w-4 h-4 text-brand-primary" />
+          <span className="text-sm font-bold text-brand-primary dark:text-blue-400 tabular-nums">{xp.toLocaleString()} XP</span>
+          <span className="text-[10px] text-blue-400 font-medium">available</span>
         </div>
       </div>
 
@@ -249,7 +249,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-bold text-gray-900 dark:text-white">{item.label}</p>
                         {item.tag && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-brand-primary dark:text-blue-400">
                             {item.tag}
                           </span>
                         )}
@@ -265,13 +265,13 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Zap className="w-3.5 h-3.5 text-sky-500" />
-                    <span className="text-sm font-extrabold tabular-nums text-sky-600 dark:text-sky-400">{item.cost}</span>
+                    <Zap className="w-3.5 h-3.5 text-brand-primary" />
+                    <span className="text-sm font-extrabold tabular-nums text-brand-primary dark:text-blue-400">{item.cost}</span>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{item.desc}</p>
                 {item.tierNote && (
-                  <div className="flex items-start gap-1.5 bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/50 rounded-lg px-2.5 py-2 text-[11px] text-sky-700 dark:text-sky-400 font-medium">
+                  <div className="flex items-start gap-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-lg px-2.5 py-2 text-[11px] text-blue-900 dark:text-blue-400 font-medium">
                     <span className="shrink-0 mt-px">ℹ️</span>
                     <span>{item.tierNote}</span>
                   </div>
@@ -291,7 +291,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                     className={cn(
                       "mt-auto w-full py-2 rounded-xl text-xs font-bold transition-all",
                       canAfford
-                        ? "bg-sky-500 hover:bg-sky-600 text-white"
+                        ? "bg-brand-primary hover:bg-brand-primary text-white"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
                     )}
                   >
@@ -373,7 +373,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                       <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
                         Tier {idx + 1}
                       </p>
-                      <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] font-bold text-brand-primary dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
                         {slotBefore} → {slotAfter} slots
                       </span>
                     </div>
@@ -384,8 +384,8 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                 {/* Cost + duration */}
                 <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-0.5 shrink-0">
                   <div className="flex items-center gap-1">
-                    <Zap className="w-3.5 h-3.5 text-sky-500" />
-                    <span className="text-sm font-extrabold tabular-nums text-sky-600 dark:text-sky-400">{item.cost}</span>
+                    <Zap className="w-3.5 h-3.5 text-brand-primary" />
+                    <span className="text-sm font-extrabold tabular-nums text-brand-primary dark:text-blue-400">{item.cost}</span>
                   </div>
                   <span className="text-[10px] text-gray-400">{item.durationDays} days</span>
                 </div>
@@ -404,7 +404,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                       className={cn(
                         "w-full py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5",
                         canAfford && reqOk
-                          ? "bg-sky-500 hover:bg-sky-600 text-white"
+                          ? "bg-brand-primary hover:bg-brand-primary text-white"
                           : "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
                       )}
                     >
@@ -433,7 +433,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
           const f = PROFILE_FRAMES.find(fr => fr.key === currentFrame);
           return f ? (
             <div className="flex items-center gap-4 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-500 shrink-0" style={f.style} />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 shrink-0" style={f.style} />
               <div className="flex-1">
                 <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">{f.emoji} {f.label} — active on your profile</p>
                 <p className="text-[11px] text-gray-400 mt-0.5">Your active frame preference is saved</p>
@@ -461,14 +461,14 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
               <div key={frame.key} className={cn(
                 "rounded-2xl border p-4 flex flex-col items-center gap-2.5 text-center transition-all",
                 isActive
-                  ? "bg-sky-50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800"
+                  ? "bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800"
                   : isOwned
                     ? "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700"
                     : "bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800"
               )}>
                 {/* Frame preview circle */}
                 <div
-                  className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-2xl"
+                  className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-2xl"
                   style={isOwned || isActive ? frame.style : { opacity: 0.4 }}
                 >
                   {frame.emoji}
@@ -497,10 +497,10 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
 
                 {/* Cost */}
                 <div className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-sky-500" />
+                  <Zap className="w-3 h-3 text-brand-primary" />
                   <span className={cn(
                     "text-xs font-bold tabular-nums",
-                    isOwned ? "text-gray-400 line-through" : "text-sky-600 dark:text-sky-400"
+                    isOwned ? "text-gray-400 line-through" : "text-brand-primary dark:text-blue-400"
                   )}>
                     {frame.cost}
                   </span>
@@ -509,7 +509,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
 
                 {/* Action */}
                 {isActive ? (
-                  <span className="w-full py-1.5 rounded-lg text-[11px] font-bold text-sky-600 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 text-center">
+                  <span className="w-full py-1.5 rounded-lg text-[11px] font-bold text-brand-primary dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 text-center">
                     ✓ Active
                   </span>
                 ) : isOwned ? (
@@ -527,7 +527,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
                     className={cn(
                       "w-full py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1",
                       canAfford
-                        ? "bg-sky-500 hover:bg-sky-600 text-white"
+                        ? "bg-brand-primary hover:bg-brand-primary text-white"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
                     )}
                   >
@@ -555,7 +555,7 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
             <div key={label} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-gray-50 dark:bg-gray-800">
               <span>{emoji}</span>
               <span className="flex-1 truncate">{label}</span>
-              <span className="font-bold text-sky-500">{xpVal}</span>
+              <span className="font-bold text-brand-primary">{xpVal}</span>
             </div>
           ))}
         </div>
@@ -631,8 +631,8 @@ export function XpShopClient({ currentXp, activeTypes, boostExpiry, ownedFrames,
               <p className="text-xs text-gray-400 mt-2 leading-relaxed px-2">{successItem.desc}</p>
 
               {/* XP Spent anchor */}
-              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-905 text-sky-600 dark:text-sky-400 font-extrabold text-sm mt-6 mb-8 shadow-sm">
-                <Zap className="w-4 h-4 fill-sky-500 text-sky-500" />
+              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 text-brand-primary dark:text-blue-400 font-extrabold text-sm mt-6 mb-8 shadow-sm">
+                <Zap className="w-4 h-4 fill-blue-800 text-brand-primary" />
                 <span>{successItem.cost} XP spent</span>
               </div>
 

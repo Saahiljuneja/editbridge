@@ -84,29 +84,26 @@ export default async function BlogPage() {
   const featured = allPosts.slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-[#07050f]">
+    <div className="min-h-screen bg-slate-50/50">
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="pt-20 pb-16 px-4 sm:px-8">
+      <section className="pt-20 pb-16 px-4 sm:px-8 border-b border-neutral-200/50 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/8 border border-white/10 text-white/50 text-xs font-medium mb-6">
-            <Tag className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-50 border border-neutral-200 text-neutral-550 text-xs font-bold mb-6">
+            <Tag className="w-3.5 h-3.5 text-[#8B7FE8]" />
             EditBridge Blog
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-black text-neutral-900 mb-4 leading-tight tracking-tight">
             Guides for creators &<br />
-            <span className="text-[#8B7FE8]">the editors who help them</span>
+            <span className="text-[#7c6ff7]">the editors who help them</span>
           </h1>
-          <p className="text-white/50 text-base max-w-xl leading-relaxed">
+          <p className="text-neutral-500 text-base max-w-xl leading-relaxed">
             Hiring guides, editing tips, pricing breakdowns, and creator workflows.
           </p>
         </div>
       </section>
 
-      {/* ── Gradient bridge ───────────────────────────────────────────────── */}
-      <div className="h-16 bg-gradient-to-b from-[#07050f] to-[#f8f7ff]" />
-
       {/* ── Main content ──────────────────────────────────────────────────── */}
-      <div className="bg-[#f8f7ff] min-h-[60vh]">
+      <div className="bg-slate-50/50 min-h-[60vh]">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10">
           {allPosts.length === 0 ? (
             <div className="text-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">

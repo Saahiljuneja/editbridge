@@ -40,6 +40,35 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(row, { status: 201 });
 }
 
+const updateSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(60).optional(),
+  content: z.string().min(1).max(2000).optional(),
+});
+
+export async function PATCH(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = updateSchema.safeParse(await req.json());
+  if (!body.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+
+  const { id, name, content } = body.data;
+  const updates: Partial<{ name: string; content: string }> = {};
+  if (name !== undefined) updates.name = name;
+  if (content !== undefined) updates.content = content;
+  if (Object.keys(updates).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+
+  const [row] = await db
+    .update(briefTemplates)
+    .set(updates)
+    .where(and(eq(briefTemplates.id, id), eq(briefTemplates.userId, session.user.userId)))
+    .returning();
+
+  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json(row);
+}
+
 export async function DELETE(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

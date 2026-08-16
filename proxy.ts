@@ -44,6 +44,7 @@ const CLIENT_PROTECTED_PREFIXES = [
   "/client/saved",
   "/client/saved-portfolio",
   "/client/settings",
+  "/client/membership",
   "/client/transactions",
   "/client/analytics",
   "/client/brief-templates",

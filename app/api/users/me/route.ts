@@ -38,7 +38,7 @@ export async function PATCH(request: NextRequest) {
     name, image, bio, isAvailable, skills: skillList, tools: toolList,
     displayName, title, languages,
     niches, experienceLevel, yearsOfExperience, workStyleTags, turnaround,
-    maxActiveOrders, featuredVideoUrl, previousClients, location,
+    maxActiveOrders, featuredVideoUrl, featuredVideoUrls, previousClients, location,
   } = body;
 
   // Update user fields if provided
@@ -103,6 +103,12 @@ export async function PATCH(request: NextRequest) {
     // Featured video must be a real YouTube, Vimeo, or Google Drive URL, not arbitrary text.
     if (featuredVideoUrl && !getEmbedUrl(String(featuredVideoUrl)))
       return NextResponse.json({ error: "Featured video must be a valid YouTube, Vimeo, or Google Drive URL." }, { status: 422 });
+    if (Array.isArray(featuredVideoUrls)) {
+      for (const u of featuredVideoUrls) {
+        if (u && !getEmbedUrl(String(u)))
+          return NextResponse.json({ error: "All featured videos must be valid YouTube, Vimeo, or Google Drive URLs." }, { status: 422 });
+      }
+    }
 
     const editorUpdates: Record<string, unknown> = { updatedAt: new Date() };
     if (bio !== undefined) editorUpdates.bio = bio || null;
@@ -119,6 +125,7 @@ export async function PATCH(request: NextRequest) {
     if (previousClients !== undefined) editorUpdates.previousClients = previousClients || null;
     if (location !== undefined) editorUpdates.location = location || null;
     if (featuredVideoUrl !== undefined) editorUpdates.featuredVideoUrl = featuredVideoUrl || null;
+    if (Array.isArray(featuredVideoUrls)) editorUpdates.featuredVideoUrls = featuredVideoUrls.filter(Boolean);
 
     if (Object.keys(editorUpdates).length > 1) {
       await db

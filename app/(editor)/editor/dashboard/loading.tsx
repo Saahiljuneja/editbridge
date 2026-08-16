@@ -31,7 +31,7 @@ export default function EditorDashboardLoading() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { border: "border-t-2 border-emerald-200", icon: IndianRupee },
-            { border: "border-t-2 border-sky-200", icon: ShoppingBag },
+            { border: "border-t-2 border-blue-200", icon: ShoppingBag },
             { border: "border-t-2 border-amber-250", icon: Banknote },
             { border: "border-t-2 border-amber-150", icon: Star },
           ].map((card, i) => (

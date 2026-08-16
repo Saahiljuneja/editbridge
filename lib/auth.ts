@@ -53,25 +53,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const { comparePassword } = await import("@/lib/password");
           const email = rawEmail.toLowerCase().trim();
 
+          console.log("[auth] Login attempt for:", email);
+
           const [user] = await db
             .select()
             .from(users)
             .where(eq(users.email, email))
             .limit(1);
 
-          if (!user) return null;
+          if (!user) {
+            console.log("[auth] User not found for email:", email);
+            return null;
+          }
 
           if (!user.hashedPassword) {
             // Google-only account — no password set
-            console.log("[auth] Google-only account, no password:", email);
+            console.log("[auth] Google-only account (no password set) for:", email);
             return null;
           }
 
           const valid = await comparePassword(credentials.password as string, user.hashedPassword);
-          if (!valid) return null;
+          if (!valid) {
+            console.log("[auth] Password mismatch for:", email);
+            return null;
+          }
 
           // Block login for unverified email accounts (Google OAuth users are auto-verified)
           if (!user.emailVerified) {
+            console.log("[auth] Email unverified for:", email);
             throw new Error("EmailNotVerified:" + user.email);
           }
 
@@ -108,14 +117,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const now = Date.now();
         const lastCheck = (token.roleCheckedAt as number) ?? 0;
         if (now - lastCheck > RECHECK_MS) {
-          const [fresh] = await db
-            .select({ role: users.role })
-            .from(users)
-            .where(eq(users.id, token.userId as string))
-            .limit(1);
-          if (fresh) {
-            token.role = fresh.role as UserRole;
-            token.roleCheckedAt = now;
+          try {
+            const [fresh] = await db
+              .select({ role: users.role })
+              .from(users)
+              .where(eq(users.id, token.userId as string))
+              .limit(1);
+            if (fresh) {
+              token.role = fresh.role as UserRole;
+              token.roleCheckedAt = now;
+            }
+          } catch (err) {
+            console.warn("[auth] JWT role recheck database connection failed, retaining cached role:", err);
           }
         }
 
@@ -233,40 +246,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       // ── Manual session update() ──────────────────────────────────────
       if (trigger === "update" && token.userId) {
-        const [fresh] = await db
-          .select({ role: users.role, onboarded: users.onboarded, emailVerified: users.emailVerified, twoFactorVerifiedAt: users.twoFactorVerifiedAt, name: users.name, image: users.image })
-          .from(users)
-          .where(eq(users.id, token.userId as string))
-          .limit(1);
+        try {
+          const [fresh] = await db
+            .select({ role: users.role, onboarded: users.onboarded, emailVerified: users.emailVerified, twoFactorVerifiedAt: users.twoFactorVerifiedAt, name: users.name, image: users.image })
+            .from(users)
+            .where(eq(users.id, token.userId as string))
+            .limit(1);
 
-        if (fresh) {
-          token.name = fresh.name ?? token.name;
-          token.picture = fresh.image ?? token.picture;
-          token.role = (fresh.role as UserRole) ?? "client";
-          token.needsOnboarding = false;
-          token.emailVerified = !!fresh.emailVerified;
+          if (fresh) {
+            token.name = fresh.name ?? token.name;
+            token.picture = fresh.image ?? token.picture;
+            token.role = (fresh.role as UserRole) ?? "client";
+            token.needsOnboarding = false;
+            token.emailVerified = !!fresh.emailVerified;
 
-          if (fresh.role === "editor") {
-            const [editor] = await db
-              .select({ id: editors.id })
-              .from(editors)
-              .where(eq(editors.userId, token.userId as string))
-              .limit(1);
-            token.editorId = editor?.id ?? null;
-          } else {
-            token.editorId = null;
-          }
+            if (fresh.role === "editor") {
+              const [editor] = await db
+                .select({ id: editors.id })
+                .from(editors)
+                .where(eq(editors.userId, token.userId as string))
+                .limit(1);
+              token.editorId = editor?.id ?? null;
+            } else {
+              token.editorId = null;
+            }
 
-          // Clear the pending-2FA gate only on a server-verified marker written by
-          // /api/auth/2fa/authenticate — never trust the client-supplied update() payload
-          // itself for this. The marker is single-use: consume it immediately.
-          if (token.twoFactorPending && fresh.twoFactorVerifiedAt) {
-            const ageMs = Date.now() - fresh.twoFactorVerifiedAt.getTime();
-            if (ageMs >= 0 && ageMs < 2 * 60 * 1000) {
-              token.twoFactorPending = false;
-              await db.update(users).set({ twoFactorVerifiedAt: null }).where(eq(users.id, token.userId as string));
+            // Clear the pending-2FA gate only on a server-verified marker written by
+            // /api/auth/2fa/authenticate — never trust the client-supplied update() payload
+            // itself for this. The marker is single-use: consume it immediately.
+            if (token.twoFactorPending && fresh.twoFactorVerifiedAt) {
+              const ageMs = Date.now() - fresh.twoFactorVerifiedAt.getTime();
+              if (ageMs >= 0 && ageMs < 2 * 60 * 1000) {
+                token.twoFactorPending = false;
+                await db.update(users).set({ twoFactorVerifiedAt: null }).where(eq(users.id, token.userId as string));
+              }
             }
           }
+        } catch (err) {
+          console.warn("[auth] JWT session update database connection failed, skipping update:", err);
         }
       }
 

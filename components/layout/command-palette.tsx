@@ -29,10 +29,9 @@ const CLIENT_PAGES: Page[] = [
   { href: "/client/rewards",          label: "Rewards & XP",      icon: Zap,             group: "Perks" },
   { href: "/client/xp-store",         label: "XP Store",          icon: Gift,            group: "Perks" },
   { href: "/client/referrals",        label: "Refer & Earn",      icon: Gift,            group: "Perks" },
-  { href: "/client/notifications",    label: "Notifications",     icon: Bell,            group: "Settings" },
   { href: "/client/settings",         label: "Settings",          icon: Settings,        group: "Settings" },
   { href: "/client/help",             label: "Help & FAQ",        icon: HelpCircle,      group: "Settings" },
-  { href: "/find-editor",             label: "Find an Editor",    icon: Film,            group: "Actions" },
+  { href: "/browse",                  label: "Find an Editor",    icon: Film,            group: "Actions" },
 ];
 
 const EDITOR_PAGES: Page[] = [
@@ -54,7 +53,6 @@ const EDITOR_PAGES: Page[] = [
   { href: "/editor/rewards",          label: "Rewards & XP",      icon: Zap,             group: "Growth" },
   { href: "/editor/xp-shop",          label: "XP Shop",           icon: Gift,            group: "Growth" },
   { href: "/editor/referrals",        label: "Refer & Earn",      icon: Gift,            group: "Growth" },
-  { href: "/editor/notifications",    label: "Notifications",     icon: Bell,            group: "Settings" },
   { href: "/editor/settings",         label: "Settings",          icon: Settings,        group: "Settings" },
 ];
 
@@ -180,8 +178,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   )}
                 >
                   <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                    i === activeIndex ? "bg-[#0EA5E9]/10" : "bg-gray-100")}>
-                    <Icon className={cn("w-3.5 h-3.5", i === activeIndex ? "text-[#0EA5E9]" : "text-gray-500")} />
+                    i === activeIndex ? "bg-[#1e40af]/10" : "bg-gray-100")}>
+                    <Icon className={cn("w-3.5 h-3.5", i === activeIndex ? "text-[#1e40af]" : "text-gray-500")} />
                   </div>
                   <span className="text-[13px] font-medium text-gray-700 flex-1">{page.label}</span>
                   {i === activeIndex && <ArrowRight className="w-3.5 h-3.5 text-gray-400" />}
@@ -207,8 +205,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       )}
                     >
                       <div className={cn("w-6 h-6 rounded-md flex items-center justify-center shrink-0",
-                        globalIndex === activeIndex ? "bg-[#0EA5E9]/10" : "bg-gray-100")}>
-                        <Icon className={cn("w-3.5 h-3.5", globalIndex === activeIndex ? "text-[#0EA5E9]" : "text-gray-400")} />
+                        globalIndex === activeIndex ? "bg-[#1e40af]/10" : "bg-gray-100")}>
+                        <Icon className={cn("w-3.5 h-3.5", globalIndex === activeIndex ? "text-[#1e40af]" : "text-gray-400")} />
                       </div>
                       <span className="text-[13px] text-gray-700 flex-1">{page.label}</span>
                       {globalIndex === activeIndex && <ArrowRight className="w-3.5 h-3.5 text-gray-400" />}

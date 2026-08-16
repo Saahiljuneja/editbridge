@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPresignedDownloadUrl } from "@/lib/r2";
+import r2, { getPresignedDownloadUrl } from "@/lib/r2";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { Readable } from "stream";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { disputes, orders, deliveries } from "@/lib/db/schema";
@@ -21,6 +23,37 @@ export async function GET(
 
     // 1. Allow public access to public marketing/assets
     if (isCover || isAvatar || isPortfolio) {
+      const isVideo = /\.(mp4|webm|mov|mkv|avi|m4v)(\?|$)/i.test(filePath);
+      
+      if (isPortfolio && isVideo) {
+        const rangeHeader = _req.headers.get("range");
+        const command = new GetObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME!,
+          Key: filePath,
+          Range: rangeHeader || undefined,
+        });
+        
+        try {
+          const response = await r2.send(command);
+          const nodeStream = response.Body as Readable;
+          const webStream = Readable.toWeb(nodeStream);
+          
+          return new NextResponse(webStream as any, {
+            status: rangeHeader ? 206 : 200,
+            headers: {
+              "Content-Type": response.ContentType || "video/mp4",
+              "Content-Length": response.ContentLength?.toString() || "",
+              "Content-Range": response.ContentRange || "",
+              "Accept-Ranges": "bytes",
+              "Cache-Control": "public, max-age=31536000, immutable",
+            },
+          });
+        } catch (err) {
+          console.error("Streaming portfolio video failed:", err);
+          // fall back to presigned download url redirect if streaming fails
+        }
+      }
+
       const expiry = isCover ? 60 * 60 * 24 * 7 : 43200;
       const url = await getPresignedDownloadUrl(filePath, expiry);
       const res = NextResponse.redirect(url, { status: 302 });

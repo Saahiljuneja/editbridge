@@ -4,6 +4,9 @@ import { editors, users, packages, skills, reviews, xpBoosts } from "@/lib/db/sc
 import { and, eq, ilike, or, inArray, sql, asc, desc } from "drizzle-orm";
 import { getOnTimeRates, getVerifiedPortfolioCounts } from "@/lib/trust";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
+
+const r2Base = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,7 +50,7 @@ export async function GET(request: NextRequest) {
         if (!skillsByEditor[s.editorId]) skillsByEditor[s.editorId] = [];
         skillsByEditor[s.editorId].push(s.name);
       }
-      return NextResponse.json({ editors: rows.map((e) => ({ ...e, skills: skillsByEditor[e.id] ?? [] })) });
+      return NextResponse.json({ editors: rows.map((e) => ({ ...e, videoUrl: toPortfolioProxyUrl(e.videoUrl, r2Base), thumbnailUrl: toPortfolioProxyUrl(e.thumbnailUrl, r2Base), skills: skillsByEditor[e.id] ?? [] })) });
     }
 
     const q = searchParams.get("q") || "";
@@ -236,6 +239,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       editors: editorRows.map((e) => ({
         ...e,
+        videoUrl: toPortfolioProxyUrl(e.videoUrl, r2Base),
+        thumbnailUrl: toPortfolioProxyUrl(e.thumbnailUrl, r2Base),
         skills: skillsByEditor[e.id] ?? [],
         onTimeRate: onTimeRates[e.id] ?? null,
         verifiedPortfolioCount: verifiedCounts[e.id] ?? 0,
