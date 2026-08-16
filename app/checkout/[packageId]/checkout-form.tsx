@@ -1,30 +1,15 @@
 "use client";
-
+// checkout form — improved UI
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
-  Film,
-  Zap,
-  Layers,
-  Activity,
-  Heart,
-  Flame,
-  Smile,
-  Music,
-  Palette,
-  Link2,
-  AlignLeft,
-  Ban,
-  FileText,
-  ArrowRight,
-  Loader2,
-  CreditCard,
-  Check,
-  Plus,
-  X,
-  ArrowLeft,
+  Film, Zap, Layers, Activity, Heart, Flame, Smile,
+  Music, Palette, Link2, AlignLeft, Ban, FileText,
+  ArrowRight, Loader2, CreditCard, Check, Plus, X,
+  ArrowLeft, RotateCcw, Package2, Building2, Shield,
+  Lock, Clock, RefreshCw, BookmarkPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency, displayNameFromFull } from "@/lib/utils";
@@ -66,6 +51,22 @@ const MOOD_CONFIG: Record<string, { label: string; Icon: LucideIcon }> = {
 };
 
 const MOODS = Object.keys(MOOD_CONFIG) as (keyof typeof MOOD_CONFIG)[];
+
+const MUSIC_OPTIONS: { value: string; label: string; sub: string }[] = [
+  { value: "upbeat",          label: "Upbeat",          sub: "Fast & energetic" },
+  { value: "lofi",            label: "Lo-fi",           sub: "Chill & relaxed" },
+  { value: "editor_choice",   label: "Editor's pick",   sub: "Trust the editor" },
+  { value: "client_provides", label: "I'll provide",    sub: "Custom track" },
+  { value: "no_music",        label: "No music",        sub: "Silent edit" },
+];
+
+const COLOR_OPTIONS: { value: string; label: string; dot: string; sub: string }[] = [
+  { value: "neutral", label: "Neutral",  dot: "bg-gray-400",   sub: "Clean & balanced" },
+  { value: "bright",  label: "Bright",   dot: "bg-yellow-400", sub: "Vivid & punchy" },
+  { value: "moody",   label: "Moody",    dot: "bg-indigo-500", sub: "Dark & cinematic" },
+  { value: "warm",    label: "Warm",     dot: "bg-orange-400", sub: "Golden tones" },
+  { value: "cold",    label: "Cold",     dot: "bg-sky-400",    sub: "Cool & crisp" },
+];
 
 export default function CheckoutForm({ pkg, availableCredits, processingFeePct = 10 }: Props) {
   const router = useRouter();
@@ -130,9 +131,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
   }, [moods, musicPref, colorLook, referenceUrls, mustInclude, mustAvoid, additionalNotes, addOns, initLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMoodToggle = (m: string) => {
-    setMoods((prev) =>
-      prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]
-    );
+    setMoods((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
   };
 
   const handleAddUrl = () => {
@@ -251,13 +250,8 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
 
             if (saveAsTemplate && templateName.trim()) {
               const templateContent = JSON.stringify({
-                moods,
-                musicPreference: musicPref,
-                colorLook,
-                referenceUrls: cleanUrls,
-                mustInclude,
-                mustAvoid,
-                additionalNotes,
+                moods, musicPreference: musicPref, colorLook,
+                referenceUrls: cleanUrls, mustInclude, mustAvoid, additionalNotes,
               });
               await fetch("/api/brief-templates", {
                 method: "POST",
@@ -292,92 +286,80 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
     );
   }
 
+  // Step 2 brief summary values
+  const musicLabel = MUSIC_OPTIONS.find(o => o.value === musicPref)?.label ?? musicPref;
+  const colorLabel = COLOR_OPTIONS.find(o => o.value === colorLook)?.label ?? colorLook;
+  const colorDot   = COLOR_OPTIONS.find(o => o.value === colorLook)?.dot ?? "bg-gray-400";
+  const cleanRefUrls = referenceUrls.filter(u => u.trim() !== "");
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      {/* Header with visual step indicator */}
-      <div className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-[#f8f9fb] pb-16">
+      {/* ── Header: step indicator + progress bar ── */}
+      <div className="bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href={`/editor/${pkg.editorId}`}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-900 transition-colors font-medium"
           >
-            <ArrowLeft className="w-4 h-4" /> Cancel
+            <ArrowLeft className="w-4 h-4" /> Back
           </Link>
 
           {/* Step circles */}
           <div className="flex items-center gap-3">
-            {/* Step 1 */}
             <div className="flex items-center gap-2">
-              <div
-                className={cn(
-                  "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors",
-                  step === 1
-                    ? "bg-[#1e40af] text-white"
-                    : "bg-emerald-500 text-white"
-                )}
-              >
+              <div className={cn(
+                "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                step === 1 ? "bg-[#1e40af] text-white shadow-sm shadow-blue-200" : "bg-emerald-500 text-white"
+              )}>
                 {step === 1 ? "1" : <Check className="w-3.5 h-3.5" />}
               </div>
-              <span
-                className={cn(
-                  "text-xs font-semibold hidden sm:block",
-                  step === 1 ? "text-[#1e40af]" : "text-emerald-600"
-                )}
-              >
+              <span className={cn("text-xs font-semibold hidden sm:block", step === 1 ? "text-[#1e40af]" : "text-emerald-600")}>
                 Project Brief
               </span>
             </div>
 
             {/* Connector */}
-            <div
-              className={cn(
-                "w-12 h-px transition-colors",
-                step === 2 ? "bg-[#1e40af]" : "bg-gray-200"
-              )}
-            />
+            <div className="relative w-16 h-px bg-gray-200 overflow-hidden">
+              <div className={cn("absolute inset-y-0 left-0 bg-[#1e40af] transition-all duration-500", step === 2 ? "w-full" : "w-0")} />
+            </div>
 
-            {/* Step 2 */}
             <div className="flex items-center gap-2">
-              <div
-                className={cn(
-                  "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors",
-                  step === 2
-                    ? "bg-[#1e40af] text-white"
-                    : "bg-gray-200 text-gray-400"
-                )}
-              >
+              <div className={cn(
+                "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                step === 2 ? "bg-[#1e40af] text-white shadow-sm shadow-blue-200" : "bg-gray-100 text-gray-400"
+              )}>
                 2
               </div>
-              <span
-                className={cn(
-                  "text-xs font-semibold hidden sm:block",
-                  step === 2 ? "text-[#1e40af]" : "text-gray-400"
-                )}
-              >
+              <span className={cn("text-xs font-semibold hidden sm:block", step === 2 ? "text-[#1e40af]" : "text-gray-400")}>
                 Confirm &amp; Pay
               </span>
             </div>
           </div>
 
-          {/* Spacer to balance layout */}
           <div className="w-16" />
+        </div>
+
+        {/* Thin animated progress bar */}
+        <div className="h-[2px] bg-gray-100">
+          <div className={cn("h-full bg-[#1e40af] transition-all duration-500", step === 1 ? "w-1/2" : "w-full")} />
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8 grid md:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="md:col-span-2 space-y-5">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 grid md:grid-cols-3 gap-6 lg:gap-8">
+        {/* ── Main content ── */}
+        <div className="md:col-span-2 space-y-4">
           {step === 1 ? (
-            <div className="space-y-5">
-              {/* Templates */}
+            <div className="space-y-4">
+
+              {/* Template loader */}
               {savedTemplates.length > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between gap-4">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-3.5 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2 text-sm text-gray-500 min-w-0">
-                    <FileText className="w-4 h-4 text-gray-400 shrink-0" />
-                    <span className="truncate">Load a saved brief template</span>
+                    <BookmarkPlus className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="truncate font-medium text-xs">Load a saved brief template</span>
                   </div>
                   <select
-                    onChange={(e) => handleSelectTemplate(e.target.value)}
+                    onChange={(e) => { handleSelectTemplate(e.target.value); e.target.value = ""; }}
                     defaultValue=""
                     className="bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 shrink-0"
                   >
@@ -389,107 +371,129 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                 </div>
               )}
 
-              {/* Vibe & Style */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+              {/* ── Section 1: Creative Direction ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 pt-5 pb-4 border-b border-gray-50 flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                     <Film className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900">Vibe &amp; Style</h3>
-                    <p className="text-xs text-gray-400">Pick all that apply</p>
+                    <h3 className="text-sm font-bold text-gray-900">Creative Direction</h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Vibe, music &amp; colour grading</p>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {MOODS.map((m) => {
-                    const { label, Icon } = MOOD_CONFIG[m];
-                    const active = moods.includes(m);
-                    return (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => handleMoodToggle(m)}
-                        className={cn(
-                          "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all",
-                          active
-                            ? "bg-[#1e40af]/10 border-[#1e40af] text-[#1e40af] shadow-sm"
-                            : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
-                        )}
-                      >
-                        <Icon className="w-3.5 h-3.5" />
-                        {label}
-                      </button>
-                    );
-                  })}
+
+                <div className="p-5 space-y-6">
+                  {/* Vibes */}
+                  <div>
+                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2.5">Vibe &amp; mood <span className="text-gray-400 font-normal normal-case tracking-normal">(pick all that apply)</span></p>
+                    <div className="flex flex-wrap gap-2">
+                      {MOODS.map((m) => {
+                        const { label, Icon } = MOOD_CONFIG[m];
+                        const active = moods.includes(m);
+                        return (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => handleMoodToggle(m)}
+                            className={cn(
+                              "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all",
+                              active
+                                ? "bg-[#1e40af] border-[#1e40af] text-white shadow-sm shadow-blue-200"
+                                : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50 bg-white"
+                            )}
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {moods.length === 0 && (
+                      <p className="text-xs text-red-500 mt-2">Select at least one vibe.</p>
+                    )}
+                  </div>
+
+                  {/* Music */}
+                  <div>
+                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                      <Music className="w-3 h-3 text-violet-500" /> Music preference
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {MUSIC_OPTIONS.map((opt) => {
+                        const active = musicPref === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setMusicPref(opt.value)}
+                            className={cn(
+                              "flex flex-col items-start px-3.5 py-2.5 rounded-xl border text-left transition-all",
+                              active
+                                ? "bg-violet-50 border-violet-300 text-violet-800"
+                                : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                            )}
+                          >
+                            <span className="text-xs font-bold leading-none">{opt.label}</span>
+                            <span className={cn("text-[10px] mt-0.5 font-medium", active ? "text-violet-600" : "text-gray-400")}>{opt.sub}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Color grading */}
+                  <div>
+                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                      <Palette className="w-3 h-3 text-amber-500" /> Color grading
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {COLOR_OPTIONS.map((opt) => {
+                        const active = colorLook === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setColorLook(opt.value)}
+                            className={cn(
+                              "flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-left transition-all",
+                              active
+                                ? "bg-amber-50 border-amber-300 text-amber-800"
+                                : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                            )}
+                          >
+                            <span className={cn("w-3 h-3 rounded-full shrink-0", opt.dot)} />
+                            <div>
+                              <span className="text-xs font-bold leading-none block">{opt.label}</span>
+                              <span className={cn("text-[10px] mt-0.5 font-medium", active ? "text-amber-600" : "text-gray-400")}>{opt.sub}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-                {moods.length === 0 && (
-                  <p className="text-xs text-red-500">Select at least one vibe.</p>
-                )}
               </div>
 
-              {/* Music & Color */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-7 h-7 rounded-lg bg-violet-50 flex items-center justify-center">
-                        <Music className="w-3.5 h-3.5 text-violet-500" />
-                      </div>
-                      <h3 className="text-sm font-semibold text-gray-900">Music preference</h3>
-                    </div>
-                    <select
-                      value={musicPref}
-                      onChange={(e) => setMusicPref(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
-                    >
-                      <option value="upbeat">Upbeat &amp; fast</option>
-                      <option value="lofi">Lo-fi &amp; chill</option>
-                      <option value="editor_choice">Editor&apos;s choice</option>
-                      <option value="client_provides">I will provide music</option>
-                      <option value="no_music">No background music</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
-                        <Palette className="w-3.5 h-3.5 text-amber-500" />
-                      </div>
-                      <h3 className="text-sm font-semibold text-gray-900">Color grading</h3>
-                    </div>
-                    <select
-                      value={colorLook}
-                      onChange={(e) => setColorLook(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
-                    >
-                      <option value="neutral">Neutral &amp; clean</option>
-                      <option value="bright">Bright &amp; vibrant</option>
-                      <option value="moody">Moody &amp; cinematic</option>
-                      <option value="warm">Warm tone</option>
-                      <option value="cold">Cool tone</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Reference URLs */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <Link2 className="w-3.5 h-3.5 text-[#1e40af]" />
+              {/* ── Section 2: Reference Videos ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 pt-5 pb-4 border-b border-gray-50 flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
+                    <Link2 className="w-3.5 h-3.5 text-sky-600" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900">Reference videos</h3>
-                    <p className="text-xs text-gray-400">YouTube, Vimeo, or Drive links (optional, up to 5)</p>
+                    <h3 className="text-sm font-bold text-gray-900">Reference Videos</h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">YouTube, Vimeo, or Drive links (optional · up to 5)</p>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="p-5 space-y-2.5">
                   {referenceUrls.map((url, idx) => (
                     <div key={idx} className="flex gap-2">
                       <input
                         value={url}
                         onChange={(e) => handleUrlChange(idx, e.target.value)}
                         placeholder="https://youtube.com/watch?v=..."
-                        className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
+                        className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 bg-gray-50/50"
                       />
                       {referenceUrls.length > 1 && (
                         <button
@@ -507,7 +511,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                     <button
                       type="button"
                       onClick={handleAddUrl}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[#1e40af] hover:text-blue-900 transition-colors"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[#1e40af] hover:text-blue-900 transition-colors mt-1"
                     >
                       <Plus className="w-3.5 h-3.5" /> Add another link
                     </button>
@@ -515,77 +519,101 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                 </div>
               </div>
 
-              {/* Must Include / Avoid / Notes */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center">
+              {/* ── Section 3: Instructions ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 pt-5 pb-4 border-b border-gray-50 flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                     <AlignLeft className="w-3.5 h-3.5 text-gray-500" />
                   </div>
-                  <h3 className="text-sm font-semibold text-gray-900">Specific instructions</h3>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900">Specific Instructions</h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Tell the editor exactly what to include or avoid</p>
+                  </div>
                 </div>
+                <div className="p-5 space-y-4">
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
+                      <Check className="w-3 h-3 text-emerald-500" /> Must include <span className="font-normal normal-case tracking-normal text-gray-400">(optional)</span>
+                    </label>
+                    <textarea
+                      value={mustInclude}
+                      onChange={(e) => setMustInclude(e.target.value)}
+                      placeholder="Specific sound effects, intros, lower thirds..."
+                      maxLength={500}
+                      rows={2}
+                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 bg-gray-50/50"
+                    />
+                  </div>
 
-                <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                    <Check className="w-3 h-3 text-emerald-500" /> Must include (optional)
-                  </label>
-                  <textarea
-                    value={mustInclude}
-                    onChange={(e) => setMustInclude(e.target.value)}
-                    placeholder="Specific sound effects, intros, lower thirds..."
-                    maxLength={500}
-                    rows={2}
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
-                  />
-                </div>
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
+                      <Ban className="w-3 h-3 text-red-400" /> Must avoid <span className="font-normal normal-case tracking-normal text-gray-400">(optional)</span>
+                    </label>
+                    <textarea
+                      value={mustAvoid}
+                      onChange={(e) => setMustAvoid(e.target.value)}
+                      placeholder="Certain transitions, copyright tracks, fast zooms..."
+                      maxLength={500}
+                      rows={2}
+                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 bg-gray-50/50"
+                    />
+                  </div>
 
-                <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                    <Ban className="w-3 h-3 text-red-400" /> Must avoid (optional)
-                  </label>
-                  <textarea
-                    value={mustAvoid}
-                    onChange={(e) => setMustAvoid(e.target.value)}
-                    placeholder="Certain transitions, copyright tracks, fast zooms..."
-                    maxLength={500}
-                    rows={2}
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
-                  />
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-                    <FileText className="w-3 h-3 text-gray-400" /> Additional instructions
-                  </label>
-                  <textarea
-                    value={additionalNotes}
-                    onChange={(e) => setAdditionalNotes(e.target.value)}
-                    placeholder="Describe your timeline flow, pacing, custom text, or anything else your editor should know..."
-                    maxLength={1000}
-                    rows={4}
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
-                  />
-                  <p className="text-[10px] text-gray-400 text-right mt-1">
-                    {additionalNotes.length}/1000
-                  </p>
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">
+                      <FileText className="w-3 h-3 text-gray-400" /> Additional notes
+                    </label>
+                    <textarea
+                      value={additionalNotes}
+                      onChange={(e) => setAdditionalNotes(e.target.value)}
+                      placeholder="Timeline flow, pacing, custom text overlays, anything else your editor should know..."
+                      maxLength={1000}
+                      rows={4}
+                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50 bg-gray-50/50"
+                    />
+                    <div className="flex items-center justify-between mt-1.5">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={saveAsTemplate}
+                          onChange={(e) => setSaveAsTemplate(e.target.checked)}
+                          className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-3.5 h-3.5"
+                        />
+                        <span className="text-xs font-medium text-gray-500">Save as template</span>
+                      </label>
+                      <span className="text-[10px] text-gray-400">{additionalNotes.length}/1000</span>
+                    </div>
+                    {saveAsTemplate && (
+                      <input
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}
+                        placeholder='Template name, e.g. "Gaming Highlight Montage"'
+                        className="w-full mt-2 rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 bg-gray-50/50"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Customize Your Package Add-ons */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+              {/* ── Section 4: Add-ons ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 pt-5 pb-4 border-b border-gray-50 flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
                     <Plus className="w-3.5 h-3.5 text-amber-500" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900">Gig Add-ons (Customizations)</h3>
-                    <p className="text-xs text-gray-400">Tailor the editor's service to your exact needs</p>
+                    <h3 className="text-sm font-bold text-gray-900">Add-ons</h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Tailor the package to your exact needs</p>
                   </div>
                 </div>
-                
-                <div className="space-y-3 pt-1">
-                  {/* Extra Fast Delivery */}
+                <div className="p-5 space-y-2.5">
                   {pkg.deliveryDays > 1 && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
+                    <label className={cn(
+                      "flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer select-none transition-all",
+                      addOns.extraFast
+                        ? "bg-blue-50 border-blue-200"
+                        : "bg-gray-50/50 border-gray-100 hover:border-blue-100 hover:bg-blue-50/30"
+                    )}>
                       <input
                         type="checkbox"
                         checked={addOns.extraFast}
@@ -594,19 +622,25 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
-                          <span className="text-xs font-bold text-gray-950">⚡ Extra Fast Delivery</span>
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-gray-900">
+                            <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" /> Extra Fast Delivery
+                          </span>
                           <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹1,500</span>
                         </div>
-                        <p className="text-[11px] text-gray-550 mt-1">
-                          Reduces delivery deadline by 2 days (minimum 1 day). Delivery in {Math.max(1, pkg.deliveryDays - 2)} days.
+                        <p className="text-[11px] text-gray-500 mt-1">
+                          Delivery in {Math.max(1, pkg.deliveryDays - 2)} days instead of {pkg.deliveryDays}.
                         </p>
                       </div>
                     </label>
                   )}
 
-                  {/* Additional Revision */}
                   {pkg.revisionCount !== -1 && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
+                    <label className={cn(
+                      "flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer select-none transition-all",
+                      addOns.extraRevision
+                        ? "bg-blue-50 border-blue-200"
+                        : "bg-gray-50/50 border-gray-100 hover:border-blue-100 hover:bg-blue-50/30"
+                    )}>
                       <input
                         type="checkbox"
                         checked={addOns.extraRevision}
@@ -615,19 +649,25 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
-                          <span className="text-xs font-bold text-gray-950">🔄 Additional Revision Round</span>
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-gray-900">
+                            <RotateCcw className="w-3.5 h-3.5 text-violet-500 shrink-0" /> Additional Revision Round
+                          </span>
                           <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹500</span>
                         </div>
-                        <p className="text-[11px] text-gray-550 mt-1">
-                          Add +1 extra revision round to your package. Total revisions: {pkg.revisionCount + 1}.
+                        <p className="text-[11px] text-gray-500 mt-1">
+                          +1 extra revision. Total: {pkg.revisionCount + 1} rounds.
                         </p>
                       </div>
                     </label>
                   )}
 
-                  {/* Source Files */}
                   {!pkg.includesSourceFiles && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
+                    <label className={cn(
+                      "flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer select-none transition-all",
+                      addOns.sourceFiles
+                        ? "bg-blue-50 border-blue-200"
+                        : "bg-gray-50/50 border-gray-100 hover:border-blue-100 hover:bg-blue-50/30"
+                    )}>
                       <input
                         type="checkbox"
                         checked={addOns.sourceFiles}
@@ -636,19 +676,25 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
-                          <span className="text-xs font-bold text-gray-950">📦 Source Files Upgrade</span>
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-gray-900">
+                            <Package2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> Source Files
+                          </span>
                           <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹1,000</span>
                         </div>
-                        <p className="text-[11px] text-gray-550 mt-1">
-                          Receive raw project assets (Premiere/After Effects files) upon completion.
+                        <p className="text-[11px] text-gray-500 mt-1">
+                          Receive raw project files (Premiere / After Effects) on completion.
                         </p>
                       </div>
                     </label>
                   )}
 
-                  {/* Commercial Rights */}
                   {!pkg.includesCommercialRights && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
+                    <label className={cn(
+                      "flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer select-none transition-all",
+                      addOns.commercialRights
+                        ? "bg-blue-50 border-blue-200"
+                        : "bg-gray-50/50 border-gray-100 hover:border-blue-100 hover:bg-blue-50/30"
+                    )}>
                       <input
                         type="checkbox"
                         checked={addOns.commercialRights}
@@ -657,99 +703,130 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
-                          <span className="text-xs font-bold text-gray-950">💼 Commercial Use License</span>
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-gray-900">
+                            <Building2 className="w-3.5 h-3.5 text-sky-600 shrink-0" /> Commercial Use License
+                          </span>
                           <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹750</span>
                         </div>
-                        <p className="text-[11px] text-gray-550 mt-1">
-                          Grants full commercial rights for promotional, advertising, or business use.
+                        <p className="text-[11px] text-gray-500 mt-1">
+                          Full commercial rights for ads, branding &amp; business use.
                         </p>
                       </div>
                     </label>
                   )}
-                </div>
-              </div>
 
-              {/* Save as template */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={saveAsTemplate}
-                    onChange={(e) => setSaveAsTemplate(e.target.checked)}
-                    className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-4 h-4"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Save this brief as a reusable template
-                  </span>
-                </label>
-                {saveAsTemplate && (
-                  <input
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder='e.g. "Gaming Highlight Montage"'
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20"
-                  />
-                )}
+                  {[pkg.deliveryDays <= 1, pkg.revisionCount === -1, !!pkg.includesSourceFiles, !!pkg.includesCommercialRights].every(Boolean) && (
+                    <p className="text-xs text-gray-400 text-center py-2">All available add-ons are already included in this package.</p>
+                  )}
+                </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => setStep(2)}
-                className="w-full py-3.5 rounded-xl font-semibold text-white text-sm bg-[#1e40af] hover:bg-brand-primary flex items-center justify-center gap-2 transition-colors"
+                onClick={() => { if (moods.length === 0) { toast.error("Select at least one vibe first."); return; } setStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                className="w-full py-3.5 rounded-xl font-bold text-white text-sm bg-[#1e40af] hover:bg-blue-800 flex items-center justify-center gap-2 transition-colors shadow-sm shadow-blue-200"
               >
                 Proceed to Payment <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-4">
+
+              {/* ── Brief summary (review before paying) ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-gray-50 flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-gray-900">Your Brief</h2>
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="text-xs font-semibold text-[#1e40af] hover:text-blue-900 flex items-center gap-1 transition-colors"
+                  >
+                    <RefreshCw className="w-3 h-3" /> Edit
+                  </button>
+                </div>
+                <div className="px-5 py-4 space-y-3 text-sm">
+                  <div className="flex gap-2 flex-wrap">
+                    {moods.map(m => {
+                      const cfg = MOOD_CONFIG[m];
+                      const MoodIcon = cfg?.Icon;
+                      return (
+                        <span key={m} className="flex items-center gap-1 bg-[#1e40af]/10 text-[#1e40af] text-xs font-semibold px-2.5 py-1 rounded-lg">
+                          {MoodIcon && <MoodIcon className="w-3 h-3" />}
+                          {cfg?.label ?? m}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-xs text-gray-500">
+                    <span className="flex items-center gap-1.5">
+                      <Music className="w-3 h-3 text-violet-400 shrink-0" />
+                      <span className="font-medium text-gray-700">{musicLabel}</span>
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", colorDot)} />
+                      <span className="font-medium text-gray-700">{colorLabel}</span>
+                    </span>
+                    {cleanRefUrls.length > 0 && (
+                      <span className="flex items-center gap-1.5">
+                        <Link2 className="w-3 h-3 text-sky-400 shrink-0" />
+                        <span className="font-medium text-gray-700">{cleanRefUrls.length} reference{cleanRefUrls.length !== 1 ? "s" : ""}</span>
+                      </span>
+                    )}
+                    {addOnsCost > 0 && (
+                      <span className="flex items-center gap-1.5">
+                        <Plus className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span className="font-medium text-gray-700">
+                          {[addOns.extraFast && "Fast delivery", addOns.extraRevision && "Extra revision", addOns.sourceFiles && "Source files", addOns.commercialRights && "Commercial rights"].filter(Boolean).join(", ")}
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                  {(mustInclude || mustAvoid || additionalNotes) && (
+                    <p className="text-xs text-gray-400 border-t border-gray-50 pt-3">
+                      {mustInclude && <span className="mr-3"><span className="font-semibold text-gray-600">Include:</span> {mustInclude.slice(0, 60)}{mustInclude.length > 60 ? "…" : ""}</span>}
+                      {mustAvoid && <span><span className="font-semibold text-gray-600">Avoid:</span> {mustAvoid.slice(0, 60)}{mustAvoid.length > 60 ? "…" : ""}</span>}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               {/* Credits banner */}
               {availableCredits > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-emerald-800">
-                        {formatCurrency(availableCredits)} in credits available
-                      </p>
-                      <p className="text-xs text-emerald-600 mt-0.5">
-                        Apply to reduce your charge
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setUseCredits(!useCredits)}
-                      className={cn(
-                        "px-4 py-2 rounded-xl text-xs font-semibold border transition-all",
-                        useCredits
-                          ? "bg-emerald-600 border-emerald-600 text-white"
-                          : "border-emerald-300 text-emerald-700 hover:bg-emerald-50"
-                      )}
-                    >
-                      {useCredits ? (
-                        <span className="flex items-center gap-1.5">
-                          <Check className="w-3.5 h-3.5" /> Applied
-                        </span>
-                      ) : (
-                        "Apply Credits"
-                      )}
-                    </button>
+                <div className="bg-emerald-50 border border-emerald-200/60 rounded-2xl p-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-bold text-emerald-800">{formatCurrency(availableCredits)} in credits available</p>
+                    <p className="text-xs text-emerald-600 mt-0.5">Apply to reduce your charge</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setUseCredits(!useCredits)}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-xs font-semibold border transition-all shrink-0",
+                      useCredits
+                        ? "bg-emerald-600 border-emerald-600 text-white"
+                        : "border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                    )}
+                  >
+                    {useCredits ? <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" /> Applied</span> : "Apply Credits"}
+                  </button>
                 </div>
               )}
 
-              {/* Pricing breakdown */}
+              {/* Pricing breakdown + pay */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-50">
                   <h2 className="text-sm font-bold text-gray-900">Order Summary</h2>
                 </div>
                 <form onSubmit={handleCheckout}>
                   <div className="px-5 py-4 space-y-3 text-sm">
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-gray-500">
                       <span>Package subtotal</span>
-                      <span className="tabular-nums">{formatCurrency(subtotal)}</span>
+                      <span className="tabular-nums font-medium text-gray-700">{formatCurrency(subtotal)}</span>
                     </div>
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-gray-500">
                       <span>Processing fee ({processingFeePct}%)</span>
-                      <span className="tabular-nums">{formatCurrency(processingFee)}</span>
+                      <span className="tabular-nums font-medium text-gray-700">{formatCurrency(processingFee)}</span>
                     </div>
                     {creditsApplied > 0 && (
                       <div className="flex justify-between text-emerald-700 font-medium">
@@ -763,26 +840,43 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                     </div>
                   </div>
 
-                  <div className="px-5 pb-5 flex gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      disabled={loading}
-                      className="flex items-center gap-1.5 px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-sm font-semibold text-gray-600 transition-colors disabled:opacity-50"
-                    >
-                      <ArrowLeft className="w-4 h-4" /> Back
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="flex-1 py-3.5 rounded-xl font-semibold text-white text-sm bg-[#1e40af] hover:bg-brand-primary flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
-                    >
-                      {loading ? (
-                        <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
-                      ) : (
-                        <><CreditCard className="w-4 h-4" /> Pay {formatCurrency(chargeAmount)} &amp; Start Order</>
-                      )}
-                    </button>
+                  <div className="px-5 pb-5 space-y-3">
+                    <div className="flex gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        disabled={loading}
+                        className="flex items-center gap-1.5 px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-sm font-semibold text-gray-600 transition-colors disabled:opacity-50"
+                      >
+                        <ArrowLeft className="w-4 h-4" /> Back
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 py-3.5 rounded-xl font-bold text-white text-sm bg-[#1e40af] hover:bg-blue-800 flex items-center justify-center gap-2 disabled:opacity-60 transition-colors shadow-sm shadow-blue-200"
+                      >
+                        {loading ? (
+                          <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
+                        ) : (
+                          <><CreditCard className="w-4 h-4" /> Pay {formatCurrency(chargeAmount)} &amp; Start Order</>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Trust strip */}
+                    <div className="flex items-center justify-center gap-5 pt-1">
+                      <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                        <Shield className="w-3 h-3 text-emerald-500" /> Escrow protected
+                      </span>
+                      <span className="text-gray-200 select-none">·</span>
+                      <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                        <Lock className="w-3 h-3 text-gray-400" /> Secure payment
+                      </span>
+                      <span className="text-gray-200 select-none">·</span>
+                      <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                        <Clock className="w-3 h-3 text-gray-400" /> Refund policy applies
+                      </span>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -790,50 +884,62 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
           )}
         </div>
 
-        {/* Package summary sidebar */}
+        {/* ── Sidebar: package summary ── */}
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sticky top-6">
-            <div className="bg-gradient-to-br from-[#1e40af]/8 to-blue-50 px-5 py-4 border-b border-gray-100">
-              <p className="text-[10px] font-semibold text-[#1e40af] uppercase tracking-widest mb-1">
-                Your Order
-              </p>
-              <p className="font-bold text-gray-900 text-sm leading-snug">{pkg.title}</p>
+            {/* Dark header */}
+            <div className="bg-gray-950 px-5 py-4">
+              <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Your Order</p>
+              <p className="font-bold text-white text-sm leading-snug">{pkg.title}</p>
+              <p className="text-xs text-gray-400 mt-0.5">by {displayNameFromFull(pkg.editorName)}</p>
             </div>
+
             <div className="px-5 py-4 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">Editor</span>
-                <span className="font-semibold text-gray-900">{displayNameFromFull(pkg.editorName)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Delivery</span>
+                <span className="text-gray-400 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Delivery</span>
                 <span className="font-semibold text-gray-900">
                   {addOns.extraFast ? Math.max(1, pkg.deliveryDays - 2) : pkg.deliveryDays} days
+                  {addOns.extraFast && <span className="ml-1 text-[10px] text-amber-600 font-bold">FAST</span>}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Revisions</span>
+                <span className="text-gray-400 flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5" /> Revisions</span>
                 <span className="font-semibold text-gray-900">
                   {pkg.revisionCount === -1 ? "Unlimited" : `${pkg.revisionCount + (addOns.extraRevision ? 1 : 0)} rounds`}
                 </span>
               </div>
-              <div className="border-t border-gray-100 pt-3 flex justify-between">
-                <span className="text-gray-400">Subtotal</span>
-                <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Processing fee ({processingFeePct}%)</span>
-                <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(processingFee)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500 font-semibold">Total charge</span>
-                <span className="font-bold text-[#1e40af] tabular-nums">{formatCurrency(fullTotal)}</span>
+
+              <div className="border-t border-gray-100 pt-3 space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Processing ({processingFeePct}%)</span>
+                  <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(processingFee)}</span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-gray-100">
+                  <span className="text-gray-600 font-semibold text-sm">Total</span>
+                  <span className="font-black text-[#1e40af] tabular-nums text-base">{formatCurrency(fullTotal)}</span>
+                </div>
               </div>
             </div>
+
             {pkg.description && (
-              <div className="px-5 pb-4">
-                <p className="text-xs text-gray-400 line-clamp-3">{pkg.description}</p>
+              <div className="px-5 pb-4 border-t border-gray-50">
+                <p className="text-xs text-gray-400 leading-relaxed pt-3 line-clamp-3">{pkg.description}</p>
               </div>
             )}
+
+            {/* Mini trust strip */}
+            <div className="px-5 pb-4">
+              <div className="bg-emerald-50 border border-emerald-100 rounded-xl px-3.5 py-2.5 flex items-center gap-2">
+                <Shield className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <p className="text-[11px] text-emerald-700 font-semibold leading-snug">
+                  Payment held in escrow until you approve delivery
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
