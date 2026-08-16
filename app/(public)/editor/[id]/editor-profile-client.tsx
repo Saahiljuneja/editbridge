@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
   MapPin, Star, CheckCircle2, Clock, TrendingUp, Zap,
-  ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MessageSquare, Play,
+  ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Play,
   BadgeCheck, Globe, Briefcase, Award, X, ArrowLeftRight,
   Eye, Share2, Bookmark, Home,
 } from "lucide-react";
@@ -555,20 +555,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
   const [selectedCategory, setSelectedCategory] = useState("All");
 
 
-  // Mobile Sticky Bar state
-  const [showStickyBar, setShowStickyBar] = useState(false);
 
-  useEffect(() => {
-    function handleScroll() {
-      if (window.scrollY > 300) {
-        setShowStickyBar(true);
-      } else {
-        setShowStickyBar(false);
-      }
-    }
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const displayName = editor.displayName || displayNameFromFull(editor.name);
   const workStyleTags: string[] = editor.workStyleTags ? JSON.parse(editor.workStyleTags) : [];
@@ -733,33 +720,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
 
           {/* Action buttons (Merged, Premium Black/Neutral design) */}
           <div className="flex items-center gap-2 self-start md:self-center">
-            {editor.isAvailable ? (
-              <a
-                href="#packages"
-                className="inline-flex items-center gap-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.99]"
-              >
-                Hire me
-              </a>
-            ) : (
-              <button
-                disabled
-                className="inline-flex items-center gap-1.5 bg-neutral-100 text-neutral-400 text-xs font-extrabold px-5 py-2.5 rounded-xl cursor-not-allowed border border-neutral-200/50"
-              >
-                Unavailable
-              </button>
-            )}
-            <Link
-              href={`/client/messages?editorId=${editor.id}`}
-              onClick={(e) => {
-                if (!isLoggedIn) {
-                  e.preventDefault();
-                  window.location.href = `/login?callbackUrl=${encodeURIComponent(`/client/messages?editorId=${editor.id}`)}`;
-                }
-              }}
-              className="inline-flex items-center gap-1.5 bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-extrabold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
-            >
-              <MessageSquare className="w-4 h-4 text-neutral-400" />Message
-            </Link>
+
 
             {/* Bookmark button */}
             <button
@@ -1559,45 +1520,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
         />
       )}
 
-      {/* Mobile Sticky CTA Bar */}
-      <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#ffffff] border-t border-neutral-200/60 px-4 py-3.5 shadow-2xl flex items-center justify-between gap-4 lg:hidden transition-all duration-300 transform ${
-        showStickyBar ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
-      }`}>
-        <div className="flex items-center gap-2.5 min-w-0">
-          <Avatar src={editor.image} name={displayName} size={40} activeFrame={editor.activeFrame} />
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-neutral-900 truncate">{displayName}</p>
-            {editor.avgRating ? (
-              <div className="flex items-center gap-1 mt-0.5">
-                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 shrink-0" />
-                <span className="text-[10px] font-extrabold text-amber-600">{editor.avgRating}</span>
-                <span className="text-[10px] text-neutral-400">({editor.reviewCount})</span>
-              </div>
-            ) : editor.packages.length > 0 ? (
-              <p className="text-[10px] font-semibold text-neutral-400">
-                From {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
-              </p>
-            ) : null}
-          </div>
-        </div>
-        <div className="shrink-0 flex items-center gap-2">
-          {editor.isAvailable ? (
-            <a
-              href="#packages"
-              className="bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.99]"
-            >
-              Hire me
-            </a>
-          ) : (
-            <button
-              disabled
-              className="bg-neutral-100 text-neutral-400 text-xs font-extrabold px-4.5 py-2.5 rounded-xl cursor-not-allowed border border-neutral-200/50"
-            >
-              Unavailable
-            </button>
-          )}
-        </div>
-      </div>
+
     </div>
   );
 }

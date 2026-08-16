@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { userPoints, pointTransactions, xpBoosts } from "@/lib/db/schema";
 import { eq, and, gt, isNull, or, gte, sql } from "drizzle-orm";
-import { SHOP_ITEMS, PROFILE_FRAMES } from "@/lib/xp-shop-config";
+import { SHOP_ITEMS, PROFILE_FRAMES, calcEditorLevel, EDITOR_LEVELS } from "@/lib/xp-shop-config";
 import type { BoostType, FrameKey } from "@/lib/xp-shop-config";
 export type { BoostType, ShopItem, FrameKey, FrameItem } from "@/lib/xp-shop-config";
 export { SHOP_ITEMS, PROFILE_FRAMES, FRAME_STYLES, PORTFOLIO_TIERS, REGULAR_SHOP_ITEMS, getPortfolioSlots } from "@/lib/xp-shop-config";
@@ -72,13 +72,23 @@ export async function purchaseBoost(
   }
 
   const [pts] = await db
-    .select({ current: userPoints.current })
+    .select({ current: userPoints.current, total: userPoints.total })
     .from(userPoints)
     .where(eq(userPoints.userId, userId))
     .limit(1);
 
-  if (!pts || pts.current < item.cost) {
-    return { success: false, error: "Not enough XP" };
+  if (!pts) return { success: false, error: "Points record not found" };
+
+  if (item.minLevel) {
+    const editorLevel = calcEditorLevel(pts.total);
+    if (editorLevel.level < item.minLevel) {
+      const reqName = EDITOR_LEVELS.find((l: any) => l.level === item.minLevel)?.label ?? `Level ${item.minLevel}`;
+      return { success: false, error: `Requires Level ${item.minLevel} (${reqName}) to unlock` };
+    }
+  }
+
+  if (pts.current < item.cost) {
+    return { success: false, error: "Not enough spendable XP" };
   }
 
   const expiresAt = item.durationDays
@@ -107,13 +117,23 @@ export async function purchaseFrame(
   }
 
   const [pts] = await db
-    .select({ current: userPoints.current })
+    .select({ current: userPoints.current, total: userPoints.total })
     .from(userPoints)
     .where(eq(userPoints.userId, userId))
     .limit(1);
 
-  if (!pts || pts.current < frame.cost) {
-    return { success: false, error: "Not enough XP" };
+  if (!pts) return { success: false, error: "Points record not found" };
+
+  if (frame.minLevel) {
+    const editorLevel = calcEditorLevel(pts.total);
+    if (editorLevel.level < frame.minLevel) {
+      const reqName = EDITOR_LEVELS.find((l: any) => l.level === frame.minLevel)?.label ?? `Level ${frame.minLevel}`;
+      return { success: false, error: `Requires Level ${frame.minLevel} (${reqName}) to unlock` };
+    }
+  }
+
+  if (pts.current < frame.cost) {
+    return { success: false, error: "Not enough spendable XP" };
   }
 
   await Promise.all([

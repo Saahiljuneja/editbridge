@@ -1,23 +1,27 @@
 import { db } from "@/lib/db";
 import { userPoints, pointTransactions, userBadges, userCredits, notifications, orders, editors, reviews, portfolioItems, disputes, savedEditors, users } from "@/lib/db/schema";
 import { eq, and, sql, gte, count } from "drizzle-orm";
+import { EDITOR_LEVELS, calcEditorLevel } from "@/lib/xp-shop-config";
 
 // ─── Level thresholds ─────────────────────────────────────────────────────────
 
-export const LEVELS = [
-  { name: "bronze",   min: 0,      max: 499   },
-  { name: "silver",   min: 500,    max: 1999  },
-  { name: "gold",     min: 2000,   max: 4999  },
-  { name: "platinum", min: 5000,   max: Infinity },
+export const CLIENT_LEVELS = [
+  { name: "bronze",   min: 0,      max: 499,     label: "Bronze", emoji: "🥉" },
+  { name: "silver",   min: 500,    max: 1999,    label: "Silver", emoji: "🥈" },
+  { name: "gold",     min: 2000,   max: 4999,    label: "Gold", emoji: "🥇" },
+  { name: "platinum", min: 5000,   max: Infinity, label: "Platinum", emoji: "💎" },
 ] as const;
+
+export const LEVELS = CLIENT_LEVELS; // Legacy compatibility
 
 export type Level = "bronze" | "silver" | "gold" | "platinum";
 
-export function calcLevel(totalXp: number): Level {
-  for (const l of [...LEVELS].reverse()) {
-    if (totalXp >= l.min) return l.name as Level;
+export function calcLevel(totalXp: number, role: "editor" | "client" = "editor"): string {
+  const levelsList = role === "editor" ? EDITOR_LEVELS : CLIENT_LEVELS;
+  for (const l of [...levelsList].reverse()) {
+    if (totalXp >= l.min) return l.name;
   }
-  return "bronze";
+  return role === "editor" ? "level1" : "bronze";
 }
 
 // ─── Badge definitions ────────────────────────────────────────────────────────
@@ -79,15 +83,21 @@ async function awardBadge(userId: string, badge: string) {
   });
 }
 
-const LEVEL_RANK: Record<Level, number> = { bronze: 0, silver: 1, gold: 2, platinum: 3 };
+const LEVEL_RANK: Record<string, number> = {
+  bronze: 0, silver: 1, gold: 2, platinum: 3,
+  level1: 0, level2: 1, level3: 2, level4: 3, level5: 4, level6: 5, level7: 6,
+};
 
 async function addPoints(userId: string, amount: number, reason: string, metadata: Record<string, unknown> = {}) {
   const pts = await getOrCreatePoints(userId);
+  const [userRow] = await db.select({ role: users.role }).from(users).where(eq(users.id, userId)).limit(1);
+  const role = userRow?.role === "editor" ? "editor" : "client";
+
   // Clamp to 0 — XP never goes negative, but level can drop when total decreases
   const newTotal   = Math.max(0, pts.total + amount);
   const newCurrent = Math.max(0, pts.current + amount);
-  const newLevel   = calcLevel(newTotal);
-  const oldLevel   = pts.level as Level;
+  const newLevel   = calcLevel(newTotal, role);
+  const oldLevel   = pts.level;
 
   await db.update(userPoints).set({
     total: newTotal,
@@ -99,14 +109,21 @@ async function addPoints(userId: string, amount: number, reason: string, metadat
   await db.insert(pointTransactions).values({ userId, amount, reason, metadata });
 
   if (newLevel !== oldLevel) {
-    const leveledUp = LEVEL_RANK[newLevel] > LEVEL_RANK[oldLevel];
+    const leveledUp = (LEVEL_RANK[newLevel as any] ?? 0) > (LEVEL_RANK[oldLevel as any] ?? 0);
 
     if (leveledUp) {
-      const perks: Record<Level, string> = {
+      const perks: Record<string, string> = {
         bronze:   "",
         silver:   "You can now offer 4 packages. Clients also get a discount on orders with you.",
         gold:     "You're featured in browse results! Clients get a bigger discount.",
         platinum: "You've unlocked priority support, custom profile banner, and 10% client discount.",
+        level1:   "",
+        level2:   "You've leveled up to Level 2: Rising Editor!",
+        level3:   "You've leveled up to Level 3: Skilled Editor!",
+        level4:   "You've leveled up to Level 4: Pro Editor! Higher visibility active.",
+        level5:   "You've leveled up to Level 5: Elite Editor!",
+        level6:   "You've leveled up to Level 6: Master Editor!",
+        level7:   "You've leveled up to Level 7: Legend Editor!",
       };
       await db.insert(notifications).values({
         userId,
@@ -664,13 +681,16 @@ export async function onAbusiveBehavior(userId: string, role: "editor" | "client
 
 /** Get a user's full rewards profile */
 export async function getUserRewards(userId: string) {
-  const [pts, badges] = await Promise.all([
+  const [pts, badges, userRow] = await Promise.all([
     db.select().from(userPoints).where(eq(userPoints.userId, userId)).limit(1).then(r => r[0]),
     db.select().from(userBadges).where(eq(userBadges.userId, userId)).orderBy(userBadges.awardedAt),
+    db.select({ role: users.role }).from(users).where(eq(users.id, userId)).limit(1).then(r => r[0]),
   ]);
 
-  const level = pts?.level as Level ?? "bronze";
-  const nextLevel = LEVELS.find(l => l.name !== level && l.min > (pts?.total ?? 0));
+  const role = userRow?.role === "editor" ? "editor" : "client";
+  const level = (pts?.level ?? (role === "editor" ? "level1" : "bronze")) as any;
+  const levelsList = role === "editor" ? EDITOR_LEVELS : CLIENT_LEVELS;
+  const nextLevel = levelsList.find(l => l.min > (pts?.total ?? 0));
   const xpToNext = nextLevel ? nextLevel.min - (pts?.total ?? 0) : 0;
 
   return {
@@ -771,8 +791,20 @@ export async function getUserProgress(userId: string, role: "editor" | "client",
 const LEVEL_ORDER_ALL: Level[] = ["bronze", "silver", "gold", "platinum"];
 
 /** Perks unlocked by level */
-export function getLevelPerks(level: Level) {
-  const idx = LEVEL_ORDER_ALL.indexOf(level);
+export function getLevelPerks(level: string) {
+  if (level.startsWith("level")) {
+    const num = parseInt(level.replace("level", ""), 10) || 1;
+    return {
+      maxPackages: num < 3 ? 3 : num < 4 ? 4 : 5,
+      featuredInBrowse: num >= 4,
+      clientDiscountPercent: 0,
+      prioritySupport: num >= 7,
+      customBanner: num >= 6,
+      accountManager: num >= 7,
+    };
+  }
+
+  const idx = LEVEL_ORDER_ALL.indexOf(level as any);
   return {
     maxPackages: idx < 1 ? 3 : idx < 2 ? 4 : 5,
     featuredInBrowse: idx >= 2,

@@ -12,7 +12,7 @@ export default async function XpShopPage() {
   if (!session?.user?.userId) redirect("/login");
 
   const [ptsRow, activeBoosts, editorRow, historyRows] = await Promise.all([
-    db.select({ current: userPoints.current }).from(userPoints).where(eq(userPoints.userId, session.user.userId)).limit(1),
+    db.select({ current: userPoints.current, total: userPoints.total }).from(userPoints).where(eq(userPoints.userId, session.user.userId)).limit(1),
     getActiveBoosts(session.user.userId),
     session.user.editorId
       ? db.select({ activeFrame: editors.activeFrame }).from(editors).where(eq(editors.id, session.user.editorId)).limit(1)
@@ -30,6 +30,7 @@ export default async function XpShopPage() {
   ]);
 
   const currentXp     = ptsRow[0]?.current ?? 0;
+  const lifetimeXp    = ptsRow[0]?.total ?? 0;
   const activeTypes   = new Set(activeBoosts.map(b => b.type));
   const boostExpiry   = Object.fromEntries(activeBoosts.map(b => [b.type, b.expiresAt?.toISOString() ?? null]));
   const ownedFrames   = new Set(activeBoosts.filter(b => PROFILE_FRAMES.some(f => f.key === b.type)).map(b => b.type));
@@ -45,6 +46,7 @@ export default async function XpShopPage() {
   return (
     <XpShopClient
       currentXp={currentXp}
+      lifetimeXp={lifetimeXp}
       activeTypes={[...activeTypes]}
       boostExpiry={boostExpiry}
       ownedFrames={[...ownedFrames]}

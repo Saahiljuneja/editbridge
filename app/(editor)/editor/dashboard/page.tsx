@@ -9,7 +9,8 @@ import {
   userPoints, userCredits,
 } from "@/lib/db/schema";
 import { and, eq, sql, ne, desc, isNull, gte, lte } from "drizzle-orm";
-import { calcLevel, getLevelPerks, LEVELS } from "@/lib/rewards";
+import { calcLevel, getLevelPerks } from "@/lib/rewards";
+import { calcEditorLevel, EDITOR_LEVELS } from "@/lib/xp-shop-config";
 import type { Level } from "@/lib/rewards";
 import { formatCurrency, displayNameFromFull, formatDate, formatDateTime } from "@/lib/utils";
 import {
@@ -17,7 +18,7 @@ import {
   Star, ArrowRight, Zap, IndianRupee,
   Package, MessageSquare, AlertTriangle, RefreshCw,
   TrendingUp, ImageIcon, BadgeCheck, Share2, CircleDot,
-  HelpCircle, Film, Banknote,
+  HelpCircle, Film, Banknote, Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -219,25 +220,28 @@ export default async function EditorDashboardPage() {
   const inProgress  = activeOrders.filter(o => o.status !== "revision_requested" && o.status !== "pending");
 
   const xpTotal   = xpRow?.total ?? 0;
-  const xpLevel   = (xpRow?.level ?? "bronze") as Level;
-  const levelMeta = LEVELS.find(l => l.name === xpLevel)!;
-  const nextLevel = LEVELS.find(l => l.min > xpTotal);
-  const xpPct     = nextLevel
-    ? Math.min(100, ((xpTotal - levelMeta.min) / (nextLevel.min - levelMeta.min)) * 100)
+  const currentEditorLevel = calcEditorLevel(xpTotal);
+  const nextEditorLevel = EDITOR_LEVELS.find((l: any) => l.level === currentEditorLevel.level + 1) ?? null;
+  const xpPct = nextEditorLevel
+    ? Math.min(100, ((xpTotal - currentEditorLevel.min) / (nextEditorLevel.min - currentEditorLevel.min)) * 100)
     : 100;
+  const xpNeeded = nextEditorLevel ? nextEditorLevel.min - xpTotal : 0;
+
   const weekOrders  = weekOrdersRow?.c ?? 0;
   const expiringAmt = expiringCredits.reduce((s, c) => s + c.amount, 0);
   const earliestExp = expiringCredits.length
     ? expiringCredits.reduce((a, b) => (a.expiresAt! < b.expiresAt! ? a : b)).expiresAt
     : null;
 
-  const LEVEL_COLORS: Record<Level, string> = {
+  const LEVEL_COLORS: Record<string, string> = {
     bronze: "#D97706", silver: "#6B7280", gold: "#CA8A04", platinum: "#4F46E5",
+    level1: "#D97706", level2: "#6B7280", level3: "#3B82F6", level4: "#EF4444", level5: "#F59E0B", level6: "#10B981", level7: "#8B5CF6",
   };
-  const LEVEL_EMOJIS: Record<Level, string> = {
+  const LEVEL_EMOJIS: Record<string, string> = {
     bronze: "🥉", silver: "🥈", gold: "🥇", platinum: "💎",
+    level1: "🌱", level2: "✨", level3: "⚡", level4: "🔥", level5: "🏆", level6: "👑", level7: "🦄",
   };
-  const xpColor = LEVEL_COLORS[xpLevel];
+  const xpColor = LEVEL_COLORS[currentEditorLevel.name] || LEVEL_COLORS[xpRow?.level ?? "level1"] || "#D97706";
   const RING_R = 28;
   const RING_C = +(2 * Math.PI * RING_R).toFixed(2);
 
@@ -516,47 +520,47 @@ export default async function EditorDashboardPage() {
         </div>
 
         {/* XP widget */}
-        <Link href="/editor/rewards"
-          className="block relative bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 border border-neutral-850 rounded-3xl shadow-xl px-5 py-4 hover:border-neutral-700 transition-all duration-300 hover:-translate-y-0.5 z-10 overflow-hidden text-white">
+        <Link href="/editor/xp-shop"
+          className="block relative bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 border border-neutral-850 rounded-3xl shadow-xl px-6 py-5 hover:border-neutral-750 transition-all duration-300 hover:-translate-y-0.5 z-10 overflow-hidden text-white">
           
           {/* Ambient level glow */}
           <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-25 pointer-events-none" style={{ background: xpColor }} />
           <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full blur-3xl opacity-15 pointer-events-none" style={{ background: xpColor }} />
 
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="relative w-14 h-14 shrink-0 bg-neutral-950/60 p-0.5 rounded-full border border-white/5 shadow-inner">
-              <svg viewBox="0 0 64 64" className="w-full h-full" style={{ transform: "rotate(-90deg)" }}>
-                <circle cx="32" cy="32" r={RING_R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4.5" />
-                <circle cx="32" cy="32" r={RING_R} fill="none" stroke={xpColor} strokeWidth="4.5" strokeLinecap="round"
-                  strokeDasharray={RING_C} strokeDashoffset={RING_C * (1 - xpPct / 100)} />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xl select-none drop-shadow-md">
-                {LEVEL_EMOJIS[xpLevel]}
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="text-3xl select-none drop-shadow-md">
+                {LEVEL_EMOJIS[currentEditorLevel.name] || "🌱"}
+              </div>
+              <div>
+                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Level {currentEditorLevel.level} — {currentEditorLevel.label.toUpperCase()}</p>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-xl font-black text-white tabular-nums">{xpTotal.toLocaleString()}</span>
+                  <span className="text-xs text-neutral-405 font-semibold">/ {nextEditorLevel ? nextEditorLevel.min.toLocaleString() : "MAX"} XP</span>
+                </div>
               </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-lg font-black text-white tabular-nums">{xpTotal.toLocaleString()}</span>
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">XP</span>
-                <span className="text-[9px] font-black uppercase tracking-wider ml-1 px-2.5 py-0.5 rounded-full text-white shadow-sm"
-                  style={{ background: `linear-gradient(135deg, ${xpColor}, ${xpColor}aa)` }}>
-                  {xpLevel}
-                </span>
+
+            {/* Center: Progress Bar */}
+            <div className="flex-1 max-w-md">
+              <div className="h-2 w-full bg-neutral-800 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${xpPct}%`, background: xpColor }} />
               </div>
-              {nextLevel ? (
-                <p className="text-xs text-neutral-405 mt-0.5 font-medium">
-                  {(nextLevel.min - xpTotal).toLocaleString()} XP to {nextLevel.name.charAt(0).toUpperCase() + nextLevel.name.slice(1)}
+              {nextEditorLevel ? (
+                <p className="text-[11px] text-neutral-400 mt-1.5 font-medium">
+                  {xpNeeded.toLocaleString()} XP to {nextEditorLevel.label}
                 </p>
               ) : (
-                <p className="text-xs font-bold mt-0.5" style={{ color: xpColor }}>Max level reached 🎉</p>
+                <p className="text-[11px] font-bold mt-1.5" style={{ color: xpColor }}>Max level reached 🎉</p>
               )}
             </div>
-            <div className="hidden sm:flex flex-col items-center gap-0.5 shrink-0 border-l border-neutral-800/80 pl-4">
-              <span className="text-2xl select-none drop-shadow-sm">{weekOrders > 0 ? "🔥" : "💤"}</span>
-              <p className="text-sm font-black text-white tabular-nums">{weekOrders}/5</p>
-              <p className="text-[9px] text-neutral-405 font-bold uppercase tracking-wider">this week</p>
+
+            <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+              <span className="text-xs font-semibold text-brand-primary dark:text-blue-400 bg-blue-950/40 border border-blue-900/50 rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> View XP Shop
+              </span>
+              <ArrowRight className="w-4 h-4 text-neutral-500 hover:text-white transition-colors" />
             </div>
-            <ArrowRight className="w-4 h-4 text-neutral-500 hover:text-white shrink-0 transition-colors" />
           </div>
         </Link>
 
