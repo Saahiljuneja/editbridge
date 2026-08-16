@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
   MapPin, Star, CheckCircle2, Clock, TrendingUp, Zap,
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MessageSquare, Play,
   BadgeCheck, Globe, Briefcase, Award, X, ArrowLeftRight,
-  Eye, Share2, Bookmark
+  Eye, Share2, Bookmark, Home,
 } from "lucide-react";
-import { displayNameFromFull } from "@/lib/utils";
+import { displayNameFromFull, cn } from "@/lib/utils";
 import { getThumbnailUrl, getVideoSource } from "@/lib/portfolio-media";
 import { PortfolioVideoPlayer } from "@/components/public/portfolio-video-player";
 import { RequestQuoteButton } from "@/components/client/request-quote-button";
@@ -70,6 +70,7 @@ interface EditorProfile {
   isFeatured: boolean;
   coverImage: string | null;
   featuredVideoUrl: string | null;
+  featuredVideoUrls: string[] | null;
   languages: string | null;
   workStyleTags: string | null;
   previousClients: string | null;
@@ -81,6 +82,9 @@ interface EditorProfile {
   createdAt: string;
   kycApprovedAt?: string | null;
   packages: any[];
+  membershipTier: string;
+  level: string;
+  activeOrdersCount: number;
 
 
   skills: string[];
@@ -101,7 +105,7 @@ function Stars({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
-          className={`w-3.5 h-3.5 ${i <= Math.round(rating) ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+          className={`w-3 h-3 ${i <= Math.round(rating) ? "fill-amber-400 text-amber-400" : "text-gray-250"}`}
         />
       ))}
     </div>
@@ -125,111 +129,144 @@ function Avatar({ src, name, size = 80, activeFrame }: { src: string | null; nam
   );
 }
 
+const ADDON_DISPLAY: Record<string, string> = {
+  color_grading: "Color Grading", color_correction: "Color Correction",
+  sound_design: "Sound Design", audio_cleanup: "Audio Cleanup",
+  background_music: "Background Music", captions: "Captions / Subtitles",
+  thumbnail: "Thumbnail Design", motion_graphics: "Motion Graphics",
+  intro_outro: "Intro / Outro", lower_thirds: "Lower Thirds",
+  social_media_cuts: "Social Media Cuts", speed_ramps: "Speed Ramps",
+  green_screen: "Green Screen Removal",
+};
+
 function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Package; editorId: string; isAvailable: boolean; isHighlighted?: boolean }) {
   const price = (pkg.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+  const features = [
+    ...pkg.addons.map(a => ADDON_DISPLAY[a] ?? a.replace(/_/g, " ")),
+    ...(pkg.includesSourceFiles ? ["Source files included"] : []),
+    ...(pkg.includesCommercialRights ? ["Commercial rights"] : []),
+  ];
+
   return (
-    <div className={`relative border rounded-[20px] p-5 flex flex-col gap-3 hover:shadow-md transition-all bg-[#ffffff] ${
-      isHighlighted ? "border-indigo-500 ring-2 ring-indigo-500/10 shadow-sm" : "border-neutral-200/60 hover:border-neutral-300"
-    }`}>
+    <div className={cn(
+      "relative rounded-3xl overflow-hidden border-2 bg-white flex flex-col justify-between transition-all duration-350 h-full hover:-translate-y-1",
+      isHighlighted
+        ? "border-neutral-900 shadow-2xl shadow-neutral-950/15 md:scale-[1.04] z-10"
+        : "border-neutral-200/65 hover:border-neutral-300 hover:shadow-lg"
+    )}>
+      {/* Most Popular top bar */}
       {isHighlighted && (
-        <span className="absolute -top-2.5 right-4 bg-indigo-600 text-white text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
-          Most Popular
-        </span>
-      )}
-      {pkg.tier && (
-        <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600">{pkg.tier}</span>
-      )}
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="font-bold text-neutral-900 text-sm leading-snug">{pkg.title}</h3>
-        <span className="text-base font-black text-neutral-900 shrink-0">{price}</span>
-      </div>
-      <p className="text-xs text-neutral-400 leading-relaxed line-clamp-3">{pkg.description}</p>
-      <div className="flex flex-wrap gap-1.5">
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
-          <Clock className="w-3 h-3 text-neutral-400" />{pkg.deliveryDays}d delivery
-        </span>
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
-          <TrendingUp className="w-3 h-3 text-neutral-400" />{pkg.revisionCount} revision{pkg.revisionCount !== 1 ? "s" : ""}
-        </span>
-        {pkg.videoLengthLimit && (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
-            <Play className="w-3 h-3 text-neutral-400" />{pkg.videoLengthLimit}
-          </span>
-        )}
-        {pkg.includesSourceFiles && (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
-            Source Files
-          </span>
-        )}
-        {pkg.includesCommercialRights && (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-neutral-500 bg-[#f3f4f6] border border-neutral-200/20 rounded-lg px-2 py-1">
-            Commercial Use
-          </span>
-        )}
-      </div>
-      {pkg.addons.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {pkg.addons.slice(0, 4).map(a => (
-            <span key={a} className="text-[10px] font-bold bg-indigo-50/70 text-indigo-700 rounded-md px-1.5 py-0.5 capitalize">
-              {a.replace(/_/g, " ")}
-            </span>
-          ))}
+        <div className="bg-neutral-900 px-4 py-2.5 flex items-center justify-center gap-1.5">
+          <Zap className="w-3.5 h-3.5 text-white/90 fill-white/70" />
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">Most Popular</span>
         </div>
       )}
-      {isAvailable ? (
-        <PackageClickLink
-          href={`/client/orders/new?editorId=${editorId}&packageId=${pkg.id}`}
-          packageId={pkg.id}
-          className={`mt-auto block w-full text-center text-xs font-extrabold py-3 rounded-xl transition-all active:scale-[0.99] ${
-            isHighlighted ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-600/10" : "bg-black hover:bg-neutral-900 text-white"
-          }`}
-        >
-          Hire for {price}
-        </PackageClickLink>
-      ) : (
-        <button
-          disabled
-          className="mt-auto block w-full text-center bg-neutral-100 text-neutral-400 text-xs font-extrabold py-3 rounded-xl cursor-not-allowed border border-neutral-200/60"
-        >
-          Unavailable
-        </button>
-      )}
-    </div>
-  );
-}
 
+      {/* Card Header */}
+      <div className="p-6 flex-1 flex flex-col">
+        {pkg.tier && (
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 mb-1.5 block">{pkg.tier}</span>
+        )}
+        <h3 className="font-black text-neutral-900 text-base sm:text-lg leading-tight tracking-tight mb-2">{pkg.title}</h3>
+        <p className="text-[11.5px] text-neutral-500 font-medium leading-relaxed mb-4 flex-1">{pkg.description}</p>
+        <div className="flex items-baseline gap-1 mt-auto pt-3 border-t border-neutral-100/70">
+          <span className="text-2xl sm:text-3xl font-black text-neutral-950 leading-none tracking-tight">{price}</span>
+          <span className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">/ project</span>
+        </div>
+      </div>
+
+      {/* Card Stats / Features */}
+      <div className={cn(
+        "p-5 flex flex-col gap-3.5 border-t border-b border-neutral-100/80",
+        isHighlighted ? "bg-neutral-950/[0.02]" : "bg-neutral-50/50"
+      )}>
+        {/* Core Stats */}
+        <div className="grid grid-cols-2 gap-3 text-[11px] font-bold text-neutral-800">
+          <div className="flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+            <span>{pkg.deliveryDays} days</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+            <span>{pkg.revisionCount === -1 ? "Unlimited" : `${pkg.revisionCount} revs`}</span>
+          </div>
+        </div>
+
+        {/* Features List */}
+        {features.length > 0 && (
+          <ul className="space-y-2 mt-2">
+            {features.slice(0, 4).map(f => (
+              <li key={f} className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                </span>
+                <span className="text-[11px] font-semibold text-neutral-600 truncate leading-none">{f}</span>
+              </li>
+            ))}
+            {features.length > 4 && (
+              <li className="text-[9px] font-bold text-neutral-400 pl-6">+{features.length - 4} more included</li>
+            )}
+          </ul>
+        )}
+      </div>
+
+      {/* Footer / CTA */}
+      <div className="p-5">
+        {isAvailable ? (
+          <PackageClickLink
+            href={`/checkout/${pkg.id}`}
+            packageId={pkg.id}
+            className={cn(
+              "block w-full text-center text-xs font-black py-3 rounded-2xl transition-all active:scale-[0.98]",
+              isHighlighted
+                ? "bg-black hover:bg-neutral-900 text-white shadow-md shadow-neutral-950/20"
+                : "bg-neutral-900 hover:bg-black text-white"
+            )}
+          >
+            Select & Order
+          </PackageClickLink>
+        ) : (
+          <button disabled className="block w-full text-center bg-neutral-100 text-neutral-400 text-xs font-black py-3 rounded-2xl cursor-not-allowed border border-neutral-200/60">
+            Unavailable
+          </button>
+        )}
+      </div>
+    </div>  );
+}
 
 function ReviewCard({ review }: { review: Review }) {
   const [expanded, setExpanded] = useState(false);
   const long = (review.text?.length ?? 0) > 200;
   return (
-    <div className="border border-gray-100 rounded-2xl p-4 flex flex-col gap-2.5 bg-white">
-      <div className="flex items-center gap-2.5">
-        <Avatar src={review.reviewerImage} name={review.reviewerName} size={32} />
+    <div className="border border-neutral-100 rounded-3xl p-5 flex flex-col gap-3.5 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-md transition-all">
+      <div className="flex items-center gap-3">
+        <Avatar src={review.reviewerImage} name={review.reviewerName} size={36} />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-gray-900 truncate">{review.reviewerName}</p>
-          <p className="text-[11px] text-gray-400">{new Date(review.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}</p>
+          <p className="text-sm font-extrabold text-neutral-900 truncate">{review.reviewerName}</p>
+          <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-0.5">{new Date(review.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}</p>
         </div>
-        <div className="shrink-0">
+        <div className="shrink-0 bg-amber-50/75 border border-amber-100 rounded-xl px-2.5 py-1">
           <Stars rating={review.rating} />
         </div>
       </div>
       {review.text && (
-        <div>
-          <p className={`text-sm text-gray-600 leading-relaxed ${!expanded && long ? "line-clamp-3" : ""}`}>
-            {review.text}
+        <div className="px-1">
+          <p className={`text-sm text-neutral-600 leading-relaxed font-medium ${!expanded && long ? "line-clamp-3" : ""}`}>
+            "{review.text}"
           </p>
           {long && (
-            <button onClick={() => setExpanded(e => !e)} className="text-xs text-indigo-600 mt-1 flex items-center gap-0.5">
-              {expanded ? <><ChevronUp className="w-3 h-3" />Less</> : <><ChevronDown className="w-3 h-3" />Read more</>}
+            <button onClick={() => setExpanded(e => !e)} className="text-xs font-bold text-brand-primary mt-2 flex items-center gap-0.5">
+              {expanded ? <><ChevronUp className="w-3.5 h-3.5" />Less</> : <><ChevronDown className="w-3.5 h-3.5" />Read more</>}
             </button>
           )}
         </div>
       )}
       {review.replyText && (
-        <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-600 border-l-2 border-indigo-200">
-          <p className="font-semibold text-gray-800 mb-0.5">Editor replied:</p>
-          {review.replyText}
+        <div className="bg-neutral-50/50 rounded-2xl p-4 text-xs text-neutral-600 border-l-4 border-brand-primary/40 font-semibold mt-1">
+          <p className="font-extrabold text-neutral-900 mb-1 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-primary" /> Editor replied:
+          </p>
+          "{review.replyText}"
         </div>
       )}
     </div>
@@ -244,7 +281,7 @@ function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (ind
         const thumb = item.type === "video"
           ? (item.thumbnailUrl || getThumbnailUrl(item.url))
           : null;
-        const source = item.type === "video" ? getVideoSource(item.url) : null;
+        const source = (item.type === "video" ? getVideoSource(item.url) : null) as any;
         return (
           <button
             key={item.id}
@@ -264,13 +301,22 @@ function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (ind
                       </div>
                     </div>
                   </>
+                ) : source === "direct" ? (
+                  <>
+                    <video src={`${item.url}#t=0.1`} preload="metadata" className="w-full h-full object-cover" muted playsInline />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
+                        <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900 gap-1">
                     <Play className="w-7 h-7 text-white/70 group-hover:text-white transition-colors" />
                     {source && source !== "direct" && (
                       <span className={`text-[8px] font-bold uppercase tracking-wider text-white/50 px-1.5 py-0.5 rounded ${
                         source === "youtube" ? "bg-red-600/60" :
-                        source === "vimeo"   ? "bg-sky-500/60" :
+                        source === "vimeo"   ? "bg-brand-primary/60" :
                         "bg-green-600/60"
                       }`}>
                         {source === "youtube" ? "YouTube" : source === "vimeo" ? "Vimeo" : "Drive"}
@@ -435,9 +481,25 @@ function PortfolioLightbox({ items, index, onClose, onNavigate, editorName, edit
   );
 }
 
+function formatRelativeTime(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMonths = Math.floor(diffMs / (30 * 24 * 60 * 60 * 1050));
+    if (diffMonths <= 0) return "recently";
+    if (diffMonths === 1) return "1 month ago";
+    return `${diffMonths} months ago`;
+  } catch {
+    return "recently";
+  }
+}
+
 export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProfile; isLoggedIn: boolean }) {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
 
 
   // Bookmarking wishlist states
@@ -517,49 +579,123 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
       {/* Topographic backdrop */}
       <TopoBackground background="#ffffff" strokeColor="#f3f4f6" opacity={0.6} />
 
-      {/* Cover */}
-      <div className="h-56 sm:h-64 w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-800 border-b border-neutral-200/50 z-10">
-        {editor.coverImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={editor.coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 opacity-25 animate-pulse-slow"
-            style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #4f46e5 0%, transparent 60%), radial-gradient(circle at 80% 20%, #6366f1 0%, transparent 50%)" }} />
-        )}
-        {editor.isFeatured && (
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5">
-            <Award className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs font-semibold text-white">Featured Editor</span>
-          </div>
-        )}
-      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 pt-8 sm:pt-12">
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-2 text-xs sm:text-sm font-extrabold tracking-wide uppercase text-neutral-400 mb-6 select-none">
+          <Link href="/" className="hover:text-neutral-900 transition-colors flex items-center">
+            <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </Link>
+          <span className="text-neutral-300 select-none">/</span>
+          <Link href="/editors" className="hover:text-neutral-900 transition-colors">
+            Editors
+          </Link>
+          <span className="text-neutral-300 select-none">/</span>
+          <span className="text-neutral-900 truncate max-w-[200px] normal-case tracking-normal">
+            {displayName}
+          </span>
+        </nav>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
-        {/* Avatar row */}
-        <div className="flex items-end justify-between pb-1 pt-4 sm:pt-6">
-          <div className="relative shrink-0 -mt-16 sm:-mt-20 z-10">
-            <div className="ring-4 ring-[#ffffff] rounded-full shadow-lg overflow-hidden bg-[#ffffff]">
-              <Avatar src={editor.image} name={displayName} size={96} activeFrame={editor.activeFrame} />
+        {/* Premium Profile Header Row */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-neutral-200/50 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            {/* Avatar & KYC Badge */}
+            <div className="relative shrink-0 z-10">
+              <div className="ring-4 ring-white rounded-full shadow-lg overflow-hidden bg-white">
+                <Avatar src={editor.image} name={displayName} size={96} activeFrame={editor.activeFrame} />
+              </div>
+              {editor.kycStatus === "approved" && (
+                <div className="absolute bottom-1 right-1 group/tooltip z-10">
+                  <BadgeCheck className="w-6 h-6 text-[#0F6E56] fill-white drop-shadow-sm cursor-help" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 hidden group-hover/tooltip:block bg-gray-900 text-white text-[10px] rounded-lg p-2.5 text-center leading-relaxed shadow-md z-30 font-medium normal-case">
+                    KYC Verified: Government ID and bank details of this editor are verified by EditBridge.
+                  </div>
+                </div>
+              )}
             </div>
 
-            {editor.kycStatus === "approved" && (
-              <div className="absolute bottom-1 right-1 group/tooltip z-10">
-                <BadgeCheck className="w-6 h-6 text-indigo-600 fill-white drop-shadow-sm cursor-help" />
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 hidden group-hover/tooltip:block bg-gray-900 text-white text-[10px] rounded-lg p-2.5 text-center leading-relaxed shadow-md z-30 font-medium normal-case">
-                  KYC Verified: Government ID and bank details of this editor are verified by EditBridge.
+            {/* Profile Identity Details */}
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 leading-none tracking-tight">{displayName}</h1>
+                {editor.membershipTier && editor.membershipTier !== "hobby" && (
+                  <span className={cn(
+                    "inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border",
+                    editor.membershipTier === "pro" && "bg-neutral-950 text-white border-neutral-800",
+                    editor.membershipTier === "agency" && "bg-indigo-600 text-white border-indigo-700",
+                    editor.membershipTier === "starter" && "bg-neutral-100 text-neutral-800 border-neutral-200"
+                  )}>
+                    {editor.membershipTier}
+                  </span>
+                )}
+                {editor.isAvailable ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200/50 rounded-full px-2.5 py-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />Available
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-red-700 bg-red-50 border border-red-200/50 rounded-full px-2.5 py-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500" />Not Accepting Orders
+                  </span>
+                )}
+              </div>
+              {editor.title && <p className="text-sm text-neutral-500 font-bold leading-none">{editor.title}</p>}
+              
+              {/* Trust & Platform Metrics */}
+              <div className="flex items-center gap-x-3 gap-y-1.5 flex-wrap text-xs text-neutral-450 font-bold pt-0.5">
+                {/* Rating & Reviews */}
+                {editor.avgRating ? (
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                    <span className="text-neutral-900 font-extrabold">{editor.avgRating}</span>
+                    <span className="text-neutral-400 font-normal">({editor.reviewCount} review{editor.reviewCount !== 1 ? "s" : ""})</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-neutral-400">
+                    <Star className="w-3.5 h-3.5 text-neutral-300 shrink-0" />
+                    <span className="font-normal text-neutral-400">No reviews yet</span>
+                  </div>
+                )}
+                <span className="text-neutral-200">•</span>
+
+                {/* Level Badge */}
+                <div className="flex items-center gap-1.5 text-neutral-700 capitalize">
+                  <span className={cn(
+                    "w-2 h-2 rounded-full",
+                    editor.level === "bronze" && "bg-amber-600",
+                    editor.level === "silver" && "bg-neutral-350 border border-neutral-400/40",
+                    editor.level === "gold" && "bg-amber-400",
+                    editor.level === "platinum" && "bg-sky-400"
+                  )} />
+                  <span>{editor.level} Level</span>
+                </div>
+                <span className="text-neutral-200">•</span>
+
+                {/* Active Orders in Queue */}
+                <div className="flex items-center gap-1 text-neutral-600">
+                  <Clock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                  <span>{editor.activeOrdersCount} order{editor.activeOrdersCount !== 1 ? "s" : ""} in queue</span>
                 </div>
               </div>
-            )}
+
+              {/* Niche Badges */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                {niches.map(n => (
+                  <span key={n} className="inline-flex items-center gap-1 text-[10px] font-extrabold text-neutral-700 bg-neutral-50 border border-neutral-200/50 rounded-full px-2.5 py-0.5 capitalize">
+                    {n}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-          {/* Action buttons */}
-          <div className="flex items-center gap-2 pb-1">
+
+          {/* Action buttons (Merged, Premium Black/Neutral design) */}
+          <div className="flex items-center gap-2 self-start md:self-center">
             {editor.isAvailable ? (
-              <Link
-                href={`/client/orders/new?editorId=${editor.id}`}
+              <a
+                href="#packages"
                 className="inline-flex items-center gap-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.99]"
               >
                 Hire me
-              </Link>
+              </a>
             ) : (
               <button
                 disabled
@@ -576,7 +712,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                   window.location.href = `/login?callbackUrl=${encodeURIComponent(`/client/messages?editorId=${editor.id}`)}`;
                 }
               }}
-              className="inline-flex items-center gap-1.5 bg-[#ffffff] border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-extrabold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-extrabold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
             >
               <MessageSquare className="w-4 h-4 text-neutral-400" />Message
             </Link>
@@ -587,12 +723,12 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
               disabled={bookmarkLoading}
               className={`inline-flex items-center justify-center border p-2.5 rounded-xl transition-colors shadow-sm ${
                 bookmarked
-                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100"
-                  : "bg-[#ffffff] border-neutral-200 hover:bg-neutral-50 text-neutral-700"
+                  ? "bg-black border-black text-white hover:bg-neutral-900"
+                  : "bg-white border-neutral-200 hover:bg-neutral-50 text-neutral-700"
               }`}
               title={bookmarked ? "Remove from wishlist" : "Save to wishlist"}
             >
-              <Bookmark className={`w-4 h-4 ${bookmarked ? "fill-indigo-600 text-indigo-600" : "text-neutral-400"}`} />
+              <Bookmark className={`w-4 h-4 ${bookmarked ? "fill-white text-white" : "text-neutral-450"}`} />
             </button>
 
             {/* Share button */}
@@ -601,398 +737,746 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 navigator.clipboard.writeText(window.location.href);
                 toast.success("Profile link copied!");
               }}
-              className="inline-flex items-center justify-center bg-[#ffffff] border border-neutral-200 hover:bg-neutral-50 text-neutral-700 p-2.5 rounded-xl transition-colors shadow-sm"
+              className="inline-flex items-center justify-center bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-700 p-2.5 rounded-xl transition-colors shadow-sm"
               title="Share profile"
             >
-              <Share2 className="w-4 h-4 text-neutral-400" />
+              <Share2 className="w-4 h-4 text-neutral-450" />
             </button>
           </div>
         </div>
 
-        {/* Name / title / niches */}
-        <div className="mt-4 mb-8">
-          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 leading-tight tracking-tight">{displayName}</h1>
-          {editor.title && <p className="text-sm text-neutral-400 font-bold mt-1">{editor.title}</p>}
+        {/* ─── Hero Section: 2-Column Grid Layout ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start mb-8">
           
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            {editor.isAvailable ? (
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/50 rounded-full px-2.5 py-0.5 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />Available
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-red-700 bg-red-50 border border-red-200/50 rounded-full px-2.5 py-0.5 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />Not Accepting Orders
-              </span>
-            )}
-            
-            {editor.avgRating && (
-              <span className="inline-flex items-center gap-1 text-xs text-neutral-700 font-bold bg-[#ffffff] border border-neutral-200/60 rounded-full px-2.5 py-0.5 shadow-sm">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                {editor.avgRating}
-                <span className="text-neutral-400 font-normal">({editor.reviewCount})</span>
-              </span>
-            )}
-
-            {niches.map(n => (
-              <span key={n} className="inline-flex items-center gap-1 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100/50 rounded-full px-2.5 py-0.5 shadow-sm capitalize">
-                {n}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 pb-20">
-          {/* Left column */}
-          <div className="space-y-8 min-w-0">
-            {/* Featured Video (Showreel) */}
-            {editor.featuredVideoUrl && (
-              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
-                <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Featured Video (Showreel)</h2>
-                <div className="rounded-xl overflow-hidden aspect-video bg-black shadow-inner">
-                  <PortfolioVideoPlayer
-                     url={editor.featuredVideoUrl}
-                     title="Featured Video"
-                     editorName={displayName}
-                     editorVerified={editor.kycStatus === "approved"}
-                     aspectRatio="16/9"
-                     className="w-full"
-                  />
-                </div>
-              </section>
-            )}
-
-            {/* About */}
-            {editor.bio && (
-              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
-                <h2 className="text-base font-black text-neutral-900 tracking-tight mb-3">About me</h2>
-                <p className={`text-sm text-neutral-500 leading-relaxed ${!bioExpanded && bioLong ? "line-clamp-4" : ""}`}>
-                  {editor.bio}
-                </p>
-                {bioLong && (
-                  <button onClick={() => setBioExpanded(e => !e)} className="text-xs font-bold text-indigo-600 mt-2 hover:text-indigo-700 flex items-center gap-0.5">
-                    {bioExpanded ? <><ChevronUp className="w-3.5 h-3.5" />Show less</> : <><ChevronDown className="w-3.5 h-3.5" />Read more</>}
-                  </button>
-                )}
-              </section>
-            )}
-
-            {/* Notable Clients & Brands */}
+          {/* Left Column: Media & Core Bio (Borderless flow) */}
+          <div className="min-w-0 divide-y divide-neutral-100">
+            {/* 1. Featured Videos (Showreel) */}
             {(() => {
-              const clientsList = editor.previousClients
-                ? editor.previousClients.split(",").map(c => c.trim()).filter(Boolean)
-                : [];
-              if (clientsList.length === 0) return null;
+              const videos = (editor.featuredVideoUrls && editor.featuredVideoUrls.length > 0)
+                ? editor.featuredVideoUrls
+                : editor.featuredVideoUrl
+                  ? [editor.featuredVideoUrl]
+                  : [];
+              if (videos.length === 0) return null;
               return (
-                <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm overflow-hidden">
-                  <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Notable Clients & Brands</h2>
-                  <div className="relative w-full overflow-hidden">
-                    {/* Fade gradients */}
-                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
-                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
-                    
-                    <div className="flex w-full overflow-hidden">
-                      <div className="animate-marquee flex gap-4 py-1">
-                        {clientsList.map((c, idx) => (
-                          <div
-                            key={`orig-${c}-${idx}`}
-                            className="flex items-center gap-2 text-xs font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
-                          >
-                            <span className="text-indigo-500">⚡</span>
-                            {c}
-                          </div>
-                        ))}
-                        {clientsList.map((c, idx) => (
-                          <div
-                            key={`clone1-${c}-${idx}`}
-                            className="flex items-center gap-2 text-xs font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
-                          >
-                            <span className="text-indigo-500">⚡</span>
-                            {c}
-                          </div>
-                        ))}
-                        {clientsList.map((c, idx) => (
-                          <div
-                            key={`clone2-${c}-${idx}`}
-                            className="flex items-center gap-2 text-xs font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
-                          >
-                            <span className="text-indigo-500">⚡</span>
-                            {c}
-                          </div>
-                        ))}
+                <section className="pb-8">
+                  <div className="relative">
+                    {/* Main Active Player Box Wrapper */}
+                    <div className="relative group/player">
+                      {/* Video box with clipping */}
+                      <div className="relative rounded-2xl overflow-hidden aspect-video bg-neutral-950 shadow-lg border border-neutral-200/50">
+                        <PortfolioVideoPlayer
+                          url={videos[activeVideoIndex]}
+                          title={null}
+                          editorName={displayName}
+                          editorVerified={editor.kycStatus === "approved"}
+                          aspectRatio="16/9"
+                          className="w-full h-full"
+                          hideBranding={true}
+                        />
+
+                        {/* Client Review Translucent Overlay */}
+                        {(() => {
+                          const review = editor.reviews && editor.reviews.length > 0
+                            ? editor.reviews[activeVideoIndex % editor.reviews.length]
+                            : null;
+                          if (!review) return null;
+                          return (
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent p-5 pt-16 text-white pointer-events-none z-10">
+                              <p className="text-xs sm:text-sm font-bold italic line-clamp-2 leading-relaxed text-white drop-shadow-sm">
+                                “{review.text}”
+                              </p>
+                              <p className="text-[10px] sm:text-xs text-neutral-300 font-bold mt-2 flex items-center gap-1">
+                                Reviewed by {review.reviewerName} {formatRelativeTime(review.createdAt)}
+                              </p>
+                            </div>
+                          );
+                        })()}
                       </div>
+
+                      {/* Navigation Arrows for Slider (Placed outside the video container on desktop) */}
+                      {videos.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveVideoIndex((prev) => (prev === 0 ? videos.length - 1 : prev - 1));
+                            }}
+                            className="absolute left-2 sm:left-[-20px] lg:left-[-24px] top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-neutral-800 flex items-center justify-center shadow-lg border border-neutral-200/80 hover:bg-neutral-50 active:scale-95 transition-all hover:scale-105 duration-300 opacity-95 hover:opacity-100 cursor-pointer"
+                          >
+                            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-800" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveVideoIndex((prev) => (prev === videos.length - 1 ? 0 : prev + 1));
+                            }}
+                            className="absolute right-2 sm:right-[-20px] lg:right-[-24px] top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-neutral-800 flex items-center justify-center shadow-lg border border-neutral-200/80 hover:bg-neutral-50 active:scale-95 transition-all hover:scale-105 duration-300 opacity-95 hover:opacity-100 cursor-pointer"
+                          >
+                            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-800" />
+                          </button>
+                        </>
+                      )}
                     </div>
+
+                    {/* Bottom Thumbnail Strip */}
+                    {videos.length > 1 && (
+                      <div className="relative mt-4 flex items-center group/thumbnails px-1.5">
+                        <div 
+                          ref={thumbnailsRef}
+                          className="flex-1 flex items-center gap-3.5 overflow-x-auto scrollbar-none py-1 scroll-smooth"
+                        >
+                          {videos.map((url, idx) => {
+                            const thumb = getThumbnailUrl(url) || "/images/video-placeholder.png";
+                            const isActive = activeVideoIndex === idx;
+                            return (
+                              <button
+                                type="button"
+                                key={idx}
+                                onClick={() => setActiveVideoIndex(idx)}
+                                className={cn(
+                                  "relative aspect-video w-[90px] sm:w-[110px] rounded-lg overflow-hidden border-2 transition-all bg-neutral-900 shrink-0 select-none cursor-pointer focus:outline-none",
+                                  isActive 
+                                    ? "border-black ring-2 ring-black/10 scale-102" 
+                                    : "border-neutral-200 hover:border-neutral-400 opacity-70 hover:opacity-100"
+                                )}
+                              >
+                                <img 
+                                  src={thumb} 
+                                  alt={`Thumbnail ${idx + 1}`} 
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                                  <Play className="w-3.5 h-3.5 text-white drop-shadow-sm fill-white/20" />
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </section>
               );
             })()}
 
-            {/* Skills & Tools */}
-            {(editor.skills.length > 0 || editor.tools.length > 0 || workStyleTags.length > 0) && (
-              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
-                <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Skills & Tools</h2>
-                <div className="space-y-4">
-                  {editor.skills.length > 0 && (
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest mb-2">Skills</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {editor.skills.map(s => (
-                          <span key={s} className="text-xs bg-[#f3f4f6] border border-neutral-200/40 text-neutral-600 font-semibold rounded-lg px-2.5 py-1">{s}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {editor.tools.length > 0 && (
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest mb-2">Software</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {editor.tools.map(t => (
-                          <span key={t} className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg px-2.5 py-1 font-bold">{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {workStyleTags.length > 0 && (
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest mb-2">Work style</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {workStyleTags.map(t => (
-                          <span key={t} className="text-xs bg-violet-50 border border-violet-100 text-violet-700 rounded-lg px-2.5 py-1 font-bold">{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* Portfolio */}
-            <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
-              <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Portfolio</h2>
-              {editor.portfolioItems.length === 0 ? (
-                <div className="border border-dashed border-neutral-200 rounded-xl p-8 text-center text-neutral-400 font-semibold">
-                  No portfolio items uploaded yet.
-                </div>
-              ) : (
-                <>
-                  {/* Category Filter tabs (capsule layout) */}
-                  {categories.length > 2 && (
-                    <div className="inline-flex items-center gap-1 bg-[#f3f4f6] rounded-[18px] border border-neutral-200/50 p-1 mb-4 overflow-x-auto scrollbar-none max-w-full">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => setSelectedCategory(cat)}
-                          className={`text-[11px] font-bold px-3.5 py-1.5 rounded-[14px] transition-all shrink-0 ${
-                            selectedCategory === cat
-                              ? "bg-[#000000] text-white shadow-sm"
-                              : "text-neutral-500 hover:text-neutral-900"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <PortfolioGrid items={filteredPortfolio} onOpen={setLightboxIndex} />
-                </>
-              )}
-            </section>
-
-            {/* Packages */}
-            <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
-              <h2 className="text-base font-black text-neutral-900 tracking-tight mb-4">Packages</h2>
-              {editor.packages.length === 0 ? (
-                <div className="border border-dashed border-neutral-200 rounded-xl p-8 text-center text-neutral-400 font-semibold">
-                  No preset packages configured yet. Request a custom quote below.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {editor.packages.map((pkg, index) => {
-                    // Highlight the standard/middle tier in visual hierarchy
-                    const isHighlighted = editor.packages.length > 1 && index === Math.floor(editor.packages.length / 2);
-                    return (
-                      <PackageCard
-                        key={pkg.id}
-                        pkg={pkg}
-                        editorId={editor.id}
-                        isAvailable={editor.isAvailable}
-                        isHighlighted={isHighlighted}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-
-            {/* Reviews */}
-            {editor.reviews.length > 0 && (
-              <section className="bg-[#ffffff] rounded-3xl border border-neutral-200/50 p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
-                  <h2 className="text-base font-black text-neutral-900 tracking-tight">
-                    Reviews ({editor.reviewCount})
-                  </h2>
-                </div>
-
-                {/* Rating Breakdown Graph */}
-                {editor.reviewCount > 0 && editor.ratingDistribution && (
-                  <div className="bg-neutral-50/50 border border-neutral-200/50 rounded-2xl p-5 mb-6 flex flex-col gap-2.5">
-                    <p className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">Rating Breakdown</p>
-                    <div className="space-y-2">
-                      {[5, 4, 3, 2, 1].map((stars, idx) => {
-                        const pct = editor.ratingDistribution ? (editor.ratingDistribution[idx] ?? 0) : 0;
-                        return (
-                          <div key={stars} className="flex items-center gap-3 text-xs">
-                            <span className="w-8 font-extrabold text-neutral-500 flex items-center gap-0.5 shrink-0">
-                              {stars}★
-                            </span>
-                            <div className="flex-1 h-2.5 bg-neutral-200/40 rounded-full overflow-hidden">
-                              <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
-                            </div>
-                            <span className="w-8 text-right font-extrabold text-neutral-400 shrink-0">
-                              {pct}%
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  {editor.reviews.slice(0, 6).map(r => <ReviewCard key={r.id} review={r} />)}
-                </div>
-                {editor.reviews.length > 6 && (
-                  <Link
-                    href={`/editor/${editor.id}/reviews`}
-                    className="mt-5 inline-flex items-center gap-1 text-xs font-extrabold text-indigo-600 hover:text-indigo-700 transition-colors"
-                  >
-                    View all {editor.reviewCount} reviews <ChevronRight className="w-4 h-4" />
-                  </Link>
+            {/* 2. About me */}
+            {editor.bio && (
+              <section className="py-8">
+                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-3">About me</h2>
+                <p className={`text-sm text-neutral-500 leading-relaxed font-medium ${!bioExpanded && bioLong ? "line-clamp-6" : ""}`}>
+                  {editor.bio}
+                </p>
+                {bioLong && (
+                  <button onClick={() => setBioExpanded(e => !e)} className="text-xs font-bold text-brand-primary mt-2 hover:text-brand-primary/80 flex items-center gap-0.5">
+                    {bioExpanded ? <><ChevronUp className="w-3.5 h-3.5" />Show less</> : <><ChevronDown className="w-3.5 h-3.5" />Read more</>}
+                  </button>
                 )}
               </section>
             )}
           </div>
 
-          {/* Right sidebar */}
-          <aside className="space-y-5">
-            {/* Stats */}
-            <div className="bg-[#ffffff] border border-neutral-200/50 rounded-3xl p-5 shadow-sm space-y-3.5">
-              <h3 className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Stats</h3>
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />Orders completed
-                  </span>
-                  <span className="text-sm font-bold text-neutral-900">{editor.totalOrders}</span>
-                </div>
-                {editor.completionRate !== null && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
-                      <TrendingUp className="w-3.5 h-3.5 text-[#0EA5E9]" />Completion rate
+          {/* Right Column: Sticky Action Card (Stays as a floating card) */}
+          <aside className="space-y-5 lg:sticky lg:top-24">
+            <div className="bg-white border border-neutral-200/60 rounded-3xl p-6 shadow-xl shadow-neutral-100/50 space-y-6">
+              
+              {/* Pricing section */}
+              {editor.packages.length > 0 ? (
+                <div className="space-y-2.5">
+                  <p className="text-[10px] font-extrabold text-neutral-450 uppercase tracking-widest">Pricing</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-neutral-900">
+                      {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", {
+                        style: "currency", currency: "INR", maximumFractionDigits: 0
+                      })}
                     </span>
-                    <span className="text-sm font-bold text-neutral-900">{editor.completionRate}%</span>
+                    <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">starting price</span>
                   </div>
-                )}
-                {editor.avgResponseTime !== null && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-amber-500" />Avg response
-                    </span>
-                    <span className="text-sm font-bold text-neutral-900 flex items-center gap-1.5">
-                      <span className={`w-2 h-2 rounded-full ${
-                        editor.avgResponseTime < 60 ? "bg-emerald-500" :
-                        editor.avgResponseTime < 240 ? "bg-amber-400" :
-                        "bg-red-500"
-                      }`} />
-                      {editor.avgResponseTime < 60
-                        ? `${editor.avgResponseTime}m`
-                        : `${Math.round(editor.avgResponseTime / 60)}h`}
-                    </span>
-                  </div>
-                )}
-                {/* Profile View Counter */}
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-500 font-semibold flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5 text-sky-500" />Profile views
-                  </span>
-                  <span className="text-sm font-bold text-neutral-900">
-                    {editor.viewCount?.toLocaleString() ?? 0}
-                  </span>
                 </div>
-              </div>
-            </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-[10px] font-extrabold text-neutral-455 uppercase tracking-widest">Pricing</p>
+                  <p className="text-sm font-extrabold text-neutral-500">Custom quotes only</p>
+                </div>
+              )}
 
-            {/* Details */}
-            <div className="bg-[#ffffff] border border-neutral-200/50 rounded-3xl p-5 shadow-sm space-y-3.5">
-              <h3 className="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Details</h3>
+              {/* Major CTAs */}
               <div className="space-y-2.5">
-                {editor.location && (
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
-                    <span className="text-sm font-semibold text-neutral-600">{editor.location}</span>
-                  </div>
-                )}
-                {expLabel && (
-                  <div className="flex items-start gap-2">
-                    <Briefcase className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
-                    <span className="text-sm font-semibold text-neutral-600">
-                      {expLabel}{editor.yearsOfExperience ? ` · ${editor.yearsOfExperience} yr${editor.yearsOfExperience !== 1 ? "s" : ""}` : ""}
-                    </span>
-                  </div>
-                )}
-                {languages.length > 0 && (
-                  <div className="flex items-start gap-2">
-                    <Globe className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
-                    <span className="text-sm font-semibold text-neutral-600">
-                      {languages.map(l => `${l.language} (${l.level})`).join(", ")}
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-neutral-400 mt-0.5 shrink-0" />
-                  <span className="text-sm font-semibold text-neutral-600">
-                    Member since {new Date(editor.kycApprovedAt || editor.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA */}
-            {editor.packages.length > 0 && (
-              <div className="border border-neutral-200/50 bg-[#ffffff] rounded-3xl p-5 text-center space-y-3.5 shadow-sm">
-                <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Pricing</p>
-                <p className="text-sm font-bold text-neutral-500 leading-tight">
-                  Starting from{" "}
-                  <span className="text-lg text-neutral-900 font-black">
-                    {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", {
-                      style: "currency", currency: "INR", maximumFractionDigits: 0
-                    })}
-                  </span>
-                </p>
                 {editor.isAvailable ? (
-                  <Link
-                    href={`/client/orders/new?editorId=${editor.id}`}
-                    className="block w-full bg-black hover:bg-neutral-900 text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm"
+                  <a
+                    href="#packages"
+                    className="block w-full bg-black hover:bg-neutral-900 text-white text-center text-xs font-black py-3.5 rounded-xl transition-all shadow-md shadow-neutral-950/15 active:scale-[0.98]"
                   >
-                    Get started
-                  </Link>
+                    Hire this editor
+                  </a>
                 ) : (
                   <button
                     disabled
-                    className="block w-full bg-neutral-100 text-neutral-400 text-xs font-bold py-3 rounded-xl cursor-not-allowed border border-neutral-200/50"
+                    className="block w-full bg-neutral-100 text-neutral-400 text-xs font-black py-3.5 rounded-xl cursor-not-allowed border border-neutral-200/50"
                   >
                     Unavailable
                   </button>
                 )}
+
                 <div className="relative flex items-center gap-2 py-0.5 select-none">
                   <div className="flex-1 h-px bg-neutral-100" />
                   <span className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-wider">or</span>
                   <div className="flex-1 h-px bg-neutral-100" />
                 </div>
+
                 <RequestQuoteButton editorId={editor.id} />
               </div>
-            )}
+
+              <div className="border-t border-neutral-100/70" />
+
+              {/* Trust Details */}
+              <div className="space-y-3.5">
+                <p className="text-[10px] font-extrabold text-neutral-455 uppercase tracking-widest">Trust & Details</p>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-500">
+                    <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Escrow-protected payment</span>
+                  </div>
+                  {editor.location && (
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-500">
+                      <MapPin className="w-4 h-4 text-neutral-400 shrink-0" />
+                      <span>Located in {editor.location}</span>
+                    </div>
+                  )}
+                  {expLabel && (
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-500">
+                      <Briefcase className="w-4 h-4 text-neutral-400 shrink-0" />
+                      <span>{expLabel}{editor.yearsOfExperience ? ` · ${editor.yearsOfExperience} yrs exp` : ""}</span>
+                    </div>
+                  )}
+                  {languages.length > 0 && (
+                    <div className="flex items-start gap-2 text-xs font-bold text-neutral-500">
+                      <Globe className="w-4 h-4 text-neutral-400 shrink-0 mt-0.5" />
+                      <span className="leading-snug">
+                        Speaks {languages.map(l => l.language).join(", ")}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-500">
+                    <Clock className="w-4 h-4 text-neutral-400 shrink-0" />
+                    <span>Member since {new Date(editor.kycApprovedAt || editor.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-neutral-100/70" />
+
+              {/* Platform Metrics */}
+              <div className="space-y-3.5">
+                <p className="text-[10px] font-extrabold text-neutral-455 uppercase tracking-widest">Stats</p>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-neutral-450">Orders completed</span>
+                    <span className="text-neutral-900 font-extrabold">{editor.totalOrders}</span>
+                  </div>
+                  {editor.completionRate !== null && (
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-neutral-450">Completion rate</span>
+                      <span className="text-neutral-900 font-extrabold">{editor.completionRate}%</span>
+                    </div>
+                  )}
+                  {editor.avgResponseTime !== null && (
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-neutral-450">Avg response time</span>
+                      <span className="text-neutral-900 font-extrabold">
+                        {editor.avgResponseTime < 60
+                          ? `${editor.avgResponseTime}m`
+                          : `${Math.round(editor.avgResponseTime / 60)}h`}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-neutral-450">Profile views</span>
+                    <span className="text-neutral-900 font-extrabold">{editor.viewCount?.toLocaleString() ?? 0}</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </aside>
+        </div>
+
+        {/* ─── Bottom/Rest Sections: Continuous Borderless Flow ─── */}
+        <div className="divide-y divide-neutral-100 pb-20">
+          
+          {/* Skills & Tools (Full-width, Borderless row) */}
+          {(editor.skills.length > 0 || editor.tools.length > 0 || workStyleTags.length > 0) && (
+            <section className="py-8">
+              <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-6">Skills & Tools</h2>
+              <div className="space-y-6">
+                {/* Skills */}
+                {editor.skills.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-extrabold text-neutral-400 uppercase tracking-wider mb-3">Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {editor.skills.map(s => (
+                        <span key={s} className="text-xs bg-[#f3f4f6] text-neutral-700 font-bold rounded-xl px-3.5 py-1.5 border border-neutral-200/30 shadow-sm">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Software */}
+                {editor.tools.length > 0 && (
+                  <div className="pt-5 border-t border-neutral-100/60">
+                    <h3 className="text-xs font-extrabold text-neutral-450 uppercase tracking-wider mb-3">Software</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {editor.tools.map(t => (
+                        <span key={t} className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl px-3.5 py-1.5 font-bold shadow-sm">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Work Style */}
+                {workStyleTags.length > 0 && (
+                  <div className="pt-5 border-t border-neutral-100/60">
+                    <h3 className="text-xs font-extrabold text-neutral-450 uppercase tracking-wider mb-3">Work style</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {workStyleTags.map(t => (
+                        <span key={t} className="text-xs bg-violet-50 border border-violet-100 text-violet-700 rounded-xl px-3.5 py-1.5 font-bold shadow-sm">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* 3. Notable Clients & Brands (Borderless marquee flow) */}
+          {(() => {
+            const clientsList = editor.previousClients
+              ? editor.previousClients.split(",").map(c => c.trim()).filter(Boolean)
+              : [];
+            if (clientsList.length === 0) return null;
+            return (
+              <section className="py-8 overflow-hidden">
+                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-4">Notable Clients & Brands</h2>
+                <div className="relative w-full overflow-hidden">
+                  <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+                  <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+                  
+                  <div className="flex w-full overflow-hidden">
+                    <div className="animate-marquee flex gap-4 py-1">
+                      {clientsList.map((c, idx) => (
+                        <div
+                          key={`orig-${c}-${idx}`}
+                          className="flex items-center gap-2 text-xs font-bold text-neutral-450 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                        >
+                          <span className="text-indigo-500">⚡</span>
+                          {c}
+                        </div>
+                      ))}
+                      {clientsList.map((c, idx) => (
+                        <div
+                          key={`clone1-${c}-${idx}`}
+                          className="flex items-center gap-2 text-xs font-bold text-neutral-450 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                        >
+                          <span className="text-indigo-500">⚡</span>
+                          {c}
+                        </div>
+                      ))}
+                      {clientsList.map((c, idx) => (
+                        <div
+                          key={`clone2-${c}-${idx}`}
+                          className="flex items-center gap-2 text-xs font-bold text-neutral-450 bg-neutral-50 border border-neutral-200/60 rounded-xl px-5 py-2.5 shadow-sm transition-all duration-300 select-none shrink-0"
+                        >
+                          <span className="text-indigo-500">⚡</span>
+                          {c}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            );
+          })()}
+
+          {/* 4. Portfolio */}
+          <section className="py-8">
+            <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-1">Portfolio</h2>
+            <p className="text-xs text-neutral-450 font-semibold mb-6">Past work samples and completed projects</p>
+            {editor.portfolioItems.length === 0 ? (
+              <div className="border border-dashed border-neutral-200 rounded-2xl p-10 text-center text-neutral-450 font-semibold text-sm">
+                No portfolio items uploaded yet.
+              </div>
+            ) : (
+              <>
+                {categories.length > 2 && (
+                  <div className="inline-flex items-center gap-1 bg-[#f3f4f6] rounded-[18px] border border-neutral-200/50 p-1 mb-6 overflow-x-auto scrollbar-none max-w-full">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`text-[11px] font-bold px-3.5 py-1.5 rounded-[14px] transition-all shrink-0 ${
+                          selectedCategory === cat
+                            ? "bg-[#000000] text-white shadow-sm"
+                            : "text-neutral-500 hover:text-neutral-900"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <PortfolioGrid items={filteredPortfolio} onOpen={setLightboxIndex} />
+              </>
+            )}
+          </section>
+
+          {/* 5. Packages */}
+          <section id="packages" className="py-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest">Packages & Tiers</h2>
+                <p className="text-xs text-neutral-450 font-semibold mt-0.5">Fixed-scope packages with clear deliverables</p>
+              </div>
+              {editor.packages.length > 0 && (
+                <span className="text-[10px] font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 px-2.5 py-1 rounded-full">
+                  {editor.packages.length} tier{editor.packages.length !== 1 ? "s" : ""} available
+                </span>
+              )}
+            </div>
+            {editor.packages.length === 0 ? (
+              <div className="border border-dashed border-neutral-200 rounded-2xl p-10 text-center text-neutral-450 font-semibold text-sm">
+                No preset packages yet. Request a custom quote above.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Fiverr-like Matrix Comparison Table */}
+                <div className="overflow-x-auto border border-neutral-200/70 rounded-2xl bg-white shadow-sm">
+                  <table className="w-full border-collapse text-left text-xs">
+                    <thead>
+                      <tr className="bg-neutral-50/50 border-b border-neutral-200/60">
+                        <th className="p-5 font-black text-neutral-800 w-1/4 align-top">
+                          <div className="flex flex-col gap-1.5 items-start">
+                            {editor.packages[0]?.videoCategory && (
+                              <span className="px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider bg-neutral-100 text-neutral-650 border border-neutral-200/60 leading-none">
+                                {editor.packages[0].videoCategory.replace(/_/g, " ")}
+                              </span>
+                            )}
+                            <span className="mt-1">Package Inclusions</span>
+                          </div>
+                        </th>
+                        {editor.packages.map((p, idx) => {
+                          const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                          return (
+                            <th 
+                              key={p.id} 
+                              className={cn(
+                                "p-5 text-center w-1/4 align-top border-l border-neutral-100/70",
+                                isHighlighted && "bg-neutral-950/[0.015]"
+                              )}
+                            >
+                              <div className="flex flex-col gap-1.5">
+                                {isHighlighted && (
+                                  <div className="flex justify-center">
+                                    <span className="px-2.5 py-1 rounded bg-neutral-900 text-white text-[8px] font-black uppercase tracking-widest leading-none shadow-sm">
+                                      Most Popular
+                                    </span>
+                                  </div>
+                                )}
+                                <span className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 block mt-1">
+                                  {p.tier || 'Tier'}
+                                </span>
+                                <div className="text-sm font-black text-neutral-900 leading-snug">{p.title}</div>
+                                {p.description && (
+                                  <p className="text-[10.5px] text-neutral-500 font-medium leading-relaxed mt-1.5 block max-w-[190px] mx-auto normal-case font-sans">
+                                    {p.description}
+                                  </p>
+                                )}
+                                <div className="text-lg font-black mt-3 text-neutral-950">
+                                  {(p.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                                </div>
+                              </div>
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                      {/* Delivery Days */}
+                      <tr>
+                        <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Delivery Time</td>
+                        {editor.packages.map((p, idx) => {
+                          const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                          return (
+                            <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                              {p.deliveryDays} Days
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {/* Revisions */}
+                      <tr>
+                        <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Revisions</td>
+                        {editor.packages.map((p, idx) => {
+                          const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                          return (
+                            <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                              {p.revisionCount === -1 ? "Unlimited" : p.revisionCount}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {/* Video Length Limit */}
+                      {editor.packages.some(p => p.videoLengthLimit) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Video Length</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {p.videoLengthLimit || "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Video Count */}
+                      {editor.packages.some(p => p.videoCount) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Videos Included</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {p.videoCount ? `${p.videoCount} video${p.videoCount !== 1 ? 's' : ''}` : "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Resolution */}
+                      {editor.packages.some(p => p.resolution) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Resolution</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {p.resolution ? p.resolution.toUpperCase() : "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Max Raw Footage */}
+                      {editor.packages.some(p => p.maxRawFootage) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Max Raw Footage</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {p.maxRawFootage || "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Aspect Ratios */}
+                      {editor.packages.some(p => p.aspectRatios && p.aspectRatios.length > 0) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Aspect Ratios</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            const val = Array.isArray(p.aspectRatios) ? p.aspectRatios.join(", ") : "—";
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60 text-[10px]", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {val || "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Software Used */}
+                      {editor.packages.some(p => p.softwareUsed && p.softwareUsed.length > 0) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Software Used</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            const val = Array.isArray(p.softwareUsed) 
+                              ? p.softwareUsed.map((s: string) => s.replace(/_/g, " ").toUpperCase()).join(", ") 
+                              : "—";
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60 text-[10px]", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {val || "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Delivery Formats */}
+                      {editor.packages.some(p => p.deliveryFormats && p.deliveryFormats.length > 0) && (
+                        <tr>
+                          <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Delivery Formats</td>
+                          {editor.packages.map((p, idx) => {
+                            const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                            const val = Array.isArray(p.deliveryFormats) 
+                              ? p.deliveryFormats.map((s: string) => s.replace(/_/g, " ").toUpperCase()).join(", ") 
+                              : "—";
+                            return (
+                              <td key={p.id} className={cn("p-4 font-semibold text-center border-l border-neutral-100/60 text-[10px]", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                {val || "—"}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      )}
+                      {/* Source Files */}
+                      <tr>
+                        <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Source Files</td>
+                        {editor.packages.map((p, idx) => {
+                          const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                          return (
+                            <td key={p.id} className={cn("p-4 border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                              <div className="flex justify-center">
+                                {p.includesSourceFiles ? (
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 fill-emerald-50 shrink-0" />
+                                ) : (
+                                  <span className="text-neutral-300 font-bold">—</span>
+                                )}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {/* Commercial Rights */}
+                      <tr>
+                        <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Commercial Use</td>
+                        {editor.packages.map((p, idx) => {
+                          const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                          return (
+                            <td key={p.id} className={cn("p-4 border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                              <div className="flex justify-center">
+                                {p.includesCommercialRights ? (
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-600 fill-emerald-50 shrink-0" />
+                                ) : (
+                                  <span className="text-neutral-300 font-bold">—</span>
+                                )}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {/* Addon Inclusions (Dynamic list of all platform addons) */}
+                      {(() => {
+                        const addonKeys = Object.keys(ADDON_DISPLAY);
+                        return addonKeys.map((key) => {
+                          const hasAddon = editor.packages.some(p => p.addons.includes(key));
+                          if (!hasAddon) return null;
+                          return (
+                            <tr key={key}>
+                              <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">{ADDON_DISPLAY[key]}</td>
+                              {editor.packages.map((p, idx) => {
+                                const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                                return (
+                                  <td key={p.id} className={cn("p-4 border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                                    <div className="flex justify-center">
+                                      {p.addons.includes(key) ? (
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 fill-emerald-50 shrink-0" />
+                                      ) : (
+                                        <span className="text-neutral-300 font-bold">—</span>
+                                      )}
+                                    </div>
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          );
+                        });
+                      })()}
+                      {/* Row CTAs */}
+                      <tr className="bg-neutral-50/10">
+                        <td className="p-4 font-bold text-neutral-900 bg-neutral-50/20">Select Order</td>
+                        {editor.packages.map((p, idx) => {
+                          const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                          return (
+                            <td key={p.id} className={cn("p-4 text-center border-l border-neutral-100/60", isHighlighted && "bg-neutral-950/[0.015]")}>
+                              {editor.isAvailable ? (
+                                <PackageClickLink
+                                  href={`/checkout/${p.id}`}
+                                  packageId={p.id}
+                                  className={cn(
+                                    "inline-flex items-center justify-center w-full text-center text-xs font-black py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.98]",
+                                    isHighlighted
+                                      ? "bg-black hover:bg-neutral-900 text-white shadow-md shadow-neutral-950/20"
+                                      : "bg-neutral-900 hover:bg-black text-white"
+                                  )}
+                                >
+                                  Select & Order
+                                </PackageClickLink>
+                              ) : (
+                                <button disabled className="w-full text-center bg-neutral-100 text-neutral-400 text-xs font-extrabold py-2.5 rounded-xl cursor-not-allowed border border-neutral-200/50">
+                                  Unavailable
+                                </button>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* 7. Reviews */}
+          {editor.reviews.length > 0 && (
+            <section className="py-8">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest">
+                  Reviews ({editor.reviewCount})
+                </h2>
+              </div>
+
+              {/* Rating Breakdown Graph */}
+              {editor.reviewCount > 0 && editor.ratingDistribution && (
+                <div className="bg-neutral-50/50 border border-neutral-200/50 rounded-2xl p-5 mb-6 flex flex-col gap-2.5">
+                  <p className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">Rating Breakdown</p>
+                  <div className="space-y-2">
+                    {[5, 4, 3, 2, 1].map((stars, idx) => {
+                      const pct = editor.ratingDistribution ? (editor.ratingDistribution[idx] ?? 0) : 0;
+                      return (
+                        <div key={stars} className="flex items-center gap-3 text-xs">
+                          <span className="w-8 font-extrabold text-neutral-500 flex items-center gap-0.5 shrink-0">
+                            {stars}★
+                          </span>
+                          <div className="flex-1 h-2.5 bg-neutral-200/40 rounded-full overflow-hidden">
+                            <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                          </div>
+                          <span className="w-8 text-right font-extrabold text-neutral-400 shrink-0">
+                            {pct}%
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {editor.reviews.slice(0, 6).map(r => <ReviewCard key={r.id} review={r} />)}
+              </div>
+              {editor.reviews.length > 6 && (
+                <Link
+                  href={`/editor/${editor.id}/reviews`}
+                  className="mt-5 inline-flex items-center gap-1 text-xs font-extrabold text-brand-primary hover:text-brand-primary/80 transition-colors"
+                >
+                  View all {editor.reviewCount} reviews <ChevronRight className="w-4 h-4" />
+                </Link>
+              )}
+            </section>
+          )}
         </div>
       </div>
 
@@ -1024,12 +1508,12 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
         </div>
         <div className="shrink-0 flex items-center gap-2">
           {editor.isAvailable ? (
-            <Link
-              href={`/client/orders/new?editorId=${editor.id}`}
-              className="bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-4.5 py-2.5 rounded-xl transition-all shadow-sm"
+            <a
+              href="#packages"
+              className="bg-black hover:bg-neutral-900 text-white text-xs font-extrabold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.99]"
             >
               Hire me
-            </Link>
+            </a>
           ) : (
             <button
               disabled

@@ -46,6 +46,7 @@ type Props = {
     includesCommercialRights?: boolean;
   };
   availableCredits: number;
+  processingFeePct?: number;
 };
 
 declare global {
@@ -66,7 +67,7 @@ const MOOD_CONFIG: Record<string, { label: string; Icon: LucideIcon }> = {
 
 const MOODS = Object.keys(MOOD_CONFIG) as (keyof typeof MOOD_CONFIG)[];
 
-export default function CheckoutForm({ pkg, availableCredits }: Props) {
+export default function CheckoutForm({ pkg, availableCredits, processingFeePct = 10 }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -94,13 +95,39 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [templateName, setTemplateName] = useState("");
 
+  const draftKey = `checkout-draft-${pkg.id}`;
+
   useEffect(() => {
     fetch("/api/brief-templates")
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => { if (Array.isArray(data)) setSavedTemplates(data); })
       .catch(() => {})
-      .finally(() => setInitLoading(false));
-  }, []);
+      .finally(() => {
+        const raw = localStorage.getItem(draftKey);
+        if (raw) {
+          try {
+            const d = JSON.parse(raw);
+            if (Array.isArray(d.moods) && d.moods.length) setMoods(d.moods);
+            if (d.musicPref) setMusicPref(d.musicPref);
+            if (d.colorLook) setColorLook(d.colorLook);
+            if (Array.isArray(d.referenceUrls) && d.referenceUrls.length) setReferenceUrls(d.referenceUrls);
+            if (d.mustInclude !== undefined) setMustInclude(d.mustInclude);
+            if (d.mustAvoid !== undefined) setMustAvoid(d.mustAvoid);
+            if (d.additionalNotes !== undefined) setAdditionalNotes(d.additionalNotes);
+            if (d.addOns) setAddOns(d.addOns);
+            toast("Draft restored", { description: "Your previous brief was saved." });
+          } catch { /* ignore corrupt draft */ }
+        }
+        setInitLoading(false);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (initLoading) return;
+    localStorage.setItem(draftKey, JSON.stringify({
+      moods, musicPref, colorLook, referenceUrls, mustInclude, mustAvoid, additionalNotes, addOns,
+    }));
+  }, [moods, musicPref, colorLook, referenceUrls, mustInclude, mustAvoid, additionalNotes, addOns, initLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMoodToggle = (m: string) => {
     setMoods((prev) =>
@@ -123,6 +150,22 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
   };
 
   const handleSelectTemplate = (content: string) => {
+    try {
+      const parsed = JSON.parse(content);
+      if (parsed && typeof parsed === "object") {
+        if (Array.isArray(parsed.moods) && parsed.moods.length) setMoods(parsed.moods);
+        if (parsed.musicPreference) setMusicPref(parsed.musicPreference);
+        if (parsed.colorLook) setColorLook(parsed.colorLook);
+        if (Array.isArray(parsed.referenceUrls) && parsed.referenceUrls.length) setReferenceUrls(parsed.referenceUrls);
+        if (parsed.mustInclude !== undefined) setMustInclude(parsed.mustInclude);
+        if (parsed.mustAvoid !== undefined) setMustAvoid(parsed.mustAvoid);
+        if (parsed.additionalNotes !== undefined) setAdditionalNotes(parsed.additionalNotes);
+        toast.success("Template loaded — all fields restored.");
+        return;
+      }
+    } catch {
+      // Legacy plain-text template
+    }
     setAdditionalNotes(content);
     toast.success("Template loaded into notes.");
   };
@@ -133,7 +176,6 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
     (addOns.sourceFiles ? 100000 : 0) +
     (addOns.commercialRights ? 75000 : 0);
 
-  const processingFeePct = 2;
   const subtotal = pkg.price + addOnsCost;
   const processingFee = Math.round(subtotal * (processingFeePct / 100));
   const fullTotal = subtotal + processingFee;
@@ -208,21 +250,23 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
             if (!verifyRes.ok) throw new Error(verifyData.error ?? "Payment verification failed");
 
             if (saveAsTemplate && templateName.trim()) {
-              const lines: string[] = [];
-              if (moods.length) lines.push(`Moods: ${moods.join(", ")}`);
-              if (musicPref) lines.push(`Music: ${musicPref}`);
-              if (colorLook) lines.push(`Color: ${colorLook}`);
-              if (cleanUrls.length) lines.push(`References:\n${cleanUrls.map((u) => `  - ${u}`).join("\n")}`);
-              if (mustInclude) lines.push(`Must include: ${mustInclude}`);
-              if (mustAvoid) lines.push(`Must avoid: ${mustAvoid}`);
-              if (additionalNotes) lines.push(`Notes: ${additionalNotes}`);
+              const templateContent = JSON.stringify({
+                moods,
+                musicPreference: musicPref,
+                colorLook,
+                referenceUrls: cleanUrls,
+                mustInclude,
+                mustAvoid,
+                additionalNotes,
+              });
               await fetch("/api/brief-templates", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: templateName.trim(), content: lines.join("\n") }),
+                body: JSON.stringify({ name: templateName.trim(), content: templateContent }),
               }).catch(() => {});
             }
 
+            localStorage.removeItem(draftKey);
             toast.success("Order confirmed!");
             router.push(`/checkout/${pkg.id}/success`);
           } catch (verifyErr) {
@@ -230,7 +274,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
           }
         },
         prefill: {},
-        theme: { color: "#0EA5E9" },
+        theme: { color: "#1e40af" },
       });
       rz.open();
     } catch (err) {
@@ -268,7 +312,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                 className={cn(
                   "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors",
                   step === 1
-                    ? "bg-[#0EA5E9] text-white"
+                    ? "bg-[#1e40af] text-white"
                     : "bg-emerald-500 text-white"
                 )}
               >
@@ -277,7 +321,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
               <span
                 className={cn(
                   "text-xs font-semibold hidden sm:block",
-                  step === 1 ? "text-[#0EA5E9]" : "text-emerald-600"
+                  step === 1 ? "text-[#1e40af]" : "text-emerald-600"
                 )}
               >
                 Project Brief
@@ -288,7 +332,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
             <div
               className={cn(
                 "w-12 h-px transition-colors",
-                step === 2 ? "bg-[#0EA5E9]" : "bg-gray-200"
+                step === 2 ? "bg-[#1e40af]" : "bg-gray-200"
               )}
             />
 
@@ -298,7 +342,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                 className={cn(
                   "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors",
                   step === 2
-                    ? "bg-[#0EA5E9] text-white"
+                    ? "bg-[#1e40af] text-white"
                     : "bg-gray-200 text-gray-400"
                 )}
               >
@@ -307,7 +351,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
               <span
                 className={cn(
                   "text-xs font-semibold hidden sm:block",
-                  step === 2 ? "text-[#0EA5E9]" : "text-gray-400"
+                  step === 2 ? "text-[#1e40af]" : "text-gray-400"
                 )}
               >
                 Confirm &amp; Pay
@@ -335,7 +379,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                   <select
                     onChange={(e) => handleSelectTemplate(e.target.value)}
                     defaultValue=""
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 shrink-0"
+                    className="bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 shrink-0"
                   >
                     <option value="" disabled>Select template…</option>
                     {savedTemplates.map((t) => (
@@ -348,8 +392,8 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
               {/* Vibe & Style */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center">
-                    <Film className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <Film className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900">Vibe &amp; Style</h3>
@@ -368,7 +412,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                         className={cn(
                           "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all",
                           active
-                            ? "bg-[#0EA5E9]/10 border-[#0EA5E9] text-[#0EA5E9] shadow-sm"
+                            ? "bg-[#1e40af]/10 border-[#1e40af] text-[#1e40af] shadow-sm"
                             : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
                         )}
                       >
@@ -396,7 +440,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     <select
                       value={musicPref}
                       onChange={(e) => setMusicPref(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                     >
                       <option value="upbeat">Upbeat &amp; fast</option>
                       <option value="lofi">Lo-fi &amp; chill</option>
@@ -415,7 +459,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     <select
                       value={colorLook}
                       onChange={(e) => setColorLook(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                      className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                     >
                       <option value="neutral">Neutral &amp; clean</option>
                       <option value="bright">Bright &amp; vibrant</option>
@@ -430,8 +474,8 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
               {/* Reference URLs */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center">
-                    <Link2 className="w-3.5 h-3.5 text-[#0EA5E9]" />
+                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <Link2 className="w-3.5 h-3.5 text-[#1e40af]" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900">Reference videos</h3>
@@ -445,7 +489,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                         value={url}
                         onChange={(e) => handleUrlChange(idx, e.target.value)}
                         placeholder="https://youtube.com/watch?v=..."
-                        className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                        className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                       />
                       {referenceUrls.length > 1 && (
                         <button
@@ -463,7 +507,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     <button
                       type="button"
                       onClick={handleAddUrl}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[#0EA5E9] hover:text-sky-700 transition-colors"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[#1e40af] hover:text-blue-900 transition-colors"
                     >
                       <Plus className="w-3.5 h-3.5" /> Add another link
                     </button>
@@ -490,7 +534,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     placeholder="Specific sound effects, intros, lower thirds..."
                     maxLength={500}
                     rows={2}
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                   />
                 </div>
 
@@ -504,7 +548,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     placeholder="Certain transitions, copyright tracks, fast zooms..."
                     maxLength={500}
                     rows={2}
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                   />
                 </div>
 
@@ -518,7 +562,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     placeholder="Describe your timeline flow, pacing, custom text, or anything else your editor should know..."
                     maxLength={1000}
                     rows={4}
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20 focus:border-[#0EA5E9]/50"
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]/50"
                   />
                   <p className="text-[10px] text-gray-400 text-right mt-1">
                     {additionalNotes.length}/1000
@@ -541,17 +585,17 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                 <div className="space-y-3 pt-1">
                   {/* Extra Fast Delivery */}
                   {pkg.deliveryDays > 1 && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
                       <input
                         type="checkbox"
                         checked={addOns.extraFast}
                         onChange={(e) => setAddOns(prev => ({ ...prev, extraFast: e.target.checked }))}
-                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                        className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-4 h-4 mt-0.5 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
                           <span className="text-xs font-bold text-gray-950">⚡ Extra Fast Delivery</span>
-                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹1,500</span>
+                          <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹1,500</span>
                         </div>
                         <p className="text-[11px] text-gray-550 mt-1">
                           Reduces delivery deadline by 2 days (minimum 1 day). Delivery in {Math.max(1, pkg.deliveryDays - 2)} days.
@@ -562,17 +606,17 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
 
                   {/* Additional Revision */}
                   {pkg.revisionCount !== -1 && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
                       <input
                         type="checkbox"
                         checked={addOns.extraRevision}
                         onChange={(e) => setAddOns(prev => ({ ...prev, extraRevision: e.target.checked }))}
-                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                        className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-4 h-4 mt-0.5 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
                           <span className="text-xs font-bold text-gray-950">🔄 Additional Revision Round</span>
-                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹500</span>
+                          <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹500</span>
                         </div>
                         <p className="text-[11px] text-gray-550 mt-1">
                           Add +1 extra revision round to your package. Total revisions: {pkg.revisionCount + 1}.
@@ -583,17 +627,17 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
 
                   {/* Source Files */}
                   {!pkg.includesSourceFiles && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
                       <input
                         type="checkbox"
                         checked={addOns.sourceFiles}
                         onChange={(e) => setAddOns(prev => ({ ...prev, sourceFiles: e.target.checked }))}
-                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                        className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-4 h-4 mt-0.5 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
                           <span className="text-xs font-bold text-gray-950">📦 Source Files Upgrade</span>
-                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹1,000</span>
+                          <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹1,000</span>
                         </div>
                         <p className="text-[11px] text-gray-550 mt-1">
                           Receive raw project assets (Premiere/After Effects files) upon completion.
@@ -604,17 +648,17 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
 
                   {/* Commercial Rights */}
                   {!pkg.includesCommercialRights && (
-                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-sky-100 bg-gray-50/30 hover:bg-sky-50/10 cursor-pointer select-none transition-all">
+                    <label className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-100 bg-gray-50/30 hover:bg-blue-50/10 cursor-pointer select-none transition-all">
                       <input
                         type="checkbox"
                         checked={addOns.commercialRights}
                         onChange={(e) => setAddOns(prev => ({ ...prev, commercialRights: e.target.checked }))}
-                        className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4 mt-0.5 shrink-0"
+                        className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-4 h-4 mt-0.5 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline gap-2">
                           <span className="text-xs font-bold text-gray-950">💼 Commercial Use License</span>
-                          <span className="text-xs font-extrabold text-[#0EA5E9] shrink-0">+₹750</span>
+                          <span className="text-xs font-extrabold text-[#1e40af] shrink-0">+₹750</span>
                         </div>
                         <p className="text-[11px] text-gray-550 mt-1">
                           Grants full commercial rights for promotional, advertising, or business use.
@@ -632,7 +676,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     type="checkbox"
                     checked={saveAsTemplate}
                     onChange={(e) => setSaveAsTemplate(e.target.checked)}
-                    className="rounded border-gray-300 text-[#0EA5E9] focus:ring-[#0EA5E9] w-4 h-4"
+                    className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af] w-4 h-4"
                   />
                   <span className="text-sm font-medium text-gray-700">
                     Save this brief as a reusable template
@@ -643,7 +687,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     value={templateName}
                     onChange={(e) => setTemplateName(e.target.value)}
                     placeholder='e.g. "Gaming Highlight Montage"'
-                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/20"
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20"
                   />
                 )}
               </div>
@@ -651,7 +695,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="w-full py-3.5 rounded-xl font-semibold text-white text-sm bg-[#0EA5E9] hover:bg-sky-600 flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-3.5 rounded-xl font-semibold text-white text-sm bg-[#1e40af] hover:bg-brand-primary flex items-center justify-center gap-2 transition-colors"
               >
                 Proceed to Payment <ArrowRight className="w-4 h-4" />
               </button>
@@ -715,7 +759,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     )}
                     <div className="flex justify-between font-bold text-gray-900 text-base border-t border-gray-100 pt-3">
                       <span>Total charge</span>
-                      <span className="tabular-nums text-[#0EA5E9]">{formatCurrency(chargeAmount)}</span>
+                      <span className="tabular-nums text-[#1e40af]">{formatCurrency(chargeAmount)}</span>
                     </div>
                   </div>
 
@@ -731,7 +775,7 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 py-3.5 rounded-xl font-semibold text-white text-sm bg-[#0EA5E9] hover:bg-sky-600 flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+                      className="flex-1 py-3.5 rounded-xl font-semibold text-white text-sm bg-[#1e40af] hover:bg-brand-primary flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
                     >
                       {loading ? (
                         <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
@@ -749,8 +793,8 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
         {/* Package summary sidebar */}
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sticky top-6">
-            <div className="bg-gradient-to-br from-[#0EA5E9]/8 to-sky-50 px-5 py-4 border-b border-gray-100">
-              <p className="text-[10px] font-semibold text-[#0EA5E9] uppercase tracking-widest mb-1">
+            <div className="bg-gradient-to-br from-[#1e40af]/8 to-blue-50 px-5 py-4 border-b border-gray-100">
+              <p className="text-[10px] font-semibold text-[#1e40af] uppercase tracking-widest mb-1">
                 Your Order
               </p>
               <p className="font-bold text-gray-900 text-sm leading-snug">{pkg.title}</p>
@@ -773,8 +817,16 @@ export default function CheckoutForm({ pkg, availableCredits }: Props) {
                 </span>
               </div>
               <div className="border-t border-gray-100 pt-3 flex justify-between">
-                <span className="text-gray-400">Package price</span>
-                <span className="font-bold text-gray-900 tabular-nums">{formatCurrency(subtotal)}</span>
+                <span className="text-gray-400">Subtotal</span>
+                <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(subtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Processing fee ({processingFeePct}%)</span>
+                <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(processingFee)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 font-semibold">Total charge</span>
+                <span className="font-bold text-[#1e40af] tabular-nums">{formatCurrency(fullTotal)}</span>
               </div>
             </div>
             {pkg.description && (
