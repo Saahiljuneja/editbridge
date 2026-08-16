@@ -51,7 +51,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/client/transactions", label: "Payments",     icon: CreditCard },
       { href: "/client/wallet",       label: "My Wallet",    icon: Wallet },
       { href: "/client/rewards",      label: "Rewards & XP", icon: Zap },
-      { href: "/client/xp-shop",      label: "XP Shop",      icon: Store },
+      { href: "/client/xp-store",      label: "XP Shop",      icon: Store },
       { href: "/client/membership",   label: "Membership",   icon: Crown },
       { href: "/client/referral",     label: "Refer & Earn", icon: Gift },
     ],
