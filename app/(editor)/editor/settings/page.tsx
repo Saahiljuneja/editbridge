@@ -39,7 +39,7 @@ function SectionHeader({ title, desc }: { title: string; desc?: string }) {
   return (
     <div className="px-6 py-4 border-b border-gray-100">
       <p className="font-semibold text-gray-900 text-sm flex items-center gap-2">
-        <span className="w-[3px] h-3.5 rounded-full bg-[#7C3AED] shrink-0" />
+        <span className="w-[3px] h-3.5 rounded-full bg-[#1e40af] shrink-0" />
         {title}
       </p>
       {desc && <p className="text-xs text-gray-400 mt-0.5 pl-[11px]">{desc}</p>}
@@ -71,7 +71,7 @@ function SaveButton({ loading, label = "Save changes" }: { loading: boolean; lab
     <button
       type="submit"
       disabled={loading}
-      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#7C3AED] hover:bg-violet-700 disabled:opacity-50 transition-colors shadow-sm shadow-violet-200"
+      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-blue-900 disabled:opacity-50 transition-colors shadow-sm shadow-blue-200"
     >
       {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
       {loading ? "Saving…" : label}
@@ -155,7 +155,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Your full name"
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
             />
           </div>
           <div className="space-y-1.5">
@@ -167,7 +167,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               onChange={e => setDisplayName(e.target.value)}
               placeholder="e.g. Alex V. — leave blank to use your full name"
               maxLength={40}
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
             />
             <p className="text-xs text-gray-400">Shown on your public profile card instead of your full name</p>
           </div>
@@ -193,7 +193,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Professional Wedding & Cinematic Editor"
               maxLength={120}
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
             />
             <p className="text-xs text-gray-400">{title.length}/120 · Shown on your profile card</p>
           </div>
@@ -205,7 +205,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               placeholder="Describe your editing style, experience, and what makes your work unique…"
               maxLength={2000}
               rows={5}
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 resize-none"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e40af]/30 resize-none"
             />
             <p className="text-xs text-gray-400">{bio.length}/2000</p>
           </div>
@@ -218,7 +218,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               onChange={e => setLocation(e.target.value)}
               placeholder="e.g. Mumbai, India"
               maxLength={60}
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
             />
             <p className="text-xs text-gray-400">Shown on your public profile</p>
           </div>
@@ -232,7 +232,7 @@ function ProfileTab({ session, update }: { session: ReturnType<typeof useSession
               onChange={e => setFeaturedVideoUrl(e.target.value)}
               placeholder="https://youtube.com/watch?v=…"
               type="url"
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
             />
             <p className="text-xs text-gray-400">Shown at the top of your public profile</p>
           </div>
@@ -400,7 +400,7 @@ function TwoFactorSection() {
               </button>
               <button
                 onClick={finishSetup}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-violet-700 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e40af] text-white text-sm font-semibold hover:bg-blue-900 transition-colors"
               >
                 <Check className="w-3.5 h-3.5" /> I've saved these codes
               </button>
@@ -424,14 +424,14 @@ function TwoFactorSection() {
                 onChange={(e) => setVerifyCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
-                className="rounded-xl border-gray-200 text-center font-mono tracking-widest focus-visible:ring-[#7C3AED]/30"
+                className="rounded-xl border-gray-200 text-center font-mono tracking-widest focus-visible:ring-[#1e40af]/30"
               />
             </div>
             <div className="flex gap-2">
               <button
                 onClick={confirmSetup}
                 disabled={busy || verifyCode.length !== 6}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-violet-700 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e40af] text-white text-sm font-semibold hover:bg-blue-900 disabled:opacity-50 transition-colors"
               >
                 {busy ? "Verifying…" : "Confirm & enable"}
               </button>
@@ -541,7 +541,7 @@ function TwoFactorSection() {
                   </button>
                   <button
                     onClick={() => { setRegeneratedCodes([]); setShowRegenerate(false); }}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-violet-700 transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1e40af] text-white text-sm font-semibold hover:bg-blue-900 transition-colors"
                   >
                     <Check className="w-3.5 h-3.5" /> I&apos;ve saved these
                   </button>
@@ -557,7 +557,7 @@ function TwoFactorSection() {
             <button
               onClick={startSetup}
               disabled={busy}
-              className="px-4 py-2 rounded-xl bg-[#7C3AED] text-white text-sm font-semibold hover:bg-violet-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 rounded-xl bg-[#1e40af] text-white text-sm font-semibold hover:bg-blue-900 disabled:opacity-50 transition-colors"
             >
               {busy ? "Starting…" : "Enable 2FA"}
             </button>
@@ -617,16 +617,16 @@ function SecurityTab() {
         <form onSubmit={handleChangePassword} className="p-6 space-y-4">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">Current password</Label>
-            <Input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} autoComplete="current-password" className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30" />
+            <Input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} autoComplete="current-password" className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">New password</Label>
-              <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30" />
+              <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">Confirm</Label>
-              <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30" />
+              <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} autoComplete="new-password" className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30" />
             </div>
           </div>
           {newPassword.length > 0 && (
@@ -797,9 +797,9 @@ function PaymentsTab() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-violet-100 bg-violet-50 px-5 py-4 text-sm text-[#7C3AED]">
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-[#1e40af]">
         <p className="font-semibold mb-0.5">How payouts work</p>
-        <p className="text-xs text-violet-700 leading-relaxed">
+        <p className="text-xs text-blue-700 leading-relaxed">
           Earnings are released 7 days after an order is marked complete. Funds are transferred to your registered bank account via NEFT/IMPS. A 20% platform fee is deducted from each order.
         </p>
       </div>
@@ -846,7 +846,7 @@ function PaymentsTab() {
               value={accountName}
               onChange={e => setAccountName(e.target.value)}
               placeholder="Name as per bank records"
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -857,7 +857,7 @@ function PaymentsTab() {
                 onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ""))}
                 placeholder="1234567890"
                 inputMode="numeric"
-                className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+                className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
               />
             </div>
             <div className="space-y-1.5">
@@ -867,7 +867,7 @@ function PaymentsTab() {
                 onChange={e => setIfsc(e.target.value.toUpperCase())}
                 placeholder="SBIN0001234"
                 maxLength={11}
-                className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30 font-mono"
+                className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30 font-mono"
               />
             </div>
           </div>
@@ -885,7 +885,7 @@ function PaymentsTab() {
               onChange={e => setPanNumber(e.target.value.toUpperCase().slice(0, 10))}
               placeholder="ABCDE1234F"
               maxLength={10}
-              className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30 font-mono uppercase"
+              className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30 font-mono uppercase"
             />
             <p className="text-xs text-gray-400">10 characters — 5 letters, 4 digits, 1 letter</p>
           </div>
@@ -1039,9 +1039,9 @@ function TemplatesTab() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-violet-100 bg-violet-50 px-5 py-4 text-sm text-[#7C3AED]">
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-[#1e40af]">
         <p className="font-semibold mb-0.5">Using templates in chat</p>
-        <p className="text-xs text-violet-700 leading-relaxed">
+        <p className="text-xs text-blue-700 leading-relaxed">
           Type &quot;/&quot; in any order chat to quickly insert a template. If you set a shortcut, typing it
           after the slash (e.g. <span className="font-mono">/thanks</span>) jumps straight to that template.
         </p>
@@ -1058,7 +1058,7 @@ function TemplatesTab() {
               type="button"
               onClick={() => setShowForm(true)}
               disabled={templates.length >= MAX_TEMPLATES}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#7C3AED] text-white text-xs font-semibold hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1e40af] text-white text-xs font-semibold hover:bg-blue-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <Plus className="w-3.5 h-3.5" /> Add template
             </button>
@@ -1074,7 +1074,7 @@ function TemplatesTab() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Thank you for your order"
                 maxLength={60}
-                className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30"
+                className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30"
               />
             </div>
             <div className="space-y-1.5">
@@ -1086,7 +1086,7 @@ function TemplatesTab() {
                   onChange={(e) => setShortcut(e.target.value.replace(/[^a-zA-Z]/g, "").toLowerCase())}
                   placeholder="thanks"
                   maxLength={20}
-                  className="rounded-xl border-gray-200 focus-visible:ring-[#7C3AED]/30 font-mono"
+                  className="rounded-xl border-gray-200 focus-visible:ring-[#1e40af]/30 font-mono"
                 />
               </div>
             </div>
@@ -1098,7 +1098,7 @@ function TemplatesTab() {
                 placeholder="Thank you for your order! I'll get started right away."
                 maxLength={1000}
                 rows={3}
-                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/30 resize-none"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e40af]/30 resize-none"
               />
               <p className="text-xs text-gray-400 text-right">{content.length}/1000</p>
             </div>
@@ -1133,7 +1133,7 @@ function TemplatesTab() {
                 className={cn(
                   "flex items-start gap-3 px-6 py-4 transition-colors",
                   draggingId === t.id && "opacity-40",
-                  dragOverId === t.id && "bg-[#7C3AED]/5"
+                  dragOverId === t.id && "bg-[#1e40af]/5"
                 )}
               >
                 <GripVertical className="w-4 h-4 text-gray-300 mt-0.5 cursor-grab shrink-0" />
@@ -1150,7 +1150,7 @@ function TemplatesTab() {
                   <button
                     type="button"
                     onClick={() => startEdit(t)}
-                    className="p-1.5 rounded-lg text-gray-300 hover:text-[#7C3AED] hover:bg-violet-50/5 transition-colors"
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-[#1e40af] hover:bg-blue-50/5 transition-colors"
                     aria-label="Edit template"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -1244,7 +1244,7 @@ export default function EditorSettingsPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-100 px-6 py-5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#7C3AED] via-violet-400 to-violet-300" />
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#1e40af] via-blue-500 to-blue-400" />
         <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2 mt-1">
           Account Settings
         </h1>
@@ -1261,7 +1261,7 @@ export default function EditorSettingsPage() {
               className={cn(
                 "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap shrink-0",
                 activeTab === tab.id
-                  ? "border-[#7C3AED] text-[#7C3AED] bg-violet-50/60"
+                  ? "border-[#1e40af] text-[#1e40af] bg-blue-50/60"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
               )}
             >
