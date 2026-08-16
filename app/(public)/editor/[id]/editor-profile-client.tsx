@@ -481,6 +481,50 @@ function PortfolioLightbox({ items, index, onClose, onNavigate, editorName, edit
   );
 }
 
+// ── Tool icon map: known software → abbr label + color theme ──
+const TOOL_STYLES: Record<string, { abbr: string; bg: string; text: string; badge: string }> = {
+  "premiere pro":       { abbr: "Pr", bg: "bg-indigo-50",  text: "text-indigo-700",  badge: "bg-indigo-600" },
+  "after effects":      { abbr: "Ae", bg: "bg-violet-50",  text: "text-violet-700",  badge: "bg-violet-600" },
+  "davinci resolve":    { abbr: "DV", bg: "bg-orange-50",  text: "text-orange-700",  badge: "bg-orange-500" },
+  "final cut pro":      { abbr: "FC", bg: "bg-sky-50",     text: "text-sky-700",     badge: "bg-sky-500" },
+  "capcut":             { abbr: "CC", bg: "bg-rose-50",    text: "text-rose-700",    badge: "bg-rose-500" },
+  "avid media composer":{ abbr: "Av", bg: "bg-teal-50",    text: "text-teal-700",    badge: "bg-teal-600" },
+  "sony vegas":         { abbr: "SV", bg: "bg-amber-50",   text: "text-amber-700",   badge: "bg-amber-500" },
+  "kdenlive":           { abbr: "Kd", bg: "bg-green-50",   text: "text-green-700",   badge: "bg-green-600" },
+  "blender":            { abbr: "Bl", bg: "bg-orange-50",  text: "text-orange-700",  badge: "bg-orange-400" },
+  "motion":             { abbr: "Mo", bg: "bg-sky-50",     text: "text-sky-700",     badge: "bg-sky-400" },
+  "resolve":            { abbr: "DV", bg: "bg-orange-50",  text: "text-orange-700",  badge: "bg-orange-500" },
+};
+
+function ToolChip({ tool }: { tool: string }) {
+  const key = tool.toLowerCase().replace(/_/g, " ");
+  const style = TOOL_STYLES[key];
+  if (style) {
+    return (
+      <span className={cn("inline-flex items-center gap-1.5 text-xs rounded-xl px-3 py-1.5 font-bold shadow-sm border border-transparent", style.bg, style.text)}>
+        <span className={cn("w-[18px] h-[18px] rounded text-white text-[7px] font-black flex items-center justify-center shrink-0", style.badge)}>
+          {style.abbr}
+        </span>
+        {tool.replace(/_/g, " ")}
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl px-3.5 py-1.5 font-bold shadow-sm">
+      {tool.replace(/_/g, " ")}
+    </span>
+  );
+}
+
+function SectionHeading({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <h2 className={cn("text-sm font-black text-neutral-900 uppercase tracking-widest flex items-center gap-2.5", className)}>
+      <span className="w-[3px] h-3.5 rounded-full bg-neutral-800 shrink-0" />
+      {children}
+    </h2>
+  );
+}
+
 function formatRelativeTime(dateStr: string): string {
   try {
     const date = new Date(dateStr);
@@ -865,7 +909,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             {/* 2. About me */}
             {editor.bio && (
               <section className="py-8">
-                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-3">About me</h2>
+                <SectionHeading className="mb-3">About me</SectionHeading>
                 <p className={`text-sm text-neutral-500 leading-relaxed font-medium ${!bioExpanded && bioLong ? "line-clamp-6" : ""}`}>
                   {editor.bio}
                 </p>
@@ -969,33 +1013,45 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
               <div className="border-t border-neutral-100/70" />
 
               {/* Platform Metrics */}
-              <div className="space-y-3.5">
+              <div className="space-y-3">
                 <p className="text-[10px] font-extrabold text-neutral-455 uppercase tracking-widest">Stats</p>
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-neutral-450">Orders completed</span>
-                    <span className="text-neutral-900 font-extrabold">{editor.totalOrders}</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-neutral-50 rounded-2xl px-3.5 py-3 border border-neutral-100">
+                    <p className="text-xl font-black text-neutral-900 leading-none">{editor.totalOrders}</p>
+                    <p className="text-[10px] font-bold text-neutral-450 mt-1">Orders done</p>
                   </div>
+                  {editor.avgRating ? (
+                    <div className="bg-amber-50 rounded-2xl px-3.5 py-3 border border-amber-100">
+                      <p className="text-xl font-black text-amber-600 leading-none">{editor.avgRating}</p>
+                      <p className="text-[10px] font-bold text-amber-500 mt-1">Avg rating</p>
+                    </div>
+                  ) : (
+                    <div className="bg-neutral-50 rounded-2xl px-3.5 py-3 border border-neutral-100">
+                      <p className="text-xl font-black text-neutral-400 leading-none">—</p>
+                      <p className="text-[10px] font-bold text-neutral-400 mt-1">Avg rating</p>
+                    </div>
+                  )}
                   {editor.completionRate !== null && (
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-neutral-450">Completion rate</span>
-                      <span className="text-neutral-900 font-extrabold">{editor.completionRate}%</span>
+                    <div className="bg-emerald-50 rounded-2xl px-3.5 py-3 border border-emerald-100">
+                      <p className="text-xl font-black text-emerald-700 leading-none">{editor.completionRate}%</p>
+                      <p className="text-[10px] font-bold text-emerald-600/80 mt-1">Completion</p>
                     </div>
                   )}
                   {editor.avgResponseTime !== null && (
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-neutral-450">Avg response time</span>
-                      <span className="text-neutral-900 font-extrabold">
-                        {editor.avgResponseTime < 60
-                          ? `${editor.avgResponseTime}m`
-                          : `${Math.round(editor.avgResponseTime / 60)}h`}
-                      </span>
+                    <div className="bg-sky-50 rounded-2xl px-3.5 py-3 border border-sky-100">
+                      <p className="text-xl font-black text-sky-700 leading-none">
+                        {editor.avgResponseTime < 60 ? `${editor.avgResponseTime}m` : `${Math.round(editor.avgResponseTime / 60)}h`}
+                      </p>
+                      <p className="text-[10px] font-bold text-sky-600/80 mt-1">Response</p>
                     </div>
                   )}
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-neutral-450">Profile views</span>
-                    <span className="text-neutral-900 font-extrabold">{editor.viewCount?.toLocaleString() ?? 0}</span>
-                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs font-bold pt-0.5">
+                  <span className="text-neutral-450">Profile views</span>
+                  <span className="flex items-center gap-1 text-neutral-700 font-extrabold">
+                    <Eye className="w-3 h-3 text-neutral-400" />
+                    {editor.viewCount?.toLocaleString() ?? 0}
+                  </span>
                 </div>
               </div>
 
@@ -1009,7 +1065,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           {/* Skills & Tools (Full-width, Borderless row) */}
           {(editor.skills.length > 0 || editor.tools.length > 0 || workStyleTags.length > 0) && (
             <section className="py-8">
-              <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-6">Skills & Tools</h2>
+              <SectionHeading className="mb-6">Skills &amp; Tools</SectionHeading>
               <div className="space-y-6">
                 {/* Skills */}
                 {editor.skills.length > 0 && (
@@ -1029,7 +1085,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                     <h3 className="text-xs font-extrabold text-neutral-450 uppercase tracking-wider mb-3">Software</h3>
                     <div className="flex flex-wrap gap-2">
                       {editor.tools.map(t => (
-                        <span key={t} className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl px-3.5 py-1.5 font-bold shadow-sm">{t}</span>
+                        <ToolChip key={t} tool={t} />
                       ))}
                     </div>
                   </div>
@@ -1058,7 +1114,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
             if (clientsList.length === 0) return null;
             return (
               <section className="py-8 overflow-hidden">
-                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-4">Notable Clients & Brands</h2>
+                <SectionHeading className="mb-4">Notable Clients &amp; Brands</SectionHeading>
                 <div className="relative w-full overflow-hidden">
                   <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
                   <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
@@ -1101,11 +1157,17 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
 
           {/* 4. Portfolio */}
           <section className="py-8">
-            <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-1">Portfolio</h2>
-            <p className="text-xs text-neutral-450 font-semibold mb-6">Past work samples and completed projects</p>
+            <SectionHeading className="mb-1">Portfolio</SectionHeading>
+            <p className="text-xs text-neutral-450 font-semibold mt-1 mb-6">Past work samples and completed projects</p>
             {editor.portfolioItems.length === 0 ? (
-              <div className="border border-dashed border-neutral-200 rounded-2xl p-10 text-center text-neutral-450 font-semibold text-sm">
-                No portfolio items uploaded yet.
+              <div className="flex flex-col items-center justify-center py-16 border border-dashed border-neutral-200 rounded-2xl text-center bg-neutral-50/30">
+                <div className="w-14 h-14 rounded-2xl bg-neutral-100 flex items-center justify-center mb-4">
+                  <Play className="w-7 h-7 text-neutral-400" />
+                </div>
+                <p className="font-extrabold text-neutral-600 text-sm">No portfolio yet</p>
+                <p className="text-xs text-neutral-400 font-medium mt-1.5 max-w-xs leading-relaxed">
+                  This editor hasn&apos;t uploaded work samples yet. You can still request a quote or message them directly.
+                </p>
               </div>
             ) : (
               <>
@@ -1135,8 +1197,8 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           <section id="packages" className="py-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest">Packages & Tiers</h2>
-                <p className="text-xs text-neutral-450 font-semibold mt-0.5">Fixed-scope packages with clear deliverables</p>
+                <SectionHeading>Packages &amp; Tiers</SectionHeading>
+                <p className="text-xs text-neutral-450 font-semibold mt-1">Fixed-scope packages with clear deliverables</p>
               </div>
               {editor.packages.length > 0 && (
                 <span className="text-[10px] font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 px-2.5 py-1 rounded-full">
@@ -1434,32 +1496,38 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           {editor.reviews.length > 0 && (
             <section className="py-8">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
-                <h2 className="text-sm font-black text-neutral-900 uppercase tracking-widest">
-                  Reviews ({editor.reviewCount})
-                </h2>
+                <SectionHeading>Reviews ({editor.reviewCount})</SectionHeading>
               </div>
 
               {/* Rating Breakdown Graph */}
               {editor.reviewCount > 0 && editor.ratingDistribution && (
-                <div className="bg-neutral-50/50 border border-neutral-200/50 rounded-2xl p-5 mb-6 flex flex-col gap-2.5">
-                  <p className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">Rating Breakdown</p>
-                  <div className="space-y-2">
-                    {[5, 4, 3, 2, 1].map((stars, idx) => {
-                      const pct = editor.ratingDistribution ? (editor.ratingDistribution[idx] ?? 0) : 0;
-                      return (
-                        <div key={stars} className="flex items-center gap-3 text-xs">
-                          <span className="w-8 font-extrabold text-neutral-500 flex items-center gap-0.5 shrink-0">
-                            {stars}★
-                          </span>
-                          <div className="flex-1 h-2.5 bg-neutral-200/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                <div className="bg-neutral-50/50 border border-neutral-200/50 rounded-2xl p-5 mb-6">
+                  <div className="flex gap-6 items-center">
+                    {/* Left: big score */}
+                    <div className="shrink-0 flex flex-col items-center gap-1.5 min-w-[72px]">
+                      <span className="text-5xl font-black text-neutral-900 leading-none tabular-nums">
+                        {editor.avgRating?.toFixed(1) ?? "—"}
+                      </span>
+                      <Stars rating={editor.avgRating ?? 0} />
+                      <span className="text-[10px] font-bold text-neutral-400 text-center leading-snug">
+                        {editor.reviewCount} review{editor.reviewCount !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    {/* Right: bars */}
+                    <div className="flex-1 space-y-2">
+                      {[5, 4, 3, 2, 1].map((stars, idx) => {
+                        const pct = editor.ratingDistribution ? (editor.ratingDistribution[idx] ?? 0) : 0;
+                        return (
+                          <div key={stars} className="flex items-center gap-2.5 text-xs">
+                            <span className="w-4 font-extrabold text-neutral-500 shrink-0 text-right">{stars}</span>
+                            <div className="flex-1 h-2 bg-neutral-200/50 rounded-full overflow-hidden">
+                              <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="w-7 text-right font-bold text-neutral-400 shrink-0 text-[10px]">{pct}%</span>
                           </div>
-                          <span className="w-8 text-right font-extrabold text-neutral-400 shrink-0">
-                            {pct}%
-                          </span>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1499,11 +1567,17 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           <Avatar src={editor.image} name={displayName} size={40} activeFrame={editor.activeFrame} />
           <div className="min-w-0">
             <p className="text-xs font-bold text-neutral-900 truncate">{displayName}</p>
-            {editor.packages.length > 0 && (
+            {editor.avgRating ? (
+              <div className="flex items-center gap-1 mt-0.5">
+                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 shrink-0" />
+                <span className="text-[10px] font-extrabold text-amber-600">{editor.avgRating}</span>
+                <span className="text-[10px] text-neutral-400">({editor.reviewCount})</span>
+              </div>
+            ) : editor.packages.length > 0 ? (
               <p className="text-[10px] font-semibold text-neutral-400">
-                Starting from {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                From {(Math.min(...editor.packages.map(p => p.price)) / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
               </p>
-            )}
+            ) : null}
           </div>
         </div>
         <div className="shrink-0 flex items-center gap-2">
