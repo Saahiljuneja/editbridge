@@ -2,6 +2,14 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { db } from "@/lib/db";
+import { platformSettings } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
+import {
+  readMaintenanceCache,
+  writeMaintenanceCache,
+  isWithinMaintenanceWindow,
+} from "@/lib/maintenance-cache";
 
 const { auth } = NextAuth(authConfig);
 
@@ -13,17 +21,33 @@ const ADMIN_ROLES = new Set([
   "staff_moderation",
 ]);
 
-async function isMaintenanceOn(origin: string): Promise<boolean> {
-  try {
-    const res = await fetch(`${origin}/api/maintenance-check`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (!res.ok) return false;
-    const data = await res.json() as { on?: boolean };
-    return data.on === true;
-  } catch {
-    return false;
+async function isMaintenanceOn(): Promise<boolean> {
+  let state = readMaintenanceCache();
+
+  if (!state) {
+    try {
+      const rows = await db
+        .select({ key: platformSettings.key, value: platformSettings.value })
+        .from(platformSettings)
+        .where(inArray(platformSettings.key, ["maintenance_mode", "maintenance_start", "maintenance_end"]));
+
+      const map: Record<string, string> = {};
+      for (const row of rows) map[row.key] = row.value;
+
+      state = {
+        manualOn: map.maintenance_mode === "true",
+        windowStart: map.maintenance_start ?? "",
+        windowEnd: map.maintenance_end ?? "",
+      };
+      writeMaintenanceCache(state);
+    } catch (err) {
+      console.warn("[middleware] Failed to read platform maintenance settings from database, assuming off:", err);
+      return false;
+    }
   }
+
+  const windowActive = isWithinMaintenanceWindow(state.windowStart, state.windowEnd);
+  return state.manualOn || windowActive;
 }
 
 // Paths that require any authenticated session (client routes).
@@ -64,7 +88,7 @@ export default auth(async (req: NextRequest & { auth: { user?: { role?: string; 
     !pathname.startsWith("/api/maintenance-check") &&
     role !== "admin"
   ) {
-    const maintenance = await isMaintenanceOn(req.nextUrl.origin);
+    const maintenance = await isMaintenanceOn();
     if (maintenance) {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json(

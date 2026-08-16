@@ -23,7 +23,7 @@ function googleDnsLookup(
   });
 }
 
-neonConfig.fetch = async function customFetch(
+(neonConfig as any).fetch = async function customFetch(
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> {
