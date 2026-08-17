@@ -371,7 +371,7 @@ export function PaymentsClient({
             </div>
           </div>
 
-          <div className="h-[180px]">
+          <div className="h-[180px]" style={{ pointerEvents: "none" }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                 <defs>
