@@ -6,10 +6,10 @@ import { EDITOR_LEVELS, calcEditorLevel } from "@/lib/xp-shop-config";
 // ─── Level thresholds ─────────────────────────────────────────────────────────
 
 export const CLIENT_LEVELS = [
-  { name: "bronze",   min: 0,      max: 499,     label: "Bronze", emoji: "🥉" },
-  { name: "silver",   min: 500,    max: 1999,    label: "Silver", emoji: "🥈" },
-  { name: "gold",     min: 2000,   max: 4999,    label: "Gold", emoji: "🥇" },
-  { name: "platinum", min: 5000,   max: Infinity, label: "Platinum", emoji: "💎" },
+  { name: "bronze",   min: 0,    max: 499,     label: "Bronze",   emoji: "🥉" },
+  { name: "silver",   min: 500,  max: 1999,    label: "Silver",   emoji: "🥈" },
+  { name: "gold",     min: 2000, max: 4999,    label: "Gold",     emoji: "🥇" },
+  { name: "platinum", min: 5000, max: Infinity, label: "Platinum", emoji: "💎" },
 ] as const;
 
 export const LEVELS = CLIENT_LEVELS; // Legacy compatibility
@@ -84,7 +84,7 @@ async function awardBadge(userId: string, badge: string) {
 }
 
 const LEVEL_RANK: Record<string, number> = {
-  bronze: 0, silver: 1, gold: 2, platinum: 3,
+  bronze: 0, silver: 1, gold: 2, platinum: 3, vip: 4, elite: 5,
   level1: 0, level2: 1, level3: 2, level4: 3, level5: 4, level6: 5, level7: 6,
 };
 
@@ -114,9 +114,11 @@ async function addPoints(userId: string, amount: number, reason: string, metadat
     if (leveledUp) {
       const perks: Record<string, string> = {
         bronze:   "",
-        silver:   "You can now offer 4 packages. Clients also get a discount on orders with you.",
-        gold:     "You're featured in browse results! Clients get a bigger discount.",
-        platinum: "You've unlocked priority support, custom profile banner, and 10% client discount.",
+        silver:   "You are now a Regular Client!",
+        gold:     "You are now an Active Client!",
+        platinum: "You are now a Pro Client!",
+        vip:      "You've unlocked VIP status with exclusive benefits!",
+        elite:    "You've reached Elite Client status! Highest tier support active.",
         level1:   "",
         level2:   "You've leveled up to Level 2: Rising Editor!",
         level3:   "You've leveled up to Level 3: Skilled Editor!",

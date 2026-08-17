@@ -29,10 +29,10 @@ type LevelMeta = {
 };
 
 const LM: Record<Level, LevelMeta> = {
-  bronze:   { label: "Bronze",   emoji: "🥉", tagline: "Standard Member",   accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.06)",  textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",   border: "border-amber-500/20",  start: 0,    end: 500      },
-  silver:   { label: "Silver",   emoji: "🥈", tagline: "Building Momentum", accent: "#6B7280", ring: "#9CA3AF", glow: "rgba(156,163,175,0.06)", textClass: "text-slate-600",  bgGradient: "from-slate-400/15 to-gray-500/5",     border: "border-slate-400/25",  start: 500,  end: 2000     },
-  gold:     { label: "Gold",     emoji: "🥇", tagline: "Top Supporter",     accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",   textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",   border: "border-yellow-500/25", start: 2000, end: 5000     },
-  platinum: { label: "Platinum", emoji: "💎", tagline: "Elite Status",      accent: "#4F46E5", ring: "#818CF8", glow: "rgba(129,140,248,0.1)",  textClass: "text-indigo-600", bgGradient: "from-indigo-500/15 to-purple-600/5",  border: "border-indigo-500/25", start: 5000, end: Infinity },
+  bronze:   { label: "Bronze",   emoji: "🥉", tagline: "Getting Started",  accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.06)",  textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",  border: "border-amber-500/20",  start: 0,    end: 500      },
+  silver:   { label: "Silver",   emoji: "🥈", tagline: "Building Momentum",accent: "#6B7280", ring: "#9CA3AF", glow: "rgba(156,163,175,0.06)", textClass: "text-slate-600",  bgGradient: "from-slate-400/15 to-gray-500/5",    border: "border-slate-400/25",  start: 500,  end: 2000     },
+  gold:     { label: "Gold",     emoji: "🥇", tagline: "Loyal Supporter",  accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",   textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",  border: "border-yellow-500/25", start: 2000, end: 5000     },
+  platinum: { label: "Platinum", emoji: "💎", tagline: "Premium Member",   accent: "#06B6D4", ring: "#22D3EE", glow: "rgba(34,211,238,0.1)",   textClass: "text-cyan-600",   bgGradient: "from-cyan-500/15 to-teal-500/5",     border: "border-cyan-500/25",   start: 5000, end: Infinity },
 };
 
 const LEVEL_ORDER: Level[] = ["bronze", "silver", "gold", "platinum"];
@@ -40,9 +40,9 @@ const LEVEL_XP_LABELS = ["0", "500", "2k", "5k"];
 
 const PERKS: Record<Level, Array<{ icon: string; text: string }>> = {
   bronze:   [{ icon: "👥", text: "Standard matching" },  { icon: "🎧", text: "Basic support" }],
-  silver:   [{ icon: "🏷️", text: "2% off orders" },      { icon: "🎗️", text: "Silver badge" },      { icon: "⚡", text: "Early editor access" }],
-  gold:     [{ icon: "🏷️", text: "5% off orders" },      { icon: "👑", text: "Gold badge" },         { icon: "🎯", text: "Priority matching" },    { icon: "📞", text: "Dedicated support" }],
-  platinum: [{ icon: "🏷️", text: "10% off orders" },     { icon: "💎", text: "Platinum badge" },     { icon: "🔥", text: "Top priority" },         { icon: "🤝", text: "VIP support" }],
+  silver:   [{ icon: "🏷️", text: "2% off orders" },      { icon: "🎗️", text: "Silver badge" },    { icon: "⚡", text: "Early editor access" }],
+  gold:     [{ icon: "🏷️", text: "5% off orders" },      { icon: "🥇", text: "Gold badge" },      { icon: "🎯", text: "Priority matching" },   { icon: "📞", text: "Dedicated support" }],
+  platinum: [{ icon: "🏷️", text: "10% off orders" },     { icon: "💎", text: "Platinum badge" },  { icon: "🔥", text: "Top priority" },        { icon: "🤝", text: "VIP support" }],
 };
 
 const BADGES: Record<string, { label: string; emoji: string; desc: string; hint: string; credit?: string }> = {
@@ -110,6 +110,7 @@ const RING_C = +(2 * Math.PI * RING_R).toFixed(2);
 
 interface StoreProps {
   currentXp: number;
+  totalXp: number;
   activeTypes: string[];
   boostExpiry: Record<string, string | null>;
   ownedBadges: string[];
@@ -255,7 +256,7 @@ export function ClientRewardsClient({ storeProps }: { storeProps: StoreProps }) 
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-gray-600">{data.xp.toLocaleString()} XP</span>
                   <span style={{ color: lm.accent }}>
-                    <strong>{data.xpToNext.toLocaleString()} XP</strong> to {LM[data.nextLevel as Level].label}
+                    <strong>{data.xpToNext.toLocaleString()} XP</strong> to {(LM[data.nextLevel as Level] ?? LM.platinum).label}
                   </span>
                 </div>
                 <div className="h-3 rounded-full overflow-hidden p-0.5" style={{ background: `${lm.ring}18` }}>
@@ -336,11 +337,11 @@ export function ClientRewardsClient({ storeProps }: { storeProps: StoreProps }) 
         <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 mb-5">Membership Tiers</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {([
-            { name: "Bronze",   emoji: "🥉", xp: "0–499",     discount: null,       perks: ["Standard matching", "Basic support"],                     lv: "bronze"   as Level },
-            { name: "Silver",   emoji: "🥈", xp: "500–1,999", discount: "2% off",   perks: ["Silver badge", "Early editor access"],                    lv: "silver"   as Level },
-            { name: "Gold",     emoji: "🥇", xp: "2k–4,999",  discount: "5% off",   perks: ["Gold badge", "Priority matching", "Dedicated support"],   lv: "gold"     as Level },
-            { name: "Platinum", emoji: "💎", xp: "5,000+",    discount: "10% off",  perks: ["Platinum badge", "Top priority", "VIP support"],           lv: "platinum" as Level },
-          ] as const).map(row => {
+            { name: "Bronze",   emoji: "🥉", xp: "0–499 XP",     discount: null,       perks: ["Standard matching", "Basic support"],                     lv: "bronze"   as Level },
+            { name: "Silver",   emoji: "🥈", xp: "500–1,999 XP", discount: "2% off",   perks: ["Silver badge", "Early editor access"],                    lv: "silver"   as Level },
+            { name: "Gold",     emoji: "🥇", xp: "2,000–4,999 XP", discount: "5% off", perks: ["Gold badge", "Priority matching", "Dedicated support"],   lv: "gold"     as Level },
+            { name: "Platinum", emoji: "💎", xp: "5,000+ XP",    discount: "10% off",  perks: ["Platinum badge", "Top priority", "VIP support"],           lv: "platinum" as Level },
+          ]).map(row => {
             const meta = LM[row.lv];
             const isCurrent = row.lv === data.level;
             return (
@@ -589,6 +590,7 @@ export function ClientRewardsClient({ storeProps }: { storeProps: StoreProps }) 
           <div className="p-0">
             <XpStoreClient
               currentXp={storeProps.currentXp}
+              totalXp={storeProps.totalXp}
               activeTypes={storeProps.activeTypes}
               boostExpiry={storeProps.boostExpiry}
               ownedBadges={storeProps.ownedBadges}
