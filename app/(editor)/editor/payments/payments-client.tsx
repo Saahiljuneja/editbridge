@@ -66,6 +66,15 @@ function escapeCsvField(val: unknown): string {
   return `"${safe.replace(/"/g, '""')}"`;
 }
 
+function formatYAxisTick(v: number) {
+  if (v === 0) return "₹0";
+  if (v >= 10000000) return `₹${(v / 10000000).toFixed(1).replace(/\.0$/, "")}Cr`;
+  if (v >= 100000) return `₹${(v / 100000).toFixed(1).replace(/\.0$/, "")}L`;
+  if (v >= 1000) return `₹${(v / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+  return `₹${v}`;
+}
+
+
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ value: number; payload: { tooltipLabel: string } }> }) {
   if (active && payload && payload.length) {
     return (
@@ -240,6 +249,10 @@ export function PaymentsClient({
     return points;
   }, [earningsPayouts, timeFilter]);
 
+  const maxVal = useMemo(() => {
+    return Math.max(...chartData.map(d => d.amount), 0);
+  }, [chartData]);
+
   function handleExport() {
     const list = activeTab === "transactions" ? sortedTransactions : sortedPayouts;
     const headers = activeTab === "transactions"
@@ -323,7 +336,7 @@ export function PaymentsClient({
           <div className="flex items-start justify-between mb-6">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                <TrendingUp className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 -rotate-45 text-gray-450 dark:text-gray-500 shrink-0" />
                 Net Earned
                 <HelpCircle className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 cursor-pointer" />
               </div>
@@ -372,7 +385,7 @@ export function PaymentsClient({
                   dataKey="ts"
                   type="number"
                   domain={["dataMin", "dataMax"]}
-                  tickCount={4}
+                  ticks={maxVal === 0 ? (timeFilter === "month" ? [1, 15, 30] : timeFilter === "year" ? [1, 6, 12] : [2024, 2025, 2026]) : undefined}
                   tickFormatter={(ts) => {
                     const pt = chartData.find(p => p.ts === ts);
                     return pt ? pt.xLabel : "";
@@ -385,7 +398,8 @@ export function PaymentsClient({
                   tick={{ fontSize: 10, fill: "#9ca3af" }}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                  domain={maxVal === 0 ? [0, 1000] : [0, "auto"]}
+                  tickFormatter={formatYAxisTick}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Area
