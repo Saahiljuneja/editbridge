@@ -46,20 +46,24 @@ interface CreditTx {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; border: string; bar: string; hex: string }> = {
-  bronze:   { label: "Bronze",   color: "text-amber-700",   bg: "bg-amber-50",    border: "border-amber-200",   bar: "bg-amber-500",    hex: "#B45309" },
-  silver:   { label: "Silver",   color: "text-slate-600",   bg: "bg-slate-100",   border: "border-slate-200",   bar: "bg-slate-400",    hex: "#475569" },
-  gold:     { label: "Gold",     color: "text-yellow-600",  bg: "bg-yellow-50",   border: "border-yellow-200",  bar: "bg-yellow-500",   hex: "#D97706" },
-  platinum: { label: "Platinum", color: "text-indigo-700",  bg: "bg-indigo-50",   border: "border-indigo-200",  bar: "bg-indigo-500",   hex: "#4F46E5" },
+  bronze:   { label: "New Client",   color: "text-amber-700",   bg: "bg-amber-50",    border: "border-amber-200",   bar: "bg-amber-500",    hex: "#B45309" },
+  silver:   { label: "Regular",      color: "text-slate-600",   bg: "bg-slate-100",   border: "border-slate-200",   bar: "bg-slate-400",    hex: "#475569" },
+  gold:     { label: "Active",       color: "text-yellow-600",  bg: "bg-yellow-50",   border: "border-yellow-200",  bar: "bg-yellow-500",   hex: "#D97706" },
+  platinum: { label: "Pro Client",   color: "text-indigo-700",  bg: "bg-indigo-50",   border: "border-indigo-200",  bar: "bg-indigo-500",   hex: "#4F46E5" },
+  vip:      { label: "VIP Client",   color: "text-purple-700",  bg: "bg-purple-50",   border: "border-purple-200",  bar: "bg-purple-500",   hex: "#8B5CF6" },
+  elite:    { label: "Elite Client", color: "text-pink-700",    bg: "bg-pink-50",     border: "border-pink-200",    bar: "bg-pink-500",     hex: "#EC4899" },
 };
 
-const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000 };
-const LEVEL_MAX:   Record<Level, number> = { bronze: 500, silver: 2000, gold: 5000, platinum: Infinity };
+const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 1000, gold: 3000, platinum: 7500, vip: 15000, elite: 30000 };
+const LEVEL_MAX:   Record<Level, number> = { bronze: 1000, silver: 3000, gold: 7500, platinum: 15000, vip: 30000, elite: Infinity };
 
 const LEVEL_PERKS: Record<Level, { title: string; perks: string[] }> = {
-  bronze:   { title: "Bronze",   perks: ["Standard visibility"] },
-  silver:   { title: "Silver",   perks: ["Silver badge", "2% editor discount"] },
-  gold:     { title: "Gold",     perks: ["Featured in browse", "5% editor discount"] },
-  platinum: { title: "Platinum", perks: ["Top placement", "Custom banner", "10% discount", "Priority support"] },
+  bronze:   { title: "New Client",   perks: ["Standard matching", "Basic support"] },
+  silver:   { title: "Regular",      perks: ["2% off orders", "Silver badge on briefs", "Early editor access"] },
+  gold:     { title: "Active",       perks: ["5% off orders", "Gold badge on briefs", "Priority matching", "Dedicated support"] },
+  platinum: { title: "Pro Client",   perks: ["10% off orders", "Platinum badge on briefs", "Top-priority editor matching", "VIP support"] },
+  vip:      { title: "VIP Client",   perks: ["Priority support Priority SLA", "Exclusive editor recommendations", "Special monthly credits", "Early access to featured editors", "Birthday/anniversary reward", "Higher referral rewards"] },
+  elite:    { title: "Elite Client", perks: ["Highest tier Elite Client status", "Animated badge", "Dedicated manager", "Zero fee checkout promotions"] },
 };
 
 const XP_REASON_LABELS: Record<string, string> = {

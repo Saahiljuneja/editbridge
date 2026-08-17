@@ -20,7 +20,7 @@ export default async function ClientRewardsPage() {
   monthStart.setHours(0, 0, 0, 0);
 
   const [ptsRow, activeBoosts, swapRow] = await Promise.all([
-    db.select({ current: userPoints.current })
+    db.select({ current: userPoints.current, total: userPoints.total })
       .from(userPoints)
       .where(eq(userPoints.userId, userId))
       .limit(1),
@@ -35,6 +35,7 @@ export default async function ClientRewardsPage() {
   ]);
 
   const currentXp        = ptsRow[0]?.current ?? 0;
+  const totalXp          = ptsRow[0]?.total ?? 0;
   const activeTypes      = activeBoosts.map(b => b.type);
   const boostExpiry      = Object.fromEntries(activeBoosts.map(b => [b.type, b.expiresAt?.toISOString() ?? null]));
   const ownedBadges      = activeBoosts.filter(b => PATRON_BADGES.some(p => p.key === b.type)).map(b => b.type);
@@ -42,7 +43,7 @@ export default async function ClientRewardsPage() {
 
   return (
     <ClientRewardsClient
-      storeProps={{ currentXp, activeTypes, boostExpiry, ownedBadges, swapUsedThisMonth }}
+      storeProps={{ currentXp, totalXp, activeTypes, boostExpiry, ownedBadges, swapUsedThisMonth }}
     />
   );
 }

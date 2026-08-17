@@ -48,6 +48,8 @@ const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; bo
   silver:   { label: "Silver",   color: "text-slate-500",  bg: "bg-slate-100",   border: "border-slate-200",  icon: Medal  },
   gold:     { label: "Gold",     color: "text-yellow-600", bg: "bg-yellow-100",  border: "border-yellow-200", icon: Crown  },
   platinum: { label: "Platinum", color: "text-indigo-600", bg: "bg-indigo-100",  border: "border-indigo-200", icon: Zap    },
+  vip:      { label: "VIP Client", color: "text-purple-600", bg: "bg-purple-100",  border: "border-purple-200", icon: Star   },
+  elite:    { label: "Elite Client", color: "text-pink-600", bg: "bg-pink-100",  border: "border-pink-200", icon: Crown  },
 };
 
 const RANK_META = {

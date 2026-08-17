@@ -1,27 +1,28 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, CheckCircle2, Pencil, Trash2 } from "lucide-react";
+import { Building2, CheckCircle2, Pencil, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface Props {
   bankAccountName: string | null;
-  bankAccountNumber: string | null;
+  bankAccountLastFour: string | null;
   bankIfsc: string | null;
 }
 
-export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfsc }: Props) {
+export function BankAccountSection({ bankAccountName, bankAccountLastFour, bankIfsc }: Props) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
   const [accountName, setAccountName] = useState(bankAccountName ?? "");
-  const [accountNumber, setAccountNumber] = useState(bankAccountNumber ?? "");
+  const [accountNumber, setAccountNumber] = useState("");
   const [ifsc, setIfsc] = useState(bankIfsc ?? "");
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(false);
 
-  const isLinked = !!(bankAccountName && bankAccountNumber && bankIfsc);
+  const isLinked = !!(bankAccountName && bankAccountLastFour && bankIfsc);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -40,6 +41,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
       }
       toast.success("Bank account saved.");
       setEditing(false);
+      setAccountNumber("");
       router.refresh();
     } catch {
       toast.error("Something went wrong.");
@@ -49,22 +51,26 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
   }
 
   async function handleRemove() {
-    if (!confirm("Remove linked bank account?")) return;
     setRemoving(true);
     try {
-      await fetch("/api/editor/bank-account", { method: "DELETE" });
+      const res = await fetch("/api/editor/bank-account", { method: "DELETE" });
+      if (!res.ok) {
+        toast.error("Failed to remove bank account.");
+        return;
+      }
       toast.success("Bank account removed.");
       router.refresh();
     } catch {
       toast.error("Something went wrong.");
     } finally {
       setRemoving(false);
+      setConfirmingRemove(false);
     }
   }
 
   if (editing) {
     return (
-      <div className="rounded-2xl border border-[var(--brand-client)]/20 bg-white p-5">
+      <div className="rounded-2xl border border-[#0EA5E9]/20 bg-white p-5">
         <p className="text-sm font-semibold text-gray-900 mb-4">
           {isLinked ? "Update bank account" : "Link bank account"}
         </p>
@@ -76,7 +82,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               value={accountName}
               onChange={e => setAccountName(e.target.value)}
               placeholder="As per bank records"
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               required
             />
           </div>
@@ -86,8 +92,8 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               type="text"
               value={accountNumber}
               onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ""))}
-              placeholder="9–18 digit account number"
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
+              placeholder={isLinked ? "Re-enter account number to update" : "9–18 digit account number"}
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               required
             />
           </div>
@@ -99,7 +105,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               onChange={e => setIfsc(e.target.value.toUpperCase())}
               placeholder="e.g. SBIN0001234"
               maxLength={11}
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[var(--brand-client)]/30"
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/30"
               required
             />
           </div>
@@ -111,7 +117,7 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               type="submit"
               disabled={saving}
               className={cn(
-                "px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[var(--brand-client)] hover:bg-[var(--brand-editor-hover)] transition-colors",
+                "px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors",
                 saving && "opacity-60 cursor-not-allowed"
               )}
             >
@@ -119,13 +125,48 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
             </button>
             <button
               type="button"
-              onClick={() => setEditing(false)}
+              onClick={() => { setEditing(false); setAccountNumber(""); }}
               className="px-5 py-2 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
           </div>
         </form>
+      </div>
+    );
+  }
+
+  if (confirmingRemove) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-4 h-4 text-red-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-red-900">Remove bank account?</p>
+            <p className="text-xs text-red-700 mt-1">Payouts will be paused until a new account is linked.</p>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleRemove}
+                disabled={removing}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors",
+                  removing && "opacity-60 cursor-not-allowed"
+                )}
+              >
+                {removing ? "Removing…" : "Yes, remove"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmingRemove(false)}
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -142,21 +183,20 @@ export function BankAccountSection({ bankAccountName, bankAccountNumber, bankIfs
               <p className="text-sm font-semibold text-green-900">Bank account linked</p>
               <p className="text-xs text-green-700 mt-0.5">{bankAccountName}</p>
               <p className="text-xs text-green-700 font-mono mt-0.5">
-                ••••{bankAccountNumber!.slice(-4)} · {bankIfsc}
+                ••••{bankAccountLastFour} · {bankIfsc}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => { setAccountName(bankAccountName ?? ""); setAccountNumber(bankAccountNumber ?? ""); setIfsc(bankIfsc ?? ""); setEditing(true); }}
+              onClick={() => { setAccountName(bankAccountName ?? ""); setAccountNumber(""); setIfsc(bankIfsc ?? ""); setEditing(true); }}
               className="p-1.5 rounded-lg hover:bg-green-100 transition-colors"
               title="Edit"
             >
               <Pencil className="w-3.5 h-3.5 text-green-600" />
             </button>
             <button
-              onClick={handleRemove}
-              disabled={removing}
+              onClick={() => setConfirmingRemove(true)}
               className="p-1.5 rounded-lg hover:bg-red-100 transition-colors"
               title="Remove"
             >

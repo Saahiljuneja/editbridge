@@ -21,7 +21,7 @@ export default async function ClientXpStorePage() {
 
   const [ptsRow, activeBoosts, swapRow] = await Promise.all([
     db
-      .select({ current: userPoints.current })
+      .select({ current: userPoints.current, total: userPoints.total })
       .from(userPoints)
       .where(eq(userPoints.userId, userId))
       .limit(1),
@@ -39,6 +39,7 @@ export default async function ClientXpStorePage() {
   ]);
 
   const currentXp         = ptsRow[0]?.current ?? 0;
+  const totalXp           = ptsRow[0]?.total ?? 0;
   const activeTypes       = activeBoosts.map(b => b.type);
   const boostExpiry       = Object.fromEntries(
     activeBoosts.map(b => [b.type, b.expiresAt?.toISOString() ?? null])
@@ -51,6 +52,7 @@ export default async function ClientXpStorePage() {
   return (
     <XpStoreClient
       currentXp={currentXp}
+      totalXp={totalXp}
       activeTypes={activeTypes}
       boostExpiry={boostExpiry}
       ownedBadges={ownedBadges}

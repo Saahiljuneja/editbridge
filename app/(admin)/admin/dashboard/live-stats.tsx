@@ -75,16 +75,16 @@ export function LiveStats({ initial }: { initial: LiveData }) {
   }, []);
 
   return (
-    <div className="rounded-3xl bg-white border border-gray-150 p-5 shadow-xl shadow-gray-100/5">
+    <div className="rounded-3xl bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 p-5 shadow-xl shadow-gray-100/5 dark:shadow-none">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className={`absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 ${pulse ? "animate-ping" : "animate-pulse"}`} />
+            <span className={cn("absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75", pulse ? "animate-ping" : "animate-pulse")} />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          <p className="text-xs font-extrabold text-neutral-900 uppercase tracking-wider">Live Platform Stats</p>
+          <p className="text-xs font-extrabold text-neutral-900 dark:text-neutral-100 uppercase tracking-wider">Live Platform Stats</p>
         </div>
-        <p className="text-[10px] text-neutral-455 font-bold uppercase tracking-wider">
+        <p className="text-[10px] text-neutral-450 dark:text-gray-400 font-bold uppercase tracking-wider">
           Refreshes every 30s{lastUpdatedStr ? ` · ${lastUpdatedStr}` : ""}
         </p>
       </div>
@@ -94,25 +94,25 @@ export function LiveStats({ initial }: { initial: LiveData }) {
           const isAlert = urgent && val > 0;
           
           const textValCls = isAlert 
-            ? "text-neutral-950 font-black" 
-            : "text-neutral-900 font-black";
+            ? "text-neutral-950 dark:text-amber-500 font-black" 
+            : "text-neutral-900 dark:text-white font-black";
 
           const subtextCls = isAlert 
-            ? "text-neutral-600 font-medium" 
-            : "text-neutral-400 font-semibold";
+            ? "text-neutral-600 dark:text-amber-300 font-medium" 
+            : "text-neutral-400 dark:text-gray-400 font-semibold";
 
           const detailCls = isAlert 
-            ? "text-neutral-500" 
-            : "text-neutral-450";
+            ? "text-neutral-500 dark:text-amber-400/80" 
+            : "text-neutral-450 dark:text-gray-500";
 
           const alertColorMap: Record<string, string> = {
-            "bg-amber-500": "border-amber-200/60 bg-amber-50/60 text-amber-850",
-            "bg-red-600": "border-red-200/60 bg-red-50/60 text-red-850",
+            "bg-amber-500": "border-amber-200/60 dark:border-amber-900/30 bg-amber-50/60 dark:bg-amber-500/10 text-amber-850 dark:text-amber-400",
+            "bg-red-600": "border-red-200/60 dark:border-red-900/30 bg-red-50/60 dark:bg-red-500/10 text-red-850 dark:text-red-400",
           };
           
           const computedCardStyle = isAlert
-            ? alertColorMap[bg] ?? "border-gray-200 bg-gray-50"
-            : "border-gray-150 bg-gray-50/50 text-neutral-800";
+            ? alertColorMap[bg] ?? "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900"
+            : "border-gray-150 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-950/40 text-neutral-800 dark:text-gray-250";
 
           return (
             <div
@@ -124,9 +124,9 @@ export function LiveStats({ initial }: { initial: LiveData }) {
             >
               <div className={cn(
                 "w-8 h-8 rounded-lg flex items-center justify-center mb-3 shadow-inner",
-                isAlert ? "bg-white/80 border border-white" : `${bg} bg-opacity-10`
+                isAlert ? "bg-white/80 dark:bg-gray-850 border border-white dark:border-gray-850" : `${bg} bg-opacity-10 dark:bg-opacity-20`
               )}>
-                <Icon className={cn("w-4 h-4", isAlert ? "text-neutral-900" : "text-neutral-600")} strokeWidth={1.8} />
+                <Icon className={cn("w-4 h-4", isAlert ? "text-neutral-900 dark:text-amber-500" : "text-neutral-600 dark:text-gray-400")} strokeWidth={1.8} />
               </div>
               <p className={cn("text-3xl font-black tabular-nums tracking-tight", textValCls)}>
                 {val}

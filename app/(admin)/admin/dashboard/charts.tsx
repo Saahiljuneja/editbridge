@@ -1,34 +1,57 @@
 "use client";
 
 import {
-  ResponsiveContainer, LineChart, Line, BarChart, Bar,
+  ResponsiveContainer, AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { DollarSign, ShoppingBag, Clock, Users } from "lucide-react";
 
 type DayPoint = { date: string; value: number };
 type PieSlice = { name: string; value: number; color: string };
 
-const TOOLTIP_STYLE = {
-  fontSize: 12,
-  borderRadius: 12,
-  border: "1px solid #e5e7eb",
-  boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-  background: "#ffffff",
-  color: "#111827",
-};
+function CustomTooltip({ active, payload, label, formatter }: any) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-xs text-gray-900 dark:text-gray-100">
+        {label && <p className="font-extrabold mb-1.5 uppercase tracking-wider text-[10px] text-gray-400 dark:text-gray-500">{label}</p>}
+        <div className="space-y-1 font-bold">
+          {payload.map((item: any, i: number) => {
+            const val = formatter ? formatter(item.value, item.name, item) : item.value;
+            const displayVal = Array.isArray(val) ? val[0] : val;
+            const displayName = Array.isArray(val) ? val[1] : item.name;
+            return (
+              <div key={i} className="flex items-center gap-4 justify-between">
+                <span className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color || item.fill }} />
+                  {displayName}
+                </span>
+                <span className="tabular-nums text-gray-950 dark:text-white">{displayVal}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
 
 export function OrdersLineChart({ data }: { data: DayPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <LineChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="dark:stroke-gray-800" />
+      <AreaChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+        <defs>
+          <linearGradient id="orderGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--brand-client)" stopOpacity={0.2}/>
+            <stop offset="95%" stopColor="var(--brand-client)" stopOpacity={0}/>
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="stroke-gray-100 dark:stroke-gray-800" />
         <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
         <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} allowDecimals={false} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ fontWeight: 600 }} />
-        <Line type="monotone" dataKey="value" name="Orders" stroke="var(--brand-client)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: "var(--brand-client)", strokeWidth: 0 }} />
-      </LineChart>
+        <Tooltip content={<CustomTooltip />} />
+        <Area type="monotone" dataKey="value" name="Orders" stroke="var(--brand-client)" strokeWidth={2.5} fillOpacity={1} fill="url(#orderGrad)" activeDot={{ r: 5, fill: "var(--brand-client)", strokeWidth: 0 }} />
+      </AreaChart>
     </ResponsiveContainer>
   );
 }
@@ -37,11 +60,17 @@ export function SignupsBarChart({ data }: { data: DayPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="dark:stroke-gray-800" />
+        <defs>
+          <linearGradient id="signupGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#10b981" stopOpacity={0.9}/>
+            <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="stroke-gray-100 dark:stroke-gray-800" />
         <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
         <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} allowDecimals={false} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ fontWeight: 600 }} />
-        <Bar dataKey="value" name="Signups" fill="#10b981" radius={[4, 4, 0, 0]} />
+        <Tooltip content={<CustomTooltip />} />
+        <Bar dataKey="value" name="Signups" fill="url(#signupGrad)" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -56,7 +85,7 @@ export function UserPieChart({ data }: { data: PieSlice[] }) {
             <Cell key={i} fill={entry.color} />
           ))}
         </Pie>
-        <Tooltip contentStyle={TOOLTIP_STYLE} />
+        <Tooltip content={<CustomTooltip />} />
       </PieChart>
     </ResponsiveContainer>
   );
@@ -68,7 +97,17 @@ export function PlatformRevenueChart({ data }: { data: PlatformRevenuePoint[] })
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="dark:stroke-gray-800" />
+        <defs>
+          <linearGradient id="gtvGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--brand-client)" stopOpacity={0.9}/>
+            <stop offset="95%" stopColor="var(--brand-client)" stopOpacity={0.3}/>
+          </linearGradient>
+          <linearGradient id="commGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#10B981" stopOpacity={0.9}/>
+            <stop offset="95%" stopColor="#10B981" stopOpacity={0.3}/>
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="stroke-gray-100 dark:stroke-gray-800" />
         <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
         <YAxis
           tick={{ fontSize: 10, fill: "#9ca3af" }}
@@ -77,15 +116,18 @@ export function PlatformRevenueChart({ data }: { data: PlatformRevenuePoint[] })
           tickFormatter={(v) => `₹${(v / 100).toFixed(0)}`}
         />
         <Tooltip
-          contentStyle={TOOLTIP_STYLE}
-          formatter={(v, name) => [
-            formatCurrency(Number(v)),
-            name === "gtv" ? "GTV" : "Net Commission",
-          ]}
+          content={
+            <CustomTooltip
+              formatter={(v: any, name: any) => [
+                formatCurrency(Number(v)),
+                name === "gtv" ? "GTV" : "Net Commission",
+              ]}
+            />
+          }
         />
         <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 11 }} />
-        <Bar dataKey="gtv" name="gtv" fill="var(--brand-client)" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="commission" name="commission" fill="#10B981" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="gtv" name="gtv" fill="url(#gtvGrad)" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="commission" name="commission" fill="url(#commGrad)" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -110,7 +152,7 @@ export function PlatformActiveOrdersChart({ data }: { data: ActiveWorkloadPoint[
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="dark:stroke-gray-800" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="stroke-gray-100 dark:stroke-gray-800" />
         <XAxis
           dataKey="status"
           tick={{ fontSize: 10, fill: "#9ca3af" }}
@@ -120,8 +162,11 @@ export function PlatformActiveOrdersChart({ data }: { data: ActiveWorkloadPoint[
         />
         <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} allowDecimals={false} />
         <Tooltip
-          contentStyle={TOOLTIP_STYLE}
-          formatter={(v, name, props) => [v, STATUS_LABELS[props.payload.status] ?? name]}
+          content={
+            <CustomTooltip
+              formatter={(v: any, name: any, props: any) => [v, STATUS_LABELS[props.payload.status] ?? name]}
+            />
+          }
         />
         <Bar dataKey="count" fill="#3B82F6" radius={[6, 6, 0, 0]}>
           {data.map((entry, index) => (
@@ -139,10 +184,10 @@ export function PlatformNicheResponseChart({ data }: { data: NicheResponsePoint[
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={data} layout="vertical" margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="dark:stroke-gray-800" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" className="stroke-gray-100 dark:stroke-gray-800" />
         <XAxis type="number" tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
         <YAxis dataKey="niche" type="category" tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} width={80} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v}m`, "Avg Response Time"]} />
+        <Tooltip content={<CustomTooltip formatter={(v: any) => [`${v}m`, "Avg Response Time"]} />} />
         <Bar dataKey="avg_response" name="avg_response" fill="#8B5CF6" radius={[0, 4, 4, 0]} barSize={16}>
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#8B5CF6" : "#A78BFA"} />
@@ -179,7 +224,7 @@ export function PlatformClientRepeatChart({ data }: { data: RepeatRatePoint[] })
               <Cell key={`cell-${index}`} fill={REPEAT_COLORS[index % REPEAT_COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [v, "Clients"]} />
+          <Tooltip content={<CustomTooltip />} />
         </PieChart>
       </ResponsiveContainer>
       <div className="w-[45%] flex flex-col gap-3">

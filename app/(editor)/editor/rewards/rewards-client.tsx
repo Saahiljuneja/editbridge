@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 interface Badge { id: string; badge: string; awardedAt: string; label: string; emoji: string; desc: string; }
 interface LeaderboardEntry { rank: number; userId: string; weekXp: number; name: string; image: string | null; editorId: string | null; }
 interface RewardsData {
-  xp: number; level: Level; xpToNext: number; nextLevel: string | null;
+  xp: number; level: EditorLevel; xpToNext: number; nextLevel: string | null;
   availableCredits: number; progress: Record<string, number>; badges: Badge[];
 }
 interface XpTx { id: string; amount: number; reason: string; createdAt: string; }
@@ -309,7 +309,7 @@ export function EditorRewardsClient() {
 
             {/* Perks */}
             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-              {PERKS[data.level].map(p => (
+              {(PERKS[data.level] || []).map((p: any) => (
                 <span
                   key={p.text}
                   className="text-[11px] flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200/60 text-gray-700 font-semibold shadow-sm"
@@ -322,45 +322,7 @@ export function EditorRewardsClient() {
         </div>
       </div>
 
-      {/* ── Journey Roadmap ── */}
-      <div className="bg-white rounded-3xl border border-gray-100 px-6 py-5 shadow-sm overflow-hidden">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 mb-6">Journey Roadmap</p>
-        <div className="overflow-x-auto pb-1">
-          <div className="relative flex items-center justify-between min-w-[440px] px-6">
-            <div className="absolute left-[11%] right-[11%] h-[3px] bg-gray-100 rounded-full top-5" />
-            {levelIdx > 0 && (
-              <div
-                className="absolute left-[11%] h-[3px] rounded-full transition-all duration-700 top-5"
-                style={{
-                  width: `calc(${(levelIdx / (LEVEL_ORDER.length - 1)) * 78}%)`,
-                  background: `linear-gradient(90deg, ${LM.bronze.ring}, ${lm.ring})`,
-                }}
-              />
-            )}
-            {LEVEL_ORDER.map((l, i) => {
-              const m = LM[l];
-              const isCompleted = i < levelIdx;
-              const isCurrent   = i === levelIdx;
-              return (
-                <div key={l} className="relative flex flex-col items-center flex-1 z-10">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all duration-500"
-                    style={{
-                      background: isCompleted ? `${m.ring}15` : isCurrent ? "white" : "#F8FAFC",
-                      borderColor: isCurrent ? m.ring : isCompleted ? `${m.ring}60` : "#E2E8F0",
-                      boxShadow: isCurrent ? `0 0 0 4px ${m.ring}22, 0 4px 12px ${m.ring}18` : undefined,
-                    }}
-                  >
-                    {isCompleted ? <CheckCircle2 className="w-5 h-5" style={{ color: m.ring }} /> : <span className="text-xl">{m.emoji}</span>}
-                  </div>
-                  <p className={cn("text-[11px] font-bold mt-2.5", isCurrent ? "text-gray-900" : "text-gray-400")}>{m.label}</p>
-                  <p className="text-[9px] font-semibold text-gray-300 mt-0.5">{LEVEL_XP_LABELS[i]} XP</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+
 
       {/* ── Next Tier Preview ── */}
       {data.nextLevel && (LM[data.nextLevel as EditorLevel]) && (

@@ -47,14 +47,14 @@ function StatCard({
   href?: string; trend?: { diff: number; up: boolean } | null;
 }) {
   const inner = (
-    <div className={`rounded-2xl border bg-white dark:bg-gray-900 dark:border-gray-800 p-5 shadow-sm h-full hover:shadow-lg dark:hover:shadow-black/30 transition-all duration-200 group border-l-4 ${accent}`}>
+    <div className={`rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm h-full hover:shadow-md hover:scale-[1.01] transition-all duration-205 group border-l-4 ${accent}`}>
       <div className="flex items-start justify-between mb-3">
-        <Icon className="w-4 h-4 text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors" strokeWidth={1.8} />
+        <Icon className="w-4.5 h-4.5 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" strokeWidth={1.8} />
         {trend && (
-          <span className={`flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
+          <span className={`flex items-center gap-0.5 text-[11px] font-bold px-2 py-0.5 rounded-full ${
             trend.up
-              ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
-              : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-450"
+              : "bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-450"
           }`}>
             {trend.up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {trend.diff}%
@@ -63,7 +63,7 @@ function StatCard({
       </div>
       <p className="text-3xl font-black text-gray-900 dark:text-white tabular-nums tracking-tight">{value}</p>
       <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mt-1">{label}</p>
-      {sub && <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
+      {sub && <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 font-medium">{sub}</p>}
     </div>
   );
   return href ? <Link href={href} className="block h-full">{inner}</Link> : inner;
@@ -71,10 +71,10 @@ function StatCard({
 
 type AccentKey = "amber" | "red" | "violet";
 
-const ACCENT_STYLES: Record<AccentKey, { border: string; iconBg: string; iconBgDark: string; iconColor: string; badge: string }> = {
-  amber: { border: "border-amber-500", iconBg: "bg-amber-50", iconBgDark: "dark:bg-amber-500/10", iconColor: "text-amber-600", badge: "bg-amber-500" },
-  red:   { border: "border-red-600",   iconBg: "bg-red-50",   iconBgDark: "dark:bg-red-500/10",   iconColor: "text-red-600",   badge: "bg-red-500"   },
-  violet:{ border: "border-violet-600",iconBg: "bg-violet-50",iconBgDark: "dark:bg-violet-500/10",iconColor: "text-violet-600",badge: "bg-violet-500"},
+const ACCENT_STYLES: Record<AccentKey, { border: string; borderDark: string; iconBg: string; iconBgDark: string; iconColor: string; badge: string }> = {
+  amber: { border: "border-amber-500", borderDark: "dark:border-amber-550/40", iconBg: "bg-amber-50", iconBgDark: "dark:bg-amber-500/10", iconColor: "text-amber-600 dark:text-amber-400", badge: "bg-amber-500" },
+  red:   { border: "border-red-600",   borderDark: "dark:border-red-550/40",   iconBg: "bg-red-50",   iconBgDark: "dark:bg-red-500/10",   iconColor: "text-red-600 dark:text-red-400",         badge: "bg-red-500"   },
+  violet:{ border: "border-violet-600",borderDark: "dark:border-violet-550/40",iconBg: "bg-violet-50",iconBgDark: "dark:bg-violet-500/10",iconColor: "text-violet-600 dark:text-violet-400",badge: "bg-violet-500"},
 };
 
 function ActionCard({
@@ -88,14 +88,16 @@ function ActionCard({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-4 rounded-2xl px-5 py-4 bg-white dark:bg-gray-900 shadow-sm hover:shadow-lg dark:hover:shadow-black/30 transition-all duration-200 group border dark:border-gray-800 ${
-        hasAlert ? `border-l-4 ${a.border} border-gray-100` : "border-gray-100"
+      className={`flex items-center gap-4 rounded-2xl px-5 py-4 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 group border ${
+        hasAlert 
+          ? `border-l-4 ${a.border} border-gray-150 ${a.borderDark}` 
+          : "border-gray-150 dark:border-gray-800"
       }`}
     >
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
         hasAlert ? `${a.iconBg} ${a.iconBgDark}` : "bg-gray-50 dark:bg-gray-800"
       }`}>
-        <Icon className={`w-5 h-5 ${hasAlert ? a.iconColor : "text-gray-400 dark:text-gray-600"}`} strokeWidth={1.8} />
+        <Icon className={`w-5 h-5 ${hasAlert ? a.iconColor : "text-gray-400 dark:text-gray-500"}`} strokeWidth={1.8} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm text-gray-900 dark:text-white">{label}</p>
@@ -106,16 +108,16 @@ function ActionCard({
           {cnt > 99 ? "99+" : cnt}
         </span>
       )}
-      <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors shrink-0" />
+      <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors shrink-0" />
     </Link>
   );
 }
 
 async function StaffKycDashboard({ actorName }: { actorName: string }) {
   const [pendingCount, approvedCount, rejectedCount, recentApplications] = await Promise.all([
-    db.select({ value: count() }).from(kycApplications).where(sql`${kycApplications.status} = 'pending'`).then(r => r[0].value),
-    db.select({ value: count() }).from(kycApplications).where(sql`${kycApplications.status} = 'approved'`).then(r => r[0].value),
-    db.select({ value: count() }).from(kycApplications).where(sql`${kycApplications.status} = 'rejected'`).then(r => r[0].value),
+    db.select({ value: count() }).from(kycApplications).where(eq(kycApplications.status, "pending")).then(r => r[0].value),
+    db.select({ value: count() }).from(kycApplications).where(eq(kycApplications.status, "approved")).then(r => r[0].value),
+    db.select({ value: count() }).from(kycApplications).where(eq(kycApplications.status, "rejected")).then(r => r[0].value),
     db.select({
       id: kycApplications.id, editorId: kycApplications.editorId,
       status: kycApplications.status, createdAt: kycApplications.createdAt,
@@ -124,40 +126,40 @@ async function StaffKycDashboard({ actorName }: { actorName: string }) {
       .from(kycApplications)
       .innerJoin(editors, eq(editors.id, kycApplications.editorId))
       .innerJoin(users, eq(users.id, editors.userId))
-      .where(sql`${kycApplications.status} = 'pending'`)
+      .where(eq(kycApplications.status, "pending"))
       .orderBy(desc(kycApplications.createdAt))
       .limit(10),
   ]);
 
   return (
-    <div className="px-8 py-6 space-y-8">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 px-8 py-6 space-y-8">
       <div>
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
           KYC Review
         </span>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">KYC Dashboard</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Welcome back, {actorName}.</p>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white mt-2 tracking-tight">KYC Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">Welcome back, {actorName}.</p>
       </div>
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: "Pending review", value: pendingCount, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-100 dark:border-amber-500/20" },
-          { label: "Approved", value: approvedCount, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-100 dark:border-emerald-500/20" },
-          { label: "Rejected", value: rejectedCount, color: "text-red-500 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/10", border: "border-red-100 dark:border-red-500/20" },
+          { label: "Pending review", value: pendingCount, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-100 dark:border-amber-900/30" },
+          { label: "Approved", value: approvedCount, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-100 dark:border-emerald-900/30" },
+          { label: "Rejected", value: rejectedCount, color: "text-red-500 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/10", border: "border-red-100 dark:border-red-900/30" },
         ].map(item => (
-          <div key={item.label} className={`rounded-2xl border ${item.border} ${item.bg} px-5 py-5`}>
-            <p className={`text-3xl font-bold ${item.color}`}>{item.value}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.label}</p>
+          <div key={item.label} className={`rounded-2xl border ${item.border} ${item.bg} px-5 py-5 shadow-sm`}>
+            <p className={`text-3xl font-black tabular-nums tracking-tight ${item.color}`}>{item.value}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-semibold">{item.label}</p>
           </div>
         ))}
       </div>
-      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="font-semibold text-gray-900 dark:text-white">Pending Applications</p>
+            <p className="font-bold text-gray-900 dark:text-white">Pending Applications</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Oldest first — review these now</p>
           </div>
-          <Link href="/admin/kyc" className="a-link">Open KYC queue →</Link>
+          <Link href="/admin/kyc" className="a-link dark:text-blue-450 dark:hover:text-blue-350">Open KYC queue →</Link>
         </div>
         {recentApplications.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-600 text-center py-8">No pending applications.</p>
@@ -165,15 +167,15 @@ async function StaffKycDashboard({ actorName }: { actorName: string }) {
           <div className="space-y-2">
             {recentApplications.map(app => (
               <Link key={app.id} href={`/admin/kyc/${app.id}`}
-                className="flex items-center gap-4 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group">
+                className="flex items-center gap-4 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group">
                 <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center shrink-0">
                   <UserCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{app.name ?? "Unknown"}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{app.name ?? "Unknown"}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{app.email}</p>
                 </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{formatDate(app.createdAt)}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0 tabular-nums">{formatDate(app.createdAt)}</p>
                 <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors shrink-0" />
               </Link>
             ))}
@@ -186,8 +188,8 @@ async function StaffKycDashboard({ actorName }: { actorName: string }) {
 
 async function StaffDisputeDashboard({ actorName }: { actorName: string }) {
   const [openCount, resolvedCount, recentOpen] = await Promise.all([
-    db.select({ value: count() }).from(disputes).where(sql`${disputes.status} = 'open'`).then(r => r[0].value),
-    db.select({ value: count() }).from(disputes).where(sql`${disputes.status} = 'resolved'`).then(r => r[0].value),
+    db.select({ value: count() }).from(disputes).where(eq(disputes.status, "open")).then(r => r[0].value),
+    db.select({ value: count() }).from(disputes).where(eq(disputes.status, "resolved")).then(r => r[0].value),
     db.select({
       id: disputes.id, reason: disputes.reason, status: disputes.status,
       createdAt: disputes.createdAt, packageTitle: packages.title, openedByName: users.name,
@@ -196,39 +198,39 @@ async function StaffDisputeDashboard({ actorName }: { actorName: string }) {
       .innerJoin(orders, eq(orders.id, disputes.orderId))
       .leftJoin(packages, eq(packages.id, orders.packageId))
       .innerJoin(users, eq(users.id, disputes.openedBy))
-      .where(sql`${disputes.status} = 'open'`)
+      .where(eq(disputes.status, "open"))
       .orderBy(desc(disputes.createdAt))
       .limit(10),
   ]);
 
   return (
-    <div className="px-8 py-6 space-y-8">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 px-8 py-6 space-y-8">
       <div>
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-2.5 py-1 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
           Dispute Resolution
         </span>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">Disputes Dashboard</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Welcome back, {actorName}.</p>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white mt-2 tracking-tight">Disputes Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">Welcome back, {actorName}.</p>
       </div>
       <div className="grid grid-cols-2 gap-4">
         {[
-          { label: "Open disputes", value: openCount, color: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/10", border: "border-red-100 dark:border-red-500/20" },
-          { label: "Resolved", value: resolvedCount, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-100 dark:border-emerald-500/20" },
+          { label: "Open disputes", value: openCount, color: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/10", border: "border-red-100 dark:border-red-900/30" },
+          { label: "Resolved", value: resolvedCount, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-100 dark:border-emerald-900/30" },
         ].map(item => (
-          <div key={item.label} className={`rounded-2xl border ${item.border} ${item.bg} px-5 py-5`}>
-            <p className={`text-3xl font-bold ${item.color}`}>{item.value}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.label}</p>
+          <div key={item.label} className={`rounded-2xl border ${item.border} ${item.bg} px-5 py-5 shadow-sm`}>
+            <p className={`text-3xl font-black tabular-nums tracking-tight ${item.color}`}>{item.value}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-semibold">{item.label}</p>
           </div>
         ))}
       </div>
-      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="font-semibold text-gray-900 dark:text-white">Open Disputes</p>
+            <p className="font-bold text-gray-900 dark:text-white">Open Disputes</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Needs your attention</p>
           </div>
-          <Link href="/admin/disputes" className="a-link">All disputes →</Link>
+          <Link href="/admin/disputes" className="a-link dark:text-blue-450 dark:hover:text-blue-350">All disputes →</Link>
         </div>
         {recentOpen.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-600 text-center py-8">No open disputes.</p>
@@ -236,15 +238,15 @@ async function StaffDisputeDashboard({ actorName }: { actorName: string }) {
           <div className="space-y-2">
             {recentOpen.map(d => (
               <Link key={d.id} href={`/admin/disputes/${d.id}`}
-                className="flex items-center gap-4 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group">
+                className="flex items-center gap-4 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group">
                 <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-500/15 flex items-center justify-center shrink-0">
                   <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{d.packageTitle ?? "Unknown package"}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{d.packageTitle ?? "Unknown package"}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 truncate">Filed by {d.openedByName ?? "user"} · {d.reason.slice(0, 60)}{d.reason.length > 60 ? "…" : ""}</p>
                 </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{formatDate(d.createdAt)}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 shrink-0 tabular-nums">{formatDate(d.createdAt)}</p>
                 <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors shrink-0" />
               </Link>
             ))}
@@ -284,10 +286,10 @@ export default async function AdminDashboardPage() {
     db.select({ value: count() }).from(orders).then(r => r[0].value),
     db.select({ value: count() }).from(orders)
       .where(sql`${orders.status} IN ('pending','in_progress','delivered','revision_requested')`).then(r => r[0].value),
-    db.select({ value: count() }).from(disputes).where(sql`${disputes.status} = 'open'`).then(r => r[0].value),
+    db.select({ value: count() }).from(disputes).where(eq(disputes.status, "open")).then(r => r[0].value),
     db.select({ value: sql<number>`COALESCE(SUM(${payouts.commissionAmount}),0)::int` })
-      .from(payouts).where(sql`${payouts.status} = 'completed'`).then(r => r[0].value),
-    db.select({ value: count() }).from(kycApplications).where(sql`${kycApplications.status} = 'pending'`).then(r => r[0].value),
+      .from(payouts).where(eq(payouts.status, "completed")).then(r => r[0].value),
+    db.select({ value: count() }).from(kycApplications).where(eq(kycApplications.status, "pending")).then(r => r[0].value),
     db.select({ value: count() }).from(orders).where(sql`${orders.createdAt} >= ${monthStart}`).then(r => r[0].value),
     db.select({ value: sql<number>`COALESCE(SUM(${payouts.commissionAmount}),0)::int` })
       .from(payouts).where(sql`${payouts.status} = 'completed' AND ${payouts.createdAt} >= ${monthStart}`).then(r => r[0].value),
@@ -298,13 +300,13 @@ export default async function AdminDashboardPage() {
       .from(payouts).where(sql`${payouts.status} = 'completed' AND ${payouts.createdAt} >= ${lastMonthStart} AND ${payouts.createdAt} <= ${lastMonthEnd}`).then(r => r[0].value),
     db.select({ value: count() }).from(users).where(sql`${users.createdAt} >= ${todayStart}`).then(r => r[0].value),
     db.select({ value: count() }).from(users).where(sql`${users.createdAt} >= ${weekStart}`).then(r => r[0].value),
-    db.select({ value: count() }).from(payouts).where(sql`${payouts.status} = 'pending'`).then(r => r[0].value),
-    db.select({ value: count() }).from(editors).where(sql`${editors.kycStatus} = 'approved'`).then(r => r[0].value),
-    db.select({ value: count() }).from(editors).where(sql`${editors.kycStatus} = 'pending'`).then(r => r[0].value),
-    db.select({ value: count() }).from(editors).where(sql`${editors.kycStatus} = 'rejected'`).then(r => r[0].value),
+    db.select({ value: count() }).from(payouts).where(eq(payouts.status, "pending")).then(r => r[0].value),
+    db.select({ value: count() }).from(editors).where(eq(editors.kycStatus, "approved")).then(r => r[0].value),
+    db.select({ value: count() }).from(editors).where(eq(editors.kycStatus, "pending")).then(r => r[0].value),
+    db.select({ value: count() }).from(editors).where(eq(editors.kycStatus, "rejected")).then(r => r[0].value),
     db.select({ name: users.name, email: users.email, totalOrders: editors.totalOrders, kycStatus: editors.kycStatus })
       .from(editors).innerJoin(users, eq(users.id, editors.userId))
-      .where(sql`${editors.kycStatus} = 'approved'`).orderBy(desc(editors.totalOrders)).limit(5),
+      .where(eq(editors.kycStatus, "approved")).orderBy(desc(editors.totalOrders)).limit(5),
     db.select({
       id: auditLogs.id, action: auditLogs.action, entityType: auditLogs.entityType,
       actorRole: auditLogs.actorRole, createdAt: auditLogs.createdAt, actorName: users.name,
@@ -321,7 +323,7 @@ export default async function AdminDashboardPage() {
       FROM ${users} WHERE ${users.createdAt} >= NOW() - INTERVAL '30 days'
       GROUP BY 1 ORDER BY 1
     `),
-    db.select({ value: count() }).from(users).where(sql`${users.role} = 'client'`).then(r => r[0].value),
+    db.select({ value: count() }).from(users).where(eq(users.role, "client")).then(r => r[0].value),
   ]);
 
   // ── Admin Dashboard Chart Queries ──
@@ -444,18 +446,18 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950">
       {/* ── Header ── */}
-      <div className="bg-white px-8 py-7 border-b border-gray-150">
+      <div className="bg-white dark:bg-gray-900 px-8 py-7 border-b border-gray-150 dark:border-gray-800">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-400 mb-1">Admin Panel</p>
-            <h1 className="text-2xl font-black text-neutral-900 tracking-tight">{greeting}, {actorName}.</h1>
-            <p className="text-sm text-neutral-500 mt-1">Platform overview — live stats across users, orders, revenue, and disputes.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 mb-1">Admin Panel</p>
+            <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">{greeting}, {actorName}.</h1>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 font-medium">Platform overview — live stats across users, orders, revenue, and disputes.</p>
           </div>
-          <div className="text-right shrink-0 ml-8">
-            <p className="text-sm font-bold text-neutral-900">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</p>
-            <p className="text-xs text-neutral-400 mt-0.5 font-semibold">{new Date().toLocaleDateString("en-IN", { weekday: "long" })}</p>
+          <div className="text-right shrink-0 ml-8 hidden sm:block">
+            <p className="text-sm font-bold text-neutral-900 dark:text-white">{new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</p>
+            <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5 font-semibold">{new Date().toLocaleDateString("en-IN", { weekday: "long" })}</p>
           </div>
         </div>
         <div className="mt-6">
@@ -467,7 +469,7 @@ export default async function AdminDashboardPage() {
 
         {/* ── Needs Attention ── */}
         <div>
-          <p className="a-section-label">Needs Attention</p>
+          <p className="a-section-label dark:text-gray-500">Needs Attention</p>
           <div className="grid sm:grid-cols-3 gap-3">
             <ActionCard label="KYC Queue" sub="Pending applications" icon={FileCheck} accentKey="amber" href="/admin/kyc" count={pendingKyc} />
             <ActionCard label="Open Disputes" sub="Needs resolution" icon={AlertTriangle} accentKey="red" href="/admin/disputes" count={openDisputes} />
@@ -477,7 +479,7 @@ export default async function AdminDashboardPage() {
 
         {/* ── Platform Metrics ── */}
         <div>
-          <p className="a-section-label">Platform Metrics</p>
+          <p className="a-section-label dark:text-gray-500">Platform Metrics</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <StatCard label="Total Users" value={totalUsers} icon={Users} accent="border-blue-500" href="/admin/users" />
             <StatCard label="Total Editors" value={totalEditors} sub="Registered on platform" icon={FileCheck} accent="border-violet-500" href="/admin/users?role=editor" />
@@ -491,18 +493,18 @@ export default async function AdminDashboardPage() {
         {/* ── Quick signup stats ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {QUICK_STATS.map(item => (
-            <div key={item.label} className={`rounded-2xl border px-4 py-4 ${item.light} ${item.dark}`}>
+            <div key={item.label} className={`rounded-2xl border px-4 py-4 ${item.light} ${item.dark} shadow-sm transition-transform duration-200 hover:scale-[1.01]`}>
               <p className="text-2xl font-black tabular-nums">{item.value}</p>
-              <p className="text-xs mt-1 font-medium opacity-70">{item.label}</p>
+              <p className="text-xs mt-1 font-semibold opacity-70">{item.label}</p>
             </div>
           ))}
         </div>
 
         {/* ── 30-Day Trends ── */}
         <div>
-          <p className="a-section-label">30-Day Trends</p>
+          <p className="a-section-label dark:text-gray-500">30-Day Trends</p>
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Orders</p>
@@ -512,13 +514,13 @@ export default async function AdminDashboardPage() {
               </div>
               <OrdersLineChart data={ordersChartData} />
             </div>
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Signups</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">New registrations — last 30 days</p>
                 </div>
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full">{thisMonthSignups} this month</span>
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full">{thisMonthSignups} this month</span>
               </div>
               <SignupsBarChart data={signupsChartData} />
             </div>
@@ -527,7 +529,7 @@ export default async function AdminDashboardPage() {
 
         {/* ── User breakdown + Funnel ── */}
         <div className="grid lg:grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
             <p className="font-semibold text-gray-900 dark:text-white mb-1">User breakdown</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Clients vs editor KYC status</p>
             <UserPieChart data={pieData} />
@@ -535,13 +537,13 @@ export default async function AdminDashboardPage() {
               {pieData.map(d => (
                 <div key={d.name} className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
-                  <span className="text-xs text-gray-600 dark:text-gray-400">{d.name} ({d.value})</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold">{d.name} ({d.value})</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
             <p className="font-semibold text-gray-900 dark:text-white mb-1">Editor funnel</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">Where editors drop off</p>
             <div className="space-y-3">
@@ -551,8 +553,8 @@ export default async function AdminDashboardPage() {
                 return (
                   <div key={step.label}>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-600 dark:text-gray-300">{step.label}</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
+                      <span className="text-gray-600 dark:text-gray-300 font-semibold">{step.label}</span>
+                      <span className="font-bold text-gray-900 dark:text-white">
                         {step.value} <span className="text-gray-400 dark:text-gray-500 font-normal">({Math.round(pctOfFirst)}%)</span>
                       </span>
                     </div>
@@ -568,10 +570,10 @@ export default async function AdminDashboardPage() {
 
         {/* ── Platform Analytics & Performance Charts ── */}
         <div>
-          <p className="a-section-label">Platform Performance & Niche Insights</p>
+          <p className="a-section-label dark:text-gray-500">Platform Performance & Niche Insights</p>
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Platform Revenue */}
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Earnings & GTV Growth</p>
@@ -582,7 +584,7 @@ export default async function AdminDashboardPage() {
             </div>
 
             {/* Active Platform Workload */}
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Active Order Distribution</p>
@@ -593,7 +595,7 @@ export default async function AdminDashboardPage() {
             </div>
 
             {/* Editor Response Times by Niche */}
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Response Times by Niche</p>
@@ -604,7 +606,7 @@ export default async function AdminDashboardPage() {
             </div>
 
             {/* Client Retention */}
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Client Repeat Rates</p>
@@ -618,13 +620,13 @@ export default async function AdminDashboardPage() {
 
         {/* ── Top Editors + Recent Activity ── */}
         <div className="grid lg:grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <p className="font-bold text-gray-900 dark:text-white">Top Editors</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">By total orders completed</p>
               </div>
-              <Link href="/admin/users?role=editor" className="a-link">View all →</Link>
+              <Link href="/admin/users?role=editor" className="a-link dark:text-blue-450 dark:hover:text-blue-350">View all →</Link>
             </div>
             {topEditors.length === 0 ? (
               <p className="text-sm text-gray-400 dark:text-gray-600 text-center py-8">No completed orders yet.</p>
@@ -642,12 +644,12 @@ export default async function AdminDashboardPage() {
                       <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{(editor.name ?? "?")[0].toUpperCase()}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{editor.name ?? "Unknown"}</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{editor.name ?? "Unknown"}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{editor.email}</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg">
                       <ShoppingBag className="w-3 h-3 text-gray-400 dark:text-gray-600" />
-                      <span className="text-sm font-bold text-gray-700 dark:text-gray-200 tabular-nums">{editor.totalOrders}</span>
+                      <span className="text-sm font-black text-gray-700 dark:text-gray-200 tabular-nums">{editor.totalOrders}</span>
                     </div>
                   </div>
                 ))}
@@ -655,13 +657,13 @@ export default async function AdminDashboardPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <p className="font-bold text-gray-900 dark:text-white">Recent Activity</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Latest admin actions on the platform</p>
               </div>
-              <Link href="/admin/audit" className="a-link">Full log →</Link>
+              <Link href="/admin/audit" className="a-link dark:text-blue-450 dark:hover:text-blue-350">Full log →</Link>
             </div>
             {recentActivity.length === 0 ? (
               <p className="text-sm text-gray-400 dark:text-gray-600 text-center py-8">No activity yet.</p>
@@ -684,10 +686,10 @@ export default async function AdminDashboardPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-900 dark:text-white leading-snug">
-                          <span className="font-semibold">{item.actorName ?? "Admin"}</span>
-                          {" "}<span className="text-gray-500 dark:text-gray-400">{ACTION_LABEL[item.action] ?? item.action}</span>
+                          <span className="font-bold">{item.actorName ?? "Admin"}</span>
+                          {" "}<span className="text-gray-500 dark:text-gray-400 font-medium">{ACTION_LABEL[item.action] ?? item.action}</span>
                         </p>
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{formatDate(item.createdAt)} · {item.actorRole}</p>
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 font-medium">{formatDate(item.createdAt)} · {item.actorRole}</p>
                       </div>
                     </div>
                   );
@@ -698,20 +700,20 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* ── Quick Actions ── */}
-        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-155 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
           <p className="font-bold text-gray-900 dark:text-white mb-4">Quick Actions</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { label: "Review KYC",       href: "/admin/kyc",           icon: FileCheck,    cls: "bg-amber-50 dark:bg-amber-500/10  text-amber-700  dark:text-amber-400  hover:bg-amber-100  dark:hover:bg-amber-500/20  border border-amber-100  dark:border-amber-500/20" },
-              { label: "Resolve Disputes", href: "/admin/disputes",      icon: AlertTriangle,cls: "bg-red-50   dark:bg-red-500/10    text-red-700    dark:text-red-400    hover:bg-red-100    dark:hover:bg-red-500/20    border border-red-100    dark:border-red-500/20" },
-              { label: "Pending Payouts",  href: "/admin/revenue",       icon: Wallet,       cls: "bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-500/20 border border-violet-100 dark:border-violet-500/20" },
-              { label: "Manage Users",     href: "/admin/users",         icon: Users,        cls: "bg-blue-50  dark:bg-blue-500/10   text-blue-700   dark:text-blue-400   hover:bg-blue-100   dark:hover:bg-blue-500/20   border border-blue-100   dark:border-blue-500/20" },
-              { label: "All Orders",       href: "/admin/orders",        icon: ShoppingBag,  cls: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20" },
-              { label: "Add Staff",        href: "/admin/staff",         icon: UserPlus,     cls: "bg-gray-50  dark:bg-gray-800      text-gray-700   dark:text-gray-300   hover:bg-gray-100   dark:hover:bg-gray-700/60   border border-gray-200   dark:border-gray-700" },
-              { label: "Announcements",    href: "/admin/announcements", icon: Zap,          cls: "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-100 dark:border-indigo-500/20" },
-              { label: "Audit Log",        href: "/admin/audit",         icon: Activity,     cls: "bg-gray-50  dark:bg-gray-800      text-gray-700   dark:text-gray-300   hover:bg-gray-100   dark:hover:bg-gray-700/60   border border-gray-200   dark:border-gray-700" },
+              { label: "Review KYC",       href: "/admin/kyc",           icon: FileCheck,    cls: "bg-amber-50 dark:bg-amber-500/10  text-amber-750  dark:text-amber-400  hover:bg-amber-100  dark:hover:bg-amber-500/20  border border-amber-100  dark:border-amber-500/20" },
+              { label: "Resolve Disputes", href: "/admin/disputes",      icon: AlertTriangle,cls: "bg-red-50   dark:bg-red-500/10    text-red-750    dark:text-red-400    hover:bg-red-100    dark:hover:bg-red-500/20    border border-red-100    dark:border-red-500/20" },
+              { label: "Pending Payouts",  href: "/admin/revenue",       icon: Wallet,       cls: "bg-violet-50 dark:bg-violet-500/10 text-violet-750 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-500/20 border border-violet-100 dark:border-violet-500/20" },
+              { label: "Manage Users",     href: "/admin/users",         icon: Users,        cls: "bg-blue-50  dark:bg-blue-500/10   text-blue-750   dark:text-blue-400   hover:bg-blue-100   dark:hover:bg-blue-500/20   border border-blue-100   dark:border-blue-500/20" },
+              { label: "All Orders",       href: "/admin/orders",        icon: ShoppingBag,  cls: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-755 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20" },
+              { label: "Add Staff",        href: "/admin/staff",         icon: UserPlus,     cls: "bg-gray-50  dark:bg-gray-800      text-gray-700   dark:text-gray-300   hover:bg-gray-100   dark:hover:bg-gray-700/60   border border-gray-200   dark:border-gray-750" },
+              { label: "Announcements",    href: "/admin/announcements", icon: Zap,          cls: "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-755 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-indigo-100 dark:border-indigo-500/20" },
+              { label: "Audit Log",        href: "/admin/audit",         icon: Activity,     cls: "bg-gray-50  dark:bg-gray-800      text-gray-700   dark:text-gray-300   hover:bg-gray-100   dark:hover:bg-gray-700/60   border border-gray-200   dark:border-gray-750" },
             ].map(({ label, href, icon: Icon, cls }) => (
-              <Link key={href} href={href} className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${cls}`}>
+              <Link key={href} href={href} className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all ${cls}`}>
                 <Icon className="w-4 h-4 shrink-0" />
                 {label}
               </Link>
@@ -720,18 +722,18 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* ── System health ── */}
-        <div className="rounded-2xl border border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/60 dark:bg-emerald-900/10 p-5">
+        <div className="rounded-2xl border border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/60 dark:bg-emerald-950/20 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
                 <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-300">All systems operational</p>
-                <p className="text-xs text-emerald-600/70 dark:text-emerald-500">No active maintenance mode · Payments, orders, and KYC running normally</p>
+                <p className="text-sm font-bold text-emerald-900 dark:text-emerald-355">All systems operational</p>
+                <p className="text-xs text-emerald-600/70 dark:text-emerald-500/80 font-medium">No active maintenance mode · Payments, orders, and KYC running normally</p>
               </div>
             </div>
-            <Link href="/admin/announcements" className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline underline-offset-2 shrink-0">
+            <Link href="/admin/announcements" className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline underline-offset-2 shrink-0 ml-4">
               Post notice →
             </Link>
           </div>

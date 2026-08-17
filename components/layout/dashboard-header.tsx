@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Plus, LogOut, Settings, User, Search, ChevronDown, Zap, ShieldCheck, Crown, X, ArrowLeft } from "lucide-react";
+import { Bell, Plus, LogOut, Settings, User, Search, ChevronDown, Zap, ShieldCheck, Crown, X, ArrowLeft, Home } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -361,6 +361,28 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
             </Link>
           )}
 
+          {/* Home Link — client, editor & admin portals */}
+          {(pathname.startsWith("/client") || pathname.startsWith("/editor") || pathname.startsWith("/admin")) && (
+            <Link
+              href="/"
+              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-neutral-100 transition-colors"
+              title="Go to Homepage"
+            >
+              <Home className="w-4 h-4 text-neutral-500" />
+            </Link>
+          )}
+
+          {/* Settings Link — client, editor & admin portals */}
+          {(pathname.startsWith("/client") || pathname.startsWith("/editor") || pathname.startsWith("/admin")) && (
+            <Link
+              href={`${portalPrefix}/settings`}
+              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-neutral-100 transition-colors"
+              title="Settings"
+            >
+              <Settings className="w-4 h-4 text-neutral-500" />
+            </Link>
+          )}
+
           {/* Bell — client & editor portals only */}
           {(pathname.startsWith("/client") || pathname.startsWith("/editor")) && (
             <div className="relative" ref={bellRef}>
@@ -463,20 +485,8 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
                 >
                   <User className="w-3.5 h-3.5 text-neutral-400" /> My Profile
                 </Link>
-                <Link
-                  href={`${portalPrefix}/settings`}
-                  onClick={() => setUserMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-xs text-neutral-600 hover:text-black hover:bg-neutral-50 rounded-xl transition-colors font-semibold"
-                >
-                  <Settings className="w-3.5 h-3.5 text-neutral-400" /> Settings
-                </Link>
-                <Link
-                  href="/"
-                  onClick={() => setUserMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-xs text-neutral-600 hover:text-black hover:bg-neutral-50 rounded-xl transition-colors font-semibold"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5 text-neutral-400" /> Back to website
-                </Link>
+
+
 
                 <div className="h-px bg-neutral-100 my-1" />
 

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { userPoints, pointTransactions, xpBoosts } from "@/lib/db/schema";
 import { eq, and, gt, isNull, or, gte, sql } from "drizzle-orm";
-import { addCredit } from "@/lib/rewards";
+import { addCredit, calcLevel, CLIENT_LEVELS } from "@/lib/rewards";
 import { CLIENT_STORE_ITEMS, PATRON_BADGES } from "@/lib/client-xp-store-config";
 import type { ClientItemType, PatronBadgeKey } from "@/lib/client-xp-store-config";
 
@@ -69,13 +69,25 @@ export async function redeemClientItem(
   }
 
   const [pts] = await db
-    .select({ current: userPoints.current })
+    .select({ current: userPoints.current, total: userPoints.total })
     .from(userPoints)
     .where(eq(userPoints.userId, userId))
     .limit(1);
 
-  if (!pts || pts.current < item.cost) {
-    return { success: false, error: "Not enough XP" };
+  if (!pts) return { success: false, error: "Points record not found" };
+
+  if (item.minLevel) {
+    const clientLevel = calcLevel(pts.total, "client");
+    const levelMeta = CLIENT_LEVELS.find((l: any) => l.name === clientLevel);
+    const currentLevelNum = levelMeta ? CLIENT_LEVELS.indexOf(levelMeta) + 1 : 1;
+    if (currentLevelNum < item.minLevel) {
+      const reqLevelName = CLIENT_LEVELS[item.minLevel - 1]?.label ?? `Level ${item.minLevel}`;
+      return { success: false, error: `Requires Level ${item.minLevel} (${reqLevelName}) to unlock` };
+    }
+  }
+
+  if (pts.current < item.cost) {
+    return { success: false, error: "Not enough spendable XP credits" };
   }
 
   const expiresAt = item.durationDays
@@ -93,8 +105,8 @@ export async function redeemClientItem(
     reason: `client_store_${type}`,
   });
 
-  if (type === "xp_credit_swap") {
-    await addCredit(userId, item.creditReward!, "XP → Credit conversion");
+  if (type.startsWith("credit_") || type === "xp_credit_swap") {
+    await addCredit(userId, item.creditReward!, `${item.label} conversion`);
   } else {
     await db.insert(xpBoosts).values({ userId, type, expiresAt });
   }

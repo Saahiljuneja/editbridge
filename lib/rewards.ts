@@ -6,15 +6,17 @@ import { EDITOR_LEVELS, calcEditorLevel } from "@/lib/xp-shop-config";
 // ─── Level thresholds ─────────────────────────────────────────────────────────
 
 export const CLIENT_LEVELS = [
-  { name: "bronze",   min: 0,    max: 499,     label: "Bronze",   emoji: "🥉" },
-  { name: "silver",   min: 500,  max: 1999,    label: "Silver",   emoji: "🥈" },
-  { name: "gold",     min: 2000, max: 4999,    label: "Gold",     emoji: "🥇" },
-  { name: "platinum", min: 5000, max: Infinity, label: "Platinum", emoji: "💎" },
+  { name: "bronze",   min: 0,      max: 999,     label: "New Client", emoji: "🥉" },
+  { name: "silver",   min: 1000,   max: 2999,    label: "Regular", emoji: "🥈" },
+  { name: "gold",     min: 3000,   max: 7499,    label: "Active", emoji: "🥇" },
+  { name: "platinum", min: 7500,   max: 14999,   label: "Pro Client", emoji: "💎" },
+  { name: "vip",      min: 15000,  max: 29999,   label: "VIP Client", emoji: "⭐" },
+  { name: "elite",    min: 30000,  max: Infinity, label: "Elite Client", emoji: "👑" },
 ] as const;
 
 export const LEVELS = CLIENT_LEVELS; // Legacy compatibility
 
-export type Level = "bronze" | "silver" | "gold" | "platinum";
+export type Level = "bronze" | "silver" | "gold" | "platinum" | "vip" | "elite";
 
 export function calcLevel(totalXp: number, role: "editor" | "client" = "editor"): string {
   const levelsList = role === "editor" ? EDITOR_LEVELS : CLIENT_LEVELS;

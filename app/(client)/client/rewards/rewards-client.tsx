@@ -29,10 +29,12 @@ type LevelMeta = {
 };
 
 const LM: Record<Level, LevelMeta> = {
-  bronze:   { label: "Bronze",   emoji: "🥉", tagline: "Getting Started",  accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.06)",  textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",  border: "border-amber-500/20",  start: 0,    end: 500      },
-  silver:   { label: "Silver",   emoji: "🥈", tagline: "Building Momentum",accent: "#6B7280", ring: "#9CA3AF", glow: "rgba(156,163,175,0.06)", textClass: "text-slate-600",  bgGradient: "from-slate-400/15 to-gray-500/5",    border: "border-slate-400/25",  start: 500,  end: 2000     },
-  gold:     { label: "Gold",     emoji: "🥇", tagline: "Loyal Supporter",  accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",   textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",  border: "border-yellow-500/25", start: 2000, end: 5000     },
-  platinum: { label: "Platinum", emoji: "💎", tagline: "Premium Member",   accent: "#06B6D4", ring: "#22D3EE", glow: "rgba(34,211,238,0.1)",   textClass: "text-cyan-600",   bgGradient: "from-cyan-500/15 to-teal-500/5",     border: "border-cyan-500/25",   start: 5000, end: Infinity },
+  bronze:   { label: "New Client",   emoji: "🥉", tagline: "Getting Started",  accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.06)",  textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",  border: "border-amber-500/20",  start: 0,     end: 1000 },
+  silver:   { label: "Regular",      emoji: "🥈", tagline: "Building Momentum",accent: "#6B7280", ring: "#9CA3AF", glow: "rgba(156,163,175,0.06)", textClass: "text-slate-600",  bgGradient: "from-slate-400/15 to-gray-500/5",    border: "border-slate-400/25",  start: 1000,  end: 3000 },
+  gold:     { label: "Active",       emoji: "🥇", tagline: "Loyal Supporter",  accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",   textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",  border: "border-yellow-500/25", start: 3000,  end: 7500 },
+  platinum: { label: "Pro Client",   emoji: "💎", tagline: "Premium Member",   accent: "#06B6D4", ring: "#22D3EE", glow: "rgba(34,211,238,0.1)",   textClass: "text-cyan-600",   bgGradient: "from-cyan-500/15 to-teal-500/5",     border: "border-cyan-500/25",   start: 7500,  end: 15000 },
+  vip:      { label: "VIP Client",   emoji: "⭐", tagline: "VIP Status",       accent: "#4F46E5", ring: "#818CF8", glow: "rgba(129,140,248,0.1)",  textClass: "text-indigo-600", bgGradient: "from-indigo-500/15 to-purple-600/5", border: "border-indigo-500/25", start: 15000, end: 30000 },
+  elite:    { label: "Elite Client", emoji: "👑", tagline: "Elite Status",     accent: "#EC4899", ring: "#F472B6", glow: "rgba(244,114,182,0.1)",  textClass: "text-pink-600",   bgGradient: "from-pink-500/15 to-rose-600/5",     border: "border-pink-500/25",   start: 30000, end: Infinity },
 };
 
 
@@ -41,6 +43,8 @@ const PERKS: Record<Level, Array<{ icon: string; text: string }>> = {
   silver:   [{ icon: "🏷️", text: "2% off orders" },      { icon: "🎗️", text: "Silver badge" },    { icon: "⚡", text: "Early editor access" }],
   gold:     [{ icon: "🏷️", text: "5% off orders" },      { icon: "🥇", text: "Gold badge" },      { icon: "🎯", text: "Priority matching" },   { icon: "📞", text: "Dedicated support" }],
   platinum: [{ icon: "🏷️", text: "10% off orders" },     { icon: "💎", text: "Platinum badge" },  { icon: "🔥", text: "Top priority" },        { icon: "🤝", text: "VIP support" }],
+  vip:      [{ icon: "🏷️", text: "15% off orders" },     { icon: "⭐", text: "VIP status badge" }, { icon: "⚡", text: "Priority matching" },    { icon: "🎧", text: "24/7 dedicated support" }],
+  elite:    [{ icon: "🏷️", text: "20% off orders" },     { icon: "👑", text: "Elite status badge" },{ icon: "⚡", text: "Priority matching" },    { icon: "🎧", text: "24/7 dedicated support" }],
 };
 
 const BADGES: Record<string, { label: string; emoji: string; desc: string; hint: string; credit?: string }> = {

@@ -176,7 +176,7 @@ function ContextMenuPortal({ menu, isPinned, copied, onOpenTab, onCopy, onPin, o
 
 // ─── Panel (fly-out) ──────────────────────────────────────────────────────────
 
-function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContextMenu, onNavigate, theme, themeId, onThemeChange, userName, userImage, initials, roleLabel }: {
+function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContextMenu, onNavigate, theme, themeId, onThemeChange }: {
   group: (typeof NAV_GROUPS)[0];
   pathname: string; role: UserRole; counts: Counts; pulsing: Set<string>;
   pinned: string[]; onPin: (href: string, label: string) => void;
@@ -184,7 +184,6 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
   onNavigate?: () => void;
   theme: (typeof SIDEBAR_THEMES)[0];
   themeId: SidebarThemeId; onThemeChange: (id: SidebarThemeId) => void;
-  userName: string; userImage: string | null; initials: string; roleLabel: string;
 }) {
   const navRef = useRef<HTMLDivElement>(null);
   const [showTopFade,    setShowTopFade]    = useState(false);
@@ -286,54 +285,7 @@ function Panel({ group, pathname, role, counts, pulsing, pinned, onPin, onContex
           style={{ background: "linear-gradient(to top, #ffffff, transparent)" }} />
       </div>
 
-      {/* Quick actions */}
-      <div className="shrink-0 border-t border-neutral-100 px-3 pt-2.5 pb-1">
-        <Link href="/admin/settings"
-          className={cn("flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-bold transition-colors mb-0.5",
-            pathname.startsWith("/admin/settings") ? "text-neutral-900 bg-neutral-100" : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50")}>
-          <Settings className="w-3.5 h-3.5 shrink-0 text-neutral-450" />
-          Settings
-        </Link>
-        <Link href="/" target="_blank"
-          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors mb-0.5">
-          <ExternalLink className="w-3.5 h-3.5 shrink-0 text-neutral-450" />
-          Open website
-        </Link>
-        <div className="flex items-center gap-2.5 px-2.5 py-2 mb-0.5 select-none">
-          <div className="w-3.5 h-3.5 rounded-full shrink-0 border border-neutral-200" style={{ background: theme.accent }} />
-          <span className="text-[12.5px] font-bold text-neutral-500 mr-auto">Theme</span>
-          <div className="flex items-center gap-1.5">
-            {SIDEBAR_THEMES.map(t => (
-              <button key={t.id} title={t.label}
-                className={cn("w-3.5 h-3.5 rounded-full border transition-transform hover:scale-110",
-                  themeId === t.id ? "border-neutral-400 scale-110" : "border-transparent")}
-                style={{ background: t.accent }}
-                onClick={() => { try { localStorage.setItem("admin-sidebar-theme", t.id); } catch {} onThemeChange(t.id); }} />
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* User footer */}
-      <div className="shrink-0 border-t border-neutral-100 px-3 py-3">
-        <div className="flex items-center gap-2.5 px-1">
-          <div className="relative shrink-0">
-            <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-[11px] font-bold"
-              style={{ background: `linear-gradient(135deg, ${theme.accent}, #f97316)` }}>
-              {userImage ? <img src={userImage} alt={userName} className="w-full h-full object-cover" /> : initials}
-            </div>
-            <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400 border-2 border-white" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[12.5px] font-black text-neutral-800 truncate leading-tight">{userName || "Admin"}</p>
-            <p className="text-[10.5px] text-neutral-450 truncate leading-tight">{roleLabel}</p>
-          </div>
-          <button onClick={() => signOut({ callbackUrl: "/login" })} title="Sign out"
-            className="shrink-0 p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
@@ -534,10 +486,7 @@ function MobileDrawer({ pathname, role, counts, pulsing, pinned, onPin, onContex
       </div>
 
       <div className="px-4 py-3 border-t border-neutral-100 shrink-0">
-        <Link href="/admin/settings" onClick={onClose}
-          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-neutral-850 transition-colors py-2 font-bold">
-          <Settings className="w-4 h-4" /> Settings
-        </Link>
+
         <button onClick={() => signOut({ callbackUrl: "/login" })}
           className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-red-500 transition-colors py-2 w-full font-bold">
           <LogOut className="w-4 h-4" /> Sign out
@@ -801,8 +750,7 @@ export function AdminSidebar({
                 <Panel group={activePanelGroup} pathname={pathname} role={role}
                   counts={counts} pulsing={pulsing} pinned={pinned} onPin={togglePin}
                   onContextMenu={handleContextMenu} onNavigate={handleNavigate} theme={currentTheme}
-                  themeId={themeId} onThemeChange={handleThemeChange}
-                  userName={userName} userImage={userImage} initials={initials} roleLabel={roleLabel} />
+                  themeId={themeId} onThemeChange={handleThemeChange} />
               )}
             </div>
           </>

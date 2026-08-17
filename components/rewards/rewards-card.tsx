@@ -26,14 +26,16 @@ interface RewardsData {
 }
 
 const LEVEL_CONFIG: Record<Level, { label: string; color: string; bg: string; border: string; bar: string }> = {
-  bronze:   { label: "Bronze",   color: "text-amber-700",  bg: "bg-amber-50",   border: "border-amber-200",  bar: "bg-amber-500"  },
-  silver:   { label: "Silver",   color: "text-slate-600",  bg: "bg-slate-50",   border: "border-slate-200",  bar: "bg-slate-400"  },
-  gold:     { label: "Gold",     color: "text-yellow-600", bg: "bg-yellow-50",  border: "border-yellow-200", bar: "bg-yellow-500" },
-  platinum: { label: "Platinum", color: "text-indigo-700", bg: "bg-indigo-50",  border: "border-indigo-200", bar: "bg-indigo-500" },
+  bronze:   { label: "New Client",   color: "text-amber-700",  bg: "bg-amber-50",   border: "border-amber-200",  bar: "bg-amber-500"  },
+  silver:   { label: "Regular",      color: "text-slate-600",  bg: "bg-slate-50",   border: "border-slate-200",  bar: "bg-slate-400"  },
+  gold:     { label: "Active",       color: "text-yellow-600", bg: "bg-yellow-50",  border: "border-yellow-200", bar: "bg-yellow-500" },
+  platinum: { label: "Pro Client",   color: "text-indigo-700", bg: "bg-indigo-50",  border: "border-indigo-200", bar: "bg-indigo-500" },
+  vip:      { label: "VIP Client",   color: "text-purple-700", bg: "bg-purple-50",  border: "border-purple-200", bar: "bg-purple-500" },
+  elite:    { label: "Elite Client", color: "text-pink-700", bg: "bg-pink-50",  border: "border-pink-200", bar: "bg-pink-500" },
 };
 
-const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 500, gold: 2000, platinum: 5000 };
-const LEVEL_MAX: Record<Level, number>   = { bronze: 500, silver: 2000, gold: 5000, platinum: Infinity };
+const LEVEL_START: Record<Level, number> = { bronze: 0, silver: 1000, gold: 3000, platinum: 7500, vip: 15000, elite: 30000 };
+const LEVEL_MAX: Record<Level, number>   = { bronze: 1000, silver: 3000, gold: 7500, platinum: 15000, vip: 30000, elite: Infinity };
 
 // Each milestone: { badge key, emoji, label, what triggers it, current count fn, target }
 type Milestone = {
