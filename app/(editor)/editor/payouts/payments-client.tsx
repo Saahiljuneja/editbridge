@@ -481,28 +481,29 @@ export function PaymentsClient({
         {/* Quick Filters row & count */}
         {activeTab === "transactions" && (
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5">
-              <p className="text-xs text-gray-400 font-bold mr-1 uppercase tracking-wider">Quick filters:</p>
-              <button
-                onClick={() => { setQuickFilter("successful"); setPage(1); }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  quickFilter === "successful"
-                    ? "bg-gray-200 dark:bg-gray-800 text-neutral-800 dark:text-neutral-200"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                Successful
-              </button>
-              <button
-                onClick={() => { setQuickFilter("abandoned"); setPage(1); }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  quickFilter === "abandoned"
-                    ? "bg-gray-200 dark:bg-gray-800 text-neutral-800 dark:text-neutral-200"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                Abandoned
-              </button>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-400 mr-0.5">Quick filters:</p>
+              {(["successful", "abandoned"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => { setQuickFilter(f); setPage(1); }}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    quickFilter === f
+                      ? "bg-white dark:bg-gray-900 border border-[#0EA5E9] text-[#0EA5E9]"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                  }`}
+                >
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
+              {quickFilter !== "all" && (
+                <button
+                  onClick={() => { setQuickFilter("all"); setPage(1); }}
+                  className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
+                >
+                  Clear
+                </button>
+              )}
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 font-bold tabular-nums">
               {sortedTransactions.length} transaction{sortedTransactions.length !== 1 ? "s" : ""}
