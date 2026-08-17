@@ -294,14 +294,32 @@ export function PaymentsClient({
             <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Payments</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-              kycStatus === "approved"
-                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
-                : "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${kycStatus === "approved" ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
-              Payment Status: {kycStatus === "approved" ? "Active" : "Pending KYC"}
-            </span>
+            {(() => {
+              let label: string;
+              let bg: string;
+              let text: string;
+              let dot: string;
+              let pulse = false;
+
+              if (kycStatus === "rejected") {
+                label = "KYC Rejected"; bg = "bg-red-50 dark:bg-red-950/40"; text = "text-red-700 dark:text-red-400"; dot = "bg-red-500";
+              } else if (kycStatus === "expired") {
+                label = "KYC Expired"; bg = "bg-amber-50 dark:bg-amber-950/40"; text = "text-amber-700 dark:text-amber-400"; dot = "bg-amber-500"; pulse = true;
+              } else if (kycStatus !== "approved") {
+                label = "Pending KYC"; bg = "bg-amber-50 dark:bg-amber-950/40"; text = "text-amber-700 dark:text-amber-400"; dot = "bg-amber-500"; pulse = true;
+              } else if (!bankAccountLastFour) {
+                label = "Bank Account Required"; bg = "bg-amber-50 dark:bg-amber-950/40"; text = "text-amber-700 dark:text-amber-400"; dot = "bg-amber-500"; pulse = true;
+              } else {
+                label = "Payouts Active"; bg = "bg-emerald-50 dark:bg-emerald-950/40"; text = "text-emerald-700 dark:text-emerald-400"; dot = "bg-emerald-500";
+              }
+
+              return (
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${bg} ${text}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${dot} ${pulse ? "animate-pulse" : ""}`} />
+                  {label}
+                </span>
+              );
+            })()}
             <button
               onClick={() => setShowBankSettings(!showBankSettings)}
               className={`p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all ${
