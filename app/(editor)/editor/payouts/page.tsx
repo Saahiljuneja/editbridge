@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { payouts, orders, packages, editors, users } from "@/lib/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { PaymentsClient } from "./payments-client";
 
 export const dynamic = "force-dynamic";

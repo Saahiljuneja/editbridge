@@ -202,16 +202,30 @@ export function PaymentsClient({
 
   const totalPayoutPages = Math.ceil(sortedPayouts.length / PAGE_SIZE);
 
-  // Total earnings respects the active product + time filter
+  // Earnings card: only product + time filters — search query must not affect the total or chart
+  const earningsPayouts = useMemo(() => {
+    return payouts.filter(p => {
+      if (productFilter !== "all" && p.packageTitle !== productFilter) return false;
+      const pDate = new Date(p.createdAt);
+      const now = new Date();
+      if (timeFilter === "month") {
+        if (pDate.getMonth() !== now.getMonth() || pDate.getFullYear() !== now.getFullYear()) return false;
+      } else if (timeFilter === "year") {
+        if (pDate.getFullYear() !== now.getFullYear()) return false;
+      }
+      return true;
+    });
+  }, [payouts, productFilter, timeFilter]);
+
   const totalEarningsVal = useMemo(() => {
-    return filteredPayouts
+    return earningsPayouts
       .filter(p => p.status === "completed")
       .reduce((sum, p) => sum + p.netAmount, 0);
-  }, [filteredPayouts]);
+  }, [earningsPayouts]);
 
-  // Chart data also respects filters so it matches the earnings total shown above it
+  // Chart uses the same search-excluded list so it always matches the displayed total
   const chartCoordinates = useMemo(() => {
-    const completedPayouts = filteredPayouts
+    const completedPayouts = earningsPayouts
       .filter(p => p.status === "completed" && p.settledAt)
       .sort((a, b) => new Date(a.settledAt!).getTime() - new Date(b.settledAt!).getTime());
 
@@ -244,7 +258,7 @@ export function PaymentsClient({
       ];
     }
     return points;
-  }, [filteredPayouts]);
+  }, [earningsPayouts]);
 
   function handleExport() {
     const list = activeTab === "transactions" ? sortedTransactions : sortedPayouts;
