@@ -48,7 +48,7 @@ const editorLinks = [
   { href: "/editor/notifications",   label: "Notifications" },
   { href: "/editor/analytics",       label: "Analytics" },
   { href: "/editor/featured",        label: "Featured Placement", flag: "featured_placement" as const },
-  { href: "/editor/payouts",         label: "Payouts" },
+  { href: "/editor/payments",        label: "Payments" },
   { href: "/editor/availability",    label: "Availability" },
   { href: "/editor/rewards",         label: "Rewards & XP" },
   { href: "/editor/saved-portfolio", label: "Saved Portfolio" },

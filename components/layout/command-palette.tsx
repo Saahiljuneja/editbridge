@@ -41,7 +41,7 @@ const EDITOR_PAGES: Page[] = [
   { href: "/editor/quotes",           label: "Quotes",            icon: FileQuestion,    group: "Work" },
   { href: "/editor/questions",        label: "Pre-order Q&A",     icon: HelpCircle,      group: "Work" },
   { href: "/editor/messages",         label: "Messages",          icon: MessageSquare,   group: "Work" },
-  { href: "/editor/payouts",          label: "Payouts",           icon: DollarSign,      group: "Work" },
+  { href: "/editor/payments",         label: "Payments",          icon: DollarSign,      group: "Work" },
   { href: "/editor/disputes",         label: "Disputes",          icon: AlertTriangle,   group: "Work" },
   { href: "/editor/profile",          label: "My Profile",        icon: User,            group: "Profile" },
   { href: "/editor/packages",         label: "Services",          icon: Package,         group: "Profile" },

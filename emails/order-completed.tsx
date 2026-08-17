@@ -49,8 +49,8 @@ export function OrderCompleted({
         payout history from your payouts dashboard.
       </Text>
 
-      <Button href={`${appUrl}/editor/payouts`} style={button}>
-        View payouts
+      <Button href={`${appUrl}/editor/payments`} style={button}>
+        View payments
       </Button>
     </BaseLayout>
   );

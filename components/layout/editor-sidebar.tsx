@@ -29,6 +29,7 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
       { href: "/editor/questions",       label: "Pre-order Q&A", icon: HelpCircle },
       { href: "/editor/messages",        label: "Messages",      icon: MessageSquare, badgeKey: "messages" as const },
       { href: "/editor/wallet",          label: "My Wallet",     icon: Wallet },
+      { href: "/editor/payments",        label: "Payments",      icon: DollarSign },
       { href: "/editor/disputes",        label: "Disputes",      icon: AlertTriangle },
     ],
   },

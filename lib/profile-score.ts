@@ -120,9 +120,9 @@ export function calculateProfileScore(
   // Bank account linked — 5pts
   if (editor.bankAccountNumber) {
     score += 5;
-    items.push({ key: "bank", label: "Bank account linked", points: 5, completed: true, actionHref: "/editor/payouts" });
+    items.push({ key: "bank", label: "Bank account linked", points: 5, completed: true, actionHref: "/editor/payments" });
   } else {
-    items.push({ key: "bank", label: "Link your bank account", points: 5, completed: false, actionHref: "/editor/payouts" });
+    items.push({ key: "bank", label: "Link your bank account", points: 5, completed: false, actionHref: "/editor/payments" });
   }
 
   return { score, maxScore: 100, items };

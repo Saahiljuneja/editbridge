@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
           "/dashboard",
           "/editor/dashboard",
           "/editor/kyc",
-          "/editor/payouts",
+          "/editor/payments",
           "/editor/settings",
           "/messages",
           "/orders",

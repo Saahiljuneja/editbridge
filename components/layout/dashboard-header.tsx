@@ -39,7 +39,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/editor/quotes":          "Quotes",
   "/editor/questions":       "Pre-order Q&A",
   "/editor/messages":        "Messages",
-  "/editor/payouts":         "Payouts",
+  "/editor/payments":        "Payments",
   "/editor/disputes":        "Disputes",
   "/editor/profile":         "My Profile",
   "/editor/saved-portfolio": "Saved",

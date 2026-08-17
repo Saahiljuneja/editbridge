@@ -724,9 +724,9 @@ export default async function EditorDashboardPage() {
                   <span className="text-sm font-black text-neutral-900 tabular-nums">{formatCurrency(totalEarnings)}</span>
                 </div>
               </div>
-              <Link href="/editor/payouts"
+              <Link href="/editor/payments"
                 className="mt-5 flex items-center justify-between text-xs font-bold text-brand-primary hover:text-brand-primary-hover transition-colors">
-                View payouts <ArrowRight className="w-3.5 h-3.5" />
+                View payments <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
