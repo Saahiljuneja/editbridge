@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { Level } from "@/lib/rewards";
-import { Zap, Gift, Clock, CheckCircle2, Store, Star, ShoppingBag, ArrowUpRight } from "lucide-react";
+import { Zap, Gift, Clock, Store, Star, ShoppingBag, ArrowUpRight } from "lucide-react";
 import { XpStoreClient } from "../xp-store/xp-store-client";
 
 const COLOR = "#1e40af";
@@ -35,8 +35,6 @@ const LM: Record<Level, LevelMeta> = {
   platinum: { label: "Platinum", emoji: "💎", tagline: "Premium Member",   accent: "#06B6D4", ring: "#22D3EE", glow: "rgba(34,211,238,0.1)",   textClass: "text-cyan-600",   bgGradient: "from-cyan-500/15 to-teal-500/5",     border: "border-cyan-500/25",   start: 5000, end: Infinity },
 };
 
-const LEVEL_ORDER: Level[] = ["bronze", "silver", "gold", "platinum"];
-const LEVEL_XP_LABELS = ["0", "500", "2k", "5k"];
 
 const PERKS: Record<Level, Array<{ icon: string; text: string }>> = {
   bronze:   [{ icon: "👥", text: "Standard matching" },  { icon: "🎧", text: "Basic support" }],
@@ -170,7 +168,6 @@ export function ClientRewardsClient({ storeProps }: { storeProps: StoreProps }) 
 
   const earnedSet = new Set(data.badges.map(b => b.badge));
   const earnedMap = Object.fromEntries(data.badges.map(b => [b.badge, b.awardedAt]));
-  const levelIdx  = LEVEL_ORDER.indexOf(data.level);
   const now = new Date();
 
   return (
@@ -285,49 +282,6 @@ export function ClientRewardsClient({ storeProps }: { storeProps: StoreProps }) 
                 </span>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Journey Roadmap ── */}
-      <div className="bg-white rounded-3xl border border-gray-100 px-6 py-5 shadow-sm overflow-hidden">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 mb-6">Journey Roadmap</p>
-        <div className="overflow-x-auto pb-1">
-          <div className="relative flex items-center justify-between min-w-[440px] px-6">
-            <div className="absolute left-[11%] right-[11%] h-[3px] bg-gray-100 rounded-full top-5" />
-            {levelIdx > 0 && (
-              <div
-                className="absolute left-[11%] h-[3px] rounded-full transition-all duration-700 top-5"
-                style={{
-                  width: `calc(${(levelIdx / (LEVEL_ORDER.length - 1)) * 78}%)`,
-                  background: `linear-gradient(90deg, ${LM.bronze.ring}, ${lm.ring})`,
-                }}
-              />
-            )}
-            {LEVEL_ORDER.map((l, i) => {
-              const m = LM[l];
-              const isCompleted = i < levelIdx;
-              const isCurrent   = i === levelIdx;
-              return (
-                <div key={l} className="relative flex flex-col items-center flex-1 z-10">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all duration-500"
-                    style={{
-                      background: isCompleted ? `${m.ring}15` : isCurrent ? "white" : "#F8FAFC",
-                      borderColor: isCurrent ? m.ring : isCompleted ? `${m.ring}60` : "#E2E8F0",
-                      boxShadow: isCurrent ? `0 0 0 4px ${m.ring}22, 0 4px 12px ${m.ring}18` : undefined,
-                    }}
-                  >
-                    {isCompleted
-                      ? <CheckCircle2 className="w-5 h-5" style={{ color: m.ring }} />
-                      : <span className="text-xl">{m.emoji}</span>
-                    }
-                  </div>
-                  <p className={cn("text-[11px] font-bold mt-2.5", isCurrent ? "text-gray-900" : "text-gray-400")}>{m.label}</p>
-                  <p className="text-[9px] font-semibold text-gray-300 mt-0.5">{LEVEL_XP_LABELS[i]} XP</p>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>
