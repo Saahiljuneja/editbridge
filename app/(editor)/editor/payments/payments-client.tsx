@@ -113,7 +113,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
           {payload[0].payload.tooltipLabel}
         </p>
         <p className="font-black text-gray-900 dark:text-white flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-sky-400 shrink-0" />
+          <span className="w-2 h-2 rounded-full bg-[#1e40af] shrink-0" />
           {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 0 }).format(payload[0].value)}
         </p>
       </div>
@@ -457,14 +457,14 @@ export function PaymentsClient({
                           type="date"
                           value={customFrom}
                           onChange={e => setCustomFrom(e.target.value)}
-                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400"
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]"
                         />
                         <p className="text-xs text-gray-400 text-center font-medium">and</p>
                         <input
                           type="date"
                           value={customTo}
                           onChange={e => setCustomTo(e.target.value)}
-                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400"
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af]"
                         />
                         <div className="flex gap-2 pt-0.5">
                           <button
@@ -476,7 +476,7 @@ export function PaymentsClient({
                           <button
                             disabled={!customFrom || !customTo}
                             onClick={() => { setPage(1); setShowTimeDropdown(false); }}
-                            className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-[#0EA5E9] hover:bg-sky-600"
+                            className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-[#1e40af] hover:bg-blue-800"
                           >
                             Apply
                           </button>
@@ -494,8 +494,8 @@ export function PaymentsClient({
               <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="earningsGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#1e40af" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#1e40af" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-gray-100 dark:stroke-gray-800" />
@@ -523,11 +523,11 @@ export function PaymentsClient({
                 <Area
                   type="monotone"
                   dataKey="amount"
-                  stroke="#38bdf8"
+                  stroke="#1e40af"
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#earningsGrad)"
-                  activeDot={{ r: 5, fill: "#38bdf8", strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: "#1e40af", strokeWidth: 0 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -574,8 +574,8 @@ export function PaymentsClient({
 
           <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-950/40 flex items-center justify-center shrink-0">
-                <Receipt className="w-3.5 h-3.5 text-sky-500" />
+              <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center shrink-0">
+                <Receipt className="w-3.5 h-3.5 text-[#1e40af]" />
               </div>
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Orders</p>
             </div>
@@ -619,7 +619,7 @@ export function PaymentsClient({
                 placeholder={activeTab === "transactions" ? "Search client or product…" : "Search product or transfer ID…"}
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 pl-9 pr-4 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-gray-900 dark:text-white placeholder:text-gray-400"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 pl-9 pr-4 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#1e40af]/20 text-gray-900 dark:text-white placeholder:text-gray-400"
               />
             </div>
             <button
@@ -654,7 +654,7 @@ export function PaymentsClient({
                   onClick={() => { setQuickFilter(f); setPage(1); }}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                     quickFilter === f
-                      ? "bg-white dark:bg-gray-900 border border-[#0EA5E9] text-[#0EA5E9]"
+                      ? "bg-white dark:bg-gray-900 border border-[#1e40af] text-[#1e40af]"
                       : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
                   }`}
                 >
@@ -830,11 +830,11 @@ export function PaymentsClient({
                             po.status === "completed"
                               ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
                               : po.status === "processing"
-                                ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400"
+                                ? "bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-400"
                                 : "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
                           }`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${
-                              po.status === "completed" ? "bg-emerald-500" : po.status === "processing" ? "bg-sky-500 animate-pulse" : "bg-amber-500 animate-pulse"
+                              po.status === "completed" ? "bg-emerald-500" : po.status === "processing" ? "bg-[#1e40af] animate-pulse" : "bg-amber-500 animate-pulse"
                             }`} />
                             {po.status === "completed" ? "Settled" : po.status === "processing" ? "Processing" : "Pending"}
                           </span>
