@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import {
   Search, SlidersHorizontal, ArrowUpDown, Download,
   Settings, HelpCircle, ArrowRight,
   ChevronLeft, ChevronRight as ChevronRightIcon,
   Clock, CheckCircle2, XCircle, TrendingUp, Banknote, Receipt,
+  ChevronDown, Calendar,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
@@ -66,6 +67,35 @@ function escapeCsvField(val: unknown): string {
   return `"${safe.replace(/"/g, '""')}"`;
 }
 
+type TimeFilter = "today" | "yesterday" | "last7" | "last30" | "lifetime" | "custom";
+
+const TIME_OPTIONS: { value: TimeFilter; label: string }[] = [
+  { value: "today",     label: "Today" },
+  { value: "yesterday", label: "Yesterday" },
+  { value: "last7",     label: "Last 7 Days" },
+  { value: "last30",    label: "Last 30 Days" },
+  { value: "lifetime",  label: "Lifetime" },
+  { value: "custom",    label: "Custom Date" },
+];
+
+function passesTimeFilter(date: Date, tf: TimeFilter, customFrom: string, customTo: string): boolean {
+  const now = new Date();
+  const sod = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (tf === "today") return date >= sod;
+  if (tf === "yesterday") {
+    const prev = new Date(sod); prev.setDate(prev.getDate() - 1);
+    return date >= prev && date < sod;
+  }
+  if (tf === "last7")  { const d = new Date(sod); d.setDate(d.getDate() - 7);  return date >= d; }
+  if (tf === "last30") { const d = new Date(sod); d.setDate(d.getDate() - 30); return date >= d; }
+  if (tf === "custom") {
+    if (customFrom && date < new Date(customFrom)) return false;
+    if (customTo   && date > new Date(customTo + "T23:59:59")) return false;
+    return true;
+  }
+  return true; // lifetime
+}
+
 function formatYAxisTick(v: number) {
   if (v === 0) return "₹0";
   if (v >= 10000000) return `₹${(v / 10000000).toFixed(1).replace(/\.0$/, "")}Cr`;
@@ -102,12 +132,26 @@ export function PaymentsClient({
 }: Props) {
   const [activeTab, setActiveTab] = useState<"transactions" | "payouts">("transactions");
   const [productFilter, setProductFilter] = useState("all");
-  const [timeFilter, setTimeFilter] = useState("lifetime");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("lifetime");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
+  const timeDropdownRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [quickFilter, setQuickFilter] = useState<"successful" | "abandoned" | "all">("successful");
   const [sortAsc, setSortAsc] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(e.target as Node)) {
+        setShowTimeDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const uniquePackages = useMemo(() => {
     const pkgs = new Set<string>();
@@ -118,13 +162,7 @@ export function PaymentsClient({
   const filteredTransactions = useMemo(() => {
     return transactions.filter(tx => {
       if (productFilter !== "all" && tx.packageTitle !== productFilter) return false;
-      const txDate = new Date(tx.createdAt);
-      const now = new Date();
-      if (timeFilter === "month") {
-        if (txDate.getMonth() !== now.getMonth() || txDate.getFullYear() !== now.getFullYear()) return false;
-      } else if (timeFilter === "year") {
-        if (txDate.getFullYear() !== now.getFullYear()) return false;
-      }
+      if (!passesTimeFilter(new Date(tx.createdAt), timeFilter, customFrom, customTo)) return false;
       if (quickFilter === "successful" && tx.status === "cancelled") return false;
       if (quickFilter === "abandoned" && tx.status !== "cancelled") return false;
       if (searchQuery.trim()) {
@@ -137,7 +175,7 @@ export function PaymentsClient({
       }
       return true;
     });
-  }, [transactions, productFilter, timeFilter, quickFilter, searchQuery]);
+  }, [transactions, productFilter, timeFilter, customFrom, customTo, quickFilter, searchQuery]);
 
   const sortedTransactions = useMemo(() => {
     return [...filteredTransactions].sort((a, b) => {
@@ -156,13 +194,7 @@ export function PaymentsClient({
   const filteredPayouts = useMemo(() => {
     return payouts.filter(p => {
       if (productFilter !== "all" && p.packageTitle !== productFilter) return false;
-      const pDate = new Date(p.createdAt);
-      const now = new Date();
-      if (timeFilter === "month") {
-        if (pDate.getMonth() !== now.getMonth() || pDate.getFullYear() !== now.getFullYear()) return false;
-      } else if (timeFilter === "year") {
-        if (pDate.getFullYear() !== now.getFullYear()) return false;
-      }
+      if (!passesTimeFilter(new Date(p.createdAt), timeFilter, customFrom, customTo)) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         if (
@@ -172,7 +204,7 @@ export function PaymentsClient({
       }
       return true;
     });
-  }, [payouts, productFilter, timeFilter, searchQuery]);
+  }, [payouts, productFilter, timeFilter, customFrom, customTo, searchQuery]);
 
   const sortedPayouts = useMemo(() => {
     return [...filteredPayouts].sort((a, b) => {
@@ -192,16 +224,9 @@ export function PaymentsClient({
   const earningsPayouts = useMemo(() => {
     return payouts.filter(p => {
       if (productFilter !== "all" && p.packageTitle !== productFilter) return false;
-      const pDate = new Date(p.createdAt);
-      const now = new Date();
-      if (timeFilter === "month") {
-        if (pDate.getMonth() !== now.getMonth() || pDate.getFullYear() !== now.getFullYear()) return false;
-      } else if (timeFilter === "year") {
-        if (pDate.getFullYear() !== now.getFullYear()) return false;
-      }
-      return true;
+      return passesTimeFilter(new Date(p.createdAt), timeFilter, customFrom, customTo);
     });
-  }, [payouts, productFilter, timeFilter]);
+  }, [payouts, productFilter, timeFilter, customFrom, customTo]);
 
   const totalEarningsVal = useMemo(() =>
     earningsPayouts.filter(p => p.status === "completed").reduce((s, p) => s + p.netAmount, 0),
@@ -231,18 +256,22 @@ export function PaymentsClient({
       }) + " · " + fmtTime(d);
 
       let xLabel: string;
-      if (timeFilter === "month") xLabel = d.getDate().toString();
-      else if (timeFilter === "year") xLabel = d.toLocaleDateString("en-IN", { month: "short" });
-      else xLabel = d.getFullYear().toString();
+      if (timeFilter === "today" || timeFilter === "yesterday") {
+        xLabel = d.toLocaleTimeString("en-IN", { hour: "2-digit", hour12: true }).replace(" ", "");
+      } else if (timeFilter === "last7" || timeFilter === "last30" || timeFilter === "custom") {
+        xLabel = d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+      } else {
+        xLabel = d.getFullYear().toString();
+      }
 
       return { tooltipLabel, ts: d.getTime(), xLabel, amount: running / 100 };
     });
 
     if (points.length === 0) {
-      if (timeFilter === "month") {
-        return [{ tooltipLabel: "", ts: 1, xLabel: "1", amount: 0 }, { tooltipLabel: "", ts: 15, xLabel: "15", amount: 0 }, { tooltipLabel: "", ts: 30, xLabel: "30", amount: 0 }];
-      } else if (timeFilter === "year") {
-        return [{ tooltipLabel: "", ts: 1, xLabel: "Jan", amount: 0 }, { tooltipLabel: "", ts: 6, xLabel: "Jun", amount: 0 }, { tooltipLabel: "", ts: 12, xLabel: "Dec", amount: 0 }];
+      if (timeFilter === "today" || timeFilter === "yesterday") {
+        return [{ tooltipLabel: "", ts: 1, xLabel: "12AM", amount: 0 }, { tooltipLabel: "", ts: 2, xLabel: "12PM", amount: 0 }, { tooltipLabel: "", ts: 3, xLabel: "11PM", amount: 0 }];
+      } else if (timeFilter !== "lifetime") {
+        return [{ tooltipLabel: "", ts: 1, xLabel: "—", amount: 0 }, { tooltipLabel: "", ts: 2, xLabel: "—", amount: 0 }];
       }
       return [{ tooltipLabel: "", ts: 2024, xLabel: "2024", amount: 0 }, { tooltipLabel: "", ts: 2025, xLabel: "2025", amount: 0 }, { tooltipLabel: "", ts: 2026, xLabel: "2026", amount: 0 }];
     }
@@ -356,15 +385,62 @@ export function PaymentsClient({
                 <option value="all">All Products</option>
                 {uniquePackages.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
-              <select
-                value={timeFilter}
-                onChange={e => { setTimeFilter(e.target.value); setPage(1); }}
-                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-              >
-                <option value="lifetime">All time</option>
-                <option value="year">This year</option>
-                <option value="month">This month</option>
-              </select>
+              {/* Custom time filter dropdown */}
+              <div ref={timeDropdownRef} className="relative">
+                <button
+                  onClick={() => setShowTimeDropdown(v => !v)}
+                  className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-w-[110px] justify-between"
+                >
+                  {TIME_OPTIONS.find(o => o.value === timeFilter)?.label ?? "Lifetime"}
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${showTimeDropdown ? "rotate-180" : ""}`} />
+                </button>
+
+                {showTimeDropdown && (
+                  <div className="absolute right-0 top-full mt-1.5 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl z-50 py-1.5 overflow-hidden">
+                    {TIME_OPTIONS.map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setTimeFilter(opt.value);
+                          setPage(1);
+                          if (opt.value !== "custom") setShowTimeDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors flex items-center gap-2 ${
+                          timeFilter === opt.value
+                            ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
+                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                        }`}
+                      >
+                        {opt.value === "custom" && <Calendar className="w-3.5 h-3.5 shrink-0" />}
+                        {opt.label}
+                      </button>
+                    ))}
+
+                    {timeFilter === "custom" && (
+                      <div className="px-3 pb-3 pt-1 space-y-2 border-t border-gray-100 dark:border-gray-800 mt-1">
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-400 mb-1">From</p>
+                          <input
+                            type="date"
+                            value={customFrom}
+                            onChange={e => { setCustomFrom(e.target.value); setPage(1); }}
+                            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500/40"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-400 mb-1">To</p>
+                          <input
+                            type="date"
+                            value={customTo}
+                            onChange={e => { setCustomTo(e.target.value); setPage(1); }}
+                            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500/40"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -502,7 +578,7 @@ export function PaymentsClient({
               />
             </div>
             <button
-              onClick={() => { setQuickFilter("all"); setProductFilter("all"); setTimeFilter("lifetime"); setSearchQuery(""); setPage(1); }}
+              onClick={() => { setQuickFilter("all"); setProductFilter("all"); setTimeFilter("lifetime"); setCustomFrom(""); setCustomTo(""); setSearchQuery(""); setPage(1); }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" /> Clear
