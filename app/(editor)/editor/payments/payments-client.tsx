@@ -136,7 +136,9 @@ export function PaymentsClient({
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [showTimeDropdown, setShowTimeDropdown] = useState(false);
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
   const timeDropdownRef = useRef<HTMLDivElement>(null);
+  const productDropdownRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [quickFilter, setQuickFilter] = useState<"successful" | "abandoned" | "all">("successful");
   const [sortAsc, setSortAsc] = useState(false);
@@ -147,6 +149,9 @@ export function PaymentsClient({
     function handleClickOutside(e: MouseEvent) {
       if (timeDropdownRef.current && !timeDropdownRef.current.contains(e.target as Node)) {
         setShowTimeDropdown(false);
+      }
+      if (productDropdownRef.current && !productDropdownRef.current.contains(e.target as Node)) {
+        setShowProductDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -377,14 +382,36 @@ export function PaymentsClient({
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <select
-                value={productFilter}
-                onChange={e => { setProductFilter(e.target.value); setPage(1); }}
-                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-              >
-                <option value="all">All Products</option>
-                {uniquePackages.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+              {/* Product filter dropdown */}
+              <div ref={productDropdownRef} className="relative">
+                <button
+                  onClick={() => setShowProductDropdown(v => !v)}
+                  className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-w-[120px] justify-between"
+                >
+                  <span className="truncate max-w-[100px]">
+                    {productFilter === "all" ? "All Products" : productFilter}
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 shrink-0 transition-transform ${showProductDropdown ? "rotate-180" : ""}`} />
+                </button>
+
+                {showProductDropdown && (
+                  <div className="absolute right-0 top-full mt-1.5 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl z-50 py-1.5 overflow-hidden">
+                    {[{ value: "all", label: "All Products" }, ...uniquePackages.map(p => ({ value: p, label: p }))].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => { setProductFilter(opt.value); setPage(1); setShowProductDropdown(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors truncate ${
+                          productFilter === opt.value
+                            ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
+                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {/* Custom time filter dropdown */}
               <div ref={timeDropdownRef} className="relative">
                 <button
