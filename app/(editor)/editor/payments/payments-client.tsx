@@ -417,24 +417,35 @@ export function PaymentsClient({
                     ))}
 
                     {timeFilter === "custom" && (
-                      <div className="px-3 pb-3 pt-1 space-y-2 border-t border-gray-100 dark:border-gray-800 mt-1">
-                        <div>
-                          <p className="text-[10px] font-semibold text-gray-400 mb-1">From</p>
-                          <input
-                            type="date"
-                            value={customFrom}
-                            onChange={e => { setCustomFrom(e.target.value); setPage(1); }}
-                            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500/40"
-                          />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-semibold text-gray-400 mb-1">To</p>
-                          <input
-                            type="date"
-                            value={customTo}
-                            onChange={e => { setCustomTo(e.target.value); setPage(1); }}
-                            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500/40"
-                          />
+                      <div className="border-t border-gray-100 dark:border-gray-800 mt-1 p-4 space-y-3">
+                        <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">Select a custom range:</p>
+                        <input
+                          type="date"
+                          value={customFrom}
+                          onChange={e => setCustomFrom(e.target.value)}
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-xs text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400/60"
+                        />
+                        <p className="text-xs text-gray-400 text-center">and</p>
+                        <input
+                          type="date"
+                          value={customTo}
+                          onChange={e => setCustomTo(e.target.value)}
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-xs text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400/60"
+                        />
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={() => { setCustomFrom(""); setCustomTo(""); setTimeFilter("lifetime"); setShowTimeDropdown(false); setPage(1); }}
+                            className="flex-1 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            disabled={!customFrom || !customTo}
+                            onClick={() => { setPage(1); setShowTimeDropdown(false); }}
+                            className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-800 dark:bg-gray-200 dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-white"
+                          >
+                            Apply
+                          </button>
                         </div>
                       </div>
                     )}
