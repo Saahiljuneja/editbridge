@@ -6,7 +6,7 @@ import {
   Settings, HelpCircle, ArrowRight,
   ChevronLeft, ChevronRight as ChevronRightIcon,
   Clock, CheckCircle2, XCircle, TrendingUp, Banknote, Receipt,
-  ChevronDown, Calendar,
+  ChevronDown, Calendar, Check,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
@@ -423,53 +423,60 @@ export function PaymentsClient({
                 </button>
 
                 {showTimeDropdown && (
-                  <div className="absolute right-0 top-full mt-1.5 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl z-50 py-1.5 overflow-hidden">
-                    {TIME_OPTIONS.map(opt => (
-                      <button
-                        key={opt.value}
-                        onClick={() => {
-                          setTimeFilter(opt.value);
-                          setPage(1);
-                          if (opt.value !== "custom") setShowTimeDropdown(false);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors flex items-center gap-2 ${
-                          timeFilter === opt.value
-                            ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                        }`}
-                      >
-                        {opt.value === "custom" && <Calendar className="w-3.5 h-3.5 shrink-0" />}
-                        {opt.label}
-                      </button>
-                    ))}
+                  <div className="absolute right-0 top-full mt-1.5 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.10)] z-50 overflow-hidden">
+                    <div className="py-1.5">
+                      {TIME_OPTIONS.map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => {
+                            setTimeFilter(opt.value);
+                            setPage(1);
+                            if (opt.value !== "custom") setShowTimeDropdown(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between gap-2 ${
+                            timeFilter === opt.value
+                              ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
+                              : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60 font-medium"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            {opt.value === "custom" && <Calendar className="w-3.5 h-3.5 shrink-0 text-gray-400" />}
+                            {opt.label}
+                          </span>
+                          {timeFilter === opt.value && opt.value !== "custom" && (
+                            <Check className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
 
                     {timeFilter === "custom" && (
-                      <div className="border-t border-gray-100 dark:border-gray-800 mt-1 p-4 space-y-3">
-                        <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">Select a custom range:</p>
+                      <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-3 bg-gray-50/60 dark:bg-gray-800/30">
+                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Select a custom range:</p>
                         <input
                           type="date"
                           value={customFrom}
                           onChange={e => setCustomFrom(e.target.value)}
-                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-xs text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400/60"
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400"
                         />
-                        <p className="text-xs text-gray-400 text-center">and</p>
+                        <p className="text-xs text-gray-400 text-center font-medium">and</p>
                         <input
                           type="date"
                           value={customTo}
                           onChange={e => setCustomTo(e.target.value)}
-                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-xs text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400/60"
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400"
                         />
-                        <div className="flex gap-2 pt-1">
+                        <div className="flex gap-2 pt-0.5">
                           <button
                             onClick={() => { setCustomFrom(""); setCustomTo(""); setTimeFilter("lifetime"); setShowTimeDropdown(false); setPage(1); }}
-                            className="flex-1 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            className="flex-1 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                           >
                             Cancel
                           </button>
                           <button
                             disabled={!customFrom || !customTo}
                             onClick={() => { setPage(1); setShowTimeDropdown(false); }}
-                            className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-800 dark:bg-gray-200 dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-white"
+                            className="flex-1 py-2 rounded-xl text-xs font-semibold text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-[#0EA5E9] hover:bg-sky-600"
                           >
                             Apply
                           </button>
