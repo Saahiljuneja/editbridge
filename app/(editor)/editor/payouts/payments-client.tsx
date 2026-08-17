@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { BankAccountSection } from "./bank-account-section";
 import Link from "next/link";
 
 interface TransactionRow {
@@ -99,7 +98,6 @@ export function PaymentsClient({
   kycStatus,
 }: Props) {
   const [activeTab, setActiveTab] = useState<"transactions" | "payouts">("transactions");
-  const [showBankSettings, setShowBankSettings] = useState(false);
   const [productFilter, setProductFilter] = useState("all");
   const [timeFilter, setTimeFilter] = useState("lifetime");
   const [searchQuery, setSearchQuery] = useState("");
@@ -320,26 +318,16 @@ export function PaymentsClient({
                 </span>
               );
             })()}
-            <button
-              onClick={() => setShowBankSettings(!showBankSettings)}
-              className={`p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all ${
-                showBankSettings ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white" : "bg-white dark:bg-gray-900 text-gray-400"
-              }`}
+            <Link
+              href="/editor/settings?tab=payments"
+              className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300 transition-all"
+              title="Payment settings"
             >
               <Settings className="w-4 h-4" />
-            </button>
+            </Link>
           </div>
         </div>
 
-        {showBankSettings && (
-          <div className="mt-5 border-t border-gray-100 dark:border-gray-800 pt-5">
-            <BankAccountSection
-              bankAccountName={bankAccountName}
-              bankAccountLastFour={bankAccountLastFour}
-              bankIfsc={bankIfsc}
-            />
-          </div>
-        )}
       </div>
 
       <div className="px-8 py-7 space-y-7">

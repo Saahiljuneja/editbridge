@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1238,7 +1239,11 @@ function NotificationsTab() {
 // ─── Page ──────────────────────────────────────────────────────────────────────
 export default function EditorSettingsPage() {
   const { data: session, update } = useSession();
-  const [activeTab, setActiveTab] = useState<Tab>("profile");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    TABS.some(t => t.id === initialTab) ? initialTab! : "profile"
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
