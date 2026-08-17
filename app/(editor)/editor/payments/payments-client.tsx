@@ -346,9 +346,6 @@ export function PaymentsClient({
                   minimumFractionDigits: 0, maximumFractionDigits: 2,
                 }).format(totalEarningsVal / 100)}
               </p>
-              <p className="text-xs text-gray-400 mt-1">
-                {timeFilter === "month" ? "This month" : timeFilter === "year" ? "This year" : "All time"} · {settledPayoutsCount} payout{settledPayoutsCount !== 1 ? "s" : ""} settled
-              </p>
             </div>
             <div className="flex items-center gap-2">
               <select
