@@ -38,6 +38,7 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
       includesCommercialRights: packages.includesCommercialRights,
       editorName: users.name,
       editorId: packages.editorId,
+      editorImage: users.image,
       isAvailable: editors.isAvailable,
     })
     .from(packages)
