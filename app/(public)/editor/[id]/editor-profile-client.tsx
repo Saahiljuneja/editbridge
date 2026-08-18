@@ -26,6 +26,12 @@ interface Package {
   deliveryDays: number;
   revisionCount: number;
   videoLengthLimit: string | null;
+  videoCount?: number | null;
+  resolution?: string | null;
+  maxRawFootage?: string | null;
+  aspectRatios?: string[];
+  deliveryFormats?: string[];
+  videoCategory?: string | null;
   addons: string[];
   softwareUsed: string[];
   includesSourceFiles: boolean;
@@ -141,18 +147,19 @@ const ADDON_DISPLAY: Record<string, string> = {
 
 function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Package; editorId: string; isAvailable: boolean; isHighlighted?: boolean }) {
   const price = (pkg.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
-  const features = [
-    ...pkg.addons.map(a => ADDON_DISPLAY[a] ?? a.replace(/_/g, " ")),
+
+  const inclusions: string[] = [
     ...(pkg.includesSourceFiles ? ["Source files included"] : []),
     ...(pkg.includesCommercialRights ? ["Commercial rights"] : []),
+    ...pkg.addons.map(a => ADDON_DISPLAY[a] ?? a.replace(/_/g, " ")),
   ];
 
   return (
     <div className={cn(
-      "relative rounded-3xl overflow-hidden border-2 bg-white flex flex-col justify-between transition-all duration-350 h-full hover:-translate-y-1",
+      "relative rounded-3xl overflow-hidden border-2 bg-white flex flex-col transition-all duration-200",
       isHighlighted
-        ? "border-neutral-900 shadow-2xl shadow-neutral-950/15 md:scale-[1.04] z-10"
-        : "border-neutral-200/65 hover:border-neutral-300 hover:shadow-lg"
+        ? "border-neutral-900 shadow-2xl shadow-neutral-950/15"
+        : "border-neutral-200/65"
     )}>
       {/* Most Popular top bar */}
       {isHighlighted && (
@@ -162,55 +169,115 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
         </div>
       )}
 
-      {/* Card Header */}
-      <div className="p-6 flex-1 flex flex-col">
+      {/* Header: tier, title, description, price */}
+      <div className="p-6 flex flex-col gap-1.5">
         {pkg.tier && (
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 mb-1.5 block">{pkg.tier}</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400">{pkg.tier}</span>
         )}
-        <h3 className="font-black text-neutral-900 text-base sm:text-lg leading-tight tracking-tight mb-2">{pkg.title}</h3>
-        <p className="text-[11.5px] text-neutral-500 font-medium leading-relaxed mb-4 flex-1">{pkg.description}</p>
-        <div className="flex items-baseline gap-1 mt-auto pt-3 border-t border-neutral-100/70">
-          <span className="text-2xl sm:text-3xl font-black text-neutral-950 leading-none tracking-tight">{price}</span>
+        <h3 className="font-black text-neutral-900 text-lg leading-tight tracking-tight">{pkg.title}</h3>
+        <p className="text-[12px] text-neutral-500 font-medium leading-relaxed">{pkg.description}</p>
+        <div className="flex items-baseline gap-1 mt-3 pt-3 border-t border-neutral-100">
+          <span className="text-3xl font-black text-neutral-950 leading-none tracking-tight">{price}</span>
           <span className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">/ project</span>
         </div>
       </div>
 
-      {/* Card Stats / Features */}
+      {/* Specs */}
       <div className={cn(
-        "p-5 flex flex-col gap-3.5 border-t border-b border-neutral-100/80",
-        isHighlighted ? "bg-neutral-950/[0.02]" : "bg-neutral-50/50"
+        "p-5 flex flex-col gap-4 border-t border-b border-neutral-100",
+        isHighlighted ? "bg-neutral-950/[0.02]" : "bg-neutral-50/40"
       )}>
-        {/* Core Stats */}
-        <div className="grid grid-cols-2 gap-3 text-[11px] font-bold text-neutral-800">
+        {/* Quick stats grid */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-[11px] font-bold text-neutral-700">
           <div className="flex items-center gap-2">
             <Clock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-            <span>{pkg.deliveryDays} days</span>
+            <span>{pkg.deliveryDays} day{pkg.deliveryDays !== 1 ? "s" : ""} delivery</span>
           </div>
           <div className="flex items-center gap-2">
             <TrendingUp className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-            <span>{pkg.revisionCount === -1 ? "Unlimited" : `${pkg.revisionCount} revs`}</span>
+            <span>{pkg.revisionCount === -1 ? "Unlimited revisions" : `${pkg.revisionCount} revision${pkg.revisionCount !== 1 ? "s" : ""}`}</span>
           </div>
+          {pkg.videoLengthLimit && (
+            <div className="flex items-center gap-2 col-span-2">
+              <span className="text-neutral-400 text-xs">⏱</span>
+              <span>Up to {pkg.videoLengthLimit}</span>
+            </div>
+          )}
+          {!!pkg.videoCount && pkg.videoCount > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-400 text-xs">🎬</span>
+              <span>{pkg.videoCount} video{pkg.videoCount !== 1 ? "s" : ""}</span>
+            </div>
+          )}
+          {pkg.resolution && (
+            <div className="flex items-center gap-2">
+              <span className="text-neutral-400 text-xs">🖥</span>
+              <span>{pkg.resolution.toUpperCase()}</span>
+            </div>
+          )}
+          {pkg.maxRawFootage && (
+            <div className="flex items-center gap-2 col-span-2">
+              <span className="text-neutral-400 text-xs">📁</span>
+              <span>Raw footage: {pkg.maxRawFootage}</span>
+            </div>
+          )}
         </div>
 
-        {/* Features List */}
-        {features.length > 0 && (
-          <ul className="space-y-2 mt-2">
-            {features.slice(0, 4).map(f => (
-              <li key={f} className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
-                </span>
-                <span className="text-[11px] font-semibold text-neutral-600 truncate leading-none">{f}</span>
-              </li>
-            ))}
-            {features.length > 4 && (
-              <li className="text-[9px] font-bold text-neutral-400 pl-6">+{features.length - 4} more included</li>
-            )}
-          </ul>
+        {/* Aspect Ratios */}
+        {pkg.aspectRatios && pkg.aspectRatios.length > 0 && (
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Aspect Ratios</p>
+            <div className="flex flex-wrap gap-1">
+              {pkg.aspectRatios.map(r => (
+                <span key={r} className="text-[10px] font-bold bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{r}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Software */}
+        {pkg.softwareUsed && pkg.softwareUsed.length > 0 && (
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Software</p>
+            <div className="flex flex-wrap gap-1">
+              {pkg.softwareUsed.map(s => (
+                <span key={s} className="text-[10px] font-bold bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{s.replace(/_/g, " ")}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Delivery Formats */}
+        {pkg.deliveryFormats && pkg.deliveryFormats.length > 0 && (
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Delivery Formats</p>
+            <div className="flex flex-wrap gap-1">
+              {pkg.deliveryFormats.map(f => (
+                <span key={f} className="text-[10px] font-bold bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{f.replace(/_/g, " ").toUpperCase()}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* All inclusions */}
+        {inclusions.length > 0 && (
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-wider text-neutral-400 mb-2">Included</p>
+            <ul className="space-y-2">
+              {inclusions.map(f => (
+                <li key={f} className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                  </span>
+                  <span className="text-[11px] font-semibold text-neutral-600 leading-none">{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
 
-      {/* Footer / CTA */}
+      {/* CTA */}
       <div className="p-5">
         {isAvailable ? (
           <PackageClickLink
@@ -231,7 +298,8 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
           </button>
         )}
       </div>
-    </div>  );
+    </div>
+  );
 }
 
 function ReviewCard({ review }: { review: Review }) {
