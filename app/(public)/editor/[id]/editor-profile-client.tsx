@@ -223,7 +223,7 @@ function PackageCard({ pkg, editorId, isAvailable, isHighlighted }: { pkg: Packa
                 : "bg-neutral-900 hover:bg-black text-white"
             )}
           >
-            Select & Order
+            Hire for {price}
           </PackageClickLink>
         ) : (
           <button disabled className="block w-full text-center bg-neutral-100 text-neutral-400 text-xs font-black py-3 rounded-2xl cursor-not-allowed border border-neutral-200/60">
@@ -1524,7 +1524,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                                       : "bg-neutral-900 hover:bg-black text-white"
                                   )}
                                 >
-                                  Select & Order
+                                  Hire for {(p.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
                                 </PackageClickLink>
                               ) : (
                                 <button disabled className="w-full text-center bg-neutral-100 text-neutral-400 text-xs font-extrabold py-2.5 rounded-xl cursor-not-allowed border border-neutral-200/50">
