@@ -234,7 +234,7 @@ export function XpShopClient({
     { label: "Fast Delivery", emoji: "🏅", desc: "Complete 10 orders before deadline", progress: 6, target: 10 },
     { label: "Client Favorite", emoji: "⭐", desc: "Maintain 10 five-star reviews", progress: 8, target: 10 },
     { label: "10K Club", emoji: "🔥", desc: "Earn ₹10,000+ completed earnings", progress: 8500, target: 10000, isCurrency: true },
-    { label: "Elite Editor", emoji: "💎", desc: "Complete 100 orders successfully", progress: 24, target: 100 },
+    { label: "Pro Editor", emoji: "💎", desc: "Complete 100 orders successfully", progress: 24, target: 100 },
     { label: "Zero Revision", emoji: "🎯", desc: "Complete 10 orders without revisions", progress: 5, target: 10 },
     { label: "Communication Pro", emoji: "💬", desc: "Maintain an excellent response rate", progress: 95, target: 100, isPercentage: true }
   ];
