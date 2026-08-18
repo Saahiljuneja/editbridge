@@ -18,7 +18,7 @@ interface CreditTx { id: string; amount: number; reason: string; expiresAt: stri
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-type EditorLevel = "level1" | "level2" | "level3" | "level4" | "level5" | "level6" | "level7";
+type EditorLevel = "level1" | "level2" | "level3" | "level4";
 
 type LevelMeta = {
   label: string; emoji: string; tagline: string;
@@ -31,14 +31,11 @@ const LM: Record<EditorLevel, LevelMeta> = {
   level1: { label: "New Editor", emoji: "🌱", tagline: "Getting started",   accent: "#16A34A", ring: "#4ADE80", glow: "rgba(74,222,128,0.06)",   textClass: "text-green-600",  bgGradient: "from-green-500/10 to-emerald-500/5",  border: "border-green-500/20",  start: 0,     end: 1000  },
   level2: { label: "Rising",     emoji: "✨", tagline: "Building momentum", accent: "#0EA5E9", ring: "#38BDF8", glow: "rgba(56,189,248,0.06)",   textClass: "text-sky-600",    bgGradient: "from-sky-500/10 to-blue-500/5",       border: "border-sky-500/20",    start: 1000,  end: 3000  },
   level3: { label: "Skilled",    emoji: "⚡", tagline: "Gaining traction",  accent: "#D97706", ring: "#F59E0B", glow: "rgba(245,158,11,0.08)",   textClass: "text-amber-600",  bgGradient: "from-amber-500/10 to-orange-500/5",   border: "border-amber-500/20",  start: 3000,  end: 7500  },
-  level4: { label: "Pro",        emoji: "🔥", tagline: "Top performer",     accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",    textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",   border: "border-yellow-500/25", start: 7500,  end: 15000 },
-  level5: { label: "Elite",      emoji: "🏆", tagline: "Elite editor",      accent: "#4F46E5", ring: "#818CF8", glow: "rgba(129,140,248,0.1)",   textClass: "text-indigo-600", bgGradient: "from-indigo-500/15 to-purple-600/5",  border: "border-indigo-500/25", start: 15000, end: 30000 },
-  level6: { label: "Master",     emoji: "👑", tagline: "Platform master",   accent: "#8B5CF6", ring: "#A78BFA", glow: "rgba(167,139,250,0.1)",   textClass: "text-purple-600", bgGradient: "from-purple-500/15 to-indigo-600/5",  border: "border-purple-500/25", start: 30000, end: 50000 },
-  level7: { label: "Legend",     emoji: "🦄", tagline: "Ultimate tier",     accent: "#EC4899", ring: "#F472B6", glow: "rgba(244,114,182,0.1)",   textClass: "text-pink-600",   bgGradient: "from-pink-500/15 to-rose-600/5",      border: "border-pink-500/25",   start: 50000, end: Infinity },
+  level4: { label: "Pro",        emoji: "🔥", tagline: "Top performer",     accent: "#B45309", ring: "#EAB308", glow: "rgba(234,179,8,0.08)",    textClass: "text-yellow-600", bgGradient: "from-yellow-500/15 to-amber-500/5",   border: "border-yellow-500/25", start: 7500,  end: Infinity },
 };
 
-const LEVEL_ORDER: EditorLevel[] = ["level1", "level2", "level3", "level4", "level5", "level6", "level7"];
-const LEVEL_XP_LABELS = ["0", "1k", "3k", "7.5k", "15k", "30k", "50k"];
+const LEVEL_ORDER: EditorLevel[] = ["level1", "level2", "level3", "level4"];
+const LEVEL_XP_LABELS = ["0", "1k", "3k", "7.5k"];
 const VIOLET = "#1e40af";
 
 const PERKS: Record<EditorLevel, Array<{ icon: string; text: string }>> = {
@@ -46,9 +43,6 @@ const PERKS: Record<EditorLevel, Array<{ icon: string; text: string }>> = {
   level2: [{ icon: "📦", text: "4 packages" },  { icon: "🎗️", text: "Rising badge" },      { icon: "💸", text: "2% client discount" }],
   level3: [{ icon: "📦", text: "5 packages" },  { icon: "⭐", text: "Featured in search" }, { icon: "💸", text: "5% client discount" }],
   level4: [{ icon: "📦", text: "5 packages" },  { icon: "🔝", text: "Top placement" },     { icon: "🎨", text: "Custom banner" },      { icon: "💸", text: "10% discount" }],
-  level5: [{ icon: "⭐", text: "Priority support" }, { icon: "🎯", text: "Exclusive matches" },  { icon: "💰", text: "Monthly credits" },   { icon: "📈", text: "Higher referrals" }],
-  level6: [{ icon: "👑", text: "Master badge" },     { icon: "🔥", text: "Top-priority matching"}, { icon: "🎁", text: "Anniversary rewards" }, { icon: "🤝", text: "Dedicated support" }],
-  level7: [{ icon: "🦄", text: "Legend status" },    { icon: "✨", text: "Permanent spotlight" }, { icon: "🎁", text: "Exclusive rewards" },    { icon: "🏆", text: "Hall of fame" }],
 };
 
 const BADGES: Record<string, { label: string; emoji: string; desc: string; hint: string; credit?: string }> = {
@@ -289,7 +283,7 @@ export function EditorRewardsClient() {
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-gray-600">{data.xp.toLocaleString()} XP</span>
                   <span style={{ color: lm.accent }}>
-                    <strong>{data.xpToNext.toLocaleString()} XP</strong> to {(LM[data.nextLevel as EditorLevel] ?? LM.level7).label}
+                    <strong>{data.xpToNext.toLocaleString()} XP</strong> to {(LM[data.nextLevel as EditorLevel] ?? LM.level4).label}
                   </span>
                 </div>
                 <div className="h-3 rounded-full overflow-hidden p-0.5" style={{ background: `${lm.ring}18` }}>

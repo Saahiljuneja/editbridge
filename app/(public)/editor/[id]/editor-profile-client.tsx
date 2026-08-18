@@ -695,9 +695,6 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                     level2: "bg-emerald-400",
                     level3: "bg-blue-500",
                     level4: "bg-amber-500",
-                    level5: "bg-orange-500",
-                    level6: "bg-purple-500",
-                    level7: "bg-amber-400",
                   };
                   const label = lvlInfo?.label ?? (editor.level.charAt(0).toUpperCase() + editor.level.slice(1));
                   const activeDotClass = lvlInfo ? (levelDotColors[editor.level] ?? "bg-neutral-400") : "bg-neutral-400";

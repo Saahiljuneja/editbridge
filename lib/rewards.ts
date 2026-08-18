@@ -87,7 +87,7 @@ async function awardBadge(userId: string, badge: string) {
 
 const LEVEL_RANK: Record<string, number> = {
   bronze: 0, silver: 1, gold: 2, platinum: 3, vip: 4, elite: 5,
-  level1: 0, level2: 1, level3: 2, level4: 3, level5: 4, level6: 5, level7: 6,
+  level1: 0, level2: 1, level3: 2, level4: 3,
 };
 
 async function addPoints(userId: string, amount: number, reason: string, metadata: Record<string, unknown> = {}) {
@@ -125,9 +125,6 @@ async function addPoints(userId: string, amount: number, reason: string, metadat
         level2:   "You've leveled up to Level 2: Rising Editor!",
         level3:   "You've leveled up to Level 3: Skilled Editor!",
         level4:   "You've leveled up to Level 4: Pro Editor! Higher visibility active.",
-        level5:   "You've leveled up to Level 5: Elite Editor!",
-        level6:   "You've leveled up to Level 6: Master Editor!",
-        level7:   "You've leveled up to Level 7: Legend Editor!",
       };
       await db.insert(notifications).values({
         userId,

@@ -235,11 +235,11 @@ export default async function EditorDashboardPage() {
 
   const LEVEL_COLORS: Record<string, string> = {
     bronze: "#D97706", silver: "#6B7280", gold: "#CA8A04", platinum: "#4F46E5",
-    level1: "#D97706", level2: "#6B7280", level3: "#3B82F6", level4: "#EF4444", level5: "#F59E0B", level6: "#10B981", level7: "#8B5CF6",
+    level1: "#D97706", level2: "#6B7280", level3: "#3B82F6", level4: "#EF4444",
   };
   const LEVEL_EMOJIS: Record<string, string> = {
     bronze: "🥉", silver: "🥈", gold: "🥇", platinum: "💎",
-    level1: "🌱", level2: "✨", level3: "⚡", level4: "🔥", level5: "🏆", level6: "👑", level7: "🦄",
+    level1: "🌱", level2: "✨", level3: "⚡", level4: "🔥",
   };
   const xpColor = LEVEL_COLORS[currentEditorLevel.name] || LEVEL_COLORS[xpRow?.level ?? "level1"] || "#D97706";
   const RING_R = 28;

@@ -113,10 +113,10 @@ export function XpShopClient({
   const xpNeeded = nextEditorLevel ? nextEditorLevel.min - lifetimeXp : 0;
 
   const LEVEL_COLORS: Record<string, string> = {
-    level1: "#D97706", level2: "#6B7280", level3: "#3B82F6", level4: "#EF4444", level5: "#F59E0B", level6: "#10B981", level7: "#8B5CF6",
+    level1: "#D97706", level2: "#6B7280", level3: "#3B82F6", level4: "#EF4444",
   };
   const LEVEL_EMOJIS: Record<string, string> = {
-    level1: "🌱", level2: "✨", level3: "⚡", level4: "🔥", level5: "🏆", level6: "👑", level7: "🦄",
+    level1: "🌱", level2: "✨", level3: "⚡", level4: "🔥",
   };
   const xpColor = LEVEL_COLORS[currentEditorLevel.name] || "#D97706";
 

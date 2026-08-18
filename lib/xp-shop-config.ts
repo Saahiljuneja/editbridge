@@ -462,10 +462,7 @@ export const EDITOR_LEVELS = [
   { level: 1, name: "level1", label: "New Editor", emoji: "🌱", min: 0, max: 999 },
   { level: 2, name: "level2", label: "Rising", emoji: "✨", min: 1000, max: 2999 },
   { level: 3, name: "level3", label: "Skilled", emoji: "⚡", min: 3000, max: 7499 },
-  { level: 4, name: "level4", label: "Pro", emoji: "🔥", min: 7500, max: 14999 },
-  { level: 5, name: "level5", label: "Elite", emoji: "🏆", min: 15000, max: 29999 },
-  { level: 6, name: "level6", label: "Master", emoji: "👑", min: 30000, max: 49999 },
-  { level: 7, name: "level7", label: "Legend", emoji: "🦄", min: 50000, max: Infinity },
+  { level: 4, name: "level4", label: "Pro", emoji: "🔥", min: 7500, max: Infinity },
 ] as const;
 
 export function calcEditorLevel(totalXp: number) {
