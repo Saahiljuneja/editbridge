@@ -701,18 +701,18 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                   const currentLevel = lvlInfo?.level ?? 0;
                   return (
                     <div className="flex items-center gap-1.5 text-neutral-700">
+                      <span>{label} Level</span>
                       <div className="flex items-center gap-[3px]">
                         {EDITOR_LEVELS.map((l) => (
                           <span
                             key={l.name}
                             className={cn(
-                              "w-1.5 h-1.5 rounded-full transition-colors",
+                              "w-1.5 h-1.5 rotate-45 transition-colors",
                               l.level <= currentLevel ? activeDotClass : "bg-neutral-200"
                             )}
                           />
                         ))}
                       </div>
-                      <span>{label} Level</span>
                     </div>
                   );
                 })()}
