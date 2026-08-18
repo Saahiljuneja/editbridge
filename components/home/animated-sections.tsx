@@ -1080,7 +1080,7 @@ function EditorCard({ e, i }: { e: any; i: number }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
             <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-            <span className="text-xs font-bold text-neutral-800">{e.rating.toFixed(1)}</span>
+            <span className="text-xs font-bold text-neutral-800">{Number(e.rating).toFixed(1)}</span>
             {e.reviews > 0 && <span className="text-xs text-neutral-400">({e.reviews})</span>}
           </div>
           <span className="text-neutral-200">·</span>
@@ -1135,7 +1135,7 @@ export function AnimatedEditorCards({ editors: realEditors, editorCount = 0 }: {
           initials: (e.displayName ?? e.name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
           role: (() => { const n = e.niche; if (!n) return e.title ?? "Video Editor"; try { const p = JSON.parse(n); return Array.isArray(p) ? p[0] : n; } catch { return n; } })(),
           loc: e.location ?? "India",
-          rating: e.avgRating ?? 5.0,
+          rating: e.avgRating != null ? Number(e.avgRating) : 5.0,
           reviews: e.reviewCount,
           price: e.minPrice ? `₹${Math.round(e.minPrice / 100).toLocaleString("en-IN")}` : "₹1,500",
           time: e.minDeliveryDays ? `${e.minDeliveryDays} day${e.minDeliveryDays === 1 ? "" : "s"}` : "3 days",
