@@ -90,6 +90,33 @@ const STAT_ICONS: Record<string, LucideIcon> = {
   Videos: Video, Resolution: MonitorPlay, "Raw Footage": HardDrive,
 };
 
+const SHORT_FORM_ONLY = new Set(["youtube_shorts", "instagram_reel", "tiktok"]);
+
+// Maps a package's videoCategory (+ optional videoFormat) to a checkout contentType value.
+// Returns null when the mapping is ambiguous and the client must choose.
+function deriveLockedContentType(
+  videoCategory: string | null | undefined,
+  videoFormat: string | null | undefined,
+): string | null {
+  if (!videoCategory) return null;
+  const direct: Record<string, string> = {
+    wedding: "wedding_event",
+    corporate: "corporate",
+    travel: "travel_vlog",
+    podcast: "podcast_video",
+    music: "music_video",
+  };
+  if (direct[videoCategory]) return direct[videoCategory];
+  if (videoCategory === "gaming" && videoFormat === "long_form") return "gaming_montage";
+  return null;
+}
+
+function filterContentTypes(videoFormat: string | null | undefined): typeof CONTENT_TYPES {
+  if (videoFormat === "long_form") return CONTENT_TYPES.filter(ct => !SHORT_FORM_ONLY.has(ct.value));
+  if (videoFormat === "short_form") return CONTENT_TYPES.filter(ct => SHORT_FORM_ONLY.has(ct.value) || ct.value === "other");
+  return CONTENT_TYPES;
+}
+
 /* ─── Types ───────────────────────────────────────────────────── */
 
 type BriefTemplate = { id: string; name: string; content: string };
@@ -103,6 +130,7 @@ type Props = {
     aspectRatios?: string[]; addons?: string[];
     softwareUsed?: string[]; deliveryFormats?: string[];
     includesSourceFiles?: boolean; includesCommercialRights?: boolean;
+    videoCategory?: string | null; videoFormat?: string | null;
     editorName: string; editorId: string; editorImage?: string | null;
   };
   availableCredits: number;
@@ -124,8 +152,12 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
   const [initLoading, setInitLoading] = useState(true);
   const [savedTemplates, setSavedTemplates] = useState<BriefTemplate[]>([]);
 
+  // Derived from package — null means client must choose
+  const lockedContentType = deriveLockedContentType(pkg.videoCategory, pkg.videoFormat);
+  const filteredContentTypes = filterContentTypes(pkg.videoFormat);
+
   // ── Brief fields ──
-  const [contentType, setContentType] = useState("");
+  const [contentType, setContentType] = useState(lockedContentType ?? "");
   const [targetPlatform, setTargetPlatform] = useState("");
   const [desiredDuration, setDesiredDuration] = useState("");
   const [footageDelivery, setFootageDelivery] = useState("google_drive");
@@ -167,7 +199,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
         if (raw) {
           try {
             const d = JSON.parse(raw);
-            if (d.contentType)                                         setContentType(d.contentType);
+            if (d.contentType && !lockedContentType)                   setContentType(d.contentType);
             if (d.targetPlatform)                                      setTargetPlatform(d.targetPlatform);
             if (d.desiredDuration !== undefined)                       setDesiredDuration(d.desiredDuration);
             if (d.footageDelivery)                                     setFootageDelivery(d.footageDelivery);
@@ -184,7 +216,38 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
             if (d.brandNotes !== undefined)                            setBrandNotes(d.brandNotes);
             if (d.urgentDeadline !== undefined)                        setUrgentDeadline(d.urgentDeadline);
             if (d.addOns)                                              setAddOns(d.addOns);
-            toast("Draft restored", { description: "Your previous brief was saved locally." });
+            toast.custom((t) => (
+              <div className="flex items-center justify-between w-full max-w-sm bg-white dark:bg-neutral-900 border border-gray-150 dark:border-neutral-800 rounded-2xl shadow-xl p-4 gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/50 mt-0.5">
+                    <BookmarkPlus className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-black text-gray-900 dark:text-white leading-tight">Draft restored</h4>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 leading-normal mt-0.5">Your previous brief was loaded.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem(draftKey);
+                    setContentType(lockedContentType ?? "");
+                    setTargetPlatform(""); setDesiredDuration(""); setFootageDelivery("google_drive");
+                    setFootageLink(""); setRawFootageDuration(""); setMoods([]);
+                    setMusicPref("editor_choice"); setMusicTrackInfo(""); setColorLook("neutral");
+                    setReferenceUrls([""]); setUrlErrors({}); setMustInclude(""); setMustAvoid("");
+                    setAdditionalNotes(""); setBrandNotes(""); setUrgentDeadline("");
+                    setAddOns({ extraFast: false, extraRevision: false, sourceFiles: false, commercialRights: false });
+                    toast.dismiss(t);
+                    toast("Draft discarded — starting fresh.");
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-black text-white bg-neutral-900 dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all shrink-0 active:scale-[0.97]"
+                >
+                  Discard
+                </button>
+              </div>
+            ), {
+              duration: 8000,
+            });
           } catch { /* ignore */ }
         }
         setInitLoading(false);
@@ -233,7 +296,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
     try {
       const p = JSON.parse(content);
       if (p && typeof p === "object") {
-        if (p.contentType)                                     setContentType(p.contentType);
+        if (p.contentType && !lockedContentType)               setContentType(p.contentType);
         if (p.targetPlatform)                                  setTargetPlatform(p.targetPlatform);
         if (p.desiredDuration !== undefined)                   setDesiredDuration(p.desiredDuration);
         if (p.footageDelivery)                                 setFootageDelivery(p.footageDelivery);
@@ -652,22 +715,39 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                   <div>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                       Video type <span className="text-red-500">*</span>
-                      {!contentType && <span className="font-semibold normal-case tracking-normal text-amber-600 text-[9px]">— required</span>}
+                      {!contentType && !lockedContentType && <span className="font-semibold normal-case tracking-normal text-amber-600 text-[9px]">— required</span>}
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {CONTENT_TYPES.map(ct => (
-                        <button key={ct.value} type="button" onClick={() => setContentType(ct.value)}
-                          className={cn(
-                            "px-3 py-2.5 rounded-2xl text-xs font-bold border text-left transition-all duration-150 select-none hover:scale-[1.01] active:scale-[0.98]",
-                            contentType === ct.value
-                              ? "bg-orange-50 border-orange-300 text-orange-800 shadow-sm ring-2 ring-orange-500/10"
-                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
-                          )}>
-                          {ct.label}
-                          {contentType === ct.value && <Check className="inline w-3 h-3 ml-1 text-orange-600" strokeWidth={3} />}
-                        </button>
-                      ))}
-                    </div>
+                    {lockedContentType ? (
+                      <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl border border-orange-200 bg-orange-50">
+                        <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
+                        <span className="text-sm font-bold text-orange-900">
+                          {CONTENT_TYPES.find(ct => ct.value === lockedContentType)?.label}
+                        </span>
+                        <span className="text-[11px] text-orange-400 ml-auto">Matched to this package</span>
+                      </div>
+                    ) : (
+                      <>
+                        {pkg.videoFormat && pkg.videoFormat !== "both" && (
+                          <p className="text-[10px] text-gray-400 mb-2">
+                            This editor specialises in {pkg.videoFormat === "long_form" ? "long-form" : "short-form"} content — only compatible types are shown.
+                          </p>
+                        )}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {filteredContentTypes.map(ct => (
+                            <button key={ct.value} type="button" onClick={() => setContentType(ct.value)}
+                              className={cn(
+                                "px-3 py-2.5 rounded-2xl text-xs font-bold border text-left transition-all duration-150 select-none hover:scale-[1.01] active:scale-[0.98]",
+                                contentType === ct.value
+                                  ? "bg-orange-50 border-orange-300 text-orange-800 shadow-sm ring-2 ring-orange-500/10"
+                                  : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                              )}>
+                              {ct.label}
+                              {contentType === ct.value && <Check className="inline w-3 h-3 ml-1 text-orange-600" strokeWidth={3} />}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Target Platform */}

@@ -39,6 +39,8 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
       editorName: users.name,
       editorId: packages.editorId,
       editorImage: users.image,
+      videoCategory: packages.videoCategory,
+      videoFormat: packages.videoFormat,
       isAvailable: editors.isAvailable,
     })
     .from(packages)
