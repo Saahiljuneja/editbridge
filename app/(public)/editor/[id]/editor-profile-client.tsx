@@ -700,10 +700,21 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                     level7: "bg-amber-400",
                   };
                   const label = lvlInfo?.label ?? (editor.level.charAt(0).toUpperCase() + editor.level.slice(1));
-                  const dotClass = lvlInfo ? (levelDotColors[editor.level] ?? "bg-neutral-400") : "bg-neutral-400";
+                  const activeDotClass = lvlInfo ? (levelDotColors[editor.level] ?? "bg-neutral-400") : "bg-neutral-400";
+                  const currentLevel = lvlInfo?.level ?? 0;
                   return (
                     <div className="flex items-center gap-1.5 text-neutral-700">
-                      <span className={cn("w-2 h-2 rounded-full", dotClass)} />
+                      <div className="flex items-center gap-[3px]">
+                        {EDITOR_LEVELS.map((l) => (
+                          <span
+                            key={l.name}
+                            className={cn(
+                              "w-1.5 h-1.5 rounded-full transition-colors",
+                              l.level <= currentLevel ? activeDotClass : "bg-neutral-200"
+                            )}
+                          />
+                        ))}
+                      </div>
                       <span>{label} Level</span>
                     </div>
                   );
