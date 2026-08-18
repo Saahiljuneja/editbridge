@@ -503,7 +503,7 @@ export function PaymentsClient({
                   dataKey="ts"
                   type="number"
                   domain={["dataMin", "dataMax"]}
-                  ticks={maxVal === 0 ? (timeFilter === "month" ? [1, 15, 30] : timeFilter === "year" ? [1, 6, 12] : [2024, 2025, 2026]) : undefined}
+                  ticks={maxVal === 0 ? (timeFilter === "last30" ? [1, 15, 30] : timeFilter === "last7" ? [1, 3, 5, 7] : [2024, 2025, 2026]) : undefined}
                   tickFormatter={(ts) => {
                     const pt = chartData.find(p => p.ts === ts);
                     return pt ? pt.xLabel : "";
