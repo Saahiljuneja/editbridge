@@ -1262,8 +1262,24 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Fiverr-like Matrix Comparison Table */}
-                <div className="overflow-x-auto border border-neutral-200/70 rounded-2xl bg-white shadow-sm">
+                {/* Mobile: stacked cards */}
+                <div className="md:hidden flex flex-col gap-4">
+                  {editor.packages.map((p, idx) => {
+                    const isHighlighted = editor.packages.length > 1 && idx === Math.floor(editor.packages.length / 2);
+                    return (
+                      <PackageCard
+                        key={p.id}
+                        pkg={p as Package}
+                        editorId={editor.id}
+                        isAvailable={editor.isAvailable}
+                        isHighlighted={isHighlighted}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Desktop: comparison table */}
+                <div className="hidden md:block overflow-x-auto border border-neutral-200/70 rounded-2xl bg-white shadow-sm">
                   <table className="w-full border-collapse text-left text-xs">
                     <thead>
                       <tr className="bg-neutral-50/50 border-b border-neutral-200/60">
@@ -1537,6 +1553,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                       </tr>
                     </tbody>
                   </table>
+                </div>
                 </div>
               </div>
             )}
