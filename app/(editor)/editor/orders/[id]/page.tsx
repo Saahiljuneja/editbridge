@@ -126,7 +126,7 @@ export default async function EditorOrderDetailPage({
   const originalPrice = order.totalAmount - processingFee + rewardDiscount;
   const discountedPrice = order.totalAmount - processingFee;
   const payout = discountedPrice - order.commissionAmount;
-  const canDeliver = ["pending", "in_progress", "revision_requested"].includes(order.status);
+  const canDeliver = ["in_progress", "revision_requested"].includes(order.status);
 
   const briefData = (order.briefData as BriefData | null) ?? {};
   const computedRevisionCount =

@@ -83,6 +83,7 @@ export default async function EditorLayout({
           <DashboardHeader
             userName={session.user.name ?? ""}
             userImage={session.user.image ?? null}
+            editorId={editorId ?? null}
           />
           {children}
         </main>

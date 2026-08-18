@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Plus, LogOut, Settings, User, Search, ChevronDown, Zap, ShieldCheck, Crown, X, ArrowLeft, Home } from "lucide-react";
+import { Bell, Plus, LogOut, Settings, User, Search, ChevronDown, Zap, ShieldCheck, Crown, X, ArrowLeft, Home, ExternalLink } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -148,6 +148,7 @@ function NotifRow({ n }: { n: { title: string; body: string | null; isRead: bool
 interface DashboardHeaderProps {
   userName: string;
   userImage: string | null;
+  editorId?: string | null;
 }
 
 type Notification = {
@@ -160,7 +161,7 @@ type Notification = {
   createdAt: string;
 };
 
-export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
+export function DashboardHeader({ userName, userImage, editorId }: DashboardHeaderProps) {
   const pathname = usePathname();
   const [stats, setStats] = useState<HeaderStats>({ type: "unknown" });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -361,6 +362,20 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
             </Link>
           )}
 
+          {/* View public profile — editor only */}
+          {pathname.startsWith("/editor") && editorId && (
+            <Link
+              href={`/editor/${editorId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-full hover:bg-neutral-100 transition-colors text-neutral-500 hover:text-black"
+              title="View public profile"
+            >
+              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden lg:inline text-[11px] font-semibold">Public profile</span>
+            </Link>
+          )}
+
           {/* Home Link — client, editor & admin portals */}
           {(pathname.startsWith("/client") || pathname.startsWith("/editor") || pathname.startsWith("/admin")) && (
             <Link
@@ -485,8 +500,6 @@ export function DashboardHeader({ userName, userImage }: DashboardHeaderProps) {
                 >
                   <User className="w-3.5 h-3.5 text-neutral-400" /> My Profile
                 </Link>
-
-
 
                 <div className="h-px bg-neutral-100 my-1" />
 
