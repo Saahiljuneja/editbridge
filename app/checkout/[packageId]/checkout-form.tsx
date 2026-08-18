@@ -9,8 +9,18 @@ import {
   Music, Palette, Link2, AlignLeft, Ban, FileText,
   ArrowRight, Loader2, CreditCard, Check, Plus, X,
   ArrowLeft, RotateCcw, Package2, Building2, Shield,
-  Lock, Clock, RefreshCw, BookmarkPlus,
+  Lock, Clock, RefreshCw, BookmarkPlus, CheckCircle2,
 } from "lucide-react";
+
+const ADDON_DISPLAY: Record<string, string> = {
+  color_grading: "Color Grading", color_correction: "Color Correction",
+  sound_design: "Sound Design", audio_cleanup: "Audio Cleanup",
+  background_music: "Background Music", captions: "Captions / Subtitles",
+  thumbnail: "Thumbnail Design", motion_graphics: "Motion Graphics",
+  intro_outro: "Intro / Outro", lower_thirds: "Lower Thirds",
+  social_media_cuts: "Social Media Cuts", speed_ramps: "Speed Ramps",
+  green_screen: "Green Screen Removal",
+};
 import { toast } from "sonner";
 import { formatCurrency, displayNameFromFull } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -20,15 +30,24 @@ type BriefTemplate = { id: string; name: string; content: string };
 type Props = {
   pkg: {
     id: string;
+    tier?: string | null;
     title: string;
     description: string;
     price: number;
     deliveryDays: number;
     revisionCount: number;
-    editorName: string;
-    editorId: string;
+    videoLengthLimit?: string | null;
+    videoCount?: number | null;
+    resolution?: string | null;
+    maxRawFootage?: string | null;
+    aspectRatios?: string[];
+    addons?: string[];
+    softwareUsed?: string[];
+    deliveryFormats?: string[];
     includesSourceFiles?: boolean;
     includesCommercialRights?: boolean;
+    editorName: string;
+    editorId: string;
   };
   availableCredits: number;
   processingFeePct?: number;
@@ -70,7 +89,7 @@ const COLOR_OPTIONS: { value: string; label: string; dot: string; sub: string }[
 
 export default function CheckoutForm({ pkg, availableCredits, processingFeePct = 10 }: Props) {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
   const [savedTemplates, setSavedTemplates] = useState<BriefTemplate[]>([]);
@@ -297,38 +316,69 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
       {/* ── Header: step indicator + progress bar ── */}
       <div className="bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            href={`/editor/${pkg.editorId}`}
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-900 transition-colors font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back
-          </Link>
+          {step === 0 ? (
+            <Link
+              href={`/editor/${pkg.editorId}`}
+              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-900 transition-colors font-medium"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => { setStep(s => s - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-900 transition-colors font-medium"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back
+            </button>
+          )}
 
           {/* Step circles */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {/* Step 0: Package Details */}
+            <div className="flex items-center gap-1.5">
               <div className={cn(
                 "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
-                step === 1 ? "bg-[#1e40af] text-white shadow-sm shadow-blue-200" : "bg-emerald-500 text-white"
+                step === 0 ? "bg-[#1e40af] text-white shadow-sm shadow-blue-200" : "bg-emerald-500 text-white"
               )}>
-                {step === 1 ? "1" : <Check className="w-3.5 h-3.5" />}
+                {step === 0 ? "1" : <Check className="w-3.5 h-3.5" />}
               </div>
-              <span className={cn("text-xs font-semibold hidden sm:block", step === 1 ? "text-[#1e40af]" : "text-emerald-600")}>
+              <span className={cn("text-xs font-semibold hidden sm:block", step === 0 ? "text-[#1e40af]" : "text-emerald-600")}>
+                Package Details
+              </span>
+            </div>
+
+            <div className="relative w-10 h-px bg-gray-200 overflow-hidden">
+              <div className={cn("absolute inset-y-0 left-0 bg-[#1e40af] transition-all duration-500", step >= 1 ? "w-full" : "w-0")} />
+            </div>
+
+            {/* Step 1: Project Brief */}
+            <div className="flex items-center gap-1.5">
+              <div className={cn(
+                "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                step === 1 ? "bg-[#1e40af] text-white shadow-sm shadow-blue-200"
+                  : step > 1 ? "bg-emerald-500 text-white"
+                  : "bg-gray-100 text-gray-400"
+              )}>
+                {step > 1 ? <Check className="w-3.5 h-3.5" /> : "2"}
+              </div>
+              <span className={cn("text-xs font-semibold hidden sm:block",
+                step === 1 ? "text-[#1e40af]" : step > 1 ? "text-emerald-600" : "text-gray-400")}>
                 Project Brief
               </span>
             </div>
 
-            {/* Connector */}
-            <div className="relative w-16 h-px bg-gray-200 overflow-hidden">
+            <div className="relative w-10 h-px bg-gray-200 overflow-hidden">
               <div className={cn("absolute inset-y-0 left-0 bg-[#1e40af] transition-all duration-500", step === 2 ? "w-full" : "w-0")} />
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Step 2: Confirm & Pay */}
+            <div className="flex items-center gap-1.5">
               <div className={cn(
                 "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
                 step === 2 ? "bg-[#1e40af] text-white shadow-sm shadow-blue-200" : "bg-gray-100 text-gray-400"
               )}>
-                2
+                3
               </div>
               <span className={cn("text-xs font-semibold hidden sm:block", step === 2 ? "text-[#1e40af]" : "text-gray-400")}>
                 Confirm &amp; Pay
@@ -341,14 +391,131 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
 
         {/* Thin animated progress bar */}
         <div className="h-[2px] bg-gray-100">
-          <div className={cn("h-full bg-[#1e40af] transition-all duration-500", step === 1 ? "w-1/2" : "w-full")} />
+          <div className={cn(
+            "h-full bg-[#1e40af] transition-all duration-500",
+            step === 0 ? "w-1/3" : step === 1 ? "w-2/3" : "w-full"
+          )} />
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 grid md:grid-cols-3 gap-6 lg:gap-8">
         {/* ── Main content ── */}
         <div className="md:col-span-2 space-y-4">
-          {step === 1 ? (
+          {step === 0 ? (
+            /* ─── Step 0: Package Overview ─── */
+            <div className="space-y-4">
+
+              {/* Hero card */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-gray-950 px-6 py-5">
+                  {pkg.tier && (
+                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-blue-400 mb-1 block">{pkg.tier}</span>
+                  )}
+                  <h2 className="font-black text-white text-xl leading-tight">{pkg.title}</h2>
+                  <p className="text-sm text-gray-400 mt-1.5 leading-relaxed">{pkg.description}</p>
+                </div>
+
+                {/* Quick stats */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-gray-100">
+                  {[
+                    { label: "Delivery", value: `${pkg.deliveryDays} day${pkg.deliveryDays !== 1 ? "s" : ""}` },
+                    { label: "Revisions", value: pkg.revisionCount === -1 ? "Unlimited" : `${pkg.revisionCount} round${pkg.revisionCount !== 1 ? "s" : ""}` },
+                    ...(pkg.videoLengthLimit ? [{ label: "Video Length", value: pkg.videoLengthLimit }] : []),
+                    ...((pkg.videoCount ?? 0) > 0 ? [{ label: "Videos", value: `${pkg.videoCount}` }] : []),
+                    ...(pkg.resolution ? [{ label: "Resolution", value: pkg.resolution.toUpperCase() }] : []),
+                    ...(pkg.maxRawFootage ? [{ label: "Raw Footage", value: pkg.maxRawFootage }] : []),
+                  ].map(s => (
+                    <div key={s.label} className="bg-white px-4 py-3.5">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{s.label}</p>
+                      <p className="text-sm font-bold text-gray-900 mt-0.5">{s.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pill tag groups */}
+              {((pkg.aspectRatios?.length ?? 0) > 0 || (pkg.softwareUsed?.length ?? 0) > 0 || (pkg.deliveryFormats?.length ?? 0) > 0) && (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  {(pkg.aspectRatios?.length ?? 0) > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">Aspect Ratios</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {pkg.aspectRatios!.map(r => (
+                          <span key={r} className="text-xs font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">{r}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(pkg.softwareUsed?.length ?? 0) > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">Software</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {pkg.softwareUsed!.map(s => (
+                          <span key={s} className="text-xs font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">{s.replace(/_/g, " ")}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(pkg.deliveryFormats?.length ?? 0) > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">Delivery Formats</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {pkg.deliveryFormats!.map(f => (
+                          <span key={f} className="text-xs font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">{f.replace(/_/g, " ").toUpperCase()}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Inclusions checklist */}
+              {(() => {
+                const inclusions = [
+                  ...(pkg.includesSourceFiles ? ["Source files included"] : []),
+                  ...(pkg.includesCommercialRights ? ["Commercial rights"] : []),
+                  ...(pkg.addons ?? []).map(a => ADDON_DISPLAY[a] ?? a.replace(/_/g, " ")),
+                ];
+                return inclusions.length > 0 ? (
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-3">What&apos;s Included</p>
+                    <ul className="space-y-2.5">
+                      {inclusions.map(f => (
+                        <li key={f} className="flex items-center gap-2.5">
+                          <span className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                          </span>
+                          <span className="text-sm font-semibold text-gray-700">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null;
+              })()}
+
+              {/* Price summary + CTA */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex items-baseline justify-between mb-5">
+                  <span className="text-sm font-semibold text-gray-500">Package price</span>
+                  <span className="text-3xl font-black text-gray-950">
+                    {(pkg.price / 100).toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+                <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-xs text-amber-700 font-medium mb-4 flex items-start gap-2">
+                  <span className="shrink-0 mt-0.5">⚡</span>
+                  <span>Review all details above before proceeding. Once payment is made, the order cannot be cancelled without the editor&apos;s consent.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  className="w-full py-3.5 rounded-xl font-bold text-white text-sm bg-[#1e40af] hover:bg-blue-800 flex items-center justify-center gap-2 transition-colors shadow-sm shadow-blue-200"
+                >
+                  Looks good — Continue to Brief <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+          ) : step === 1 ? (
             <div className="space-y-4">
 
               {/* Template loader */}

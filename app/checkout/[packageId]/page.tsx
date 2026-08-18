@@ -20,15 +20,24 @@ export default async function PackageCheckoutPage({ params }: { params: Promise<
   const [pkg] = await db
     .select({
       id: packages.id,
+      tier: packages.tier,
       title: packages.title,
       description: packages.description,
       price: packages.price,
       deliveryDays: packages.deliveryDays,
       revisionCount: packages.revisionCount,
-      editorName: users.name,
-      editorId: packages.editorId,
+      videoLengthLimit: packages.videoLengthLimit,
+      videoCount: packages.videoCount,
+      resolution: packages.resolution,
+      maxRawFootage: packages.maxRawFootage,
+      aspectRatios: packages.aspectRatios,
+      addons: packages.addons,
+      softwareUsed: packages.softwareUsed,
+      deliveryFormats: packages.deliveryFormats,
       includesSourceFiles: packages.includesSourceFiles,
       includesCommercialRights: packages.includesCommercialRights,
+      editorName: users.name,
+      editorId: packages.editorId,
       isAvailable: editors.isAvailable,
     })
     .from(packages)
