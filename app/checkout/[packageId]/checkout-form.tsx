@@ -10,7 +10,7 @@ import {
   ArrowLeft, RotateCcw, Package2, Building2, Shield,
   Lock, Clock, RefreshCw, BookmarkPlus, CheckCircle2,
   Truck, Repeat2, Timer, Video, MonitorPlay, HardDrive,
-  Ratio, Wrench, FileVideo, UserCheck,
+  Ratio, Wrench, FileVideo, Moon, Wand2, VolumeX,
   Clapperboard, Globe, Upload, Calendar, Tag,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -69,12 +69,12 @@ const MOOD_CONFIG: Record<string, { label: string; Icon: LucideIcon; color: stri
 };
 const MOODS = Object.keys(MOOD_CONFIG) as (keyof typeof MOOD_CONFIG)[];
 
-const MUSIC_OPTIONS: { value: string; label: string; sub: string; icon: string }[] = [
-  { value: "upbeat",          label: "Upbeat",        sub: "Fast & energetic",  icon: "⚡" },
-  { value: "lofi",            label: "Lo-fi",         sub: "Chill & relaxed",   icon: "🌙" },
-  { value: "editor_choice",   label: "Editor's pick", sub: "Trust the editor",  icon: "✨" },
-  { value: "client_provides", label: "I'll provide",  sub: "I have a track",    icon: "🎵" },
-  { value: "no_music",        label: "No music",      sub: "Silent edit",       icon: "🔇" },
+const MUSIC_OPTIONS: { value: string; label: string; sub: string; Icon: LucideIcon }[] = [
+  { value: "upbeat",          label: "Upbeat",        sub: "Fast & energetic",  Icon: Zap },
+  { value: "lofi",            label: "Lo-fi",         sub: "Chill & relaxed",   Icon: Moon },
+  { value: "editor_choice",   label: "Editor's pick", sub: "Trust the editor",  Icon: Wand2 },
+  { value: "client_provides", label: "I'll provide",  sub: "I have a track",    Icon: Music },
+  { value: "no_music",        label: "No music",      sub: "Silent edit",       Icon: VolumeX },
 ];
 
 const COLOR_OPTIONS: { value: string; label: string; dot: string; ring: string; sub: string }[] = [
@@ -428,6 +428,15 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
     } else if (step === 1) {
       if (!contentType) { toast.error("Please select what type of video you need edited."); return; }
       if (moods.length === 0) { toast.error("Please select at least one vibe for your video."); return; }
+      const selectedFootageOpt = FOOTAGE_OPTIONS.find(o => o.value === footageDelivery);
+      if (selectedFootageOpt?.needsLink && !footageLink.trim()) {
+        toast.error(`Paste your ${selectedFootageOpt.label} link so the editor can access your footage.`);
+        return;
+      }
+      if (saveAsTemplate && !templateName.trim()) {
+        toast.error("Enter a name for your template, or turn off template saving.");
+        return;
+      }
       await persistTemplate(); // saved before payment, not after
       setStep(2); window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -449,7 +458,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
 
   /* ── Derived display values ── */
   const musicLabel = MUSIC_OPTIONS.find(o => o.value === musicPref)?.label ?? musicPref;
-  const musicIcon  = MUSIC_OPTIONS.find(o => o.value === musicPref)?.icon ?? "🎵";
+  const MusicIcon  = MUSIC_OPTIONS.find(o => o.value === musicPref)?.Icon ?? Music;
   const colorOpt   = COLOR_OPTIONS.find(o => o.value === colorLook);
   const cleanRefUrls = referenceUrls.filter(u => u.trim() !== "");
   const inclusions = [
@@ -944,6 +953,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                       {MUSIC_OPTIONS.map(opt => {
+                        const OptIcon = opt.Icon;
                         const active = musicPref === opt.value;
                         return (
                           <button key={opt.value} type="button" onClick={() => setMusicPref(opt.value)}
@@ -951,8 +961,8 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                               "flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-all duration-150 select-none hover:scale-[1.02] active:scale-[0.98]",
                               active ? "bg-violet-50/50 border-violet-300 shadow-sm ring-2 ring-violet-500/10" : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                             )}>
-                            <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0", active ? "bg-violet-100/50" : "bg-gray-50")}>
-                              {opt.icon}
+                            <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", active ? "bg-violet-100/50" : "bg-gray-50")}>
+                              <OptIcon className={cn("w-4 h-4", active ? "text-violet-600" : "text-gray-400")} />
                             </div>
                             <div className="min-w-0 flex-1">
                               <span className={cn("text-xs font-bold block leading-tight", active ? "text-violet-850" : "text-gray-800")}>{opt.label}</span>
@@ -1152,6 +1162,15 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                 onClick={() => {
                   if (!contentType) { toast.error("Please select a video type first."); return; }
                   if (moods.length === 0) { toast.error("Please select at least one vibe first."); return; }
+                  const selectedFootageOpt = FOOTAGE_OPTIONS.find(o => o.value === footageDelivery);
+                  if (selectedFootageOpt?.needsLink && !footageLink.trim()) {
+                    toast.error(`Paste your ${selectedFootageOpt.label} link so the editor can access your footage.`);
+                    return;
+                  }
+                  if (saveAsTemplate && !templateName.trim()) {
+                    toast.error("Enter a name for your template, or turn off template saving.");
+                    return;
+                  }
                   persistTemplate();
                   setStep(2); window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
@@ -1211,10 +1230,10 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       <div>
                         <p className={cn("text-xs font-bold", footageOpt?.needsLink ? "text-sky-800" : "text-gray-700")}>{footageOpt?.label ?? "—"}</p>
                         {footageLink && footageOpt?.needsLink && (
-                          <p className="text-[10px] text-sky-600 font-medium mt-0.5 break-all">{footageLink.length > 50 ? footageLink.slice(0, 50) + "…" : footageLink}</p>
+                          <p title={footageLink} className="text-[10px] text-sky-600 font-medium mt-0.5 break-all">{footageLink.length > 50 ? footageLink.slice(0, 50) + "…" : footageLink}</p>
                         )}
                         {rawFootageDuration && (
-                          <p className="text-[10px] text-gray-500 font-medium mt-0.5">{rawFootageDuration}</p>
+                          <p className="text-[10px] text-gray-500 font-medium mt-0.5">Approx: {rawFootageDuration}</p>
                         )}
                       </div>
                     </div>
@@ -1241,7 +1260,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                     <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-150">
                       <p className="text-[9px] font-black uppercase tracking-wider text-gray-400 mb-2">Music</p>
                       <div className="flex items-center gap-2">
-                        <span className="text-base">{musicIcon}</span>
+                        <MusicIcon className="w-4 h-4 text-violet-500 shrink-0" />
                         <div>
                           <span className="text-xs font-bold text-gray-800 block">{musicLabel}</span>
                           {musicPref === "client_provides" && musicTrackInfo && (
@@ -1309,6 +1328,20 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                     </div>
                   )}
 
+                  {/* Base package inclusions */}
+                  {inclusions.length > 0 && (
+                    <div className="border-t border-gray-100 pt-5">
+                      <p className="text-[9px] font-black uppercase tracking-wider text-gray-400 mb-2.5">Included in Package</p>
+                      <div className="flex flex-wrap gap-2">
+                        {inclusions.map(l => (
+                          <span key={l} className="flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-full">
+                            <Check className="w-3 h-3" />{l}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Add-ons */}
                   {activeAddOnLabels.length > 0 && (
                     <div className="border-t border-gray-100 pt-5">
@@ -1330,12 +1363,18 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                 <div className="bg-[#f0fdf4] border border-emerald-200 rounded-3xl p-5 flex items-center justify-between gap-4 shadow-sm">
                   <div>
                     <p className="text-sm font-black text-emerald-800">{formatCurrency(availableCredits)} in credits available</p>
-                    <p className="text-xs font-semibold text-emerald-600 mt-1">Apply to reduce your order cost</p>
+                    <p className="text-xs font-semibold text-emerald-600 mt-1">
+                      {useCredits && creditsApplied < availableCredits
+                        ? `${formatCurrency(availableCredits - creditsApplied)} stays in your account`
+                        : "Apply to reduce your order cost"}
+                    </p>
                   </div>
                   <button type="button" onClick={() => setUseCredits(!useCredits)}
                     className={cn("px-4 py-2.5 rounded-xl text-xs font-black border transition-all shrink-0 active:scale-[0.98]",
                       useCredits ? "bg-emerald-600 border-emerald-600 text-white shadow-sm" : "border-emerald-300 text-emerald-700 hover:bg-emerald-100/50 bg-white")}>
-                    {useCredits ? <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" strokeWidth={3} /> Applied</span> : "Apply Credits"}
+                    {useCredits
+                      ? <span className="flex items-center gap-1.5"><X className="w-3.5 h-3.5" strokeWidth={3} /> Remove</span>
+                      : "Apply Credits"}
                   </button>
                 </div>
               )}
@@ -1358,7 +1397,10 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       </div>
                     )}
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-gray-400 font-medium">Processing Fee ({processingFeePct}%)</span>
+                      <span className="text-gray-400 font-medium">
+                        Processing Fee ({processingFeePct}%)
+                        <span className="block text-[9px] font-medium text-gray-300 mt-0.5">Platform, payment & escrow</span>
+                      </span>
                       <span className="tabular-nums font-bold text-gray-400">{formatCurrency(processingFee)}</span>
                     </div>
                     {creditsApplied > 0 && (
@@ -1379,6 +1421,12 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                         ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
                         : <><CreditCard className="w-4 h-4" /> Pay {formatCurrency(chargeAmount)} &amp; Start Order</>}
                     </button>
+                    <div className="flex items-start gap-2.5 bg-amber-50/60 border border-amber-200/60 rounded-2xl px-4 py-3">
+                      <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-amber-800 font-semibold leading-snug">
+                        Payment is final — orders cannot be cancelled without the editor&apos;s consent. Review everything above before paying.
+                      </p>
+                    </div>
                     <div className="flex items-center justify-center gap-4 flex-wrap">
                       {[
                         { icon: <Shield className="w-3.5 h-3.5 text-emerald-500" />, label: "Escrow protected" },
