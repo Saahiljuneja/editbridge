@@ -631,7 +631,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {/* Avatar & KYC Badge */}
             <div className="relative shrink-0 z-10">
-              <div className="ring-4 ring-white rounded-full shadow-lg overflow-hidden bg-white">
+              <div className="ring-4 ring-white rounded-full shadow-lg bg-white">
                 <Avatar src={editor.image} name={displayName} size={96} activeFrame={editor.activeFrame} />
               </div>
               {editor.kycStatus === "approved" && (

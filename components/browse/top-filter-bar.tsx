@@ -4,6 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ChevronDown, X, Star } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 const NICHES = [
   { value: "", label: "All" },
@@ -55,11 +56,13 @@ export function TopFilterBar() {
     setMaxPrice(searchParams.get("max_price") ?? "");
   }, [searchParams]);
 
+  // Close on outside click — also check for portaled panels via data attribute
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (barRef.current && !barRef.current.contains(e.target as Node)) {
-        setOpen(null);
-      }
+      const target = e.target as Element;
+      const insideBar = barRef.current?.contains(target);
+      const insidePanel = !!target?.closest("[data-filter-panel]");
+      if (!insideBar && !insidePanel) setOpen(null);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -104,7 +107,6 @@ export function TopFilterBar() {
   const deliveryLabel = DELIVERY_OPTIONS.find(o => o.value === get("delivery"))?.label;
   const ratingActive = get("min_rating");
   const budgetActive = !!(get("min_price") || get("max_price"));
-
   const nicheLabel = NICHES.find(n => n.value === get("niche") && n.value)?.label;
 
   return (
@@ -253,9 +255,23 @@ function DropBtn({
   label: string; active: boolean; open: boolean; onToggle: () => void;
   children: React.ReactNode; panelWidth?: string;
 }) {
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setCoords({ top: r.bottom + 8, left: r.left });
+    }
+  }, [open]);
+
   return (
-    <div className="relative shrink-0">
+    <div className="shrink-0">
       <button
+        ref={btnRef}
         onClick={onToggle}
         className={cn(
           "flex items-center gap-1.5 h-9 px-4 rounded-full border text-[12px] font-bold uppercase tracking-wider transition-all whitespace-nowrap",
@@ -267,13 +283,20 @@ function DropBtn({
         {label}
         <ChevronDown className={cn("w-3.5 h-3.5 transition-transform shrink-0 opacity-60", open && "rotate-180")} />
       </button>
-      {open && (
-        <div className={cn(
-          "absolute left-0 top-full mt-2 bg-white rounded-2xl border border-neutral-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.06)] z-30 overflow-hidden",
-          panelWidth
-        )}>
+
+      {/* Portaled panel — escapes the overflow-x-auto scroll container */}
+      {open && coords && mounted && createPortal(
+        <div
+          data-filter-panel
+          style={{ position: "fixed", top: coords.top, left: coords.left, zIndex: 9999 }}
+          className={cn(
+            "bg-white rounded-2xl border border-neutral-200/60 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden",
+            panelWidth
+          )}
+        >
           {children}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
