@@ -9,6 +9,7 @@ import { and, eq, sql, inArray } from "drizzle-orm";
 import { displayNameFromFull } from "@/lib/utils";
 import { auth } from "@/lib/auth";
 import { toPortfolioProxyUrl } from "@/lib/portfolio-url";
+import { calcEditorLevel } from "@/lib/xp-shop-config";
 import { EditorProfileClient } from "./editor-profile-client";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +54,7 @@ async function getEditorProfileData(id: string) {
       activeFrame: editors.activeFrame,
       membershipTier: editors.membershipTier,
       level: userPoints.level,
+      xpTotal: userPoints.total,
     })
     .from(editors)
     .innerJoin(users, eq(editors.userId, users.id))
@@ -191,7 +193,7 @@ async function getEditorProfileData(id: string) {
     viewCount,
     isBookmarked,
     ratingDistribution,
-    level: editor.level || "bronze",
+    level: calcEditorLevel(editor.xpTotal ?? 0).name,
     activeOrdersCount,
   };
 }

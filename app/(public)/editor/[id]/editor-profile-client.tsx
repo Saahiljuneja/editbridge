@@ -13,7 +13,7 @@ import { getThumbnailUrl, getVideoSource } from "@/lib/portfolio-media";
 import { PortfolioVideoPlayer } from "@/components/public/portfolio-video-player";
 import { RequestQuoteButton } from "@/components/client/request-quote-button";
 import { PackageClickLink } from "@/components/editor/package-click-link";
-import { FRAME_STYLES, type FrameKey } from "@/lib/xp-shop-config";
+import { FRAME_STYLES, EDITOR_LEVELS, type FrameKey } from "@/lib/xp-shop-config";
 import { TopoBackground } from "@/components/common/topo-background";
 import { toast } from "sonner";
 
@@ -688,16 +688,26 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                 <span className="text-neutral-200">•</span>
 
                 {/* Level Badge */}
-                <div className="flex items-center gap-1.5 text-neutral-700 capitalize">
-                  <span className={cn(
-                    "w-2 h-2 rounded-full",
-                    editor.level === "bronze" && "bg-amber-600",
-                    editor.level === "silver" && "bg-neutral-350 border border-neutral-400/40",
-                    editor.level === "gold" && "bg-amber-400",
-                    editor.level === "platinum" && "bg-sky-400"
-                  )} />
-                  <span>{editor.level} Level</span>
-                </div>
+                {(() => {
+                  const lvlInfo = EDITOR_LEVELS.find(l => l.name === editor.level);
+                  const levelDotColors: Record<string, string> = {
+                    level1: "bg-neutral-400",
+                    level2: "bg-emerald-400",
+                    level3: "bg-blue-500",
+                    level4: "bg-amber-500",
+                    level5: "bg-orange-500",
+                    level6: "bg-purple-500",
+                    level7: "bg-amber-400",
+                  };
+                  const label = lvlInfo?.label ?? (editor.level.charAt(0).toUpperCase() + editor.level.slice(1));
+                  const dotClass = lvlInfo ? (levelDotColors[editor.level] ?? "bg-neutral-400") : "bg-neutral-400";
+                  return (
+                    <div className="flex items-center gap-1.5 text-neutral-700">
+                      <span className={cn("w-2 h-2 rounded-full", dotClass)} />
+                      <span>{label} Level</span>
+                    </div>
+                  );
+                })()}
                 <span className="text-neutral-200">•</span>
 
                 {/* Active Orders in Queue */}
