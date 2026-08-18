@@ -93,12 +93,15 @@ const STAT_ICONS: Record<string, LucideIcon> = {
 const SHORT_FORM_ONLY = new Set(["youtube_shorts", "instagram_reel", "tiktok"]);
 
 // Maps a package's videoCategory (+ optional videoFormat) to a checkout contentType value.
-// Returns null when the mapping is ambiguous and the client must choose.
+// Returns null when the mapping is ambiguous or the package covers multiple categories.
 function deriveLockedContentType(
   videoCategory: string | null | undefined,
   videoFormat: string | null | undefined,
 ): string | null {
   if (!videoCategory) return null;
+  const categories = videoCategory.split(",").filter(Boolean);
+  if (categories.length !== 1) return null; // multi-category → client must choose
+  const cat = categories[0];
   const direct: Record<string, string> = {
     wedding: "wedding_event",
     corporate: "corporate",
@@ -106,12 +109,15 @@ function deriveLockedContentType(
     podcast: "podcast_video",
     music: "music_video",
   };
-  if (direct[videoCategory]) return direct[videoCategory];
-  if (videoCategory === "gaming" && videoFormat === "long_form") return "gaming_montage";
+  if (direct[cat]) return direct[cat];
+  if (cat === "gaming" && videoFormat === "long_form") return "gaming_montage";
   return null;
 }
 
-function filterContentTypes(videoFormat: string | null | undefined): typeof CONTENT_TYPES {
+function filterContentTypes(videoFormat: string | null | undefined, videoCategory: string | null | undefined): typeof CONTENT_TYPES {
+  // Only filter when the package is single-category (multi-category editors handle all formats)
+  const categories = (videoCategory ?? "").split(",").filter(Boolean);
+  if (categories.length > 1) return CONTENT_TYPES;
   if (videoFormat === "long_form") return CONTENT_TYPES.filter(ct => !SHORT_FORM_ONLY.has(ct.value));
   if (videoFormat === "short_form") return CONTENT_TYPES.filter(ct => SHORT_FORM_ONLY.has(ct.value) || ct.value === "other");
   return CONTENT_TYPES;
@@ -154,7 +160,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
 
   // Derived from package — null means client must choose
   const lockedContentType = deriveLockedContentType(pkg.videoCategory, pkg.videoFormat);
-  const filteredContentTypes = filterContentTypes(pkg.videoFormat);
+  const filteredContentTypes = filterContentTypes(pkg.videoFormat, pkg.videoCategory);
 
   // ── Brief fields ──
   const [contentType, setContentType] = useState(lockedContentType ?? "");
@@ -727,7 +733,7 @@ export default function CheckoutForm({ pkg, availableCredits, processingFeePct =
                       </div>
                     ) : (
                       <>
-                        {pkg.videoFormat && pkg.videoFormat !== "both" && (
+                        {pkg.videoFormat && pkg.videoFormat !== "both" && (pkg.videoCategory ?? "").split(",").filter(Boolean).length <= 1 && (
                           <p className="text-[10px] text-gray-400 mb-2">
                             This editor specialises in {pkg.videoFormat === "long_form" ? "long-form" : "short-form"} content — only compatible types are shown.
                           </p>

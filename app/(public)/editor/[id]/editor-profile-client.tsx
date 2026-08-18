@@ -1354,9 +1354,13 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                         <th className="p-5 font-black text-neutral-800 w-1/4 align-top">
                           <div className="flex flex-col gap-1.5 items-start">
                             {editor.packages[0]?.videoCategory && (
-                              <span className="px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider bg-neutral-100 text-neutral-650 border border-neutral-200/60 leading-none">
-                                {editor.packages[0].videoCategory.replace(/_/g, " ")}
-                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                {editor.packages[0].videoCategory.split(",").filter(Boolean).slice(0, 2).map((cat: string) => (
+                                  <span key={cat} className="px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider bg-neutral-100 text-neutral-650 border border-neutral-200/60 leading-none">
+                                    {cat.trim().replace(/_/g, " ")}
+                                  </span>
+                                ))}
+                              </div>
                             )}
                             <span className="mt-1">Package Inclusions</span>
                           </div>

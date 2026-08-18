@@ -51,7 +51,7 @@ function matchCondition(cat: CategoryPage) {
         and(
           eq(packages.editorId, editors.id),
           eq(packages.isActive, true),
-          or(...cat.matchKeywords.map((k) => eq(packages.videoCategory, k)))
+          or(...cat.matchKeywords.map((k) => sql`${packages.videoCategory} = ${k} OR ${packages.videoCategory} LIKE ${k + ",%"} OR ${packages.videoCategory} LIKE ${"%" + "," + k} OR ${packages.videoCategory} LIKE ${"%" + "," + k + ",%" }`))
         )
       )
   );

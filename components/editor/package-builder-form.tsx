@@ -152,10 +152,11 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
       : ""
   );
   const [videoCount, setVideoCount] = useState(existing ? String(existing.videoCount) : "1");
-  const [videoCategory, setVideoCategory] = useState(
-    lockedCategory !== undefined ? (lockedCategory ?? "") : (existing?.videoCategory ?? "")
+  const [videoCategories, setVideoCategories] = useState<string[]>(
+    lockedCategory !== undefined
+      ? (lockedCategory ? [lockedCategory] : [])
+      : (existing?.videoCategory ?? "").split(",").filter(Boolean)
   );
-  const [videoCategoryCustom, setVideoCategoryCustom] = useState("");
   const [videoFormat, setVideoFormat] = useState<string>(
     lockedFormat !== undefined ? (lockedFormat ?? "") : (existing?.videoFormat ?? "")
   );
@@ -194,7 +195,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         setVideoLengthCustom("");
       }
       setVideoCount(String(existing.videoCount));
-      setVideoCategory(existing.videoCategory ?? "");
+      setVideoCategories((existing.videoCategory ?? "").split(",").filter(Boolean));
       setVideoFormat(existing.videoFormat ?? "");
       setResolution(existing.resolution ?? "");
       setAspectRatios(existing.aspectRatios ?? []);
@@ -219,8 +220,15 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
   const previewRevisions = parseInt(revisionCount);
   const previewVideoCount = parseInt(videoCount) || 1;
 
-  const activeCategory = lockedCategory !== undefined ? lockedCategory : videoCategory;
-  const visibleAddons = getAddonsForCategory(activeCategory);
+  const activeCategories = lockedCategory !== undefined ? (lockedCategory ? [lockedCategory] : []) : videoCategories;
+  const visibleAddons = activeCategories.length === 0
+    ? ALL_ADDON_OPTIONS
+    : ALL_ADDON_OPTIONS.filter(a =>
+        activeCategories.some(cat => {
+          const keys = CATEGORY_ADDONS[cat as keyof typeof CATEGORY_ADDONS];
+          return !keys || keys.includes(a.value);
+        })
+      );
 
   function toggleAddon(v: string) {
     setAddons((prev) => prev.includes(v) ? prev.filter((a) => a !== v) : [...prev, v]);
@@ -254,7 +262,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           revisionCount: revisionNum,
           videoLengthLimit: (videoLengthLimit === "__custom__" ? videoLengthCustom.trim() : videoLengthLimit) || null,
           videoCount: isNaN(videoCountNum) ? 1 : videoCountNum,
-          videoCategory: (videoCategory === "other" && videoCategoryCustom.trim() ? videoCategoryCustom.trim() : videoCategory) || null,
+          videoCategory: videoCategories.length > 0 ? videoCategories.join(",") : null,
           videoFormat: videoFormat || null,
           resolution: resolution || null,
           aspectRatios,
@@ -477,7 +485,12 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Video category */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Video category</Label>
+          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+            Video category
+            {lockedCategory === undefined && (
+              <span className="ml-1.5 text-[10px] font-medium text-gray-400 normal-case tracking-normal">— select all that apply</span>
+            )}
+          </Label>
           {lockedCategory !== undefined ? (
             <div className="flex items-center gap-2">
               <span className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: ACCENT }}>
@@ -486,40 +499,30 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               <span className="text-xs text-gray-400">Set by category — cannot be changed here</span>
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-2 gap-2">
-                {VIDEO_CATEGORIES.map((c) => {
-                  const sel = videoCategory === c.value;
-                  return (
-                    <button
-                      key={c.value}
-                      type="button"
-                      onClick={() => setVideoCategory(sel ? "" : c.value)}
-                      className={cn(
-                        "rounded-xl border p-3 text-left transition-all",
-                        sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
-                      )}
-                      style={sel ? { background: `${ACCENT}12`, borderColor: ACCENT } : {}}
-                    >
-                      <p className="text-xs font-semibold leading-snug" style={sel ? { color: ACCENT } : { color: "#374151" }}>
-                        {c.label}
-                      </p>
-                      <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{c.sub}</p>
-                    </button>
-                  );
-                })}
-              </div>
-              {videoCategory === "other" && (
-                <input
-                  autoFocus
-                  value={videoCategoryCustom}
-                  onChange={(e) => setVideoCategoryCustom(e.target.value)}
-                  placeholder="e.g. Food & Cooking, ASMR, Unboxing…"
-                  className="w-full px-3 py-2 rounded-xl border text-sm text-gray-800 outline-none"
-                  style={{ borderColor: ACCENT, boxShadow: `0 0 0 3px ${ACCENT}18` }}
-                />
-              )}
-            </>
+            <div className="grid grid-cols-2 gap-2">
+              {VIDEO_CATEGORIES.map((c) => {
+                const sel = videoCategories.includes(c.value);
+                return (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setVideoCategories(prev =>
+                      sel ? prev.filter(v => v !== c.value) : [...prev, c.value]
+                    )}
+                    className={cn(
+                      "rounded-xl border p-3 text-left transition-all",
+                      sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+                    )}
+                    style={sel ? { background: `${ACCENT}12`, borderColor: ACCENT } : {}}
+                  >
+                    <p className="text-xs font-semibold leading-snug" style={sel ? { color: ACCENT } : { color: "#374151" }}>
+                      {c.label}
+                    </p>
+                    <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{c.sub}</p>
+                  </button>
+                );
+              })}
+            </div>
           )}
         </div>
 

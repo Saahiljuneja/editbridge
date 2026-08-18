@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
         .from(orders)
         .innerJoin(packages, eq(packages.id, orders.packageId))
         .innerJoin(users, eq(users.id, orders.clientId))
-        .where(and(eq(packages.videoCategory, "wedding"), eq(orders.status, "completed")))
+        .where(and(sql`(${packages.videoCategory} = 'wedding' OR ${packages.videoCategory} LIKE ${"wedding,%"} OR ${packages.videoCategory} LIKE ${"%" + ",wedding"} OR ${packages.videoCategory} LIKE ${"%" + ",wedding,%"})`, eq(orders.status, "completed")))
         .groupBy(orders.clientId, users.email, users.name);
 
       const period = periodKey(now.getFullYear(), currentMonth);

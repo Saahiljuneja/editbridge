@@ -65,7 +65,7 @@ async function getCategoryEditors(category: CategoryConfig) {
       .where(
         and(
           eq(packages.isActive, true),
-          eq(packages.videoCategory, category.matchKeywords[0])
+          sql`${packages.videoCategory} = ${category.matchKeywords[0]} OR ${packages.videoCategory} LIKE ${category.matchKeywords[0] + ",%"} OR ${packages.videoCategory} LIKE ${"%" + "," + category.matchKeywords[0]} OR ${packages.videoCategory} LIKE ${"%" + "," + category.matchKeywords[0] + ",%" }`
         )
       );
 
