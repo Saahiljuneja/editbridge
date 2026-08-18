@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn, formatCurrency } from "@/lib/utils";
-import { Clock, RefreshCw, Video, ChevronDown, FileArchive, Briefcase } from "lucide-react";
+import { Clock, RefreshCw, Video, ChevronDown, FileArchive, Briefcase, AlertTriangle } from "lucide-react";
 import type { Package } from "@/types";
 
 const ACCENT = "#000000";
@@ -92,13 +92,6 @@ const CATEGORY_ADDONS: Record<string, string[]> = {
   automotive:  ["color_grading", "color_correction", "sound_design", "background_music", "speed_ramps", "motion_graphics", "social_media_cuts"],
 };
 
-function getAddonsForCategory(category: string | null | undefined): typeof ALL_ADDON_OPTIONS {
-  if (!category || category === "__none__") return ALL_ADDON_OPTIONS;
-  const keys = CATEGORY_ADDONS[category];
-  if (!keys) return ALL_ADDON_OPTIONS;
-  return ALL_ADDON_OPTIONS.filter((a) => keys.includes(a.value));
-}
-
 const SOFTWARE_OPTIONS = [
   { value: "premiere_pro",    label: "Premiere Pro" },
   { value: "davinci_resolve", label: "DaVinci Resolve" },
@@ -107,6 +100,9 @@ const SOFTWARE_OPTIONS = [
   { value: "capcut",          label: "CapCut" },
   { value: "vegas_pro",       label: "Vegas Pro" },
   { value: "filmora",         label: "Filmora" },
+  { value: "photoshop",       label: "Photoshop" },
+  { value: "canva",           label: "Canva" },
+  { value: "blender",         label: "Blender" },
 ];
 
 const MAX_RAW_FOOTAGE_OPTIONS = [
@@ -127,6 +123,14 @@ const DELIVERY_FORMAT_OPTIONS = [
   { value: "avi",         label: "AVI" },
 ];
 
+const ASPECT_RATIOS = [
+  { value: "16:9",  label: "16:9",  sub: "Landscape" },
+  { value: "9:16",  label: "9:16",  sub: "Portrait" },
+  { value: "1:1",   label: "1:1",   sub: "Square" },
+  { value: "4:5",   label: "4:5",   sub: "Portrait feed" },
+  { value: "21:9",  label: "21:9",  sub: "Cinematic" },
+];
+
 interface PackageBuilderFormProps {
   existing?: Package | null;
   lockedCategory?: string | null;
@@ -135,11 +139,20 @@ interface PackageBuilderFormProps {
   onCancel: () => void;
 }
 
+function SectionDivider({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-3 pt-1">
+      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">{title}</span>
+      <div className="flex-1 h-px bg-gray-100" />
+    </div>
+  );
+}
+
 export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onSaved, onCancel }: PackageBuilderFormProps) {
-  const [title, setTitle] = useState(existing?.title ?? "");
+  const [title, setTitle]             = useState(existing?.title ?? "");
   const [description, setDescription] = useState(existing?.description ?? "");
   const [priceRupees, setPriceRupees] = useState(existing ? String(existing.price / 100) : "");
-  const [deliveryDays, setDeliveryDays] = useState(existing ? String(existing.deliveryDays) : "");
+  const [deliveryDays, setDeliveryDays]   = useState(existing ? String(existing.deliveryDays) : "");
   const [revisionCount, setRevisionCount] = useState(existing ? String(existing.revisionCount) : "");
   const [videoLengthLimit, setVideoLengthLimit] = useState(
     VIDEO_LENGTH_OPTIONS.includes(existing?.videoLengthLimit ?? "") || !existing?.videoLengthLimit
@@ -160,9 +173,9 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
   const [videoFormat, setVideoFormat] = useState<string>(
     lockedFormat !== undefined ? (lockedFormat ?? "") : (existing?.videoFormat ?? "")
   );
-  const [resolution, setResolution] = useState<string>(existing?.resolution ?? "");
+  const [resolution, setResolution]   = useState<string>(existing?.resolution ?? "");
   const [aspectRatios, setAspectRatios] = useState<string[]>(existing?.aspectRatios ?? []);
-  const [addons, setAddons] = useState<string[]>(existing?.addons ?? []);
+  const [addons, setAddons]             = useState<string[]>(existing?.addons ?? []);
   const [softwareUsed, setSoftwareUsed] = useState<string[]>(existing?.softwareUsed ?? []);
   const [maxRawFootage, setMaxRawFootage] = useState(
     MAX_RAW_FOOTAGE_OPTIONS.includes(existing?.maxRawFootage ?? "") || !existing?.maxRawFootage
@@ -174,53 +187,76 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
       ? existing.maxRawFootage
       : ""
   );
-  const [deliveryFormats, setDeliveryFormats] = useState<string[]>(existing?.deliveryFormats ?? []);
-  const [includesSourceFiles, setIncludesSourceFiles] = useState(existing?.includesSourceFiles ?? false);
+  const [deliveryFormats, setDeliveryFormats]             = useState<string[]>(existing?.deliveryFormats ?? []);
+  const [includesSourceFiles, setIncludesSourceFiles]     = useState(existing?.includesSourceFiles ?? false);
   const [includesCommercialRights, setIncludesCommercialRights] = useState(existing?.includesCommercialRights ?? false);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [cancelConfirm, setCancelConfirm] = useState(false);
+  const [isDirty, setIsDirty]       = useState(false);
 
+  // Guard useEffect sync by package ID — prevents resetting a partially-edited form
+  // when the parent re-fetches after a save
+  const existingIdRef = useRef(existing?.id);
+
+  // Mark dirty after first mount whenever any field changes
+  const mountRef = useRef(false);
   useEffect(() => {
-    if (existing) {
-      setTitle(existing.title);
-      setDescription(existing.description);
-      setPriceRupees(String(existing.price / 100));
-      setDeliveryDays(String(existing.deliveryDays));
-      setRevisionCount(String(existing.revisionCount));
-      const vll = existing.videoLengthLimit ?? "";
-      if (vll && !VIDEO_LENGTH_OPTIONS.includes(vll)) {
-        setVideoLengthLimit("__custom__");
-        setVideoLengthCustom(vll);
-      } else {
-        setVideoLengthLimit(vll);
-        setVideoLengthCustom("");
-      }
-      setVideoCount(String(existing.videoCount));
-      setVideoCategories((existing.videoCategory ?? "").split(",").filter(Boolean));
-      setVideoFormat(existing.videoFormat ?? "");
-      setResolution(existing.resolution ?? "");
-      setAspectRatios(existing.aspectRatios ?? []);
-      setAddons(existing.addons ?? []);
-      setSoftwareUsed(existing.softwareUsed ?? []);
-      const mrf = existing.maxRawFootage ?? "";
-      if (mrf && !MAX_RAW_FOOTAGE_OPTIONS.includes(mrf)) {
-        setMaxRawFootage("__custom__");
-        setMaxRawFootageCustom(mrf);
-      } else {
-        setMaxRawFootage(mrf);
-        setMaxRawFootageCustom("");
-      }
-      setDeliveryFormats(existing.deliveryFormats ?? []);
-      setIncludesSourceFiles(existing.includesSourceFiles);
-      setIncludesCommercialRights(existing.includesCommercialRights);
+    if (!mountRef.current) { mountRef.current = true; return; }
+    setIsDirty(true);
+  }, [ // eslint-disable-line react-hooks/exhaustive-deps
+    title, description, priceRupees, deliveryDays, revisionCount,
+    videoLengthLimit, videoLengthCustom, videoCount, videoCategories, videoFormat,
+    resolution, aspectRatios, addons, softwareUsed, maxRawFootage,
+    maxRawFootageCustom, deliveryFormats, includesSourceFiles, includesCommercialRights,
+  ]);
+
+  // Sync fields only when a *different* package is passed in
+  useEffect(() => {
+    if (!existing || existing.id === existingIdRef.current) return;
+    existingIdRef.current = existing.id;
+    setTitle(existing.title);
+    setDescription(existing.description);
+    setPriceRupees(String(existing.price / 100));
+    setDeliveryDays(String(existing.deliveryDays));
+    setRevisionCount(String(existing.revisionCount));
+    const vll = existing.videoLengthLimit ?? "";
+    if (vll && !VIDEO_LENGTH_OPTIONS.includes(vll)) {
+      setVideoLengthLimit("__custom__");
+      setVideoLengthCustom(vll);
+    } else {
+      setVideoLengthLimit(vll);
+      setVideoLengthCustom("");
     }
+    setVideoCount(String(existing.videoCount));
+    setVideoCategories((existing.videoCategory ?? "").split(",").filter(Boolean));
+    setVideoFormat(existing.videoFormat ?? "");
+    setResolution(existing.resolution ?? "");
+    setAspectRatios(existing.aspectRatios ?? []);
+    setAddons(existing.addons ?? []);
+    setSoftwareUsed(existing.softwareUsed ?? []);
+    const mrf = existing.maxRawFootage ?? "";
+    if (mrf && !MAX_RAW_FOOTAGE_OPTIONS.includes(mrf)) {
+      setMaxRawFootage("__custom__");
+      setMaxRawFootageCustom(mrf);
+    } else {
+      setMaxRawFootage(mrf);
+      setMaxRawFootageCustom("");
+    }
+    setDeliveryFormats(existing.deliveryFormats ?? []);
+    setIncludesSourceFiles(existing.includesSourceFiles);
+    setIncludesCommercialRights(existing.includesCommercialRights);
+    setIsDirty(false);
   }, [existing]);
 
-  const previewPaise = Math.round(parseFloat(priceRupees || "0") * 100);
-  const previewDays = parseInt(deliveryDays) || 0;
-  const previewRevisions = parseInt(revisionCount);
-  const previewVideoCount = parseInt(videoCount) || 1;
+  const previewPaise       = Math.round(parseFloat(priceRupees || "0") * 100);
+  const previewDays        = parseInt(deliveryDays) || 0;
+  const previewRevisions   = parseInt(revisionCount);
+  const previewVideoCount  = parseInt(videoCount) || 1;
 
-  const activeCategories = lockedCategory !== undefined ? (lockedCategory ? [lockedCategory] : []) : videoCategories;
+  const activeCategories = lockedCategory !== undefined
+    ? (lockedCategory ? [lockedCategory] : [])
+    : videoCategories;
+
   const visibleAddons = activeCategories.length === 0
     ? ALL_ADDON_OPTIONS
     : ALL_ADDON_OPTIONS.filter(a =>
@@ -230,26 +266,54 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         })
       );
 
+  const visibleAddonValues = new Set(visibleAddons.map(a => a.value));
+
+  function handleCategoryToggle(value: string, currentlySelected: boolean) {
+    setVideoCategories(prev => {
+      const next = currentlySelected
+        ? prev.filter(v => v !== value)
+        : [...prev, value];
+      // Prune addons that are no longer visible under the new category set
+      const nextVisible = new Set(
+        next.length === 0
+          ? ALL_ADDON_OPTIONS.map(a => a.value)
+          : ALL_ADDON_OPTIONS
+              .filter(a => next.some(cat => {
+                const keys = CATEGORY_ADDONS[cat as keyof typeof CATEGORY_ADDONS];
+                return !keys || keys.includes(a.value);
+              }))
+              .map(a => a.value)
+      );
+      setAddons(prev => prev.filter(v => nextVisible.has(v)));
+      return next;
+    });
+  }
+
   function toggleAddon(v: string) {
-    setAddons((prev) => prev.includes(v) ? prev.filter((a) => a !== v) : [...prev, v]);
+    setAddons(prev => prev.includes(v) ? prev.filter(a => a !== v) : [...prev, v]);
+  }
+
+  function handleCancel() {
+    if (isDirty) { setCancelConfirm(true); return; }
+    onCancel();
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    const priceNum = Math.round(parseFloat(priceRupees) * 100);
-    const deliveryNum = parseInt(deliveryDays);
-    const revisionNum = parseInt(revisionCount);
+    const priceNum     = Math.round(parseFloat(priceRupees) * 100);
+    const deliveryNum  = parseInt(deliveryDays);
+    const revisionNum  = parseInt(revisionCount);
     const videoCountNum = parseInt(videoCount);
 
     if (!title.trim() || !description.trim()) { toast.error("Title and description are required."); return; }
-    if (isNaN(priceNum) || priceNum < 10000) { toast.error("Minimum price is ₹100."); return; }
+    if (isNaN(priceNum) || priceNum < 10000)  { toast.error("Minimum price is ₹100."); return; }
     if (isNaN(deliveryNum) || deliveryNum < 1) { toast.error("Delivery must be at least 1 day."); return; }
+    if (deliveryNum > 90)                      { toast.error("Maximum delivery is 90 days."); return; }
     if (isNaN(revisionNum) || revisionNum < 0) { toast.error("Revision count cannot be negative."); return; }
 
     setSaving(true);
     try {
-      const url = existing ? `/api/packages/${existing.id}` : "/api/packages";
+      const url    = existing ? `/api/packages/${existing.id}` : "/api/packages";
       const method = existing ? "PATCH" : "POST";
       const res = await fetch(url, {
         method,
@@ -284,6 +348,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
       const saved: Package = await res.json();
       toast.success(existing ? "Package updated!" : "Package created!");
+      setIsDirty(false);
       onSaved(saved);
     } catch {
       toast.error("Something went wrong.");
@@ -293,23 +358,18 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
   }
 
   const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wide outline-none focus:bg-white focus:border-black transition-all placeholder:text-neutral-400";
+  const focusHandlers = {
+    onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      e.currentTarget.style.borderColor = ACCENT;
+      e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`;
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      e.currentTarget.style.borderColor = "";
+      e.currentTarget.style.boxShadow = "";
+    },
+  };
 
-  function ChipButton({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={cn(
-          "px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-all cursor-pointer",
-          selected
-            ? "bg-black text-white border-black"
-            : "border-neutral-200 text-neutral-500 hover:border-neutral-350 bg-white hover:text-black"
-        )}
-      >
-        {children}
-      </button>
-    );
-  }
+  const Req = () => <span className="text-red-500 ml-0.5">*</span>;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -318,7 +378,9 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         {/* ── Left column ── */}
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Service title</Label>
+            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              Service title <Req />
+            </Label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -326,13 +388,17 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               required
               placeholder="e.g. Full YouTube Edit with Music Sync"
               className={inputClass}
-              onFocus={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = ""; }}
+              {...focusHandlers}
             />
+            <p className={cn("text-xs text-right", title.length > 85 ? "text-amber-500" : "text-gray-300")}>
+              {title.length}/100
+            </p>
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Description</Label>
+            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              Description <Req />
+            </Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -341,6 +407,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               maxLength={500}
               required
               className="resize-none text-sm"
+              {...focusHandlers}
             />
             <p className="text-xs text-gray-400 text-right">{description.length}/500</p>
           </div>
@@ -350,7 +417,9 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         <div className="space-y-4">
           {/* Price */}
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Price (₹)</Label>
+            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              Price (₹) <Req />
+            </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium select-none">₹</span>
               <input
@@ -360,19 +429,23 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 placeholder="e.g. 3500"
                 required
                 className={cn(inputClass, "pl-7")}
-                onFocus={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = ""; }}
+                {...focusHandlers}
               />
             </div>
-            {priceRupees && !isNaN(previewPaise) && previewPaise >= 10000 && (
-              <p className="text-xs font-semibold" style={{ color: ACCENT }}>{formatCurrency(previewPaise)}</p>
+            {priceRupees && !isNaN(previewPaise) && (
+              <p className={cn("text-xs font-semibold", previewPaise >= 10000 ? "" : "text-amber-500")}
+                 style={previewPaise >= 10000 ? { color: ACCENT } : {}}>
+                {previewPaise >= 10000 ? formatCurrency(previewPaise) : `Min ₹100 — currently ₹${parseFloat(priceRupees).toFixed(0)}`}
+              </p>
             )}
           </div>
 
           {/* Delivery + Revisions */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Delivery (days)</Label>
+              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Delivery (days) <Req />
+              </Label>
               <input
                 type="number" min="1" max="90"
                 value={deliveryDays}
@@ -380,12 +453,14 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 placeholder="e.g. 3"
                 required
                 className={inputClass}
-                onFocus={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = ""; }}
+                {...focusHandlers}
               />
+              <p className="text-[10px] text-gray-300">Max 90 days</p>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Revisions</Label>
+              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Revisions <Req />
+              </Label>
               <input
                 type="number" min="0" max="100"
                 value={revisionCount}
@@ -393,9 +468,9 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 placeholder="e.g. 2"
                 required
                 className={inputClass}
-                onFocus={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = ""; }}
+                {...focusHandlers}
               />
+              <p className="text-[10px] text-gray-300">0 = no revisions included</p>
             </div>
           </div>
 
@@ -412,8 +487,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 onChange={(e) => setVideoCount(e.target.value)}
                 placeholder="1"
                 className={inputClass}
-                onFocus={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = ""; }}
+                {...focusHandlers}
               />
             </div>
             <div className="space-y-1.5">
@@ -424,10 +498,9 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                     value={videoLengthLimit}
                     onChange={(e) => setVideoLengthLimit(e.target.value)}
                     className={cn(inputClass, "appearance-none pr-7")}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.boxShadow = ""; }}
+                    {...focusHandlers}
                   >
-                    <option value="">Not set</option>
+                    <option value="">Not specified</option>
                     {VIDEO_LENGTH_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
                     <option value="__custom__">Custom…</option>
                   </select>
@@ -435,7 +508,6 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 </div>
                 {videoLengthLimit === "__custom__" && (
                   <input
-                    autoFocus
                     value={videoLengthCustom}
                     onChange={(e) => setVideoLengthCustom(e.target.value)}
                     placeholder="e.g. Up to 45 min, 2–3 hours…"
@@ -448,40 +520,59 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           </div>
 
           {/* Live preview */}
-          {(title || previewPaise >= 10000) && (
-            <div className="rounded-xl border p-3 bg-white space-y-2 mt-1" style={{ borderColor: `${ACCENT}30` }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Preview</p>
-              {previewPaise >= 10000 && (
-                <p className="text-xl font-bold" style={{ color: ACCENT }}>{formatCurrency(previewPaise)}</p>
+          <div className={cn(
+            "rounded-xl border p-3 space-y-2 mt-1 transition-opacity",
+            (title || previewPaise > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
+          )} style={{ borderColor: `${ACCENT}30`, background: "white" }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Live preview</p>
+            <p className={cn("text-xl font-bold", previewPaise >= 10000 ? "" : "text-gray-300")}
+               style={previewPaise >= 10000 ? { color: ACCENT } : {}}>
+              {previewPaise >= 10000 ? formatCurrency(previewPaise) : "₹—"}
+            </p>
+            {title && <p className="text-sm font-semibold text-gray-800 leading-tight">{title}</p>}
+            <div className="flex flex-wrap gap-x-3 gap-y-1 pt-0.5">
+              {previewDays > 0 && (
+                <span className="flex items-center gap-1 text-xs text-gray-500">
+                  <Clock className="w-3 h-3" /> {previewDays}d
+                </span>
               )}
-              {title && <p className="text-sm font-semibold text-gray-800 leading-tight">{title}</p>}
-              <div className="flex flex-wrap gap-x-3 gap-y-1 pt-0.5">
-                {previewDays > 0 && (
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <Clock className="w-3 h-3" /> {previewDays}d
-                  </span>
-                )}
-                {!isNaN(previewRevisions) && previewRevisions >= 0 && (
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <RefreshCw className="w-3 h-3" /> {previewRevisions} rev
-                  </span>
-                )}
-                {previewVideoCount > 0 && (
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <Video className="w-3 h-3" /> {previewVideoCount} video{previewVideoCount !== 1 ? "s" : ""}
-                  </span>
-                )}
-                {videoLengthLimit && (
-                  <span className="text-xs text-gray-500">{videoLengthLimit}</span>
-                )}
-              </div>
+              {!isNaN(previewRevisions) && previewRevisions >= 0 && (
+                <span className="flex items-center gap-1 text-xs text-gray-500">
+                  <RefreshCw className="w-3 h-3" /> {previewRevisions} rev
+                </span>
+              )}
+              {previewVideoCount > 0 && (
+                <span className="flex items-center gap-1 text-xs text-gray-500">
+                  <Video className="w-3 h-3" /> {previewVideoCount} video{previewVideoCount !== 1 ? "s" : ""}
+                </span>
+              )}
+              {videoLengthLimit && videoLengthLimit !== "__custom__" && (
+                <span className="text-xs text-gray-500">{videoLengthLimit}</span>
+              )}
             </div>
-          )}
+            {videoCategories.length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-0.5">
+                {videoCategories.slice(0, 3).map(cat => (
+                  <span key={cat} className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+                    {VIDEO_CATEGORIES.find(c => c.value === cat)?.label ?? cat}
+                  </span>
+                ))}
+              </div>
+            )}
+            {addons.length > 0 && (
+              <p className="text-[10px] text-gray-400">
+                Includes: {addons.slice(0, 3).map(v => ALL_ADDON_OPTIONS.find(a => a.value === v)?.label).filter(Boolean).join(", ")}
+                {addons.length > 3 ? ` +${addons.length - 3} more` : ""}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
       {/* ── Full-width sections ── */}
       <div className="mt-6 space-y-5 border-t border-gray-100 pt-5">
+
+        <SectionDivider title="Content type" />
 
         {/* Video category */}
         <div className="space-y-2">
@@ -506,9 +597,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                   <button
                     key={c.value}
                     type="button"
-                    onClick={() => setVideoCategories(prev =>
-                      sel ? prev.filter(v => v !== c.value) : [...prev, c.value]
-                    )}
+                    onClick={() => handleCategoryToggle(c.value, sel)}
                     className={cn(
                       "rounded-xl border p-3 text-left transition-all",
                       sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
@@ -560,6 +649,8 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           )}
         </div>
 
+        <SectionDivider title="Output specs" />
+
         {/* Resolution */}
         <div className="space-y-2">
           <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Output resolution</Label>
@@ -589,13 +680,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         <div className="space-y-2">
           <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Aspect ratios delivered</Label>
           <div className="flex flex-wrap gap-2">
-            {[
-              { value: "16:9",  label: "16:9",  sub: "Landscape" },
-              { value: "9:16",  label: "9:16",  sub: "Portrait" },
-              { value: "1:1",   label: "1:1",   sub: "Square" },
-              { value: "4:5",   label: "4:5",   sub: "Portrait feed" },
-              { value: "21:9",  label: "21:9",  sub: "Cinematic" },
-            ].map((r) => {
+            {ASPECT_RATIOS.map((r) => {
               const sel = aspectRatios.includes(r.value);
               return (
                 <button
@@ -618,9 +703,43 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           <p className="text-[10px] text-neutral-400 font-medium">Select all ratios you deliver for this package.</p>
         </div>
 
+        {/* Delivery formats */}
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Delivery formats</Label>
+          <div className="flex flex-wrap gap-2">
+            {DELIVERY_FORMAT_OPTIONS.map((f) => {
+              const sel = deliveryFormats.includes(f.value);
+              return (
+                <button
+                  key={f.value}
+                  type="button"
+                  onClick={() => setDeliveryFormats((prev) => sel ? prev.filter((v) => v !== f.value) : [...prev, f.value])}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
+                    sel ? "text-white border-transparent" : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
+                  )}
+                  style={sel ? { background: ACCENT, borderColor: ACCENT } : {}}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <SectionDivider title="Services included" />
+
         {/* Add-ons */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">What&apos;s included</Label>
+          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">What&apos;s included in this package</Label>
+          {visibleAddons.length < ALL_ADDON_OPTIONS.length && (
+            <p className="text-[10px] text-gray-400">
+              Showing services relevant to your selected {videoCategories.length === 1 ? "category" : "categories"}.
+              {addons.some(v => !visibleAddonValues.has(v)) && (
+                <span className="text-amber-500 ml-1">Some previously selected items were removed when you changed categories.</span>
+              )}
+            </p>
+          )}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {visibleAddons.map((a) => {
               const sel = addons.includes(a.value);
@@ -647,6 +766,8 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           </div>
         </div>
 
+        <SectionDivider title="Technical" />
+
         {/* Software used */}
         <div className="space-y-2">
           <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Software used</Label>
@@ -671,59 +792,36 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           </div>
         </div>
 
-        {/* Max raw footage + Delivery formats */}
-        <div className="grid sm:grid-cols-2 gap-5">
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Max raw footage accepted</Label>
-            <div className="relative">
-              <select
-                value={maxRawFootage}
-                onChange={(e) => setMaxRawFootage(e.target.value)}
-                className={cn(inputClass, "appearance-none pr-7")}
-              >
-                <option value="">Not specified</option>
-                {MAX_RAW_FOOTAGE_OPTIONS.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-                <option value="__custom__">Custom…</option>
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-            {maxRawFootage === "__custom__" && (
-              <input
-                autoFocus
-                value={maxRawFootageCustom}
-                onChange={(e) => setMaxRawFootageCustom(e.target.value)}
-                placeholder="e.g. Up to 4 hours, 20–30 min…"
-                className={cn(inputClass)}
-                style={{ borderColor: ACCENT, boxShadow: `0 0 0 3px ${ACCENT}18` }}
-              />
-            )}
+        {/* Max raw footage */}
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Max raw footage accepted</Label>
+          <div className="relative">
+            <select
+              value={maxRawFootage}
+              onChange={(e) => setMaxRawFootage(e.target.value)}
+              className={cn(inputClass, "appearance-none pr-7")}
+              {...focusHandlers}
+            >
+              <option value="">Not specified</option>
+              {MAX_RAW_FOOTAGE_OPTIONS.map((o) => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+              <option value="__custom__">Custom…</option>
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Delivery formats</Label>
-            <div className="flex flex-wrap gap-2">
-              {DELIVERY_FORMAT_OPTIONS.map((f) => {
-                const sel = deliveryFormats.includes(f.value);
-                return (
-                  <button
-                    key={f.value}
-                    type="button"
-                    onClick={() => setDeliveryFormats((prev) => sel ? prev.filter((v) => v !== f.value) : [...prev, f.value])}
-                    className={cn(
-                      "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
-                      sel ? "text-white border-transparent" : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
-                    )}
-                    style={sel ? { background: ACCENT, borderColor: ACCENT } : {}}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {maxRawFootage === "__custom__" && (
+            <input
+              value={maxRawFootageCustom}
+              onChange={(e) => setMaxRawFootageCustom(e.target.value)}
+              placeholder="e.g. Up to 4 hours, 20–30 min…"
+              className={cn(inputClass)}
+              style={{ borderColor: ACCENT, boxShadow: `0 0 0 3px ${ACCENT}18` }}
+            />
+          )}
         </div>
+
+        <SectionDivider title="Rights" />
 
         {/* Source files + commercial rights */}
         <div className="grid grid-cols-2 gap-3">
@@ -774,21 +872,45 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3 pt-5 mt-3 border-t border-neutral-100">
-        <button
-          type="submit"
-          disabled={saving}
-          className={cn("flex-1 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-900 transition-all cursor-pointer", saving && "opacity-60 cursor-not-allowed")}
-        >
-          {saving ? "Saving…" : existing ? "Save changes" : "Create service"}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors cursor-pointer"
-        >
-          Cancel
-        </button>
+      <div className="pt-5 mt-3 border-t border-neutral-100 space-y-3">
+        {cancelConfirm && (
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50">
+            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+            <p className="text-xs text-amber-800 font-semibold flex-1">Discard all unsaved changes?</p>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 transition-colors"
+            >
+              Discard
+            </button>
+            <button
+              type="button"
+              onClick={() => setCancelConfirm(false)}
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-700 hover:bg-amber-100 transition-colors"
+            >
+              Keep editing
+            </button>
+          </div>
+        )}
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={saving}
+            className={cn("flex-1 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-900 transition-all cursor-pointer", saving && "opacity-60 cursor-not-allowed")}
+          >
+            {saving ? "Saving…" : existing ? "Save changes" : "Create package"}
+          </button>
+          {!cancelConfirm && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </div>
     </form>
   );
