@@ -6,7 +6,7 @@ import {
   MapPin, Star, CheckCircle2, Clock, TrendingUp, Zap,
   ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Play,
   BadgeCheck, Globe, Briefcase, Award, X, ArrowLeftRight,
-  Eye, Share2, Bookmark, Home,
+  Eye, Share2, Bookmark, Home, Heart,
 } from "lucide-react";
 import { displayNameFromFull, cn } from "@/lib/utils";
 import { getThumbnailUrl, getVideoSource } from "@/lib/portfolio-media";
@@ -273,86 +273,150 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
+function PortfolioCard({ item, index, onOpen }: { item: PortfolioItem; index: number; onOpen: (index: number) => void }) {
+  const [showBefore, setShowBefore] = useState(false);
+
+  const thumb = item.type === "video"
+    ? (item.thumbnailUrl || getThumbnailUrl(item.url))
+    : null;
+  const source = (item.type === "video" ? getVideoSource(item.url) : null) as any;
+  const beforeThumb = item.beforeUrl
+    ? (getThumbnailUrl(item.beforeUrl) || item.beforeUrl)
+    : null;
+
+  return (
+    <div className="group bg-white rounded-[22px] border border-neutral-200/55 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col">
+      {/* Thumbnail — click opens lightbox */}
+      <button
+        onClick={() => onOpen(index)}
+        className="relative aspect-video w-full block overflow-hidden bg-neutral-50 shrink-0 cursor-pointer"
+      >
+        {showBefore && beforeThumb ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={beforeThumb} alt="Before" className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
+            <div className="absolute inset-0 bg-black/15 group-hover:bg-black/30 transition-colors" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+              </div>
+            </div>
+          </>
+        ) : item.type === "video" ? (
+          thumb ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={thumb} alt={item.title ?? "Video"} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
+                  <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                </div>
+              </div>
+            </>
+          ) : source === "direct" ? (
+            <>
+              <video src={`${item.url}#t=0.1`} preload="metadata" className="w-full h-full object-cover" muted playsInline />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
+                  <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900 gap-1">
+              <Play className="w-7 h-7 text-white/70 group-hover:text-white transition-colors" />
+              {source && source !== "direct" && (
+                <span className={`text-[8px] font-bold uppercase tracking-wider text-white/50 px-1.5 py-0.5 rounded ${
+                  source === "youtube" ? "bg-red-600/60" :
+                  source === "vimeo"   ? "bg-brand-primary/60" :
+                  "bg-green-600/60"
+                }`}>
+                  {source === "youtube" ? "YouTube" : source === "vimeo" ? "Vimeo" : "Drive"}
+                </span>
+              )}
+            </div>
+          )
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.url} alt={item.title ?? "Portfolio image"} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+        )}
+
+        {/* Featured badge — top left */}
+        {item.isFeatured && (
+          <span className="absolute top-2 left-2 bg-[#1e40af] text-white rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider z-10 shadow-sm">
+            Featured
+          </span>
+        )}
+
+        {/* Verified badge — top left (only if not featured to avoid overlap) */}
+        {item.orderId && !item.isFeatured && (
+          <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[8px] font-bold text-indigo-700 flex items-center gap-0.5 cursor-help group/vtooltip z-10 shadow-sm">
+            <BadgeCheck className="w-2.5 h-2.5" />Verified
+            <div className="absolute top-full left-0 mt-1 w-44 hidden group-hover/vtooltip:block bg-gray-900 text-white text-[9px] rounded p-2 leading-normal shadow-md z-30 font-medium normal-case">
+              Verified Order: This video was created for an actual completed order on EditBridge.
+            </div>
+          </span>
+        )}
+
+        {/* Before/After toggle — top right */}
+        {item.beforeUrl && (
+          <button
+            onClick={e => { e.stopPropagation(); setShowBefore(s => !s); }}
+            className={cn(
+              "absolute top-2 right-2 rounded-full px-2 py-0.5 text-[8px] font-bold flex items-center gap-0.5 z-10 shadow-sm transition-all",
+              showBefore
+                ? "bg-[#1e40af] text-white"
+                : "bg-white/90 backdrop-blur-sm text-neutral-700 hover:bg-white"
+            )}
+          >
+            <ArrowLeftRight className="w-2.5 h-2.5" />
+            {showBefore ? "After" : "Before"}
+          </button>
+        )}
+      </button>
+
+      {/* Footer */}
+      <div className="px-3 pt-2 pb-2.5 flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-neutral-800 text-[11px] font-bold leading-tight line-clamp-1">{item.title ?? "Untitled"}</p>
+          {item.category && (
+            <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider text-neutral-400 bg-neutral-100 px-1.5 py-0.5 rounded-full">
+              {item.category}
+            </span>
+          )}
+        </div>
+        {item.likesCount > 0 && (
+          <div className="flex items-center gap-1 text-neutral-350 shrink-0 mt-0.5">
+            <Heart className="w-3 h-3" />
+            <span className="text-[10px] font-bold">{item.likesCount}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PortfolioGrid({ items, onOpen }: { items: PortfolioItem[]; onOpen: (index: number) => void }) {
+  const [showAll, setShowAll] = useState(false);
+  const INITIAL = 4;
   if (items.length === 0) return null;
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {items.map((item, index) => {
-        const thumb = item.type === "video"
-          ? (item.thumbnailUrl || getThumbnailUrl(item.url))
-          : null;
-        const source = (item.type === "video" ? getVideoSource(item.url) : null) as any;
-        return (
-          <button
-            key={item.id}
-            onClick={() => onOpen(index)}
-            className="group bg-[#ffffff] rounded-[22px] p-2 border border-neutral-200/55 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col text-left cursor-pointer"
-          >
-            {/* Rounded Preview Container */}
-            <div className="relative aspect-video w-full rounded-[16px] overflow-hidden bg-neutral-50 shrink-0">
-              {item.type === "video" ? (
-                thumb ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={thumb} alt={item.title ?? "Video"} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white fill-white ml-0.5" />
-                      </div>
-                    </div>
-                  </>
-                ) : source === "direct" ? (
-                  <>
-                    <video src={`${item.url}#t=0.1`} preload="metadata" className="w-full h-full object-cover" muted playsInline />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-black/60 flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white fill-white ml-0.5" />
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900 gap-1">
-                    <Play className="w-7 h-7 text-white/70 group-hover:text-white transition-colors" />
-                    {source && source !== "direct" && (
-                      <span className={`text-[8px] font-bold uppercase tracking-wider text-white/50 px-1.5 py-0.5 rounded ${
-                        source === "youtube" ? "bg-red-600/60" :
-                        source === "vimeo"   ? "bg-brand-primary/60" :
-                        "bg-green-600/60"
-                      }`}>
-                        {source === "youtube" ? "YouTube" : source === "vimeo" ? "Vimeo" : "Drive"}
-                      </span>
-                    )}
-                  </div>
-                )
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.url} alt={item.title ?? "Portfolio image"} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
-                  onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-              )}
-
-              {/* Badges Overlays */}
-              {item.orderId && (
-                <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[8px] font-bold text-indigo-700 flex items-center gap-0.5 cursor-help group/vtooltip z-10 shadow-sm">
-                  <BadgeCheck className="w-2.5 h-2.5" />Verified
-                  <div className="absolute top-full left-0 mt-1 w-44 hidden group-hover/vtooltip:block bg-gray-900 text-white text-[9px] rounded p-2 leading-normal shadow-md z-30 font-medium normal-case">
-                    Verified Order: This video was created for an actual completed order on EditBridge.
-                  </div>
-                </span>
-              )}
-              {item.beforeUrl && (
-                <span className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 text-[8px] font-bold text-neutral-700 flex items-center gap-0.5 z-10 shadow-sm">
-                  <ArrowLeftRight className="w-2.5 h-2.5" />Before/After
-                </span>
-              )}
-            </div>
-
-            {/* Label Footer */}
-            <div className="pt-2.5 px-1 pb-0.5 flex-1 flex flex-col">
-              <p className="text-neutral-800 text-[11px] font-bold leading-tight line-clamp-1 group-hover:text-black transition-colors">{item.title ?? "Untitled"}</p>
-            </div>
-          </button>
-        );
-      })}
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        {items.map((item, actualIndex) => {
+          if (!showAll && actualIndex >= INITIAL) return null;
+          return <PortfolioCard key={item.id} item={item} index={actualIndex} onOpen={onOpen} />;
+        })}
+      </div>
+      {items.length > INITIAL && (
+        <button
+          onClick={() => setShowAll(s => !s)}
+          className="w-full py-2.5 rounded-2xl border border-neutral-200 text-[11px] font-bold text-neutral-500 hover:text-black hover:border-neutral-400 transition-colors bg-white"
+        >
+          {showAll ? "Show less" : `Show all ${items.length} works`}
+        </button>
+      )}
     </div>
   );
 }
@@ -1136,7 +1200,14 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
 
           {/* 4. Portfolio */}
           <section className="py-8">
-            <SectionHeading className="mb-1">Portfolio</SectionHeading>
+            <div className="flex items-center justify-between mb-1">
+              <SectionHeading>Portfolio</SectionHeading>
+              {editor.portfolioItems.length > 0 && (
+                <span className="text-[10px] font-bold text-neutral-400 bg-neutral-50 border border-neutral-200/60 px-2.5 py-1 rounded-full">
+                  {editor.portfolioItems.length} work{editor.portfolioItems.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-neutral-450 font-semibold mt-1 mb-6">Past work samples and completed projects</p>
             {editor.portfolioItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 border border-dashed border-neutral-200 rounded-2xl text-center bg-neutral-50/30">
@@ -1150,7 +1221,7 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
               </div>
             ) : (
               <>
-                {categories.length > 2 && (
+                {categories.length > 1 && (
                   <div className="inline-flex items-center gap-1 bg-[#f3f4f6] rounded-[18px] border border-neutral-200/50 p-1 mb-6 overflow-x-auto scrollbar-none max-w-full">
                     {categories.map((cat) => (
                       <button
