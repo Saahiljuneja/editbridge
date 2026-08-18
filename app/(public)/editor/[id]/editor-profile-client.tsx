@@ -1554,7 +1554,6 @@ export function EditorProfileClient({ editor, isLoggedIn }: { editor: EditorProf
                     </tbody>
                   </table>
                 </div>
-                </div>
               </div>
             )}
           </section>
