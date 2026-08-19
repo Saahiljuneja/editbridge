@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
+  excludeHrefs?: string[];
 }
 
 const LINK_ICONS: Record<string, LucideIcon> = {
@@ -122,7 +123,7 @@ const ROLE_LABELS: Record<string, string> = {
   staff_moderation: "Staff · Moderation",
 };
 
-export function MobileNav({ open, onClose }: MobileNavProps) {
+export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const role = session?.user?.role;
@@ -146,19 +147,19 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
     return () => document.removeEventListener("keydown", handle);
   }, [open, onClose]);
 
-  // Scroll lock + focus management
+  // Scroll lock + focus management (iOS-compatible: position:fixed avoids momentum-scroll bleed)
   useEffect(() => {
-    if (open) {
-      prevFocusRef.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = "hidden";
-      // Defer focus so transition has started
-      requestAnimationFrame(() => closeButtonRef.current?.focus());
-    } else {
-      document.body.style.overflow = "";
+    if (!open) return;
+    prevFocusRef.current = document.activeElement as HTMLElement;
+    const scrollY = window.scrollY;
+    document.body.style.cssText = `overflow:hidden;position:fixed;top:-${scrollY}px;left:0;right:0;`;
+    requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => {
+      document.body.style.cssText = "";
+      window.scrollTo(0, scrollY);
       prevFocusRef.current?.focus();
       prevFocusRef.current = null;
-    }
-    return () => { document.body.style.overflow = ""; };
+    };
   }, [open]);
 
   const isAdmin = role === "admin" || (typeof role === "string" && role.startsWith("staff_"));
@@ -167,7 +168,9 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
     : session                          ? clientLinks
     : publicLinks;
 
-  const links = allLinks.filter((l) => !("flag" in l) || flags[(l as { flag: string }).flag] !== false);
+  const links = allLinks
+    .filter((l) => !("flag" in l) || flags[(l as { flag: string }).flag] !== false)
+    .filter((l) => !excludeHrefs?.includes(l.href));
 
   const roleLabel = ROLE_LABELS[role ?? ""] ?? "Member";
 
@@ -185,7 +188,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[60] transition-all duration-300",
+        "fixed inset-0 z-[60]",
         open ? "pointer-events-auto" : "pointer-events-none"
       )}
       aria-hidden={!open}
@@ -253,7 +256,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               <p className="text-sm font-semibold text-gray-900 truncate">{session.user?.name}</p>
               <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
             </div>
-            <span className="shrink-0 text-[10px] font-bold text-[var(--brand-client)] bg-[var(--brand-client)]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">
+            <span className="shrink-0 text-[10px] font-bold text-[#1e40af] bg-[#1e40af]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">
               {roleLabel}
             </span>
           </div>
@@ -274,11 +277,11 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                   active
-                    ? "bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
+                    ? "bg-[#1e40af]/10 text-[#1e40af]"
                     : "text-gray-700 hover:bg-gray-100"
                 )}
               >
-                <NavIcon className={cn("w-4 h-4 shrink-0", active ? "text-[var(--brand-client)]" : "text-gray-400")} />
+                <NavIcon className={cn("w-4 h-4 shrink-0", active ? "text-[#1e40af]" : "text-gray-400")} />
                 <span>{label}</span>
               </Link>
             );
@@ -286,7 +289,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 py-4 border-t border-gray-100 space-y-2">
+        <div className="px-3 pt-4 border-t border-gray-100 space-y-2" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}>
           {session ? (
             <button
               onClick={() => { onClose(); signOut({ callbackUrl: "/" }); }}
@@ -300,7 +303,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               <Link
                 href="/signup/editor"
                 onClick={onClose}
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[var(--brand-client)] border border-[var(--brand-client)]/25 bg-[var(--brand-client)]/5 hover:bg-[var(--brand-client)]/10 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[#1e40af] border border-[#1e40af]/25 bg-[#1e40af]/5 hover:bg-[#1e40af]/10 transition-colors"
               >
                 <Sparkles className="w-4 h-4" />
                 Become an Editor

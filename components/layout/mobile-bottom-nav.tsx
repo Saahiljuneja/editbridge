@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Home,
   Compass,
@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   MessageCircle,
   Package,
+  UserCheck,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,7 +49,7 @@ const EDITOR_TABS: Tab[] = [
 const ADMIN_TABS: Tab[] = [
   { href: "/admin/dashboard", label: "Home",     icon: LayoutDashboard },
   { href: "/admin/orders",    label: "Orders",   icon: ShoppingBag },
-  { href: "/admin/kyc",       label: "KYC",      icon: Package },
+  { href: "/admin/kyc",       label: "KYC",      icon: UserCheck },
   { href: "/admin/disputes",  label: "Disputes", icon: MessageCircle },
   {                           label: "More",     icon: MoreHorizontal, action: "more" },
 ];
@@ -58,6 +59,7 @@ export function MobileBottomNav() {
   const { data: session } = useSession();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const handleClose = useCallback(() => setDrawerOpen(false), []);
 
   const role = session?.user?.role;
   const isAdmin = role === "admin" || (typeof role === "string" && role.startsWith("staff_"));
@@ -75,6 +77,8 @@ export function MobileBottomNav() {
       .then((d) => { if (d) setUnreadMessages(d.count ?? 0); })
       .catch(() => {});
   }, [session, role]);
+
+  const tabHrefs = tabs.flatMap((t) => (t.href ? [t.href] : []));
 
   function isActive(tab: Tab) {
     if (!tab.href) return drawerOpen;
@@ -114,7 +118,7 @@ export function MobileBottomNav() {
                       <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1e40af]" />
                     )}
                   </div>
-                  <span className="text-[10px] font-bold leading-none">{drawerOpen ? "Close" : "More"}</span>
+                  <span className="text-[10px] font-bold leading-none mt-1">{drawerOpen ? "Close" : "More"}</span>
                 </button>
               );
             }
@@ -146,7 +150,7 @@ export function MobileBottomNav() {
         </div>
       </nav>
 
-      <MobileNav open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MobileNav open={drawerOpen} onClose={handleClose} excludeHrefs={tabHrefs} />
     </>
   );
 }
