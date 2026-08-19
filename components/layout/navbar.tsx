@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   X, ChevronDown, LayoutDashboard,
   Settings, LogOut, HelpCircle,
-  ArrowRight, Sparkles, Search,
+  ArrowRight, Sparkles,
   Loader2, AlertTriangle, Wrench, Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,16 +33,6 @@ const RESOURCES = [
   { href: "/compare",      label: "Compare"         },
 ];
 
-const POPULAR_SEARCHES = [
-  "YouTube Editing",
-  "Short-form Reels",
-  "Wedding Films",
-  "Corporate Video",
-  "Gaming Edits",
-  "Podcast Editing",
-  "Motion Graphics",
-  "Thumbnail Design",
-];
 
 const ROLE_LABELS: Record<string, string> = {
   client:           "Client",
@@ -64,17 +54,10 @@ export function Navbar({
 } = {}) {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const router   = useRouter();
 
   const [signingOut,           setSigningOut]           = useState(false);
   const [userOpen,             setUserOpen]             = useState(false);
   const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
-  const [searchQuery,          setSearchQuery]          = useState("");
-  const [searchFocused,        setSearchFocused]        = useState(false);
-  const [highlightedIdx,       setHighlightedIdx]       = useState(-1);
-  const blurTimer          = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchInputRef     = useRef<HTMLInputElement>(null);
-  const suggestionRefs     = useRef<(HTMLButtonElement | null)[]>([]);
   const userMenuRef        = useRef<HTMLDivElement>(null);
   const userMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -113,28 +96,10 @@ export function Navbar({
     setAnnouncementIdx(0);
   }
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const q = searchQuery.trim();
-    setSearchFocused(false);
-    setHighlightedIdx(-1);
-    router.push(q ? `/browse?q=${encodeURIComponent(q)}` : "/browse");
-  }
-
   /* close everything on route change */
   useEffect(() => {
     setUserOpen(false);
-    setSearchFocused(false);
-    setHighlightedIdx(-1);
   }, [pathname]);
-
-
-
-  /* cleanup blur timer */
-  useEffect(() => () => { if (blurTimer.current) clearTimeout(blurTimer.current); }, []);
-
-  /* [fix #2] reset highlighted suggestion when query changes */
-  useEffect(() => { setHighlightedIdx(-1); }, [searchQuery]);
 
   /* [fix #8] user menu keyboard trap — Escape closes, Tab cycles within */
   useEffect(() => {
@@ -166,80 +131,6 @@ export function Navbar({
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [userOpen]);
-
-  function handleSearchFocus() {
-    if (blurTimer.current) clearTimeout(blurTimer.current);
-    setSearchFocused(true);
-  }
-  function handleSearchBlur() {
-    blurTimer.current = setTimeout(() => {
-      setSearchFocused(false);
-      setHighlightedIdx(-1);
-    }, 150);
-  }
-  function handleSuggestionClick(label: string) {
-    setSearchQuery(label);
-    setSearchFocused(false);
-    setHighlightedIdx(-1);
-    router.push(`/browse?q=${encodeURIComponent(label)}`);
-  }
-
-  /* [fix #2] keyboard navigation: ArrowDown/Up/Escape in the autocomplete */
-  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!showDropdown) return;
-    if (e.key === "Escape") {
-      e.preventDefault();
-      setSearchFocused(false);
-      setHighlightedIdx(-1);
-      return;
-    }
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const next = Math.min(highlightedIdx + 1, suggestionCount - 1);
-      setHighlightedIdx(next);
-      suggestionRefs.current[next]?.focus();
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIdx(-1);
-    }
-  }
-
-  function handleSuggestionKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
-    if (e.key === "Escape") {
-      e.preventDefault();
-      setSearchFocused(false);
-      setHighlightedIdx(-1);
-      searchInputRef.current?.focus();
-      return;
-    }
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const next = Math.min(idx + 1, suggestionCount - 1);
-      setHighlightedIdx(next);
-      suggestionRefs.current[next]?.focus();
-      return;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      if (idx === 0) {
-        setHighlightedIdx(-1);
-        searchInputRef.current?.focus();
-      } else {
-        setHighlightedIdx(idx - 1);
-        suggestionRefs.current[idx - 1]?.focus();
-      }
-    }
-  }
-
-  // [fix #6] cap to 5 items
-  const allSuggestions   = searchQuery.trim()
-    ? POPULAR_SEARCHES.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
-    : POPULAR_SEARCHES;
-  const shownSuggestions = allSuggestions.slice(0, 5);
-  // when no matches we show a fallback "Search for X" — treat as 1 suggestion for keyboard nav
-  const suggestionCount  = shownSuggestions.length > 0 ? shownSuggestions.length : (searchQuery.trim() ? 1 : 0);
-  const showDropdown     = searchFocused;
 
   const initials = session?.user?.name
     ? session.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -334,111 +225,8 @@ export function Navbar({
               )}
             </Link>
 
-            {/* ── Search (desktop) ── */}
-            <div className="hidden md:flex flex-1 items-center mx-4 relative max-w-md">
-              {/* [fix #4] role="search" + aria-label on the form */}
-              <form onSubmit={handleSearch} className="w-full flex items-center relative" role="search" aria-label="Search editors">
-                <div className="flex-1 flex items-center gap-2.5 rounded-full border border-neutral-200 px-4 py-2 bg-neutral-50/50 hover:border-neutral-300 focus-within:bg-white focus-within:border-black transition-all">
-                  <Search className="w-4 h-4 text-neutral-400 shrink-0" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    onFocus={handleSearchFocus}
-                    onBlur={handleSearchBlur}
-                    onKeyDown={handleSearchKeyDown}
-                    placeholder="Search editors, niches, styles..."
-                    aria-autocomplete="list"
-                    aria-expanded={showDropdown}
-                    aria-haspopup="listbox"
-                    aria-controls={showDropdown ? "search-suggestions" : undefined}
-                    aria-activedescendant={highlightedIdx >= 0 ? `suggestion-${highlightedIdx}` : undefined}
-                    className="flex-1 min-w-0 text-sm text-neutral-900 placeholder:text-neutral-400 bg-transparent focus:outline-none"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => { setSearchQuery(""); searchInputRef.current?.focus(); }}
-                      className="text-neutral-400 hover:text-neutral-600 transition-colors shrink-0"
-                      aria-label="Clear search"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              </form>
-
-              {/* ── Autocomplete dropdown ── */}
-              {showDropdown && (
-                <div
-                  id="search-suggestions"
-                  role="listbox"
-                  aria-label="Search suggestions"
-                  className="absolute left-0 right-0 top-[calc(100%+4px)] bg-white rounded-2xl border border-neutral-200 shadow-[0_8px_30px_rgba(0,0,0,0.06)] z-50 overflow-hidden"
-                >
-                  <div className="px-4 py-2.5 border-b border-neutral-100">
-                    <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.12em]">
-                      {searchQuery.trim() ? "Suggestions" : "Popular searches"}
-                    </p>
-                  </div>
-                  <div className="py-1">
-                    {shownSuggestions.length > 0 ? shownSuggestions.map((label, idx) => (
-                      <button
-                        key={label}
-                        id={`suggestion-${idx}`}
-                        role="option"
-                        aria-selected={highlightedIdx === idx}
-                        ref={el => { suggestionRefs.current[idx] = el; }}
-                        type="button"
-                        onMouseDown={() => handleSuggestionClick(label)}
-                        onFocus={() => { if (blurTimer.current) clearTimeout(blurTimer.current); setHighlightedIdx(idx); }}
-                        onBlur={handleSearchBlur}
-                        onKeyDown={e => handleSuggestionKeyDown(e, idx)}
-                        className={cn(
-                          "flex items-center gap-3 w-full px-4 py-2.5 text-xs transition-colors text-left focus:outline-none font-medium",
-                          highlightedIdx === idx
-                            ? "bg-neutral-50 text-black font-bold"
-                            : "text-neutral-700 hover:bg-neutral-50/50"
-                        )}
-                      >
-                        <Search className={cn("w-3.5 h-3.5 shrink-0 transition-colors", highlightedIdx === idx ? "text-black" : "text-neutral-400")} />
-                        {label}
-                      </button>
-                    )) : searchQuery.trim() ? (
-                      <button
-                        id="suggestion-0"
-                        role="option"
-                        aria-selected={highlightedIdx === 0}
-                        ref={el => { suggestionRefs.current[0] = el; }}
-                        type="button"
-                        onMouseDown={() => handleSuggestionClick(searchQuery)}
-                        onFocus={() => { if (blurTimer.current) clearTimeout(blurTimer.current); setHighlightedIdx(0); }}
-                        onBlur={handleSearchBlur}
-                        onKeyDown={e => handleSuggestionKeyDown(e, 0)}
-                        className={cn(
-                          "flex items-center gap-3 w-full px-4 py-2.5 text-xs transition-colors text-left focus:outline-none font-medium",
-                          highlightedIdx === 0
-                            ? "bg-neutral-50 text-black font-bold"
-                            : "text-neutral-700 hover:bg-neutral-50/50"
-                        )}
-                      >
-                        <Search className={cn("w-3.5 h-3.5 shrink-0", highlightedIdx === 0 ? "text-black" : "text-neutral-400")} />
-                        Search for &ldquo;{searchQuery}&rdquo;
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* ── Right side ── */}
             <div className="flex items-center gap-2 ml-auto">
-
-              {/* Mobile search icon */}
-              <Link href="/browse" className="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors" aria-label="Search editors">
-                <Search className="w-5 h-5" />
-              </Link>
 
               {session ? (
                 <>
