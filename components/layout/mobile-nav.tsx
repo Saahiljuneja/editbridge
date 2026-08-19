@@ -185,7 +185,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-40 transition-all duration-300",
+        "fixed inset-0 z-[60] transition-all duration-300",
         open ? "pointer-events-auto" : "pointer-events-none"
       )}
       aria-hidden={!open}
