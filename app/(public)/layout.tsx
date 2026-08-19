@@ -20,8 +20,8 @@ export default async function PublicLayout({ children }: { children: React.React
       <Navbar />
       <main className="min-h-screen">{children}</main>
       <Footer />
-      {/* Spacer so footer content clears the fixed bottom nav on mobile */}
-      <div className="h-14 md:hidden" aria-hidden="true" />
+      {/* Spacer so footer content clears the fixed bottom nav + safe-area inset on mobile */}
+      <div className="md:hidden" aria-hidden="true" style={{ height: "calc(3.5rem + env(safe-area-inset-bottom))" }} />
       <MobileBottomNav />
     </>
   );
