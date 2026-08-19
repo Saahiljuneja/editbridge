@@ -9,13 +9,14 @@ import {
   Star, Heart, ClipboardList, CreditCard, Wallet,
   Menu, X, LogOut, Film,
   ShieldAlert, Zap, User, HelpCircle, Crown,
-  Briefcase, DollarSign, ChevronDown, ChevronUp, ArrowLeft, BarChart2,
-  Bell, Gift, Store
+  Briefcase, DollarSign, ChevronDown, ChevronUp, BarChart2,
+  Bell, Gift, Store, Sparkles, Calendar, LayoutTemplate,
+  Landmark, Bookmark, LifeBuoy, FileText, Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
 
-const ACCENT = "#1e40af"; // sky-500
+const ACCENT = "#1e40af"; // navy-700
 const BG     = "#ffffff";
 
 type NavItem = {
@@ -36,36 +37,48 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Work",
     icon: Briefcase,
     items: [
-      { href: "/client/dashboard", label: "Overview",    icon: LayoutDashboard },
-      { href: "/client/analytics", label: "Analytics",   icon: BarChart2 },
-      { href: "/client/orders",    label: "Orders",       icon: ClipboardList },
-      { href: "/browse",           label: "Find Editors", icon: Search },
-      { href: "/client/messages",  label: "Messages",     icon: MessageSquare, badgeKey: "unread" },
-      { href: "/client/disputes",  label: "Disputes",     icon: ShieldAlert },
+      { href: "/client/dashboard",       label: "Overview",        icon: LayoutDashboard },
+      { href: "/client/analytics",       label: "Analytics",       icon: BarChart2 },
+      { href: "/client/orders",          label: "Orders",          icon: ClipboardList },
+      { href: "/client/quotes",          label: "Quotes",          icon: FileText },
+      { href: "/client/calendar",        label: "Calendar",        icon: Calendar },
+      { href: "/client/brief-templates", label: "Brief Templates", icon: LayoutTemplate },
+      { href: "/browse",                 label: "Find Editors",    icon: Search },
+      { href: "/client/messages",        label: "Messages",        icon: MessageSquare, badgeKey: "unread" },
+      { href: "/client/disputes",        label: "Disputes",        icon: ShieldAlert },
     ],
   },
   {
     label: "Financial",
     icon: DollarSign,
     items: [
-      { href: "/client/transactions", label: "Payments",     icon: CreditCard },
-      { href: "/client/wallet",       label: "My Wallet",    icon: Wallet },
-      { href: "/client/rewards",      label: "Rewards & XP", icon: Zap },
-      { href: "/client/xp-store",      label: "XP Shop",      icon: Store },
-      { href: "/client/membership",   label: "Membership",   icon: Crown },
-      { href: "/client/referral",     label: "Refer & Earn", icon: Gift },
+      { href: "/client/transactions",    label: "Transactions",    icon: CreditCard },
+      { href: "/client/wallet",          label: "My Wallet",       icon: Wallet },
+      { href: "/client/payment-methods", label: "Payment Methods", icon: Landmark },
+    ],
+  },
+  {
+    label: "Rewards",
+    icon: Sparkles,
+    items: [
+      { href: "/client/rewards",         label: "Rewards & XP",    icon: Zap },
+      { href: "/client/xp-store",        label: "XP Shop",         icon: Store },
+      { href: "/client/membership",      label: "Membership",      icon: Crown },
+      { href: "/client/referral",        label: "Refer & Earn",    icon: Gift },
     ],
   },
   {
     label: "Account",
     icon: User,
     items: [
-      { href: "/client/profile",        label: "My Profile",     icon: User },
-      { href: "/client/saved",          label: "Saved Editors",  icon: Heart },
-      { href: "/client/reviews",        label: "Reviews",        icon: Star },
-      { href: "/client/notifications",  label: "Notifications",  icon: Bell },
-      { href: "/client/help",           label: "Help & Support", icon: HelpCircle },
-      { href: "/client/settings",       label: "Settings",       icon: Settings },
+      { href: "/client/profile",         label: "My Profile",      icon: User },
+      { href: "/client/saved",           label: "Saved Editors",   icon: Heart },
+      { href: "/client/saved-portfolio", label: "Saved Portfolio", icon: Bookmark },
+      { href: "/client/reviews",         label: "Reviews",         icon: Star },
+      { href: "/client/notifications",   label: "Notifications",   icon: Bell },
+      { href: "/client/help",            label: "Help & Support",  icon: HelpCircle },
+      { href: "/client/support",         label: "Support Tickets", icon: LifeBuoy },
+      { href: "/client/settings",        label: "Settings",        icon: Settings },
     ],
   },
 ];
@@ -73,9 +86,8 @@ const NAV_GROUPS: NavGroup[] = [
 type Counts = Record<"unread", number>;
 
 function isActive(href: string, pathname: string) {
-  return href === "/client/dashboard" || href === "/browse"
-    ? pathname === href
-    : pathname.startsWith(href);
+  if (href === "/client/dashboard" || href === "/browse") return pathname === href;
+  return pathname === href || pathname.startsWith(href + "/");
 }
 
 function findActiveGroup(pathname: string): string | null {
@@ -131,13 +143,13 @@ function Panel({ pathname, counts, onNavigate, userName, userImage, initials, ac
       if (el && navRef.current) {
         isScrollingRef.current = true;
         if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        
-        const targetOffset = el.offsetTop - 12; // offset from top
+
+        const targetOffset = el.offsetTop - 12;
         navRef.current.scrollTo({ top: targetOffset, behavior: "smooth" });
 
         scrollTimeoutRef.current = setTimeout(() => {
           isScrollingRef.current = false;
-        }, 800); // block observer updates during smooth scroll
+        }, 800);
       }
     }
   }, [activePanel]);
@@ -149,12 +161,12 @@ function Panel({ pathname, counts, onNavigate, userName, userImage, initials, ac
 
     const options = {
       root: container,
-      rootMargin: "-10px 0px -75% 0px", // triggers when section is near top
+      rootMargin: "-10px 0px -75% 0px",
       threshold: 0,
     };
 
     const observer = new IntersectionObserver((entries) => {
-      if (isScrollingRef.current) return; // ignore during click scroll
+      if (isScrollingRef.current) return;
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const label = entry.target.id.replace("group-", "");
@@ -247,8 +259,6 @@ function Panel({ pathname, counts, onNavigate, userName, userImage, initials, ac
         <div className={cn("absolute bottom-0 inset-x-0 h-4 z-10 pointer-events-none transition-opacity", showBottomFade ? "opacity-100" : "opacity-0")}
           style={{ background: "linear-gradient(to top, #ffffff, transparent)" }} />
       </div>
-
-
     </div>
   );
 }
@@ -334,6 +344,8 @@ function MobileDrawer({ pathname, counts, onClose }: {
     const active = NAV_GROUPS.find(g => g.items.some(it => isActive(it.href, pathname)));
     return active ? new Set([active.label]) : new Set();
   });
+  const [signingOut, setSigningOut] = useState(false);
+
   const toggleGroup = (label: string) =>
     setOpenGroups(prev => { const n = new Set(prev); n.has(label) ? n.delete(label) : n.add(label); return n; });
 
@@ -407,9 +419,14 @@ function MobileDrawer({ pathname, counts, onClose }: {
           className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-neutral-800 transition-colors py-2 font-bold">
           <Settings className="w-4 h-4" /> Settings
         </Link>
-        <button onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-red-500 transition-colors py-2 w-full font-bold">
-          <LogOut className="w-4 h-4" /> Sign out
+        <button
+          onClick={async () => { setSigningOut(true); await signOut({ callbackUrl: "/login" }); }}
+          disabled={signingOut}
+          className="flex items-center gap-2.5 text-[13px] text-neutral-500 hover:text-red-500 transition-colors py-2 w-full font-bold disabled:opacity-50">
+          {signingOut
+            ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" />
+            : <LogOut className="w-4 h-4 shrink-0" />}
+          Sign out
         </button>
       </div>
     </div>
@@ -518,24 +535,28 @@ export function ClientSidebar({
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="relative w-72 h-full shadow-2xl">
-            <MobileDrawer pathname={pathname} counts={counts} onClose={() => setMobileOpen(false)} />
-          </div>
+      {/* Mobile drawer — always mounted for smooth slide-in */}
+      <div className={cn(
+        "md:hidden fixed inset-0 z-50 flex transition-opacity duration-200",
+        mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      )}>
+        <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+        <div className={cn(
+          "relative w-72 h-full shadow-2xl transition-transform duration-200 ease-in-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}>
+          <MobileDrawer pathname={pathname} counts={counts} onClose={() => setMobileOpen(false)} />
         </div>
-      )}
+      </div>
 
-      {/* Mobile bottom tab bar */}
+      {/* Mobile bottom tab bar — all 4 groups */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white">
         <div className="flex h-14">
-          {NAV_GROUPS.slice(0, 3).map(group => {
-            const Icon      = group.icon;
-            const firstHref = group.items[0].href;
+          {NAV_GROUPS.map(group => {
+            const Icon        = group.icon;
+            const firstHref   = group.items[0].href;
             const groupActive = group.items.some(it => isActive(it.href, pathname));
-            const hasBadge  = group.items.some(it => it.badgeKey && (counts[it.badgeKey] ?? 0) > 0);
+            const hasBadge    = group.items.some(it => it.badgeKey && (counts[it.badgeKey] ?? 0) > 0);
             return (
               <Link key={group.label} href={firstHref}
                 className={cn("flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors",
@@ -553,21 +574,16 @@ export function ClientSidebar({
               </Link>
             );
           })}
-          <button onClick={() => setMobileOpen(true)}
-            className="flex-1 flex flex-col items-center justify-center gap-0.5 text-neutral-450 transition-colors">
-            <Menu className="w-5 h-5" />
-            <span className="text-[9.5px] font-bold">More</span>
-          </button>
         </div>
       </nav>
 
       {/* Desktop sidebar */}
       <aside
-        className="hidden md:flex h-full flex-shrink-0 border-r border-neutral-200/60 transition-[width] duration-250 ease-in-out overflow-hidden"
+        className="hidden md:flex h-full flex-shrink-0 border-r border-neutral-200/60 transition-[width] duration-200 ease-in-out overflow-hidden"
         style={{ width: activePanel !== null ? 56 + 240 : 56, background: BG }}>
         <Rail pathname={pathname} counts={counts} activePanel={activePanel}
           onTogglePanel={handleTogglePanel} progress={progress} />
-        <div className={cn("overflow-hidden transition-[width,opacity] duration-250 ease-in-out flex-shrink-0",
+        <div className={cn("overflow-hidden transition-[width,opacity] duration-200 ease-in-out flex-shrink-0",
           activePanel !== null ? "opacity-100" : "opacity-0 pointer-events-none")}
           style={{ width: activePanel !== null ? 240 : 0 }}>
           {activePanel !== null && (
