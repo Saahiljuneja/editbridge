@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
-  Menu, X, ChevronDown, LayoutDashboard,
+  X, ChevronDown, LayoutDashboard,
   Settings, LogOut, HelpCircle,
   ArrowRight, Sparkles, Search,
+  Loader2, AlertTriangle, Wrench, Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MobileNav } from "@/components/layout/mobile-nav";
 import { NotificationBell } from "@/components/layout/notification-bell";
 
 /* ── data ── */
@@ -65,7 +66,7 @@ export function Navbar({
   const pathname = usePathname();
   const router   = useRouter();
 
-  const [mobileOpen,           setMobileOpen]           = useState(false);
+  const [signingOut,           setSigningOut]           = useState(false);
   const [userOpen,             setUserOpen]             = useState(false);
   const [themeBannerDismissed, setThemeBannerDismissed] = useState(false);
   const [searchQuery,          setSearchQuery]          = useState("");
@@ -123,7 +124,6 @@ export function Navbar({
   /* close everything on route change */
   useEffect(() => {
     setUserOpen(false);
-    setMobileOpen(false);
     setSearchFocused(false);
     setHighlightedIdx(-1);
   }, [pathname]);
@@ -279,12 +279,12 @@ export function Navbar({
           "relative px-4 py-2.5 text-center",
           currentAnnouncement.type === "warning"     ? "bg-amber-500"
           : currentAnnouncement.type === "maintenance" ? "bg-red-600"
-          : "bg-gradient-to-r from-[var(--brand-client)] to-[#7c6ff7]"
+          : "bg-[#1e40af]"
         )}>
-          <p className="text-xs sm:text-sm text-white font-medium pr-8">
-            {currentAnnouncement.type === "warning"     && "⚠️ "}
-            {currentAnnouncement.type === "maintenance" && "🔧 "}
-            {currentAnnouncement.type === "info"        && "📢 "}
+          <p className="text-xs sm:text-sm text-white font-medium pr-8 flex items-center justify-center gap-1.5">
+            {currentAnnouncement.type === "warning"     && <AlertTriangle className="w-3.5 h-3.5 shrink-0" />}
+            {currentAnnouncement.type === "maintenance" && <Wrench className="w-3.5 h-3.5 shrink-0" />}
+            {currentAnnouncement.type === "info"        && <Megaphone className="w-3.5 h-3.5 shrink-0" />}
             <span className="font-bold">{currentAnnouncement.title}</span>
             {currentAnnouncement.body && (
               <span className="font-normal opacity-90"> — {currentAnnouncement.body}</span>
@@ -321,8 +321,7 @@ export function Navbar({
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
               {logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt={platformName ?? "Logo"} className="h-8 w-auto max-w-[140px] object-contain" />
+                <Image src={logoUrl} alt={platformName ?? "Logo"} width={140} height={32} unoptimized className="h-8 w-auto max-w-[140px] object-contain" />
               ) : (
                 <>
                   <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center transition-all">
@@ -457,7 +456,8 @@ export function Navbar({
                       ref={userMenuTriggerRef}
                       onClick={() => setUserOpen(o => !o)}
                       aria-expanded={userOpen}
-                      aria-haspopup="true"
+                      aria-haspopup="menu"
+                      aria-label={`${session.user?.name ?? "User"} — account menu`}
                       className="flex items-center gap-2 px-2 py-1.5 rounded-[14px] border transition-all border-neutral-200 bg-neutral-50/50 hover:bg-neutral-50"
                     >
                       <div className="w-7 h-7 rounded-[8px] bg-black flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
@@ -519,11 +519,19 @@ export function Navbar({
                           </div>
                           <div className="border-t border-gray-100 p-1.5">
                             <button
-                              onClick={() => { setUserOpen(false); signOut({ callbackUrl: "/" }); }}
-                              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-colors font-medium"
+                              onClick={() => {
+                                if (signingOut) return;
+                                setSigningOut(true);
+                                setUserOpen(false);
+                                signOut({ callbackUrl: "/" });
+                              }}
+                              disabled={signingOut}
+                              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-colors font-medium disabled:opacity-50"
                             >
-                              <LogOut className="w-4 h-4 shrink-0" />
-                              Sign out
+                              {signingOut
+                                ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" />
+                                : <LogOut className="w-4 h-4 shrink-0" />}
+                              {signingOut ? "Signing out…" : "Sign out"}
                             </button>
                           </div>
                         </div>
@@ -542,23 +550,20 @@ export function Navbar({
                     Get started
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
-                  {/* [fix #3] mobile-visible compact CTA */}
-                  <Link href="/signup"
-                    className="sm:hidden flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-black hover:bg-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-all">
-                    Get started
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
+                  <div className="sm:hidden flex items-center gap-1.5">
+                    <Link href="/login"
+                      className="px-2.5 py-1.5 rounded-xl text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
+                      Sign in
+                    </Link>
+                    <Link href="/signup"
+                      className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-black hover:bg-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-all">
+                      Get started
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
                 </>
               )}
 
-              {/* Mobile hamburger — hidden; bottom nav's More button handles mobile menu */}
-              <button
-                className="hidden p-2 rounded-xl transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
             </div>
           </div>
         </div>
@@ -607,7 +612,6 @@ export function Navbar({
 
       </nav>
 
-      <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
     </>
   );
 }
