@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { editors, packages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { PackagesManager } from "./packages-manager";
-import { Info, Layers } from "lucide-react";
+import { Layers } from "lucide-react";
 import { getEffectiveTier } from "@/lib/membership";
 
 export default async function PackagesPage() {
@@ -39,19 +39,6 @@ export default async function PackagesPage() {
           <h1 className="text-2xl font-black text-gray-900 leading-tight">Services</h1>
           <p className="text-sm text-gray-400 mt-0.5 leading-relaxed">
             List your editing services. Group by category and format so clients find the right fit.
-          </p>
-        </div>
-      </div>
-
-      {/* Member Rewards discount notice */}
-      <div className="flex gap-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 mb-8">
-        <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
-          <Info className="w-4 h-4 text-amber-600" />
-        </div>
-        <div>
-          <p className="text-sm font-bold text-amber-900 mb-1">Member Rewards discount</p>
-          <p className="text-xs text-amber-700 leading-relaxed">
-            Clients with Member Rewards may receive up to 10% off your listed price. Your payout reflects the discounted price minus the {tier.commissionRate}% platform fee &mdash; you&apos;ll see a full breakdown on each order.
           </p>
         </div>
       </div>
