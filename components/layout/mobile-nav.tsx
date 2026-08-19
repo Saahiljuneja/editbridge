@@ -7,11 +7,12 @@ import { useSession, signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
-  X, LogOut, Sparkles, ArrowRight,
+  X, LogOut, Sparkles, ArrowRight, Loader2,
   Newspaper, Compass, Globe, HelpCircle, Star, Info,
   LayoutDashboard, ShoppingBag, MessageCircle, Bell, Bookmark,
   BookOpen, BarChart2, Gift, Trophy, Wallet, Settings, User,
   Package, CreditCard, Calendar, UserCheck, AlertTriangle, Users,
+  RotateCcw, TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +60,15 @@ const LINK_ICONS: Record<string, LucideIcon> = {
   "/admin/orders":            ShoppingBag,
   "/admin/disputes":          AlertTriangle,
   "/admin/users":             Users,
+  "/admin/staff":             Users,
+  "/admin/payments":          CreditCard,
+  "/admin/payouts":           Wallet,
+  "/admin/refunds":           RotateCcw,
+  "/admin/analytics":         BarChart2,
+  "/admin/revenue":           TrendingUp,
+  "/admin/showcase":          Star,
+  "/admin/announcements":     Bell,
+  "/admin/system":            Settings,
 };
 
 const publicLinks = [
@@ -106,11 +116,20 @@ const editorLinks = [
 ];
 
 const adminLinks = [
-  { href: "/admin/dashboard", label: "Dashboard" },
-  { href: "/admin/kyc",       label: "KYC Queue" },
-  { href: "/admin/orders",    label: "Orders" },
-  { href: "/admin/disputes",  label: "Disputes" },
-  { href: "/admin/users",     label: "Users" },
+  { href: "/admin/dashboard",     label: "Dashboard" },
+  { href: "/admin/kyc",           label: "KYC Queue" },
+  { href: "/admin/orders",        label: "Orders" },
+  { href: "/admin/disputes",      label: "Disputes" },
+  { href: "/admin/users",         label: "Users" },
+  { href: "/admin/staff",         label: "Staff" },
+  { href: "/admin/payments",      label: "Payments" },
+  { href: "/admin/payouts",       label: "Payouts" },
+  { href: "/admin/refunds",       label: "Refunds" },
+  { href: "/admin/analytics",     label: "Analytics" },
+  { href: "/admin/revenue",       label: "Revenue" },
+  { href: "/admin/showcase",      label: "Showcase" },
+  { href: "/admin/announcements", label: "Announcements" },
+  { href: "/admin/system",        label: "System" },
 ];
 
 const ROLE_LABELS: Record<string, string> = {
@@ -128,9 +147,12 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
   const { data: session } = useSession();
   const role = session?.user?.role;
   const [flags, setFlags] = useState<Record<string, boolean>>({});
+  const [avatarError, setAvatarError] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const prevFocusRef = useRef<HTMLElement | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
     fetch("/api/feature-flags")
@@ -163,9 +185,9 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
   }, [open]);
 
   const isAdmin = role === "admin" || (typeof role === "string" && role.startsWith("staff_"));
-  const allLinks = role === "editor"  ? editorLinks
-    : isAdmin                          ? adminLinks
-    : session                          ? clientLinks
+  const allLinks = role === "editor" ? editorLinks
+    : isAdmin                        ? adminLinks
+    : session                        ? clientLinks
     : publicLinks;
 
   const links = allLinks
@@ -176,13 +198,24 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null) return;
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
     touchStartX.current = null;
-    if (delta > 80) onClose();
+    touchStartY.current = null;
+    // Only close on clearly horizontal rightward swipe
+    if (deltaX > 80 && Math.abs(deltaX) > Math.abs(deltaY)) onClose();
+  }
+
+  function handleSignOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    onClose();
+    signOut({ callbackUrl: "/" });
   }
 
   return (
@@ -196,7 +229,7 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
       {/* Backdrop */}
       <div
         className={cn(
-          "absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
+          "absolute inset-0 bg-black/50 transition-opacity duration-300",
           open ? "opacity-100" : "opacity-0"
         )}
         onClick={onClose}
@@ -215,8 +248,11 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        {/* Header — padded below notch/Dynamic Island */}
+        <div
+          className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 shrink-0"
+          style={{ paddingTop: "calc(1rem + env(safe-area-inset-top))" }}
+        >
           <Link href="/" onClick={onClose} className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-[var(--brand-client)] flex items-center justify-center">
               <span className="text-white font-extrabold text-xs">E</span>
@@ -237,15 +273,16 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
 
         {/* User strip (when signed in) */}
         {session && (
-          <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+          <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-[var(--brand-client)] flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
-              {session.user?.image ? (
+              {session.user?.image && !avatarError ? (
                 <Image
                   src={session.user.image}
                   alt=""
                   width={36}
                   height={36}
                   unoptimized
+                  onError={() => setAvatarError(true)}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -265,9 +302,10 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
           {links.map(({ href, label }) => {
-            const active = href === "/client/dashboard" || href === "/editor/dashboard" || href === "/admin/dashboard"
+            const isDashboard = href === "/client/dashboard" || href === "/editor/dashboard" || href === "/admin/dashboard";
+            const active = isDashboard
               ? pathname === href
-              : pathname.startsWith(href);
+              : pathname === href || pathname.startsWith(href + "/");
             const NavIcon = LINK_ICONS[href] ?? Globe;
             return (
               <Link
@@ -276,9 +314,7 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
                 onClick={onClose}
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
-                  active
-                    ? "bg-[#1e40af]/10 text-[#1e40af]"
-                    : "text-gray-700 hover:bg-gray-100"
+                  active ? "bg-[#1e40af]/10 text-[#1e40af]" : "text-gray-700 hover:bg-gray-100"
                 )}
               >
                 <NavIcon className={cn("w-4 h-4 shrink-0", active ? "text-[#1e40af]" : "text-gray-400")} />
@@ -289,14 +325,20 @@ export function MobileNav({ open, onClose, excludeHrefs }: MobileNavProps) {
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 pt-4 border-t border-gray-100 space-y-2" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}>
+        <div
+          className="px-3 pt-4 border-t border-gray-100 space-y-2 shrink-0"
+          style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+        >
           {session ? (
             <button
-              onClick={() => { onClose(); signOut({ callbackUrl: "/" }); }}
-              className="flex items-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="flex items-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
             >
-              <LogOut className="h-4 w-4" />
-              Sign out
+              {signingOut
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <LogOut className="h-4 w-4" />}
+              {signingOut ? "Signing out…" : "Sign out"}
             </button>
           ) : (
             <>
