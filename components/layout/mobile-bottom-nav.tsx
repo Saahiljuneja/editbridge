@@ -8,7 +8,6 @@ import {
   Home,
   Compass,
   Newspaper,
-  UserPlus,
   MoreHorizontal,
   LayoutDashboard,
   ShoppingBag,
@@ -20,14 +19,13 @@ import { cn } from "@/lib/utils";
 import { MobileNav } from "@/components/layout/mobile-nav";
 
 type Tab =
-  | { href: string; label: string; icon: React.ElementType; exact?: boolean; badge?: true; cta?: true; action?: never }
+  | { href: string; label: string; icon: React.ElementType; exact?: boolean; badge?: true; action?: never }
   | { href?: never; label: string; icon: React.ElementType; action: "more" };
 
 const PUBLIC_TABS: Tab[] = [
   { href: "/",       label: "Home",   icon: Home,          exact: true },
   { href: "/browse", label: "Browse", icon: Compass },
   { href: "/feed",   label: "Feed",   icon: Newspaper },
-  { href: "/signup", label: "Join",   icon: UserPlus, cta: true },
   {                  label: "More",   icon: MoreHorizontal, action: "more" },
 ];
 
@@ -122,24 +120,6 @@ export function MobileBottomNav() {
             }
 
             const count = tab.badge ? unreadMessages : 0;
-
-            if (tab.cta && !active) {
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className="flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 py-1.5"
-                >
-                  {/* Pill sized to match the icon row height of sibling tabs */}
-                  <div className="flex items-center gap-0.5 bg-[#1e40af] text-white rounded-full px-2 h-5">
-                    <tab.icon className="w-3 h-3 shrink-0" />
-                    <span className="text-[10px] font-bold leading-none">{tab.label}</span>
-                  </div>
-                  {/* Empty row so vertical rhythm matches icon + label sibling tabs */}
-                  <span className="text-[10px] leading-none opacity-0" aria-hidden="true">·</span>
-                </Link>
-              );
-            }
 
             return (
               <Link
