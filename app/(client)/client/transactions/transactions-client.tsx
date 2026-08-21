@@ -135,7 +135,7 @@ export function TransactionsClient({ rows }: { rows: TxnRow[] }) {
                       {row.razorpayPaymentId ?? "—"}
                     </td>
                     <td className="px-5 py-4">
-                      <Link href={`/orders/${row.id}`}
+                      <Link href={`/client/orders/${row.id}`}
                         className="text-xs font-semibold text-[var(--brand-client)] hover:underline flex items-center gap-1">
                         View <ExternalLink className="w-3 h-3" />
                       </Link>

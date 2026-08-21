@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { orders, packages, editors, users } from "@/lib/db/schema";
-import { and, eq, desc, isNotNull } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { formatCurrency } from "@/lib/utils";
 import {
   IndianRupee, TrendingUp, ShoppingBag, CreditCard,
@@ -39,8 +39,16 @@ export default async function TransactionsPage({
   const tab = (params.tab ?? "history") as "history" | "methods";
   const userId = session.user.userId!;
 
-  const txns = await db
-    .select({
+  const [[kpiRow], txns] = await Promise.all([
+    // All-time aggregate KPIs — no LIMIT so counts are accurate regardless of order volume
+    db.select({
+      totalSpent:  sql<number>`COALESCE(SUM(${orders.totalAmount}) FILTER (WHERE ${orders.status} = 'completed'), 0)::int`,
+      totalOrders: sql<number>`COUNT(*) FILTER (WHERE ${orders.status} != 'cancelled')::int`,
+      avgOrder:    sql<number>`COALESCE(AVG(${orders.totalAmount}) FILTER (WHERE ${orders.status} = 'completed'), 0)::int`,
+    }).from(orders).where(eq(orders.clientId, userId)),
+
+    // Last 50 orders for the transaction list
+    db.select({
       id: orders.id,
       status: orders.status,
       totalAmount: orders.totalAmount,
@@ -60,11 +68,8 @@ export default async function TransactionsPage({
     .innerJoin(users, eq(users.id, editors.userId))
     .where(eq(orders.clientId, userId))
     .orderBy(desc(orders.createdAt))
-    .limit(50);
-
-  const completed = txns.filter((t) => t.status === "completed");
-  const totalSpent = completed.reduce((s, t) => s + t.totalAmount, 0);
-  const avgOrder = completed.length > 0 ? Math.round(totalSpent / completed.length) : 0;
+    .limit(50),
+  ]);
 
   // Recent payments with a Razorpay ID (for payment methods tab)
   const recentPayments = txns
@@ -79,7 +84,7 @@ export default async function TransactionsPage({
         {/* Header */}
         <div className="bg-white rounded-3xl border border-neutral-200/60 p-6 flex items-center justify-between shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-neutral-900">Payments</h1>
+            <h1 className="text-xl font-bold text-neutral-900">Transactions</h1>
             <p className="text-xs text-neutral-400 font-semibold mt-1">Transaction history and payment information</p>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0">
@@ -90,9 +95,9 @@ export default async function TransactionsPage({
         {/* KPI cards */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Total spent", value: formatCurrency(totalSpent), icon: IndianRupee, color: "var(--brand-client)" },
-            { label: "Orders placed", value: String(txns.filter((t) => t.status !== "cancelled").length), icon: ShoppingBag, color: "var(--brand-client)" },
-            { label: "Avg per order", value: avgOrder ? formatCurrency(avgOrder) : "—", icon: TrendingUp, color: "#059669" },
+            { label: "Total spent", value: formatCurrency(kpiRow.totalSpent), icon: IndianRupee, color: "var(--brand-client)" },
+            { label: "Orders placed", value: String(kpiRow.totalOrders), icon: ShoppingBag, color: "var(--brand-client)" },
+            { label: "Avg per order", value: kpiRow.avgOrder ? formatCurrency(kpiRow.avgOrder) : "—", icon: TrendingUp, color: "#059669" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
@@ -115,7 +120,7 @@ export default async function TransactionsPage({
                 className={cn(
                   "px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border shadow-sm",
                   active
-                    ? "bg-violet-600 border-violet-600 text-white"
+                    ? "bg-[#0EA5E9] border-[#0EA5E9] text-white"
                     : "bg-white border-neutral-200/60 text-neutral-600 hover:bg-neutral-50"
                 )}
               >
