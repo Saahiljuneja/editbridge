@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn, formatCurrency } from "@/lib/utils";
-import { Clock, RefreshCw, Video, ChevronDown, FileArchive, Briefcase, AlertTriangle } from "lucide-react";
+import { Clock, RefreshCw, Video, ChevronDown, FileArchive, Briefcase, AlertTriangle, Check, Shield } from "lucide-react";
 import type { Package } from "@/types";
 
-const ACCENT = "#000000";
+const ACCENT = "#1e40af";
 
 const VIDEO_LENGTH_OPTIONS = [
   "Up to 1 min",
@@ -141,8 +141,8 @@ interface PackageBuilderFormProps {
 
 function SectionDivider({ title }: { title: string }) {
   return (
-    <div className="flex items-center gap-3 pt-1">
-      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">{title}</span>
+    <div className="flex items-center gap-3 pt-2">
+      <span className="text-[9.5px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap bg-gray-50 border border-gray-150 px-3 py-1 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.015)]">{title}</span>
       <div className="flex-1 h-px bg-gray-100" />
     </div>
   );
@@ -357,17 +357,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
     }
   }
 
-  const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wide outline-none focus:bg-white focus:border-black transition-all placeholder:text-neutral-400";
-  const focusHandlers = {
-    onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      e.currentTarget.style.borderColor = ACCENT;
-      e.currentTarget.style.boxShadow = `0 0 0 3px ${ACCENT}18`;
-    },
-    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      e.currentTarget.style.borderColor = "";
-      e.currentTarget.style.boxShadow = "";
-    },
-  };
+  const inputClass = "w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/30 text-xs font-bold tracking-wide outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-gray-400 text-gray-800";
 
   const Req = () => <span className="text-red-500 ml-0.5">*</span>;
 
@@ -378,7 +368,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         {/* ── Left column ── */}
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+            <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
               Service title <Req />
             </Label>
             <input
@@ -388,15 +378,14 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               required
               placeholder="e.g. Full YouTube Edit with Music Sync"
               className={inputClass}
-              {...focusHandlers}
             />
-            <p className={cn("text-xs text-right", title.length > 85 ? "text-amber-500" : "text-gray-300")}>
+            <p className={cn("text-xs text-right font-bold", title.length > 85 ? "text-amber-500" : "text-gray-300")}>
               {title.length}/100
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+            <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
               Description <Req />
             </Label>
             <Textarea
@@ -406,10 +395,9 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               rows={4}
               maxLength={500}
               required
-              className="resize-none text-sm"
-              {...focusHandlers}
+              className="resize-none text-xs font-semibold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
             />
-            <p className="text-xs text-gray-400 text-right">{description.length}/500</p>
+            <p className="text-xs text-gray-300 text-right font-bold">{description.length}/500</p>
           </div>
         </div>
 
@@ -417,24 +405,22 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         <div className="space-y-4">
           {/* Price */}
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+            <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
               Price (₹) <Req />
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium select-none">₹</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold select-none">₹</span>
               <input
                 type="number" min="100" step="1"
                 value={priceRupees}
                 onChange={(e) => setPriceRupees(e.target.value)}
                 placeholder="e.g. 3500"
                 required
-                className={cn(inputClass, "pl-7")}
-                {...focusHandlers}
+                className={cn(inputClass, "pl-8")}
               />
             </div>
             {priceRupees && !isNaN(previewPaise) && (
-              <p className={cn("text-xs font-semibold", previewPaise >= 10000 ? "" : "text-amber-500")}
-                 style={previewPaise >= 10000 ? { color: ACCENT } : {}}>
+              <p className={cn("text-xs font-bold", previewPaise >= 10000 ? "text-[#1e40af]" : "text-amber-500")}>
                 {previewPaise >= 10000 ? formatCurrency(previewPaise) : `Min ₹100 — currently ₹${parseFloat(priceRupees).toFixed(0)}`}
               </p>
             )}
@@ -443,7 +429,7 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           {/* Delivery + Revisions */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
                 Delivery (days) <Req />
               </Label>
               <input
@@ -453,12 +439,11 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 placeholder="e.g. 3"
                 required
                 className={inputClass}
-                {...focusHandlers}
               />
-              <p className="text-[10px] text-gray-300">Max 90 days</p>
+              <p className="text-[10px] text-gray-350 font-bold">Max 90 days</p>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
                 Revisions <Req />
               </Label>
               <input
@@ -468,16 +453,15 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 placeholder="e.g. 2"
                 required
                 className={inputClass}
-                {...focusHandlers}
               />
-              <p className="text-[10px] text-gray-300">0 = no revisions included</p>
+              <p className="text-[10px] text-gray-350 font-bold">0 = no revisions</p>
             </div>
           </div>
 
           {/* Video count + length */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
                 <Video className="w-3 h-3 inline mr-1 relative -top-px" />
                 No. of videos
               </Label>
@@ -487,32 +471,29 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                 onChange={(e) => setVideoCount(e.target.value)}
                 placeholder="1"
                 className={inputClass}
-                {...focusHandlers}
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Video length</Label>
+              <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Video length</Label>
               <div className="space-y-1.5">
                 <div className="relative">
                   <select
                     value={videoLengthLimit}
                     onChange={(e) => setVideoLengthLimit(e.target.value)}
-                    className={cn(inputClass, "appearance-none pr-7")}
-                    {...focusHandlers}
+                    className={cn(inputClass, "appearance-none pr-8 cursor-pointer")}
                   >
                     <option value="">Not specified</option>
                     {VIDEO_LENGTH_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
                     <option value="__custom__">Custom…</option>
                   </select>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
                 {videoLengthLimit === "__custom__" && (
                   <input
                     value={videoLengthCustom}
                     onChange={(e) => setVideoLengthCustom(e.target.value)}
                     placeholder="e.g. Up to 45 min, 2–3 hours…"
-                    className={cn(inputClass)}
-                    style={{ borderColor: ACCENT, boxShadow: `0 0 0 3px ${ACCENT}18` }}
+                    className={inputClass}
                   />
                 )}
               </div>
@@ -521,50 +502,79 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
           {/* Live preview */}
           <div className={cn(
-            "rounded-xl border p-3 space-y-2 mt-1 transition-opacity",
-            (title || previewPaise > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
-          )} style={{ borderColor: `${ACCENT}30`, background: "white" }}>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Live preview</p>
-            <p className={cn("text-xl font-bold", previewPaise >= 10000 ? "" : "text-gray-300")}
-               style={previewPaise >= 10000 ? { color: ACCENT } : {}}>
-              {previewPaise >= 10000 ? formatCurrency(previewPaise) : "₹—"}
-            </p>
-            {title && <p className="text-sm font-semibold text-gray-800 leading-tight">{title}</p>}
-            <div className="flex flex-wrap gap-x-3 gap-y-1 pt-0.5">
-              {previewDays > 0 && (
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <Clock className="w-3 h-3" /> {previewDays}d
+            "rounded-2xl overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 text-white shadow-lg border border-neutral-800 transition-all duration-200 relative",
+            (title || previewPaise > 0) ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+          )}>
+            {/* Glowing stripe line at top */}
+            <div className="h-0.5 w-full bg-gradient-to-r from-blue-500 via-sky-400 to-[#1e40af]" />
+            
+            {/* Ambient light glow */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px] pointer-events-none" />
+            
+            <div className="p-5 space-y-4 relative">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 text-[8.5px] font-black uppercase tracking-widest text-sky-400 border border-sky-400/20 bg-sky-400/10 px-2.5 py-0.5 rounded-full shadow-[0_2px_12px_rgba(56,189,248,0.1)]">
+                  Live Preview
                 </span>
+                
+                {previewPaise >= 10000 && (
+                  <span className="flex items-center gap-1 text-[8.5px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
+                    <Shield className="w-2.5 h-2.5 text-emerald-500 shrink-0" /> Verified Escrow
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-start justify-between gap-3 pt-1">
+                <p className="text-sm font-black text-white leading-snug drop-shadow-sm">
+                  {title || <span className="text-neutral-500 italic">Untitled Service</span>}
+                </p>
+                <p className="text-xl font-black text-white shrink-0 leading-none tabular-nums drop-shadow-[0_2px_8px_rgba(56,189,248,0.2)]">
+                  {previewPaise >= 10000 ? formatCurrency(previewPaise) : "₹—"}
+                </p>
+              </div>
+
+              {description && (
+                <p className="text-xs font-semibold text-neutral-450 leading-relaxed line-clamp-2 drop-shadow-sm">{description}</p>
               )}
-              {!isNaN(previewRevisions) && previewRevisions >= 0 && (
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <RefreshCw className="w-3 h-3" /> {previewRevisions} rev
-                </span>
+
+              <div className="flex flex-wrap gap-x-3 gap-y-1.5 pt-2 border-t border-white/5">
+                {previewDays > 0 && (
+                  <span className="flex items-center gap-1 text-[11px] font-bold text-neutral-300">
+                    <Clock className="w-3.5 h-3.5 text-blue-400 shrink-0" /> {previewDays}d delivery
+                  </span>
+                )}
+                {!isNaN(previewRevisions) && previewRevisions >= 0 && (
+                  <span className="flex items-center gap-1 text-[11px] font-bold text-neutral-300">
+                    <RefreshCw className="w-3.5 h-3.5 text-amber-400 shrink-0" /> {previewRevisions === -1 ? "∞" : previewRevisions} revisions
+                  </span>
+                )}
+                {previewVideoCount > 0 && (
+                  <span className="flex items-center gap-1 text-[11px] font-bold text-neutral-300">
+                    <Video className="w-3.5 h-3.5 text-purple-400 shrink-0" /> {previewVideoCount} video{previewVideoCount !== 1 ? "s" : ""}
+                  </span>
+                )}
+                {videoLengthLimit && videoLengthLimit !== "__custom__" && (
+                  <span className="text-[11px] font-bold text-neutral-300 border border-white/5 bg-white/[0.03] px-2 py-0.5 rounded-lg">{videoLengthLimit}</span>
+                )}
+              </div>
+
+              {videoCategories.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {videoCategories.slice(0, 3).map(cat => (
+                    <span key={cat} className="text-[8.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.05] text-neutral-400">
+                      {VIDEO_CATEGORIES.find(c => c.value === cat)?.label ?? cat}
+                    </span>
+                  ))}
+                </div>
               )}
-              {previewVideoCount > 0 && (
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <Video className="w-3 h-3" /> {previewVideoCount} video{previewVideoCount !== 1 ? "s" : ""}
-                </span>
-              )}
-              {videoLengthLimit && videoLengthLimit !== "__custom__" && (
-                <span className="text-xs text-gray-500">{videoLengthLimit}</span>
+
+              {addons.length > 0 && (
+                <p className="text-[10.5px] font-semibold text-neutral-400">
+                  <span className="text-neutral-500 font-bold uppercase text-[9px] tracking-wider block mb-1">Includes Addons:</span>
+                  {addons.map(v => ALL_ADDON_OPTIONS.find(a => a.value === v)?.label).filter(Boolean).join(", ")}
+                </p>
               )}
             </div>
-            {videoCategories.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-0.5">
-                {videoCategories.slice(0, 3).map(cat => (
-                  <span key={cat} className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
-                    {VIDEO_CATEGORIES.find(c => c.value === cat)?.label ?? cat}
-                  </span>
-                ))}
-              </div>
-            )}
-            {addons.length > 0 && (
-              <p className="text-[10px] text-gray-400">
-                Includes: {addons.slice(0, 3).map(v => ALL_ADDON_OPTIONS.find(a => a.value === v)?.label).filter(Boolean).join(", ")}
-                {addons.length > 3 ? ` +${addons.length - 3} more` : ""}
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -576,21 +586,21 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Video category */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
             Video category
             {lockedCategory === undefined && (
-              <span className="ml-1.5 text-[10px] font-medium text-gray-400 normal-case tracking-normal">— select all that apply</span>
+              <span className="ml-1.5 text-[10px] font-bold text-gray-405 normal-case tracking-normal">— select all that apply</span>
             )}
           </Label>
           {lockedCategory !== undefined ? (
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: ACCENT }}>
+            <div className="flex items-center gap-2 select-none">
+              <span className="px-3 py-1.5 rounded-lg text-xs font-black text-white" style={{ background: ACCENT }}>
                 {VIDEO_CATEGORIES.find((c) => c.value === lockedCategory)?.label ?? lockedCategory ?? "No category"}
               </span>
-              <span className="text-xs text-gray-400">Set by category — cannot be changed here</span>
+              <span className="text-xs font-bold text-gray-400">Set by category — cannot be changed here</span>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {VIDEO_CATEGORIES.map((c) => {
                 const sel = videoCategories.includes(c.value);
                 return (
@@ -599,15 +609,22 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                     type="button"
                     onClick={() => handleCategoryToggle(c.value, sel)}
                     className={cn(
-                      "rounded-xl border p-3 text-left transition-all",
-                      sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+                      "rounded-xl border p-3.5 text-left transition-all hover:scale-[1.01] cursor-pointer relative",
+                      sel
+                        ? "bg-blue-500/5 border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                        : "border-gray-200 bg-white hover:border-gray-300"
                     )}
-                    style={sel ? { background: `${ACCENT}12`, borderColor: ACCENT } : {}}
                   >
-                    <p className="text-xs font-semibold leading-snug" style={sel ? { color: ACCENT } : { color: "#374151" }}>
+                    <p className={cn("text-xs font-black leading-snug", sel ? "text-blue-600" : "text-gray-800")}>
                       {c.label}
                     </p>
-                    <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{c.sub}</p>
+                    <p className="text-[10px] font-semibold text-gray-400 mt-1 leading-snug">{c.sub}</p>
+                    
+                    {sel && (
+                      <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center border border-white">
+                        <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                      </div>
+                    )}
                   </button>
                 );
               })}
@@ -617,16 +634,16 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Video format */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Video format</Label>
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Video format</Label>
           {lockedFormat !== undefined ? (
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: ACCENT }}>
+            <div className="flex items-center gap-2 select-none">
+              <span className="px-3 py-1.5 rounded-lg text-xs font-black text-white" style={{ background: ACCENT }}>
                 {VIDEO_FORMATS.find((f) => f.value === lockedFormat)?.label ?? lockedFormat ?? "Any format"}
               </span>
-              <span className="text-xs text-gray-400">Set by category — cannot be changed here</span>
+              <span className="text-xs font-bold text-gray-400">Set by category — cannot be changed here</span>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2.5">
               {VIDEO_FORMATS.map((f) => {
                 const sel = videoFormat === f.value;
                 return (
@@ -635,13 +652,20 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                     type="button"
                     onClick={() => setVideoFormat(videoFormat === f.value ? "" : f.value)}
                     className={cn(
-                      "rounded-xl border p-3 text-left transition-all",
-                      sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+                      "rounded-xl border p-3.5 text-left transition-all hover:scale-[1.01] cursor-pointer relative",
+                      sel
+                        ? "bg-blue-500/5 border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                        : "border-gray-200 bg-white hover:border-gray-300"
                     )}
-                    style={sel ? { background: `${ACCENT}12`, borderColor: ACCENT } : {}}
                   >
-                    <p className="text-xs font-semibold" style={sel ? { color: ACCENT } : { color: "#374151" }}>{f.label}</p>
-                    <p className="text-[11px] text-gray-400 mt-0.5">{f.sub}</p>
+                    <p className={cn("text-xs font-black", sel ? "text-blue-600" : "text-gray-800")}>{f.label}</p>
+                    <p className="text-[10px] font-semibold text-gray-400 mt-1">{f.sub}</p>
+                    
+                    {sel && (
+                      <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center border border-white">
+                        <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                      </div>
+                    )}
                   </button>
                 );
               })}
@@ -653,8 +677,8 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Resolution */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Output resolution</Label>
-          <div className="grid grid-cols-3 gap-2">
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Output resolution</Label>
+          <div className="grid grid-cols-3 gap-2.5">
             {RESOLUTIONS.map((r) => {
               const sel = resolution === r.value;
               return (
@@ -663,13 +687,20 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                   type="button"
                   onClick={() => setResolution(resolution === r.value ? "" : r.value)}
                   className={cn(
-                    "rounded-xl border p-3 text-left transition-all",
-                    sel ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+                    "rounded-xl border p-3.5 text-left transition-all hover:scale-[1.01] cursor-pointer relative",
+                    sel
+                      ? "bg-blue-500/5 border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                      : "border-gray-200 bg-white hover:border-gray-300"
                   )}
-                  style={sel ? { background: `${ACCENT}12`, borderColor: ACCENT } : {}}
                 >
-                  <p className="text-xs font-semibold" style={sel ? { color: ACCENT } : { color: "#374151" }}>{r.label}</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">{r.sub}</p>
+                  <p className={cn("text-xs font-black", sel ? "text-blue-600" : "text-gray-800")}>{r.label}</p>
+                  <p className="text-[10px] font-semibold text-gray-400 mt-1">{r.sub}</p>
+                  
+                  {sel && (
+                    <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center border border-white">
+                      <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                    </div>
+                  )}
                 </button>
               );
             })}
@@ -678,8 +709,8 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Aspect ratio */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Aspect ratios delivered</Label>
-          <div className="flex flex-wrap gap-2">
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Aspect ratios delivered</Label>
+          <div className="flex flex-wrap gap-2.5">
             {ASPECT_RATIOS.map((r) => {
               const sel = aspectRatios.includes(r.value);
               return (
@@ -690,23 +721,25 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                     prev.includes(r.value) ? prev.filter((x) => x !== r.value) : [...prev, r.value]
                   )}
                   className={cn(
-                    "flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all min-w-[70px] cursor-pointer",
-                    sel ? "bg-black text-white border-black" : "border-neutral-200 bg-white hover:border-neutral-300 text-neutral-500 hover:text-black font-semibold"
+                    "flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all min-w-[75px] cursor-pointer hover:scale-[1.02] relative",
+                    sel 
+                      ? "bg-blue-600 text-white border-transparent shadow-sm shadow-blue-500/15" 
+                      : "border-gray-200 bg-white hover:border-gray-300 text-gray-500 hover:text-gray-805 font-bold"
                   )}
                 >
-                  <span className="text-[11px] font-bold">{r.label}</span>
-                  <span className="text-[9px] opacity-75 mt-0.5">{r.sub}</span>
+                  <span className="text-[11px] font-black">{r.label}</span>
+                  <span className="text-[9px] font-bold opacity-75 mt-0.5">{r.sub}</span>
                 </button>
               );
             })}
           </div>
-          <p className="text-[10px] text-neutral-400 font-medium">Select all ratios you deliver for this package.</p>
+          <p className="text-[10px] text-gray-400 font-bold">Select all ratios you deliver for this package.</p>
         </div>
 
         {/* Delivery formats */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Delivery formats</Label>
-          <div className="flex flex-wrap gap-2">
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Delivery formats</Label>
+          <div className="flex flex-wrap gap-2.5">
             {DELIVERY_FORMAT_OPTIONS.map((f) => {
               const sel = deliveryFormats.includes(f.value);
               return (
@@ -715,10 +748,11 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                   type="button"
                   onClick={() => setDeliveryFormats((prev) => sel ? prev.filter((v) => v !== f.value) : [...prev, f.value])}
                   className={cn(
-                    "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
-                    sel ? "text-white border-transparent" : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
+                    "px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer hover:scale-[1.02]",
+                    sel 
+                      ? "bg-blue-600 text-white border-transparent shadow-sm" 
+                      : "border-gray-200 text-gray-650 hover:border-gray-350 bg-white"
                   )}
-                  style={sel ? { background: ACCENT, borderColor: ACCENT } : {}}
                 >
                   {f.label}
                 </button>
@@ -731,33 +765,33 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Add-ons */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">What&apos;s included in this package</Label>
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">What&apos;s included in this package</Label>
           {visibleAddons.length < ALL_ADDON_OPTIONS.length && (
-            <p className="text-[10px] text-gray-400">
+            <p className="text-[10px] text-gray-400 font-semibold">
               Showing services relevant to your selected {videoCategories.length === 1 ? "category" : "categories"}.
               {addons.some(v => !visibleAddonValues.has(v)) && (
                 <span className="text-amber-500 ml-1">Some previously selected items were removed when you changed categories.</span>
               )}
             </p>
           )}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             {visibleAddons.map((a) => {
               const sel = addons.includes(a.value);
               return (
                 <label
                   key={a.value}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 cursor-pointer transition-all",
-                    sel ? "border-black bg-neutral-50/50" : "border-neutral-200 bg-white hover:border-neutral-350"
+                    "flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 cursor-pointer transition-all select-none hover:scale-[1.01]",
+                    sel ? "border-blue-500 bg-blue-50/10 ring-1 ring-blue-500/15" : "border-gray-200 bg-white hover:border-gray-300"
                   )}
                 >
                   <input
                     type="checkbox"
                     checked={sel}
                     onChange={() => toggleAddon(a.value)}
-                    className="w-3.5 h-3.5 shrink-0 accent-black cursor-pointer"
+                    className="w-4 h-4 shrink-0 accent-blue-600 cursor-pointer"
                   />
-                  <span className={cn("text-xs font-bold", sel ? "text-black" : "text-neutral-600")}>
+                  <span className={cn("text-xs font-bold", sel ? "text-blue-600" : "text-gray-655")}>
                     {a.label}
                   </span>
                 </label>
@@ -770,8 +804,8 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Software used */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Software used</Label>
-          <div className="flex flex-wrap gap-2">
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Software used</Label>
+          <div className="flex flex-wrap gap-2.5">
             {SOFTWARE_OPTIONS.map((s) => {
               const sel = softwareUsed.includes(s.value);
               return (
@@ -780,10 +814,11 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
                   type="button"
                   onClick={() => setSoftwareUsed((prev) => sel ? prev.filter((v) => v !== s.value) : [...prev, s.value])}
                   className={cn(
-                    "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
-                    sel ? "text-white border-transparent" : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
+                    "px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer hover:scale-[1.02]",
+                    sel 
+                      ? "bg-blue-650 text-white border-transparent shadow-sm" 
+                      : "border-gray-200 text-gray-650 hover:border-gray-350 bg-white"
                   )}
-                  style={sel ? { background: ACCENT, borderColor: ACCENT } : {}}
                 >
                   {s.label}
                 </button>
@@ -794,13 +829,12 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
 
         {/* Max raw footage */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Max raw footage accepted</Label>
+          <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Max raw footage accepted</Label>
           <div className="relative">
             <select
               value={maxRawFootage}
               onChange={(e) => setMaxRawFootage(e.target.value)}
-              className={cn(inputClass, "appearance-none pr-7")}
-              {...focusHandlers}
+              className={cn(inputClass, "appearance-none pr-8 cursor-pointer")}
             >
               <option value="">Not specified</option>
               {MAX_RAW_FOOTAGE_OPTIONS.map((o) => (
@@ -808,15 +842,14 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
               ))}
               <option value="__custom__">Custom…</option>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
           {maxRawFootage === "__custom__" && (
             <input
               value={maxRawFootageCustom}
               onChange={(e) => setMaxRawFootageCustom(e.target.value)}
               placeholder="e.g. Up to 4 hours, 20–30 min…"
-              className={cn(inputClass)}
-              style={{ borderColor: ACCENT, boxShadow: `0 0 0 3px ${ACCENT}18` }}
+              className={cn(inputClass, "mt-1.5")}
             />
           )}
         </div>
@@ -824,70 +857,72 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
         <SectionDivider title="Rights" />
 
         {/* Source files + commercial rights */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3.5">
           <label
             className={cn(
-              "flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all",
-              includesSourceFiles ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+              "flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-all select-none hover:scale-[1.01]",
+              includesSourceFiles 
+                ? "border-blue-500 bg-blue-50/10 ring-1 ring-blue-500/15" 
+                : "border-gray-200 bg-white hover:border-gray-300"
             )}
-            style={includesSourceFiles ? { background: `${ACCENT}10`, borderColor: `${ACCENT}60` } : {}}
           >
             <input
               type="checkbox"
               checked={includesSourceFiles}
               onChange={(e) => setIncludesSourceFiles(e.target.checked)}
-              className="mt-0.5 w-3.5 h-3.5 shrink-0 accent-[var(--brand-client)]"
+              className="mt-0.5 w-4 h-4 shrink-0 accent-blue-600"
             />
             <div>
-              <p className="text-xs font-semibold" style={includesSourceFiles ? { color: ACCENT } : { color: "#374151" }}>
-                <FileArchive className="w-3 h-3 inline mr-1 relative -top-px" />
+              <p className={cn("text-xs font-black flex items-center gap-1.5", includesSourceFiles ? "text-blue-600" : "text-gray-805")}>
+                <FileArchive className="w-3.5 h-3.5 shrink-0" />
                 Source files
               </p>
-              <p className="text-[11px] text-gray-400 mt-0.5">Raw project files included</p>
+              <p className="text-[11px] font-semibold text-gray-400 mt-1">Raw project files included</p>
             </div>
           </label>
 
           <label
             className={cn(
-              "flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all",
-              includesCommercialRights ? "border-transparent" : "border-gray-200 bg-white hover:border-gray-300"
+              "flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-all select-none hover:scale-[1.01]",
+              includesCommercialRights 
+                ? "border-blue-500 bg-blue-50/10 ring-1 ring-blue-500/15" 
+                : "border-gray-200 bg-white hover:border-gray-300"
             )}
-            style={includesCommercialRights ? { background: `${ACCENT}10`, borderColor: `${ACCENT}60` } : {}}
           >
             <input
               type="checkbox"
               checked={includesCommercialRights}
               onChange={(e) => setIncludesCommercialRights(e.target.checked)}
-              className="mt-0.5 w-3.5 h-3.5 shrink-0 accent-[var(--brand-client)]"
+              className="mt-0.5 w-4 h-4 shrink-0 accent-blue-600"
             />
             <div>
-              <p className="text-xs font-semibold" style={includesCommercialRights ? { color: ACCENT } : { color: "#374151" }}>
-                <Briefcase className="w-3 h-3 inline mr-1 relative -top-px" />
+              <p className={cn("text-xs font-black flex items-center gap-1.5", includesCommercialRights ? "text-blue-600" : "text-gray-805")}>
+                <Briefcase className="w-3.5 h-3.5 shrink-0" />
                 Commercial rights
               </p>
-              <p className="text-[11px] text-gray-400 mt-0.5">Full commercial usage rights</p>
+              <p className="text-[11px] font-semibold text-gray-400 mt-1">Full commercial usage rights</p>
             </div>
           </label>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="pt-5 mt-3 border-t border-neutral-100 space-y-3">
+      <div className="pt-5 mt-5 border-t border-neutral-100 space-y-3.5">
         {cancelConfirm && (
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50">
-            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-            <p className="text-xs text-amber-800 font-semibold flex-1">Discard all unsaved changes?</p>
+          <div className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-amber-250 bg-amber-50 animate-in slide-in-from-top-1">
+            <AlertTriangle className="w-4 h-4 text-amber-550 shrink-0" />
+            <p className="text-xs text-amber-800 font-bold flex-1">Discard all unsaved changes?</p>
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 transition-colors"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider text-white bg-amber-500 hover:bg-amber-600 transition-colors cursor-pointer"
             >
               Discard
             </button>
             <button
               type="button"
               onClick={() => setCancelConfirm(false)}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-700 hover:bg-amber-100 transition-colors"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer"
             >
               Keep editing
             </button>
@@ -897,15 +932,15 @@ export function PackageBuilderForm({ existing, lockedCategory, lockedFormat, onS
           <button
             type="submit"
             disabled={saving}
-            className={cn("flex-1 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-black hover:bg-neutral-900 transition-all cursor-pointer", saving && "opacity-60 cursor-not-allowed")}
+            className={cn("flex-1 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-[#1e40af] hover:bg-blue-800 transition-all cursor-pointer shadow-md shadow-blue-500/10 active:scale-[0.98]", saving && "opacity-60 cursor-not-allowed")}
           >
-            {saving ? "Saving…" : existing ? "Save changes" : "Create package"}
+            {saving ? "Saving…" : existing ? "Save Changes" : "Create Package"}
           </button>
           {!cancelConfirm && (
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-colors cursor-pointer"
+              className="px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
             >
               Cancel
             </button>

@@ -197,7 +197,7 @@ function HoverPreview({ editor, name, visible }: { editor: RankedEditor; name: s
             {editor.avgRating && (
               <div className="text-center">
                 <p className="text-sm font-black text-gray-900 flex items-center gap-0.5">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />{editor.avgRating.toFixed(1)}
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />{Number(editor.avgRating).toFixed(1)}
                 </p>
                 <p className="text-[10px] text-gray-400">{editor.reviewCount} reviews</p>
               </div>
@@ -386,10 +386,10 @@ function PodiumCard({ rank, editor, name }: { rank: 1 | 2 | 3; editor: RankedEdi
             {editor.avgRating ? (
               <div className="flex items-center justify-center gap-0.5 mb-2">
                 {[1, 2, 3, 4, 5].map(s => (
-                  <Star key={s} className={cn("w-3.5 h-3.5", s <= Math.round(editor.avgRating!) ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
+                  <Star key={s} className={cn("w-3.5 h-3.5", s <= Math.round(Number(editor.avgRating!)) ? "fill-amber-400 text-amber-400" : "text-gray-200")} />
                 ))}
                 <span className="text-xs font-semibold text-gray-600 ml-1.5">
-                  {editor.avgRating.toFixed(1)} <span className="text-gray-400 font-normal">({editor.reviewCount})</span>
+                  {Number(editor.avgRating).toFixed(1)} <span className="text-gray-400 font-normal">({editor.reviewCount})</span>
                 </span>
               </div>
             ) : (
@@ -502,13 +502,13 @@ function RankRow({ editor, rank, delay, currentEditorId }: {
             </div>
             <div className="text-center min-w-[52px]">
               {editor.avgRating ? (
-                <>
-                  <p className="text-xs font-bold text-gray-800 flex items-center gap-0.5 justify-center">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />{editor.avgRating.toFixed(1)}
-                  </p>
-                  <p className="text-[10px] text-gray-400">{editor.reviewCount} reviews</p>
-                </>
-              ) : <p className="text-[10px] text-gray-400">No reviews</p>}
+              <>
+                <p className="text-xs font-bold text-gray-800 flex items-center gap-0.5 justify-center">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />{Number(editor.avgRating).toFixed(1)}
+                </p>
+                <p className="text-[10px] text-gray-400">{editor.reviewCount} reviews</p>
+              </>
+            ) : <p className="text-[10px] text-gray-400">No reviews</p>}
             </div>
             {editor.minPrice && (
               <div className="text-center hidden md:block min-w-[60px]">

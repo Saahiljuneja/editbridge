@@ -38,7 +38,7 @@ export default async function LeaderboardPage() {
       totalOrders: editors.totalOrders,
       isAvailable: editors.isAvailable,
       avgRating: sql<number | null>`
-        (SELECT ROUND(AVG(r.rating)::numeric, 1)
+        (SELECT ROUND(AVG(r.rating)::numeric, 1)::float
          FROM reviews r
          INNER JOIN orders o ON r.order_id = o.id
          WHERE o.editor_id = ${editors.id} AND r.role = 'client')

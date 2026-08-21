@@ -8,7 +8,9 @@ import {
   Plus, Pencil, Clock, RefreshCw,
   Video, FileArchive, Briefcase,
   ChevronDown, ChevronUp, Trash2, X, ArrowRight,
+  Layers, Activity, Check, CheckCircle2, Shield, AlertTriangle
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { Package } from "@/types";
 
@@ -225,174 +227,221 @@ export function PackagesManager({
     <div className="space-y-5">
       {/* Stats bar */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-stretch divide-x divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="flex flex-col items-center px-7 py-4">
-            <span className="text-3xl font-black text-gray-900 leading-none">{totalCreated}</span>
-            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Services</span>
-          </div>
-          <div className="flex flex-col items-center px-7 py-4">
-            <div className="flex items-center gap-1.5 leading-none">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span className="text-3xl font-black text-emerald-600 leading-none">{activeCount}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full sm:w-auto">
+          {/* Card 1: Total Services */}
+          <div className="flex items-center gap-4 bg-white border border-gray-150 rounded-2xl px-6 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.015)] min-w-[170px] hover:scale-[1.01] transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+              <Layers className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mt-1.5">Active</span>
+            <div>
+              <p className="text-2xl font-black text-gray-900 leading-none">{totalCreated}</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Services</p>
+            </div>
           </div>
-          <div className={cn("flex flex-col items-center px-7 py-4", setsAtLimit ? "bg-red-50/50" : "")}>
-            <span className="leading-none">
-              <span className={cn(
-                "text-3xl font-black",
-                setsAtLimit ? "text-red-600"
-                  : maxSets !== null && setKeys.length >= maxSets - 1 ? "text-amber-500"
-                  : "text-gray-900"
-              )}>{setKeys.length}</span>
-              {maxSets !== null && (
-                <span className="text-xl font-bold text-gray-300">/{maxSets}</span>
-              )}
-            </span>
-            <div className="flex items-center gap-1 mt-1.5">
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">Sets</span>
-              {setsAtLimit && (
-                <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full capitalize ml-1">{membershipTier}</span>
-              )}
+
+          {/* Card 2: Active */}
+          <div className="flex items-center gap-4 bg-white border border-gray-150 rounded-2xl px-6 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.015)] min-w-[170px] hover:scale-[1.01] transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 relative">
+              <Activity className="w-5 h-5 text-emerald-600" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-emerald-600 leading-none">{activeCount}</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Active</p>
+            </div>
+          </div>
+
+          {/* Card 3: Sets Allocation */}
+          <div className={cn(
+            "flex items-center gap-4 bg-white border rounded-2xl px-6 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.015)] min-w-[190px] hover:scale-[1.01] transition-transform",
+            setsAtLimit ? "border-red-200 bg-red-50/10" : "border-gray-150"
+          )}>
+            <div className={cn(
+              "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border",
+              setsAtLimit ? "bg-red-50 border-red-100 text-red-600"
+                : maxSets !== null && setKeys.length >= maxSets - 1 ? "bg-amber-50 border-amber-100 text-amber-500"
+                : "bg-gray-50 border-gray-100 text-gray-600"
+            )}>
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900 leading-none">
+                {setKeys.length}
+                {maxSets !== null && (
+                  <span className="text-sm font-bold text-gray-300">/{maxSets}</span>
+                )}
+              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sets Allocation</p>
+                {setsAtLimit && (
+                  <span className="text-[8px] font-black bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full uppercase tracking-wider">{membershipTier}</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
         <button
           onClick={() => setsAtLimit ? toast.error(`Upgrade from ${membershipTier} to add more service sets.`) : setShowPicker((v) => !v)}
           className={cn(
-            "flex items-center gap-2 text-sm font-bold px-5 py-3.5 rounded-xl transition-all active:scale-[0.98]",
+            "flex items-center gap-2 text-sm font-black px-6 py-4 rounded-xl transition-all active:scale-[0.98] w-full sm:w-auto justify-center cursor-pointer select-none",
             setsAtLimit
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-[var(--brand-client)] text-white hover:opacity-90"
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-250"
+              : "bg-[#1e40af] text-white hover:bg-blue-800 shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/15"
           )}
-          style={setsAtLimit ? {} : { boxShadow: "0 4px 16px rgba(14,165,233,0.30)" }}
         >
-          <Plus className="w-4 h-4" />
-          New service set
+          <Plus className="w-4 h-4" strokeWidth={2.5} />
+          New Service Set
         </button>
       </div>
 
       {/* Category picker */}
       {showPicker && (
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 animate-in slide-in-from-top-2 duration-200 space-y-5">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-gray-800">New service set</p>
-            <button onClick={() => { setShowPicker(false); setPickerCat(""); setPickerCatCustom(""); setPickerFmt(""); }} className="text-gray-400 hover:text-gray-600">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Video category</p>
-            <div className="grid grid-cols-2 gap-2">
-              {ALL_CATEGORIES.map((c) => {
-                const sel = pickerCat === c.value;
-                return (
-                  <button
-                    key={c.value}
-                    type="button"
-                    onClick={() => setPickerCat(sel ? "" : c.value)}
-                    className={cn(
-                      "rounded-xl border p-3 text-left transition-all",
-                      sel ? "bg-[var(--brand-client)]/10 border-[var(--brand-client)]" : "border-gray-200 bg-white hover:border-gray-300"
-                    )}
-                  >
-                    <p className={cn("text-xs font-semibold leading-snug", sel ? "text-[var(--brand-client)]" : "text-gray-700")}>
-                      {c.label}
-                    </p>
-                    <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{c.sub}</p>
-                  </button>
-                );
-              })}
+        <div className="rounded-2xl border border-gray-155 bg-white shadow-md overflow-hidden animate-in slide-in-from-top-2 duration-200">
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-sky-400 to-[#1e40af]" />
+          
+          <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-black text-gray-900 uppercase tracking-wider">Configure New Service Set</p>
+              <button onClick={() => { setShowPicker(false); setPickerCat(""); setPickerCatCustom(""); setPickerFmt(""); }} className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            {pickerCat === "other" && (
-              <input
-                autoFocus
-                value={pickerCatCustom}
-                onChange={(e) => setPickerCatCustom(e.target.value)}
-                placeholder="e.g. Food & Cooking, ASMR, Unboxing…"
-                className="w-full px-3 py-2 rounded-xl border border-[var(--brand-client)] text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-client)]/20"
-              />
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              Video format
-              <span className="ml-1 font-normal normal-case text-gray-400">(optional — set separate prices for short vs long)</span>
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              {ALL_FORMATS.map((f) => (
-                <button
-                  key={f.value}
-                  type="button"
-                  onClick={() => setPickerFmt(pickerFmt === f.value ? "" : f.value)}
-                  className={cn(
-                    "rounded-xl border p-3 text-left transition-all",
-                    pickerFmt === f.value
-                      ? "bg-[var(--brand-client)]/10 border-[var(--brand-client)]"
-                      : "border-gray-200 bg-white hover:border-gray-300"
+            <div className="space-y-3">
+              <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">Video Category</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                {ALL_CATEGORIES.map((c) => {
+                  const sel = pickerCat === c.value;
+                  return (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setPickerCat(sel ? "" : c.value)}
+                      className={cn(
+                        "rounded-xl border p-3.5 text-left transition-all hover:scale-[1.01] cursor-pointer relative",
+                        sel
+                          ? "bg-blue-500/5 border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                          : "border-gray-150 bg-white hover:border-gray-250"
+                      )}
+                    >
+                      <p className={cn("text-xs font-black leading-snug", sel ? "text-blue-600" : "text-gray-800")}>
+                        {c.label}
+                      </p>
+                      <p className="text-[10px] font-semibold text-gray-400 mt-1 leading-snug">{c.sub}</p>
+                      
+                      {sel && (
+                        <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-blue-650 flex items-center justify-center border border-white">
+                          <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              {pickerCat === "other" && (
+                <div className="pt-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <input
+                    autoFocus
+                    value={pickerCatCustom}
+                    onChange={(e) => setPickerCatCustom(e.target.value)}
+                    placeholder="e.g. Food & Cooking, ASMR, Unboxing…"
+                    className="w-full px-4 py-3 rounded-xl border border-blue-400 text-xs font-semibold text-gray-855 outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-400 bg-white"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-xs font-black text-gray-500 uppercase tracking-wider">
+                Video Format
+                <span className="ml-1 font-normal normal-case text-gray-400 font-semibold">(Optional — set separate prices for short vs long)</span>
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {ALL_FORMATS.map((f) => {
+                  const sel = pickerFmt === f.value;
+                  return (
+                    <button
+                      key={f.value}
+                      type="button"
+                      onClick={() => setPickerFmt(sel ? "" : f.value)}
+                      className={cn(
+                        "rounded-xl border p-3.5 text-left transition-all hover:scale-[1.01] cursor-pointer relative",
+                        sel
+                          ? "bg-blue-500/5 border-blue-500 shadow-sm ring-1 ring-blue-500/20"
+                          : "border-gray-150 bg-white hover:border-gray-250"
+                      )}
+                    >
+                      <p className={cn("text-xs font-black", sel ? "text-blue-600" : "text-gray-800")}>
+                        {f.label}
+                      </p>
+                      <p className="text-[10px] font-semibold text-gray-400 mt-1 leading-snug">{f.sub}</p>
+                      
+                      {sel && (
+                        <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-blue-650 flex items-center justify-center border border-white">
+                          <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                  {!pickerCat && !pickerFmt ? (
+                    <span className="text-gray-400">Configure options above to preview</span>
+                  ) : (
+                    <>
+                      {pickerCat && (pickerCat === "other" ? (pickerCatCustom.trim() || "Other") : CATEGORY_META[pickerCat]?.label)}
+                      {pickerCat && pickerFmt && <span className="text-gray-300 mx-2">·</span>}
+                      {pickerFmt && FORMAT_META[pickerFmt]?.label}
+                    </>
                   )}
-                >
-                  <p className={cn("text-xs font-semibold", pickerFmt === f.value ? "text-[var(--brand-client)]" : "text-gray-700")}>
-                    {f.label}
-                  </p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">{f.sub}</p>
-                </button>
-              ))}
+                </p>
+              </div>
+              <button
+                onClick={addSet}
+                disabled={!canAdd}
+                className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider px-5 py-3 rounded-xl bg-[#1e40af] text-white hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer select-none"
+              >
+                Create Set <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-            <p className="text-xs text-gray-500">
-              {pickerCat && (pickerCat === "other" ? (pickerCatCustom.trim() || "Other") : CATEGORY_META[pickerCat]?.label)}
-              {pickerCat && pickerFmt && <span className="text-gray-300 mx-1">·</span>}
-              {pickerFmt && FORMAT_META[pickerFmt]?.label}
-              {!pickerCat && !pickerFmt && <span className="text-gray-400">Select at least one option</span>}
-            </p>
-            <button
-              onClick={addSet}
-              disabled={!canAdd}
-              className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--brand-client)] text-white hover:bg-[var(--brand-client-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Create set <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       )}
-
-      {/* Empty state */}
       {setKeys.length === 0 && !showPicker && (
-        <div className="rounded-2xl border border-gray-200 bg-gradient-to-b from-gray-50/70 to-white overflow-hidden">
+        <div className="rounded-2xl border border-gray-150 bg-gradient-to-b from-gray-50/40 to-white overflow-hidden shadow-sm">
           <div className="py-16 px-8 text-center">
             {/* Icon */}
             <div
-              className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
               style={{
-                background: "linear-gradient(135deg, rgba(14,165,233,0.15) 0%, rgba(14,165,233,0.05) 100%)",
-                boxShadow: "0 12px 40px rgba(14,165,233,0.15), inset 0 1px 0 rgba(255,255,255,0.6)",
+                background: "linear-gradient(135deg, rgba(30,64,175,0.12) 0%, rgba(30,64,175,0.04) 100%)",
+                boxShadow: "0 8px 30px rgba(30,64,175,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
               }}
             >
-              <Video className="w-12 h-12 text-[var(--brand-client)]" />
+              <Video className="w-10 h-10 text-[#1e40af]" />
             </div>
 
             {/* Copy */}
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No services listed yet</h3>
-            <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed mb-8">
+            <h3 className="text-lg font-black text-gray-900 mb-2">No services listed yet</h3>
+            <p className="text-xs font-semibold text-gray-400 max-w-xs mx-auto leading-relaxed mb-8">
               Create service sets so clients know exactly what you offer &mdash; with pricing, deliverables, and your turnaround time.
             </p>
 
             {/* Feature trio */}
-            <div className="flex items-center justify-center gap-6 mb-10">
+            <div className="flex items-center justify-center gap-6 mb-10 flex-wrap">
               {["Set your own price", "Show deliverables", "Attract more clients"].map((f) => (
-                <div key={f} className="flex items-center gap-1.5">
-                  <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-white"
-                    style={{ background: "var(--brand-client)" }}
-                  >
+                <div key={f} className="flex items-center gap-2">
+                  <span className="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 text-[9px] font-black text-white bg-blue-600">
                     ✓
                   </span>
-                  <span className="text-xs font-medium text-gray-500">{f}</span>
+                  <span className="text-xs font-bold text-gray-500">{f}</span>
                 </div>
               ))}
             </div>
@@ -400,22 +449,18 @@ export function PackagesManager({
             {/* CTA */}
             <button
               onClick={() => setShowPicker(true)}
-              className="inline-flex items-center gap-2.5 text-sm font-bold px-7 py-3.5 rounded-xl text-white transition-all active:scale-[0.98]"
-              style={{
-                background: "var(--brand-client)",
-                boxShadow: "0 6px 24px rgba(14,165,233,0.35)",
-              }}
+              className="inline-flex items-center gap-2.5 text-xs font-black uppercase tracking-wider px-6 py-3.5 rounded-xl text-white transition-all active:scale-[0.98] bg-[#1e40af] hover:bg-blue-800 cursor-pointer shadow-md shadow-blue-500/10 hover:shadow-lg"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4" strokeWidth={2.5} />
               Add your first service set
             </button>
           </div>
 
           {/* Bottom hint strip */}
-          <div className="border-t border-gray-100 bg-white px-6 py-3 flex items-center justify-center gap-1.5">
+          <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-3.5 flex items-center justify-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#1e40af] shrink-0" />
-            <p className="text-xs text-gray-400">
-              {maxSets !== null ? <>Up to <span className="font-semibold text-gray-600">{maxSets} sets</span>, {packagesPerSet} packages each on {membershipTier}.</> : <>{packagesPerSet} packages per set — unlimited sets on {membershipTier}.</>} <a href="/editor/membership" className="text-[#1e40af] font-semibold">Upgrade</a> to unlock more.
+            <p className="text-xs font-semibold text-gray-400">
+              {maxSets !== null ? <>Up to <span className="font-bold text-gray-600">{maxSets} sets</span>, {packagesPerSet} packages each on {membershipTier}.</> : <>{packagesPerSet} packages per set — unlimited sets on {membershipTier}.</>} <a href="/editor/membership" className="text-[#1e40af] font-bold hover:underline">Upgrade</a> to unlock more.
             </p>
           </div>
         </div>
@@ -433,30 +478,34 @@ export function PackagesManager({
         return (
           <div
             key={key}
-            className="rounded-2xl border border-gray-200 overflow-hidden"
+            className="rounded-2xl border border-gray-150 bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.015)] transition-all duration-200"
             style={{ borderLeftColor: catMeta.color, borderLeftWidth: 4 }}
           >
             {/* Set header */}
-            <div className="flex items-center justify-between px-5 py-4 bg-white border-b border-gray-100">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white hover:bg-gray-50/40 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${catMeta.color}15` }}>
-                  <div className="w-3.5 h-3.5 rounded-full" style={{ background: catMeta.color }} />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${catMeta.color}12` }}>
+                  <div className="w-3 h-3 rounded-full" style={{ background: catMeta.color }} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-semibold text-gray-900">{catMeta.label}</span>
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <span className="text-sm font-black text-gray-900">{catMeta.label}</span>
                     {fmtMeta && (
-                      <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full", fmtMeta.badge)}>
+                      <span className={cn("text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border", 
+                        fmtMeta.badge === "bg-gray-100 text-gray-600" 
+                          ? "bg-gray-50 text-gray-500 border-gray-200" 
+                          : "bg-blue-50 text-blue-600 border-blue-100"
+                      )}>
                         {fmtMeta.label}
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">{pkgs.length} service{pkgs.length !== 1 ? "s" : ""}</span>
+                    <span className="text-xs font-bold text-gray-400">{pkgs.length} service{pkgs.length !== 1 ? "s" : ""}</span>
                     {pkgs.length > 0 && (
                       <>
                         <span className="text-gray-200">·</span>
-                        <span className="text-xs font-medium text-emerald-500">{pkgs.filter(p => p.isActive).length} active</span>
+                        <span className="text-xs font-bold text-emerald-500">{pkgs.filter(p => p.isActive).length} active</span>
                       </>
                     )}
                   </div>
@@ -464,61 +513,61 @@ export function PackagesManager({
               </div>
               <div className="flex items-center gap-2">
                 {pkgs.length === 0 && (
-                  <button onClick={() => removeSet(key)} className="p-1.5 rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors">
+                  <button onClick={() => removeSet(key)} className="p-2 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
                 <button
                   onClick={() => setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }))}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all cursor-pointer"
                 >
                   {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Services list — 3-column grid (one row per set) */}
+            {/* Services list */}
             {!isCollapsed && (
-              <div className="p-4 space-y-3 bg-gray-50/50">
+              <div className="p-5 space-y-4 bg-gray-50/50">
 
                 {/* Package cards */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {pkgs.map((pkg) => {
                     const isThisEditing = isEditingHere && editingPkg?.id === pkg.id;
                     return (
                       <div
                         key={pkg.id}
                         className={cn(
-                          "rounded-xl border bg-white overflow-hidden shadow-sm flex flex-col",
+                          "rounded-2xl border bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:shadow-md hover:shadow-gray-200/20 transition-all duration-200 flex flex-col",
                           isThisEditing
-                            ? "border-[var(--brand-client)]/40 ring-1 ring-[var(--brand-client)]/20"
-                            : "border-gray-200"
+                            ? "border-blue-500 ring-2 ring-blue-500/10"
+                            : "border-gray-150 hover:border-gray-250"
                         )}
                       >
                         {/* Main content */}
-                        <div className="px-4 pt-4 pb-3 flex-1 space-y-2">
+                        <div className="px-5 pt-5 pb-4 flex-1 space-y-3.5">
                           {/* Title + Price */}
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-semibold text-gray-900 leading-snug">{pkg.title}</p>
-                            <p className="text-xl font-black text-gray-900 shrink-0 leading-none">{formatCurrency(pkg.price)}</p>
+                          <div className="flex items-start justify-between gap-3">
+                            <p className="text-sm font-black text-gray-900 leading-snug">{pkg.title}</p>
+                            <p className="text-xl font-black text-gray-900 shrink-0 leading-none drop-shadow-sm">{formatCurrency(pkg.price)}</p>
                           </div>
-                          <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{pkg.description}</p>
+                          <p className="text-xs font-semibold text-gray-400 leading-relaxed line-clamp-2">{pkg.description}</p>
 
                           {/* Spec chips */}
                           <div className="flex flex-wrap gap-1.5">
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-900 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg">
-                              <Clock className="w-3 h-3" /> {pkg.deliveryDays}d delivery
+                            <span className="inline-flex items-center gap-1 text-[10.5px] font-bold text-blue-750 bg-blue-50/60 border border-blue-100/60 px-2.5 py-1 rounded-xl">
+                              <Clock className="w-3.5 h-3.5 text-blue-550" /> {pkg.deliveryDays}d delivery
                             </span>
-                            <span className="inline-flex items-center gap-1 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
-                              <RefreshCw className="w-3 h-3 text-gray-400" /> {pkg.revisionCount === -1 ? "∞" : pkg.revisionCount} rev
+                            <span className="inline-flex items-center gap-1 text-[10.5px] font-bold text-amber-700 bg-amber-50/60 border border-amber-100/60 px-2.5 py-1 rounded-xl">
+                              <RefreshCw className="w-3.5 h-3.5 text-amber-500" /> {pkg.revisionCount === -1 ? "∞" : pkg.revisionCount} rev
                             </span>
                             {pkg.videoLengthLimit && (
-                              <span className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                              <span className="inline-flex items-center text-[10.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200/80 px-2.5 py-1 rounded-xl">
                                 {pkg.videoLengthLimit}
                               </span>
                             )}
                             {pkg.resolution && (
-                              <span className="text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded-lg uppercase tracking-wide">
+                              <span className="inline-flex items-center text-[10.5px] font-black bg-purple-50 text-purple-600 border border-purple-100/60 px-2.5 py-1 rounded-xl uppercase tracking-wider">
                                 {pkg.resolution}
                               </span>
                             )}
@@ -526,20 +575,20 @@ export function PackagesManager({
 
                           {/* Add-on pills */}
                           {((pkg.addons?.length ?? 0) > 0 || pkg.includesSourceFiles || pkg.includesCommercialRights) && (
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex flex-wrap gap-1.5 pt-1">
                               {pkg.addons?.map((a) => (
-                                <span key={a} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--brand-client)]/8 text-[var(--brand-client)] border border-[var(--brand-client)]/20">
+                                <span key={a} className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100/50 uppercase tracking-wide">
                                   {ADDON_LABELS[a] ?? a.replace(/_/g, " ")}
                                 </span>
                               ))}
                               {pkg.includesSourceFiles && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-105">
                                   <FileArchive className="w-2.5 h-2.5" /> Source files
                                 </span>
                               )}
                               {pkg.includesCommercialRights && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                  <Briefcase className="w-2.5 h-2.5" /> Commercial rights
+                                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-105">
+                                  <Briefcase className="w-2.5 h-2.5" /> Commercial
                                 </span>
                               )}
                             </div>
@@ -547,14 +596,14 @@ export function PackagesManager({
 
                           {/* Software + delivery format tags */}
                           {((pkg.softwareUsed?.length ?? 0) > 0 || (pkg.deliveryFormats?.length ?? 0) > 0) && (
-                            <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
+                            <div className="flex flex-wrap gap-1.5 pt-3.5 border-t border-gray-100">
                               {pkg.softwareUsed?.map((s) => (
-                                <span key={s} className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
+                                <span key={s} className="text-[9.5px] font-bold text-gray-500 bg-gray-50 border border-gray-200/80 px-2 py-0.5 rounded-full">
                                   {SOFTWARE_LABELS[s] ?? s}
                                 </span>
                               ))}
                               {pkg.deliveryFormats?.map((f) => (
-                                <span key={f} className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
+                                <span key={f} className="text-[9.5px] font-bold text-gray-500 bg-gray-50 border border-gray-200/80 px-2 py-0.5 rounded-full">
                                   {FORMAT_LABELS[f] ?? f}
                                 </span>
                               ))}
@@ -563,10 +612,11 @@ export function PackagesManager({
                         </div>
 
                         {/* Footer action bar */}
-                        <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 mt-auto">
-                          <div className="flex items-center gap-2">
-                            <Switch checked={pkg.isActive} onCheckedChange={() => toggleActive(pkg)} className="scale-[0.8]" />
-                            <span className={cn("text-xs font-semibold", pkg.isActive ? "text-emerald-600" : "text-amber-600")}>
+                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-55/40 mt-auto">
+                          <div className="flex items-center gap-2 pl-1 select-none">
+                            <Switch checked={pkg.isActive} onCheckedChange={() => toggleActive(pkg)} className="scale-[0.8] cursor-pointer" />
+                            <span className={cn("text-xs font-bold flex items-center gap-1.5", pkg.isActive ? "text-emerald-600" : "text-amber-500")}>
+                              {pkg.isActive && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
                               {pkg.isActive ? "Active" : "Paused"}
                             </span>
                           </div>
@@ -574,17 +624,17 @@ export function PackagesManager({
                             <button
                               onClick={() => openForm(key, pkg)}
                               className={cn(
-                                "flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors",
+                                "flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border transition-all cursor-pointer",
                                 isThisEditing
-                                  ? "border-[var(--brand-client)]/30 bg-[var(--brand-client)]/10 text-[var(--brand-client)]"
-                                  : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
+                                  ? "border-blue-200 bg-blue-50 text-blue-600"
+                                  : "border-gray-200 text-gray-500 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50"
                               )}
                             >
                               <Pencil className="w-3 h-3" /> Edit
                             </button>
                             <button
                               onClick={() => deletePackage(pkg)}
-                              className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -597,35 +647,38 @@ export function PackagesManager({
 
                 {/* Full-width edit / create form */}
                 {isEditingHere && (
-                  <div className="rounded-xl border border-[var(--brand-client)]/25 bg-white p-5 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                      <p className="text-sm font-semibold text-gray-800">
-                        {editingPkg !== null ? `Edit — ${editingPkg?.title}` : `New service — ${setLabel(key)}`}
-                      </p>
-                      <button onClick={closeForm} className="ml-auto p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
-                        <X className="w-4 h-4" />
-                      </button>
+                  <div className="rounded-2xl border border-gray-200 bg-white shadow-md overflow-hidden animate-in fade-in duration-200">
+                    <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-sky-400 to-[#1e40af]" />
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <p className="text-sm font-black text-gray-900 uppercase tracking-wider">
+                          {editingPkg !== null ? `Edit Package — ${editingPkg?.title}` : `New Service Details — ${setLabel(key)}`}
+                        </p>
+                        <button onClick={closeForm} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-150 transition-all cursor-pointer">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <PackageBuilderForm
+                        existing={editingPkg ?? undefined}
+                        lockedCategory={category === "__none__" ? null : category}
+                        lockedFormat={format === "__none__" ? null : format}
+                        onSaved={handleSaved}
+                        onCancel={closeForm}
+                      />
                     </div>
-                    <PackageBuilderForm
-                      existing={editingPkg ?? undefined}
-                      lockedCategory={category === "__none__" ? null : category}
-                      lockedFormat={format === "__none__" ? null : format}
-                      onSaved={handleSaved}
-                      onCancel={closeForm}
-                    />
                   </div>
                 )}
 
                 {/* Add service / full indicator */}
                 {!isEditingHere && (
                   pkgs.length >= packagesPerSet ? (
-                    <div className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-100 py-3.5 text-sm font-semibold text-gray-300 cursor-not-allowed select-none">
-                      <Plus className="w-4 h-4" /> {packagesPerSet}/{packagesPerSet} packages — set is full
+                    <div className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200/80 bg-gray-50/20 py-5 text-sm font-bold text-gray-300 cursor-not-allowed select-none">
+                      <Plus className="w-4 h-4" /> {packagesPerSet}/{packagesPerSet} Packages — Set is Full
                     </div>
                   ) : (
                     <button
                       onClick={() => openForm(key, null)}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 py-3.5 text-sm font-semibold text-gray-400 hover:border-[var(--brand-client)]/50 hover:text-[var(--brand-client)] hover:bg-[var(--brand-client)]/[0.02] transition-all"
+                      className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50/5 hover:text-blue-600 py-5 text-sm font-bold text-gray-400 transition-all cursor-pointer"
                     >
                       <Plus className="w-4 h-4" /> Add a service to this set ({pkgs.length}/{packagesPerSet})
                     </button>
