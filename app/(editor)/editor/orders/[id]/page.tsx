@@ -31,9 +31,11 @@ import { ClientNotes } from "@/components/editor/client-notes";
 import { OrderEventTimeline } from "@/components/order/order-event-timeline";
 import { BlockClientButton } from "./block-client-button";
 import { AcceptOrderButton } from "./accept-order-button";
+import { DeclineOrderButton } from "./decline-order-button";
 import { ExtensionPanel } from "@/components/orders/extension-panel";
 import { DownloadAllButton } from "@/components/orders/download-all-button";
 import { DeliveryComments } from "@/components/orders/delivery-comments";
+import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 
 type BriefData = {
   mood?: string[];
@@ -137,8 +139,33 @@ export default async function EditorOrderDetailPage({
   const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
   const StatusIcon = cfg.icon;
 
+  const acceptanceDeadline = new Date(order.createdAt.getTime() + 24 * 60 * 60 * 1000);
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* NEW ORDER REQUEST banner — only for pending orders */}
+      {order.status === "pending" && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5 text-amber-700" />
+              </div>
+              <div>
+                <p className="font-bold text-amber-900 text-sm">New Order Request</p>
+                <p className="text-xs text-amber-700">
+                  You have a new order from <strong>{clientName}</strong> — please respond before your window closes.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs text-amber-700 font-medium">Respond within</span>
+              <DeadlineCountdown deadline={acceptanceDeadline.toISOString()} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
@@ -440,7 +467,17 @@ export default async function EditorOrderDetailPage({
 
               {/* Actions */}
               <div className="space-y-2.5 border-t border-gray-100 pt-4">
-                {order.status === "pending" && <AcceptOrderButton orderId={order.id} />}
+                {order.status === "pending" && (
+                  <>
+                    <AcceptOrderButton
+                      orderId={order.id}
+                      deliveryDays={order.packageDeliveryDays}
+                      revisionCount={computedRevisionCount}
+                      packageTitle={order.packageTitle}
+                    />
+                    <DeclineOrderButton orderId={order.id} />
+                  </>
+                )}
 
                 {order.status === "completed" && (
                   <a

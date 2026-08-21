@@ -42,17 +42,46 @@ export async function GET(req: Request) {
     .where(and(eq(orders.status, "pending"), lt(orders.createdAt, cutoff24h)));
 
   const cancelResults = await Promise.allSettled(stalePending.map(async (order) => {
-    await db
+    // Atomic: only update if still pending — guards against simultaneous editor acceptance
+    const updated = await db
       .update(orders)
-      .set({ status: "cancelled", updatedAt: now })
-      .where(eq(orders.id, order.id));
+      .set({
+        status: "cancelled",
+        cancelledAt: now,
+        cancellationReason: "EDITOR_NO_RESPONSE",
+        cancelledBy: "system",
+        updatedAt: now,
+      })
+      .where(and(eq(orders.id, order.id), eq(orders.status, "pending")))
+      .returning({ id: orders.id });
 
-    createOrderEvent(order.id, null, "order_cancelled", { cancelledBy: "system", reason: "no editor response within 24h" });
+    if (updated.length === 0) return; // editor accepted at the exact same moment
+
+    createOrderEvent(order.id, null, "order_cancelled", { cancelledBy: "system", reason: "EDITOR_NO_RESPONSE" });
 
     if (order.razorpayPaymentId) {
-      await createRefund(order.razorpayPaymentId, order.totalAmount).catch(err =>
-        console.error("[cron] refund failed for auto-cancel", order.id, err)
-      );
+      try {
+        await createRefund(order.razorpayPaymentId, order.totalAmount);
+      } catch (err) {
+        console.error("[cron] refund failed for auto-cancel", order.id, err);
+        createOrderEvent(order.id, null, "refund_failed", {
+          triggeredBy: "cron_auto_cancel",
+          error: String(err),
+          razorpayPaymentId: order.razorpayPaymentId,
+          amount: order.totalAmount,
+        });
+        // Alert admin
+        const [adminUser] = await db.select({ id: users.id }).from(users).where(eq(users.role, "admin")).limit(1);
+        if (adminUser) {
+          await db.insert(notifications).values({
+            userId: adminUser.id,
+            type: "order_cancelled",
+            title: "Refund failed — auto-cancel",
+            body: `Order ${order.id} was auto-cancelled (editor no response) but the Razorpay refund failed. Initiate manually.`,
+            link: `/admin/orders/${order.id}`,
+          });
+        }
+      }
     }
 
     await db.insert(notifications).values({

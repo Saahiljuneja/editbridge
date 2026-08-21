@@ -71,6 +71,8 @@ export const payoutStatusEnum = pgEnum("payout_status", [
 
 export const orderEventTypeEnum = pgEnum("order_event_type", [
   "order_placed",
+  "order_accepted",
+  "order_declined",
   "delivery_uploaded",
   "revision_requested",
   "extension_requested",
@@ -81,6 +83,7 @@ export const orderEventTypeEnum = pgEnum("order_event_type", [
   "order_completed",
   "order_cancelled",
   "payout_scheduled",
+  "refund_failed",
   "message_flagged", // internal — chat moderation flag, admin/staff view only
 ]);
 
@@ -396,6 +399,8 @@ export const orders = pgTable("orders", {
   deliveredAt: timestamp("delivered_at", { mode: "date" }), // when delivery was submitted
   completedAt: timestamp("completed_at", { mode: "date" }), // when client approved
   cancelledAt: timestamp("cancelled_at", { mode: "date" }),
+  cancellationReason: text("cancellation_reason"), // EDITOR_DECLINED | CLIENT_CANCELLED | EDITOR_NO_RESPONSE
+  cancelledBy: text("cancelled_by"), // 'client' | 'editor' | 'system'
   // Deadline extension request — editor asks for more time, client approves/rejects. One per order.
   extensionRequestedAt: timestamp("extension_requested_at", { mode: "date" }),
   extensionReason: text("extension_reason"),

@@ -13,13 +13,36 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Check, Calendar } from "lucide-react";
 
-export function AcceptOrderButton({ orderId }: { orderId: string }) {
+interface AcceptOrderButtonProps {
+  orderId: string;
+  deliveryDays?: number | null;
+  revisionCount?: number | null;
+  packageTitle?: string | null;
+}
+
+function computeDeadline(deliveryDays: number): string {
+  const d = new Date(Date.now() + deliveryDays * 24 * 60 * 60 * 1000);
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+}
+
+export function AcceptOrderButton({
+  orderId,
+  deliveryDays,
+  revisionCount,
+  packageTitle,
+}: AcceptOrderButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const deadlineStr = deliveryDays != null ? computeDeadline(deliveryDays) : null;
+  const revisionLabel =
+    revisionCount === -1 ? "unlimited revisions" :
+    revisionCount === 1 ? "1 revision" :
+    revisionCount != null ? `${revisionCount} revisions` : null;
 
   async function handleAccept() {
     setSubmitting(true);
@@ -59,9 +82,38 @@ export function AcceptOrderButton({ orderId }: { orderId: string }) {
           <DialogHeader>
             <DialogTitle>Accept this order?</DialogTitle>
             <DialogDescription>
-              This marks the order as in progress and notifies the client that you&apos;ve started working on it.
+              {packageTitle
+                ? `You are agreeing to complete "${packageTitle}" for this client.`
+                : "You are agreeing to complete this order for the client."}
             </DialogDescription>
           </DialogHeader>
+
+          {/* Commitments checklist */}
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 space-y-2">
+            <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">You are committing to:</p>
+            <ul className="space-y-1.5">
+              <li className="flex items-start gap-2 text-sm text-emerald-900">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                Complete all requested deliverables
+              </li>
+              {revisionLabel && (
+                <li className="flex items-start gap-2 text-sm text-emerald-900">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  Provide {revisionLabel} as specified
+                </li>
+              )}
+              <li className="flex items-start gap-2 text-sm text-emerald-900">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                Follow the client&apos;s project brief
+              </li>
+              {deadlineStr && (
+                <li className="flex items-start gap-2 text-sm text-emerald-900">
+                  <Calendar className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  Deliver by <strong className="ml-1">{deadlineStr}</strong>
+                </li>
+              )}
+            </ul>
+          </div>
 
           <div>
             <label className="text-xs font-semibold text-gray-600 block mb-1.5">
@@ -90,7 +142,7 @@ export function AcceptOrderButton({ orderId }: { orderId: string }) {
               {submitting ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Accepting…</>
               ) : (
-                "Accept Order"
+                "Confirm & Accept"
               )}
             </Button>
           </DialogFooter>

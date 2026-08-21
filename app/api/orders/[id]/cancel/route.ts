@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { createRefund } from "@/lib/razorpay";
 import { notifyOrderCancelled } from "@/lib/notifications";
 import { createOrderEvent } from "@/lib/order-events";
+import { notifications } from "@/lib/db/schema";
 
 export async function POST(
   _request: NextRequest,
@@ -47,12 +48,22 @@ export async function POST(
     );
   }
 
+  const cancelledBy = isClient ? "client" : "editor";
+  const cancellationReason = isClient ? "CLIENT_CANCELLED" : "EDITOR_CANCELLED";
+  const now = new Date();
+
   await db
     .update(orders)
-    .set({ status: "cancelled", updatedAt: new Date() })
+    .set({
+      status: "cancelled",
+      cancelledAt: now,
+      cancellationReason,
+      cancelledBy,
+      updatedAt: now,
+    })
     .where(eq(orders.id, id));
 
-  createOrderEvent(id, session.user.userId!, "order_cancelled", { cancelledBy: isClient ? "client" : "editor" });
+  createOrderEvent(id, session.user.userId!, "order_cancelled", { cancelledBy, reason: cancellationReason });
 
   // Attempt full Razorpay refund
   if (order.razorpayPaymentId) {
@@ -60,13 +71,31 @@ export async function POST(
       await createRefund(order.razorpayPaymentId, order.totalAmount);
     } catch (err) {
       console.error("[cancel] refund failed for order", id, err);
-      // Order is cancelled in DB — flag for manual refund by admin
-      // Don't block the response; client will see cancelled status
+      createOrderEvent(id, null, "refund_failed", {
+        triggeredBy: `${cancelledBy}_cancel`,
+        error: String(err),
+        razorpayPaymentId: order.razorpayPaymentId,
+        amount: order.totalAmount,
+      });
+      // Alert admin for manual refund
+      const [adminUser] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.role, "admin"))
+        .limit(1);
+      if (adminUser) {
+        await db.insert(notifications).values({
+          userId: adminUser.id,
+          type: "order_cancelled",
+          title: "Refund failed — manual action required",
+          body: `Order ${id} was cancelled by ${cancelledBy} but the Razorpay refund failed. Initiate refund manually.`,
+          link: `/admin/orders/${id}`,
+        });
+      }
     }
   }
 
-  // Notify both parties (fire-and-forget)
-  const cancelledBy = isClient ? "client" : "editor";
+  // Notify both parties
   const [editorRow] = await db.select({ userId: editors.userId }).from(editors).where(eq(editors.id, order.editorId)).limit(1);
   const [[clientUser], [editorUser], [pkg]] = await Promise.all([
     db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, order.clientId)).limit(1),
