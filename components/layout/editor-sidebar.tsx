@@ -10,7 +10,7 @@ import {
   MessageSquare, Settings, Star, BarChart2, AlertTriangle,
   Bell, Users, Zap, Sparkles, HelpCircle, Bookmark,
   FileQuestion, Gift, Film, Menu, X, LogOut, ArrowLeft,
-  ChevronDown, ChevronUp, Briefcase, CalendarClock,
+  ChevronDown, ChevronUp, Briefcase, CalendarClock, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -57,6 +57,7 @@ const NAV_GROUPS: { label: string; icon: React.ElementType; items: { href: strin
   {
     label: "Account", icon: Settings,
     items: [
+      { href: "/editor/account-health",  label: "Account Health", icon: ShieldCheck },
       { href: "/editor/notifications",    label: "Notifications", icon: Bell, badgeKey: "notifications" as const },
       { href: "/editor/settings",        label: "Settings",      icon: Settings },
       { href: "/editor/support",         label: "Support Tickets", icon: MessageSquare },
