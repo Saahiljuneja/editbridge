@@ -20,6 +20,8 @@ export default async function ClientAnalyticsPage() {
 
   const userId = session.user.userId!;
 
+  const now = new Date();
+
   const [statsRow, monthlyRows, editorRows, statusRows] = await Promise.all([
     // Lifetime KPIs
     db.select({
@@ -66,6 +68,15 @@ export default async function ClientAnalyticsPage() {
     `).then((r) => r.rows as { status: string; count: number }[]),
   ]);
 
+  // Build a complete 6-month window so months with no spending show as zero
+  const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthlyMap = new Map(monthlyRows.map(r => [r.month, r.spent]));
+  const paddedMonthly = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+    const label = `${MONTH_ABBR[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
+    return { month: label, spent: monthlyMap.get(label) ?? 0 };
+  });
+
   const kpis = [
     { label: "Total Spent",    value: formatCurrency(statsRow?.totalSpent ?? 0) },
     { label: "Orders Placed",  value: (statsRow?.total ?? 0).toString() },
@@ -99,7 +110,7 @@ export default async function ClientAnalyticsPage() {
         </div>
 
         <SpendingCharts
-          monthlyData={monthlyRows}
+          monthlyData={paddedMonthly}
           editorData={editorRows}
           statusData={statusRows}
         />

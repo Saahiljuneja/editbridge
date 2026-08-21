@@ -4,11 +4,11 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from "recharts";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 const STATUS_COLORS: Record<string, string> = {
-  completed:          "var(--brand-client)",
-  in_progress:        "var(--brand-client)",
+  completed:          "#0F6E56",  // brand-teal — success/done
+  in_progress:        "#0EA5E9",  // brand-client — active
   pending:            "#9CA3AF",
   delivered:          "var(--brand-editor)",
   revision_requested: "#D97706",
@@ -19,10 +19,6 @@ const STATUS_LABELS: Record<string, string> = {
   completed: "Completed", in_progress: "In Progress", pending: "Pending",
   delivered: "Delivered", revision_requested: "Revision", disputed: "Disputed", cancelled: "Cancelled",
 };
-
-function formatRupees(v: number) {
-  return `₹${(v / 100).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
-}
 
 export function SpendingCharts({
   monthlyData,
@@ -49,9 +45,9 @@ export function SpendingCharts({
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={monthlyData} barSize={32}>
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v / 100).toFixed(0)}`} />
+              <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrency(Number(v))} />
               <Tooltip
-                formatter={(v) => [formatRupees(Number(v ?? 0)), "Spent"]}
+                formatter={(v) => [formatCurrency(Number(v ?? 0)), "Spent"]}
                 contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB", fontSize: 12 }}
               />
               <Bar dataKey="spent" fill="var(--brand-client)" radius={[6, 6, 0, 0]} />
@@ -78,7 +74,7 @@ export function SpendingCharts({
                     <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full rounded-full bg-[var(--brand-client)]" style={{ width: `${Math.round((e.total_spent / maxSpend) * 100)}%` }} />
                     </div>
-                    <span className="text-xs font-medium text-gray-500 w-16 text-right">{formatRupees(e.total_spent)}</span>
+                    <span className="text-xs font-medium text-gray-500 w-16 text-right">{formatCurrency(e.total_spent)}</span>
                   </div>
                 </div>
               ))}
