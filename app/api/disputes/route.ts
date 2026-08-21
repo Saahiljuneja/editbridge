@@ -6,6 +6,7 @@ import { and, eq, sql, desc } from "drizzle-orm";
 import { openDisputeSchema } from "@/lib/validations";
 import { notifyDisputeOpened } from "@/lib/notifications";
 import { createOrderEvent } from "@/lib/order-events";
+import { persistEditorHealth } from "@/lib/health";
 
 export async function GET() {
   const session = await auth();
@@ -106,6 +107,9 @@ export async function POST(request: NextRequest) {
     .returning();
 
   createOrderEvent(orderId, userId, "dispute_opened", { reason });
+
+  // Recalculate editor health async (open disputes affect client experience category)
+  persistEditorHealth(order.editorId).catch(() => {});
 
   // Notify both parties + admin (fire-and-forget)
   const [editorRow] = await db.select({ userId: editors.userId }).from(editors).where(eq(editors.id, order.editorId)).limit(1);

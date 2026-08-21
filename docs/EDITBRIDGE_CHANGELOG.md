@@ -1,5 +1,66 @@
 # EditBridge Changelog
 
+---
+
+## [2026-08-21] — Implementation Plan: All 8 Items
+
+### Decisions Approved
+All pending decisions from EDITBRIDGE_DECISION_CONFLICTS.md approved:
+- Suspension **blocks** declines (CONFLICT-001)
+- Atomic cancel guard added (CONFLICT-002)
+- Refund wording verified and fixed (CONFLICT-003)
+- Editor availability toggle is now an eligibility gate (CONFLICT-004)
+- `persistEditorHealth()` added to all missing routes (CONFLICT-007)
+- Editors blocked from generic `/cancel` for pending orders; must use `/decline` (CONFLICT-008)
+- Refund status tracking added (`refund_status`, `refunded_at`) (CONFLICT-009)
+- New-editor health bootstrapping: minimum 5 orders required before showing score (CONFLICT-010)
+
+### Changes
+
+#### Item 1 (P0): Atomic cancel guard — `app/api/orders/[id]/cancel/route.ts`
+Removed pre-check `if (order.status !== "pending")`. Changed the `db.update()` to use `WHERE status = 'pending'` with `.returning()`. If 0 rows returned → 409.
+
+#### Item 2 (P1): Eligibility checks on decline — `app/api/orders/[id]/decline/route.ts`
+Added `isSuspended` to the editor row select. Added user `isActive` check and suspension check after the editor ownership check. Suspended or inactive editors get 403.
+
+#### Item 3 (P1): `persistEditorHealth()` on missing routes
+Added fire-and-forget `persistEditorHealth(editorId).catch(() => {})` to:
+- `app/api/orders/[id]/approve/route.ts` (order completion)
+- `app/api/reviews/route.ts` (client review submitted)
+- `app/api/disputes/route.ts` (dispute opened)
+
+#### Item 4 (P2): Restrict editor from using generic cancel for pending orders
+Added early return in `cancel/route.ts`: if `isEditor && order.status === "pending"` → 405 with message directing to `/decline`.
+
+#### Item 5 (P2): Refund status tracking
+- New migration `lib/db/migrations/0020_refund_status.sql` — applied 2026-08-21
+- Added `refundStatus` (text, nullable) and `refundedAt` (timestamp, nullable) to `lib/db/schema.ts` orders table
+- `cancel/route.ts`, `decline/route.ts`, `cron/orders/route.ts` all set `refundStatus: "initiated"` on successful `createRefund()` and `refundStatus: "failed"` on error
+
+#### Item 6 (P2): New-editor health score bootstrapping (Option A — min data threshold)
+- Added `notEnoughData?: boolean` to `HealthResult` interface in `lib/health.ts`
+- `calculateEditorHealth()` returns early with `notEnoughData: true` if `totalOrdersReceived < 5`
+- `persistEditorHealth()` skips DB write when `notEnoughData: true`
+- `app/(editor)/editor/account-health/page.tsx` shows "Not enough data yet" state with order count progress
+
+#### Item 7 (P2): Client-side refund wording fix — `app/(client)/client/orders/[id]/order-actions.tsx`
+Fixed toast.success copy from "A full refund will be processed within 5–7 days" to "Refund initiated — funds will arrive within 5–7 business days."
+
+#### Item 8 (P3): Availability toggle as eligibility gate
+- Added `EDITOR_UNAVAILABLE` to `EligibilityCode` in `lib/eligibility.ts`
+- `canEditorAcceptOrder()` now returns `EDITOR_UNAVAILABLE` if `editorRow.isAvailable === false`
+- Added `EDITOR_UNAVAILABLE: 403` to the status map in `app/api/orders/[id]/accept/route.ts`
+
+### Database Impact
+Migration `0020_refund_status.sql` applied — 2 new nullable columns on `orders` table:
+- `refund_status` (text, nullable)
+- `refunded_at` (timestamp, nullable)
+
+### Implementation Status
+**IMPLEMENTED** — 2026-08-21
+
+---
+
 Historical record of product decisions and implementation changes.
 
 Statuses: `PROPOSED` | `APPROVED` | `IMPLEMENTED` | `VERIFIED` | `REJECTED` | `SUPERSEDED`

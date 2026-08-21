@@ -242,14 +242,14 @@ Current behavior: availability toggle does NOT block accept. It only affects mar
 
 | Item | Priority | Conflict | Status | Requires Decision |
 |---|---|---|---|---|
-| 1. Atomic cancel guard | P0 | CONFLICT-002 | NOT_STARTED | No |
-| 2. Eligibility on decline | P1 | CONFLICT-001 | NOT_STARTED | Yes (suspension blocks decline?) |
-| 3. persistEditorHealth on missing routes | P1 | CONFLICT-007 | NOT_STARTED | No |
-| 4. Restrict editor generic cancel | P2 | CONFLICT-008 | BLOCKED | Yes |
-| 5. Refund status tracking | P2 | CONFLICT-009 | BLOCKED | Yes |
-| 6. New-editor score bootstrapping | P2 | CONFLICT-010 | BLOCKED | Yes |
-| 7. Verify client refund wording | P2 | CONFLICT-003 | NOT_STARTED | No |
-| 8. Availability toggle as gate | P3 | CONFLICT-004 | BLOCKED | Yes |
+| 1. Atomic cancel guard | P0 | CONFLICT-002 | COMPLETE | No |
+| 2. Eligibility on decline | P1 | CONFLICT-001 | COMPLETE | Yes — suspension blocks declines |
+| 3. persistEditorHealth on missing routes | P1 | CONFLICT-007 | COMPLETE | No |
+| 4. Restrict editor generic cancel | P2 | CONFLICT-008 | COMPLETE | Yes — editors blocked |
+| 5. Refund status tracking | P2 | CONFLICT-009 | COMPLETE | Yes — approved |
+| 6. New-editor score bootstrapping | P2 | CONFLICT-010 | COMPLETE | Yes — Option A (min 5 orders) |
+| 7. Verify client refund wording | P2 | CONFLICT-003 | COMPLETE | No |
+| 8. Availability toggle as gate | P3 | CONFLICT-004 | COMPLETE | Yes — approved |
 
 ### Items that can be implemented immediately (no decision needed):
 - **Item 1** — atomic cancel guard (P0 bug fix, safe change)

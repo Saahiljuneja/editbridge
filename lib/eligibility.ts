@@ -15,6 +15,7 @@ export type EligibilityCode =
   | "NOT_AUTHENTICATED"
   | "ACCOUNT_INACTIVE"
   | "SUSPENDED"
+  | "EDITOR_UNAVAILABLE"
   | "KYC_NOT_APPROVED"
   | "CRITICAL_HEALTH"
   | "ORDER_NOT_FOUND"
@@ -74,6 +75,15 @@ export async function canEditorAcceptOrder(
       reason: editorRow.suspensionReason
         ? `Your account is suspended: ${editorRow.suspensionReason}`
         : "Your account is suspended. Please contact support.",
+    };
+  }
+
+  // 3.5 Editor must be set as available
+  if (!editorRow.isAvailable) {
+    return {
+      eligible: false,
+      code: "EDITOR_UNAVAILABLE",
+      reason: "You are currently set to unavailable. Toggle your availability in your dashboard to accept new orders.",
     };
   }
 

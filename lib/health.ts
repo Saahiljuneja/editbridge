@@ -37,6 +37,7 @@ export interface ImprovementAction {
 }
 
 export interface HealthResult {
+  notEnoughData?: boolean;  // true if editor has < 5 orders — no meaningful score yet
   totalScore: number;
   healthStatus: HealthStatus;
   categoryScores: {
@@ -225,6 +226,27 @@ export async function calculateEditorHealth(editorId: string): Promise<HealthRes
     no_response_count: 0, editor_cancelled_count: 0, completed_count: 0,
     delivered_on_time: 0, delivered_total: 0, last_completed_days_ago: null, active_count: 0,
   };
+
+  // Minimum data threshold — don't show a score until the editor has meaningful history
+  const MIN_ORDERS_FOR_SCORE = 5;
+  if (stats.total_received < MIN_ORDERS_FOR_SCORE) {
+    return {
+      notEnoughData: true,
+      totalScore: 0,
+      healthStatus: "good" as HealthStatus,
+      categoryScores: { orderReliability: 0, quality: 0, clientExperience: 0, compliance: 0, activity: 0 },
+      signals: {
+        acceptanceRate: 100, noResponseRate: 0, onTimeDeliveryPct: 100, editorCancellationRate: 0,
+        avgRating: 0, fiveStarPct: 100, revisionFrequency: 0, disputeRate: 0,
+        responseRateScore: 75, repeatClientRate: 0, openDisputeCount: 0,
+        kycScore: 0, hasBankAccount: false, hasActivePackage: false, panProvided: false,
+        daysSinceLastOrder: 999, isAvailable: false, activeOrderCount: 0,
+        totalOrdersReceived: stats.total_received, totalCompleted: 0,
+      },
+      improvementActions: [],
+      computedAt: new Date(),
+    };
+  }
 
   // Acceptance rate denominator: orders that had a clear accept/decline/no-response outcome
   const decisiveOrders = stats.accepted_count + stats.declined_count + stats.no_response_count;
@@ -526,6 +548,9 @@ export async function calculateEditorHealth(editorId: string): Promise<HealthRes
 
 export async function persistEditorHealth(editorId: string): Promise<void> {
   const result = await calculateEditorHealth(editorId);
+
+  // Don't persist artificial defaults when there isn't enough data yet
+  if (result.notEnoughData) return;
 
   // Only send a degradation notification if status worsened
   const [current] = await db

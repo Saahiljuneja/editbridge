@@ -8,6 +8,7 @@ import { onEditorOrderCompleted, onClientOrderCompleted, onRepeatClientPair, get
 import { maybeTriggerReferralReward } from "@/lib/referrals";
 import { createOrderEvent } from "@/lib/order-events";
 import { computeTdsForEditor } from "@/lib/tds";
+import { persistEditorHealth } from "@/lib/health";
 
 export async function POST(
   _request: NextRequest,
@@ -137,6 +138,9 @@ export async function POST(
       });
     }).catch(() => {});
   }
+
+  // Recalculate health async (order completion affects quality and reliability categories)
+  persistEditorHealth(order.editorId).catch(() => {});
 
   return NextResponse.json({ success: true });
 }

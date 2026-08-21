@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { submitReviewSchema } from "@/lib/validations";
 import { notifyReviewReceived, createInAppNotification, editorWantsNotif } from "@/lib/notifications";
 import { onFiveStarReview, onClientReviewLeft } from "@/lib/rewards";
+import { persistEditorHealth } from "@/lib/health";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -87,6 +88,8 @@ export async function POST(request: NextRequest) {
     onFiveStarReview(revieweeId, rating).catch(() => {});
     // Client gets XP for leaving review
     onClientReviewLeft(userId, orderId).catch(() => {});
+    // Recalculate editor health (reviews affect quality category)
+    persistEditorHealth(order.editorId).catch(() => {});
   }
 
   // Notify reviewee (fire-and-forget)

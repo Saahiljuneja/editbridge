@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { orders, editors, users, packages } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { createRefund } from "@/lib/razorpay";
 import { notifyOrderCancelled } from "@/lib/notifications";
 import { createOrderEvent } from "@/lib/order-events";
@@ -41,10 +41,12 @@ export async function POST(
   if (!isClient && !isEditor) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (order.status !== "pending") {
+
+  // Item 4: editors must use /decline for pending orders (keeps reason structured)
+  if (isEditor && order.status === "pending") {
     return NextResponse.json(
-      { error: "Only pending orders can be cancelled" },
-      { status: 409 }
+      { error: "Pending orders must be declined via POST /api/orders/:id/decline" },
+      { status: 405 }
     );
   }
 
@@ -52,7 +54,8 @@ export async function POST(
   const cancellationReason = isClient ? "CLIENT_CANCELLED" : "EDITOR_CANCELLED";
   const now = new Date();
 
-  await db
+  // Item 1: atomic guard — only succeeds if still pending (race condition prevention)
+  const updated = await db
     .update(orders)
     .set({
       status: "cancelled",
@@ -61,7 +64,15 @@ export async function POST(
       cancelledBy,
       updatedAt: now,
     })
-    .where(eq(orders.id, id));
+    .where(and(eq(orders.id, id), eq(orders.status, "pending")))
+    .returning({ id: orders.id });
+
+  if (updated.length === 0) {
+    return NextResponse.json(
+      { error: "Only pending orders can be cancelled" },
+      { status: 409 }
+    );
+  }
 
   createOrderEvent(id, session.user.userId!, "order_cancelled", { cancelledBy, reason: cancellationReason });
 
@@ -69,8 +80,10 @@ export async function POST(
   if (order.razorpayPaymentId) {
     try {
       await createRefund(order.razorpayPaymentId, order.totalAmount);
+      await db.update(orders).set({ refundStatus: "initiated" }).where(eq(orders.id, id));
     } catch (err) {
       console.error("[cancel] refund failed for order", id, err);
+      await db.update(orders).set({ refundStatus: "failed" }).where(eq(orders.id, id));
       createOrderEvent(id, null, "refund_failed", {
         triggeredBy: `${cancelledBy}_cancel`,
         error: String(err),

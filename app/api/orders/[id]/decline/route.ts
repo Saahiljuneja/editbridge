@@ -58,12 +58,27 @@ export async function POST(
   }
 
   const [editorRow] = await db
-    .select({ id: editors.id, userId: editors.userId })
+    .select({ id: editors.id, userId: editors.userId, isSuspended: editors.isSuspended })
     .from(editors)
     .where(and(eq(editors.id, order.editorId), eq(editors.userId, session.user.userId!)))
     .limit(1);
 
   if (!editorRow) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  // Check user account active
+  const [userRow] = await db
+    .select({ isActive: users.isActive })
+    .from(users)
+    .where(eq(users.id, session.user.userId!))
+    .limit(1);
+  if (!userRow?.isActive) {
+    return NextResponse.json({ error: "Your account is inactive. Please contact support." }, { status: 403 });
+  }
+
+  // Suspension blocks declines — consistent with the eligibility model
+  if (editorRow.isSuspended) {
+    return NextResponse.json({ error: "Your account is suspended. Please contact support." }, { status: 403 });
+  }
 
   const now = new Date();
 
@@ -93,8 +108,10 @@ export async function POST(
   if (order.razorpayPaymentId) {
     try {
       await createRefund(order.razorpayPaymentId, order.totalAmount);
+      await db.update(orders).set({ refundStatus: "initiated" }).where(eq(orders.id, id));
     } catch (err) {
       console.error("[decline] refund failed for order", id, err);
+      await db.update(orders).set({ refundStatus: "failed" }).where(eq(orders.id, id));
       createOrderEvent(id, null, "refund_failed", {
         triggeredBy: "editor_decline",
         error: String(err),

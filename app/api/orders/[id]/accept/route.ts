@@ -41,6 +41,7 @@ export async function POST(
       NOT_AUTHENTICATED:  403,
       ACCOUNT_INACTIVE:   403,
       SUSPENDED:          403,
+      EDITOR_UNAVAILABLE: 403,
       KYC_NOT_APPROVED:   403,
       CRITICAL_HEALTH:    403,
       ORDER_NOT_FOUND:    404,

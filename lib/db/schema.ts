@@ -416,6 +416,8 @@ export const orders = pgTable("orders", {
   cancelledAt: timestamp("cancelled_at", { mode: "date" }),
   cancellationReason: text("cancellation_reason"), // EDITOR_DECLINED | CLIENT_CANCELLED | EDITOR_NO_RESPONSE
   cancelledBy: text("cancelled_by"), // 'client' | 'editor' | 'system'
+  refundStatus: text("refund_status"), // 'initiated' | 'confirmed' | 'failed' | null
+  refundedAt: timestamp("refunded_at", { mode: "date" }),
   // Deadline extension request — editor asks for more time, client approves/rejects. One per order.
   extensionRequestedAt: timestamp("extension_requested_at", { mode: "date" }),
   extensionReason: text("extension_reason"),

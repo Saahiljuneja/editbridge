@@ -116,7 +116,7 @@ export function OrderActions({
         toast.error(err.error ?? "Failed to cancel order.");
         return;
       }
-      toast.success("Order cancelled. A full refund will be processed within 5–7 days.");
+      toast.success("Order cancelled. Refund initiated — funds will arrive within 5–7 business days.");
       setShowCancelModal(false);
       router.refresh();
     } catch {

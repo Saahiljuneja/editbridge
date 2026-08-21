@@ -63,8 +63,10 @@ export async function GET(req: Request) {
     if (order.razorpayPaymentId) {
       try {
         await createRefund(order.razorpayPaymentId, order.totalAmount);
+        await db.update(orders).set({ refundStatus: "initiated" }).where(eq(orders.id, order.id));
       } catch (err) {
         console.error("[cron] refund failed for auto-cancel", order.id, err);
+        await db.update(orders).set({ refundStatus: "failed" }).where(eq(orders.id, order.id));
         createOrderEvent(order.id, null, "refund_failed", {
           triggeredBy: "cron_auto_cancel",
           error: String(err),
