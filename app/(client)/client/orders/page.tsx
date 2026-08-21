@@ -274,7 +274,7 @@ export default async function ClientOrdersPage({
               </p>
             )}
 
-            <OrdersListClient rows={rows} hasFilter={tab !== "all"} />
+            <OrdersListClient rows={rows} hasFilter={tab !== "all"} tab={tab} />
 
             {totalPages > 1 && (
               <div className="flex items-center justify-between pt-2">
@@ -362,7 +362,7 @@ export default async function ClientOrdersPage({
                               )}
                               <div className="flex gap-2 pt-0.5">
                                 <Link href={`/client/quotes/${quote.id}/pay`}
-                                  className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-primary hover:bg-brand-primary transition-colors">
+                                  className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors">
                                   Accept &amp; Pay {formatCurrency(quote.offeredPrice + Math.round(quote.offeredPrice * processingFeePct))}
                                 </Link>
                                 <QuoteDeclineButton quoteId={quote.id} />

@@ -27,25 +27,34 @@ type OrderRow = {
   editorName: string | null;
 };
 
+const EMPTY_STATE: Record<string, { heading: string; body: string }> = {
+  all:                { heading: "No orders yet",                  body: "You haven't placed any orders yet." },
+  pending:            { heading: "No pending orders",              body: "Orders awaiting editor pickup will appear here." },
+  in_progress:        { heading: "No active projects",             body: "Orders being worked on by your editors will appear here." },
+  delivered:          { heading: "No deliveries awaiting review",  body: "When an editor delivers work, it will appear here." },
+  revision_requested: { heading: "No revision requests",           body: "Orders with open revision requests will appear here." },
+  completed:          { heading: "No completed orders",            body: "Your finished projects will appear here." },
+  cancelled:          { heading: "No cancelled orders",            body: "Cancelled orders will appear here." },
+};
+
 export function OrdersListClient({
   rows,
   hasFilter,
+  tab,
 }: {
   rows: OrderRow[];
   hasFilter: boolean;
+  tab?: string;
 }) {
   if (rows.length === 0) {
+    const state = (tab ? EMPTY_STATE[tab] : undefined) ?? (hasFilter ? { heading: "No orders found", body: "No orders match this filter." } : EMPTY_STATE.all);
     return (
       <div className="rounded-3xl border border-neutral-200/60 bg-white shadow-sm flex flex-col items-center justify-center py-20 text-center relative z-10">
         <div className="w-14 h-14 rounded-2xl bg-neutral-50 border border-neutral-200/30 flex items-center justify-center mb-4">
           <ShoppingBag className="w-7 h-7 text-neutral-300" />
         </div>
-        <p className="font-black text-neutral-800 text-xs uppercase tracking-wider">No orders found</p>
-        <p className="text-[11px] text-neutral-400 mt-1 mb-5 font-semibold">
-          {hasFilter
-            ? "No orders match this filter."
-            : "You haven't placed any orders yet."}
-        </p>
+        <p className="font-black text-neutral-800 text-xs uppercase tracking-wider">{state.heading}</p>
+        <p className="text-[11px] text-neutral-400 mt-1 mb-5 font-semibold">{state.body}</p>
         {!hasFilter && (
           <Link
             href="/browse"
