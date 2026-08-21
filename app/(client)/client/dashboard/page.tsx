@@ -3,14 +3,14 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { orders, packages, messages, editors, users, savedEditors, userPoints } from "@/lib/db/schema";
+import { orders, packages, messages, editors, users, userPoints } from "@/lib/db/schema";
 import { and, eq, sql, desc, ne } from "drizzle-orm";
 import { formatCurrency, displayNameFromFull, cn } from "@/lib/utils";
 import {
   ArrowRight, MessageSquare,
   Search, AlertTriangle, CheckCircle2,
-  RefreshCw, Clock, Users, Plus,
-  Gift, Package, IndianRupee, BarChart2,
+  RefreshCw, Clock, Plus,
+  Gift, Package, IndianRupee, Wallet, User,
   Zap, TriangleAlert, Folder, ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -50,7 +50,7 @@ export default async function ClientDashboardPage() {
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const [activeOrders, statsRow, unreadRow, savedEditorsList, recentActivity, xpRow] =
+  const [activeOrders, statsRow, unreadRow, recentActivity, xpRow] =
     await Promise.all([
       db.select({
         id: orders.id, status: orders.status, deadline: orders.deadline,
@@ -77,11 +77,6 @@ export default async function ClientDashboardPage() {
           eq(messages.isRead, false), sql`${orders.status} NOT IN ('completed','cancelled')`,
           eq(messages.isBlocked, false)
         )).then(r => r[0]),
-
-      db.select({ editorId: editors.id })
-        .from(savedEditors)
-        .innerJoin(editors, eq(editors.id, savedEditors.editorId))
-        .where(eq(savedEditors.clientId, userId)),
 
       db.select({
         id: orders.id, status: orders.status, updatedAt: orders.updatedAt,
@@ -141,7 +136,7 @@ export default async function ClientDashboardPage() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-[26px] font-black text-neutral-900 tracking-tight leading-none">
-              {greeting}, {firstName} 👋
+              {greeting}, {firstName}
             </h1>
             <p className="text-xs text-neutral-400 font-bold mt-2">Let&apos;s create something amazing today.</p>
           </div>
@@ -187,10 +182,10 @@ export default async function ClientDashboardPage() {
         {/* KPI strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "Active",    value: String(ordersWithMeta.length), Icon: Folder,       iconBg: "bg-blue-50",    iconColor: "text-brand-primary" },
-            { label: "Unread",    value: String(unreadMessages),        Icon: MessageSquare, iconBg: "bg-blue-50",    iconColor: "text-brand-primary", href: "/client/messages" },
-            { label: "Spent",     value: totalSpent > 0 ? formatCurrency(totalSpent) : "₹0", Icon: IndianRupee, iconBg: "bg-amber-50", iconColor: "text-amber-500" },
-            { label: "Completed", value: String(completedOrders),       Icon: CheckCircle2,  iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
+            { label: "Active Orders",    value: String(ordersWithMeta.length), Icon: Folder,       iconBg: "bg-blue-50",    iconColor: "text-brand-primary" },
+            { label: "Unread Msgs",     value: String(unreadMessages),        Icon: MessageSquare, iconBg: "bg-blue-50",    iconColor: "text-brand-primary", href: "/client/messages" },
+            { label: "Total Spent",     value: totalSpent > 0 ? formatCurrency(totalSpent) : "₹0", Icon: IndianRupee, iconBg: "bg-amber-50", iconColor: "text-amber-500" },
+            { label: "Completed",       value: String(completedOrders),       Icon: CheckCircle2,  iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
           ].map(({ label, value, Icon, iconBg, iconColor, href }) => (
             <div key={label} className={cn("bg-white rounded-2xl border border-neutral-200/60 p-4 shadow-sm flex items-center gap-3", href && "hover:border-neutral-300 transition-colors cursor-pointer")}>
               {href ? (
@@ -360,12 +355,12 @@ export default async function ClientDashboardPage() {
               <h3 className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-4">Quick Actions</h3>
               <div className="space-y-2.5">
                 {([
-                  { href: "/browse",            label: "New Order",     Icon: Plus,          iconBg: "bg-black",       iconColor: "text-white" },
+                  { href: "/browse",            label: "Browse Editors", Icon: Search,        iconBg: "bg-black",       iconColor: "text-white" },
+                  { href: "/client/orders",     label: "My Orders",     Icon: Folder,        iconBg: "bg-blue-50",     iconColor: "text-brand-primary" },
                   { href: "/client/messages",   label: "Messages",      Icon: MessageSquare, iconBg: "bg-blue-50",     iconColor: "text-brand-primary", badge: unreadMessages },
-                  { href: "/client/orders",     label: "All Orders",    Icon: Folder,        iconBg: "bg-blue-50",     iconColor: "text-brand-primary" },
-                  { href: "/client/analytics",  label: "Analytics",     Icon: BarChart2,     iconBg: "bg-blue-50",     iconColor: "text-brand-primary" },
-                  { href: "/client/membership", label: "Refer & Earn",  Icon: Gift,          iconBg: "bg-amber-50",    iconColor: "text-amber-500" },
-                  { href: "/client/saved",      label: "Saved Editors", Icon: Users,         iconBg: "bg-neutral-100", iconColor: "text-neutral-600", badge: savedEditorsList.length || undefined },
+                  { href: "/client/wallet",     label: "Wallet",        Icon: Wallet,        iconBg: "bg-amber-50",    iconColor: "text-amber-500" },
+                  { href: "/client/profile",    label: "Profile",       Icon: User,          iconBg: "bg-neutral-100", iconColor: "text-neutral-600" },
+                  { href: "/client/referral",   label: "Refer & Earn",  Icon: Gift,          iconBg: "bg-emerald-50",  iconColor: "text-emerald-600" },
                 ] as { href: string; label: string; Icon: React.ElementType; iconBg: string; iconColor: string; badge?: number }[]).map(
                   ({ href, label, Icon, iconBg, iconColor, badge }) => (
                     <Link key={label} href={href}
@@ -394,7 +389,7 @@ export default async function ClientDashboardPage() {
               <div className="relative z-10 space-y-2">
                 <h4 className="font-black text-sm">Refer & Earn</h4>
                 <p className="text-[11px] text-white/80 leading-relaxed font-semibold">Invite friends and earn credit on their first order.</p>
-                <Link href="/client/membership" className="inline-block mt-2 bg-white text-blue-900 hover:bg-neutral-100 px-4 py-1.5 rounded-xl text-[11px] font-black transition-all">
+                <Link href="/client/referral" className="inline-block mt-2 bg-white text-blue-900 hover:bg-neutral-100 px-4 py-1.5 rounded-xl text-[11px] font-black transition-all">
                   Invite Now
                 </Link>
               </div>
