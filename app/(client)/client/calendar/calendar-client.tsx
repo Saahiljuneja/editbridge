@@ -148,7 +148,7 @@ export function CalendarClient({ orders }: { orders: OrderEvent[] }) {
           </div>
           <div className="divide-y divide-gray-50">
             {selectedOrders.map((o) => (
-              <Link key={o.id} href={`/orders/${o.id}`}
+              <Link key={o.id} href={`/client/orders/${o.id}`}
                 className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
                 <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", STATUS_DOT[o.status] ?? "bg-gray-400")} />
                 <div className="flex-1 min-w-0">
@@ -176,7 +176,7 @@ export function CalendarClient({ orders }: { orders: OrderEvent[] }) {
                 const isPast = d < today;
                 const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
                 return (
-                  <Link key={o.id} href={`/orders/${o.id}`}
+                  <Link key={o.id} href={`/client/orders/${o.id}`}
                     className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors">
                     <div className="text-center w-10 shrink-0">
                       <p className="text-[10px] font-bold text-gray-400 uppercase">{MONTHS[d.getMonth()].slice(0, 3)}</p>

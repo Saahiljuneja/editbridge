@@ -206,7 +206,7 @@ export default async function ClientOrdersPage({
   ];
 
   return (
-    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden select-none">
+    <div className="relative min-h-screen bg-slate-50/50 pb-12 overflow-hidden">
       <TopoBackground background="#f8fafc" strokeColor="#e2e8f0" opacity={0.4} />
 
       <div className="max-w-6xl mx-auto px-6 pt-6 space-y-6 relative z-10">
@@ -307,7 +307,7 @@ export default async function ClientOrdersPage({
                 <p className="font-semibold text-neutral-800">No quote requests yet</p>
                 <p className="text-sm text-neutral-400 mt-1 mb-5">Visit an editor&apos;s profile and click &quot;Request a Quote&quot;</p>
                 <Link href="/browse"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-primary hover:bg-brand-primary transition-colors">
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors">
                   Browse editors
                 </Link>
               </div>
