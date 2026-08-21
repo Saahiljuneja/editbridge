@@ -13,13 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, Check, Calendar } from "lucide-react";
+import { CheckCircle2, Loader2, Check, Calendar, ShieldAlert } from "lucide-react";
+import Link from "next/link";
 
 interface AcceptOrderButtonProps {
   orderId: string;
   deliveryDays?: number | null;
   revisionCount?: number | null;
   packageTitle?: string | null;
+  canAccept?: boolean;
+  blockReason?: string;
 }
 
 function computeDeadline(deliveryDays: number): string {
@@ -32,6 +35,8 @@ export function AcceptOrderButton({
   deliveryDays,
   revisionCount,
   packageTitle,
+  canAccept = true,
+  blockReason,
 }: AcceptOrderButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -65,6 +70,32 @@ export function AcceptOrderButton({
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // Blocked state — health is Critical or account suspended
+  if (!canAccept) {
+    return (
+      <div className="space-y-2">
+        <button
+          disabled
+          className="w-full py-3 rounded-xl text-sm font-semibold text-gray-400 bg-gray-100 border border-gray-200 flex items-center justify-center gap-2 cursor-not-allowed"
+        >
+          <ShieldAlert className="w-4 h-4" />
+          Accept Order
+        </button>
+        {blockReason && (
+          <div className="rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-xs text-red-700 space-y-1.5">
+            <p>{blockReason}</p>
+            <Link
+              href="/editor/account-health"
+              className="inline-flex items-center gap-1 font-bold underline underline-offset-2 hover:text-red-900"
+            >
+              View Account Health →
+            </Link>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

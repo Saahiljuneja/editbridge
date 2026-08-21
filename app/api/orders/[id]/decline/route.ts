@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRefund } from "@/lib/razorpay";
 import { createOrderEvent } from "@/lib/order-events";
+import { persistEditorHealth } from "@/lib/health";
 
 const DECLINE_REASONS = [
   "I'm unavailable",
@@ -126,6 +127,9 @@ export async function POST(
     body: "The editor was unable to take on your project. Your refund has been initiated and should arrive within 5–7 business days.",
     link: `/orders/${id}`,
   });
+
+  // Recalculate health async (decline affects acceptance rate)
+  persistEditorHealth(editorRow.id).catch(() => {});
 
   return NextResponse.json({ ok: true });
 }

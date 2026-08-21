@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { notifications, editors, userPreferences } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { notifications, editors, users, userPreferences } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { createElement } from "react";
 import { sendEmail } from "@/lib/resend";
 import { formatCurrency, formatDate, displayNameFromFull } from "@/lib/utils";
@@ -653,4 +653,43 @@ export function notifyReviewReceived(opts: {
       }),
     })
   );
+}
+
+// ─── Account Health notifications ───────────────────────────────────────────
+
+export function notifyHealthDegraded(
+  editorUserId: string,
+  editorId: string,
+  newStatus: string,
+  topAction?: { title: string; href?: string },
+) {
+  const statusLabels: Record<string, string> = {
+    at_risk: "At Risk",
+    critical: "Critical",
+  };
+  const label = statusLabels[newStatus] ?? newStatus;
+
+  fire(async () => {
+    await db.insert(notifications).values({
+      userId: editorUserId,
+      type: "account_health_warning",
+      title: `Account Health: ${label}`,
+      body: topAction
+        ? `Your account health has dropped to ${label}. Priority: ${topAction.title}`
+        : `Your account health has dropped to ${label}. View your Account Health for required actions.`,
+      link: "/editor/account-health",
+    });
+  });
+}
+
+export function notifyAccountSuspended(editorUserId: string, reason: string) {
+  fire(async () => {
+    await db.insert(notifications).values({
+      userId: editorUserId,
+      type: "account_suspended",
+      title: "Account suspended",
+      body: `Your account has been suspended. Reason: ${reason}. Contact support to resolve this.`,
+      link: "/editor/account-health",
+    });
+  });
 }

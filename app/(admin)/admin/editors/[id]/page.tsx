@@ -17,6 +17,8 @@ import { ToggleAvailabilityForm } from "./toggle-availability-form";
 import { VacationForm } from "./vacation-form";
 import { MaxOrdersForm } from "./max-orders-form";
 import { ResetKycButton } from "./reset-kyc-button";
+import { HealthScoreCard } from "./health-score-card";
+import { SuspendEditorForm } from "./suspend-editor-form";
 import { GrantCreditsForm } from "../../users/[id]/grant-credits-form";
 import { AdjustXpForm } from "../../users/[id]/adjust-xp-form";
 import { ImpersonateButton } from "../../users/[id]/impersonate-button";
@@ -365,6 +367,14 @@ export default async function AdminEditorDetailPage({ params }: { params: Promis
             </div>
           </div>
 
+          {/* Account Health */}
+          <HealthScoreCard
+            editorId={id}
+            healthScore={editor.healthScore ?? null}
+            healthStatus={editor.healthStatus ?? null}
+            healthComputedAt={editor.healthComputedAt ?? null}
+          />
+
           {/* Admin controls */}
           <div className="rounded-xl border border-border bg-white p-4 space-y-3">
             <p className="font-semibold text-sm text-gray-900 flex items-center gap-1.5">
@@ -381,6 +391,11 @@ export default async function AdminEditorDetailPage({ params }: { params: Promis
                 <>
                   <ResetKycButton editorId={id} />
                   <ImpersonateButton userId={editor.userId} />
+                  <SuspendEditorForm
+                    editorId={id}
+                    isSuspended={editor.isSuspended}
+                    suspensionReason={editor.suspensionReason ?? null}
+                  />
                 </>
               )}
             </div>

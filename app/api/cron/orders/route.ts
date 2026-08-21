@@ -10,6 +10,7 @@ import { createOrderEvent } from "@/lib/order-events";
 import { computeTdsForEditor } from "@/lib/tds";
 import { revalidatePublicPagesCache } from "@/lib/revalidate";
 import { updateCronHeartbeat } from "@/lib/cron-heartbeat";
+import { persistEditorHealth } from "@/lib/health";
 
 // Called by Vercel Cron — secured by CRON_SECRET header
 export async function GET(req: Request) {
@@ -395,8 +396,27 @@ export async function GET(req: Request) {
     results.errors.push(`rank-score-update: ${err}`);
   }
 
-  console.log("[cron/orders]", { ...results, announcementsPublished, vacationResumed, kycExpired, totalOrdersReconciled, rankScoresUpdated });
+  // ── 9. Recalculate Account Health for all active editors ─────────────────
+  // Safety net: even if triggered recalculations were missed, no score stays stale.
+  let healthRecalculated = 0;
+  let healthErrors = 0;
+  try {
+    const activeEditors = await db
+      .select({ id: editors.id })
+      .from(editors)
+      .where(eq(editors.kycStatus, "approved"));
+
+    const healthResults = await Promise.allSettled(
+      activeEditors.map(e => persistEditorHealth(e.id))
+    );
+    healthRecalculated = healthResults.filter(r => r.status === "fulfilled").length;
+    healthErrors = healthResults.filter(r => r.status === "rejected").length;
+  } catch (err) {
+    results.errors.push(`health-recalculate: ${err}`);
+  }
+
+  console.log("[cron/orders]", { ...results, announcementsPublished, vacationResumed, kycExpired, totalOrdersReconciled, rankScoresUpdated, healthRecalculated, healthErrors });
   revalidatePublicPagesCache();
   await updateCronHeartbeat("orders");
-  return NextResponse.json({ ok: true, ...results, announcementsPublished, vacationResumed, kycExpired, totalOrdersReconciled, rankScoresUpdated });
+  return NextResponse.json({ ok: true, ...results, announcementsPublished, vacationResumed, kycExpired, totalOrdersReconciled, rankScoresUpdated, healthRecalculated, healthErrors });
 }

@@ -3,6 +3,8 @@ import { orderEvents } from "@/lib/db/schema";
 
 export type OrderEventType =
   | "order_placed"
+  | "order_accepted"
+  | "order_declined"
   | "delivery_uploaded"
   | "revision_requested"
   | "extension_requested"
@@ -13,7 +15,8 @@ export type OrderEventType =
   | "order_completed"
   | "order_cancelled"
   | "payout_scheduled"
-  | "message_flagged";
+  | "message_flagged"
+  | "refund_failed";
 
 /**
  * Record an order-timeline event. Fire-and-forget safe — failures are logged

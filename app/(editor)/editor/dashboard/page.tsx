@@ -18,7 +18,7 @@ import {
   Star, ArrowRight, Zap, IndianRupee,
   Package, MessageSquare, AlertTriangle, RefreshCw,
   TrendingUp, ImageIcon, BadgeCheck, Share2, CircleDot,
-  HelpCircle, Film, Banknote, Sparkles,
+  HelpCircle, Film, Banknote, Sparkles, ShieldCheck, ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -77,6 +77,8 @@ export default async function EditorDashboardPage() {
       createdAt: editors.createdAt, kycStatus: editors.kycStatus, kycApprovedAt: editors.kycApprovedAt,
       isAvailable: editors.isAvailable, displayName: editors.displayName,
       niche: editors.niche,
+      healthScore: editors.healthScore, healthStatus: editors.healthStatus,
+      isSuspended: editors.isSuspended,
     }).from(editors).where(eq(editors.id, editorId)).limit(1).then(r => r[0]),
 
     db.select({
@@ -697,6 +699,68 @@ export default async function EditorDashboardPage() {
           <div className="space-y-4">
 
             <AvailabilityToggle initial={isAvailable} kycApproved={kycApproved} />
+
+            {/* Account Health card */}
+            {(() => {
+              const hs = editorRow?.healthStatus;
+              const score = editorRow?.healthScore ?? null;
+              const suspended = editorRow?.isSuspended ?? false;
+              if (suspended) {
+                return (
+                  <Link href="/editor/account-health"
+                    className="block bg-red-50 rounded-3xl border border-red-200 shadow-sm p-4 hover:border-red-300 transition-colors">
+                    <div className="flex items-center gap-2 mb-1">
+                      <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+                      <p className="text-xs font-extrabold uppercase tracking-wider text-red-700">Account Suspended</p>
+                    </div>
+                    <p className="text-xs text-red-600 mt-1">Contact support to restore your account.</p>
+                    <p className="text-xs font-bold text-red-700 flex items-center gap-1 mt-2">View details <ArrowRight className="w-3 h-3" /></p>
+                  </Link>
+                );
+              }
+              if (!hs || score === null) {
+                return (
+                  <Link href="/editor/account-health"
+                    className="block bg-white rounded-3xl border border-gray-150 shadow-xl shadow-gray-100/5 p-4 hover:border-gray-250 transition-colors">
+                    <div className="flex items-center gap-2 mb-1">
+                      <ShieldCheck className="w-4 h-4 text-gray-400 shrink-0" />
+                      <p className="text-xs font-extrabold uppercase tracking-wider text-neutral-400">Account Health</p>
+                    </div>
+                    <p className="text-xs text-gray-400">Not yet calculated — will update overnight.</p>
+                  </Link>
+                );
+              }
+              const hsCfg: Record<string, { label: string; bar: string; text: string; bg: string; border: string }> = {
+                excellent:       { label: "Excellent",       bar: "bg-emerald-500",  text: "text-emerald-700", bg: "bg-emerald-50",  border: "border-emerald-200" },
+                good:            { label: "Good",            bar: "bg-emerald-500",  text: "text-emerald-700", bg: "bg-white",       border: "border-gray-150"    },
+                needs_attention: { label: "Needs Attention", bar: "bg-amber-500",    text: "text-amber-700",   bg: "bg-amber-50",    border: "border-amber-200"   },
+                at_risk:         { label: "At Risk",         bar: "bg-orange-500",   text: "text-orange-700",  bg: "bg-orange-50",   border: "border-orange-200"  },
+                critical:        { label: "Critical",        bar: "bg-red-500",      text: "text-red-700",     bg: "bg-red-50",      border: "border-red-200"     },
+              };
+              const cfg = hsCfg[hs] ?? hsCfg.good;
+              return (
+                <Link href="/editor/account-health"
+                  className={cn("block rounded-3xl border shadow-sm p-4 hover:border-opacity-70 transition-colors", cfg.bg, cfg.border)}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      {hs === "critical" || hs === "at_risk"
+                        ? <ShieldAlert className={cn("w-4 h-4 shrink-0", cfg.text)} />
+                        : <ShieldCheck className={cn("w-4 h-4 shrink-0", cfg.text)} />
+                      }
+                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-neutral-400">Account Health</p>
+                    </div>
+                    <span className={cn("text-sm font-black tabular-nums", cfg.text)}>{score}</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-gray-100 overflow-hidden mb-2">
+                    <div className={cn("h-full rounded-full", cfg.bar)} style={{ width: `${score}%` }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={cn("text-xs font-bold", cfg.text)}>{cfg.label}</span>
+                    <span className={cn("text-xs font-bold flex items-center gap-0.5", cfg.text)}>Details <ArrowRight className="w-3 h-3" /></span>
+                  </div>
+                </Link>
+              );
+            })()}
 
             {/* Earnings */}
             <div className="bg-white rounded-3xl border border-gray-150 border-t-2 border-t-emerald-500 shadow-xl shadow-gray-100/5 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-gray-200/10 hover:border-gray-250">

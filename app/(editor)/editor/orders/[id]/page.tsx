@@ -37,6 +37,7 @@ import { ExtensionPanel } from "@/components/orders/extension-panel";
 import { DownloadAllButton } from "@/components/orders/download-all-button";
 import { DeliveryComments } from "@/components/orders/delivery-comments";
 import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
+import { canEditorAcceptOrder } from "@/lib/eligibility";
 
 type BriefData = {
   mood?: string[];
@@ -141,6 +142,13 @@ export default async function EditorOrderDetailPage({
   const StatusIcon = cfg.icon;
 
   const acceptanceDeadline = new Date(order.createdAt.getTime() + 24 * 60 * 60 * 1000);
+
+  // Server-side eligibility — drives button state; API remains authoritative
+  const eligibility = order.status === "pending"
+    ? await canEditorAcceptOrder(editorId, order.id, session.user.userId!)
+    : null;
+  const canAccept   = eligibility?.eligible ?? false;
+  const blockReason = !canAccept && eligibility ? eligibility.reason : undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -553,6 +561,8 @@ export default async function EditorOrderDetailPage({
                       deliveryDays={order.packageDeliveryDays}
                       revisionCount={computedRevisionCount}
                       packageTitle={order.packageTitle}
+                      canAccept={canAccept}
+                      blockReason={blockReason}
                     />
                     <DeclineOrderButton orderId={order.id} />
                   </>

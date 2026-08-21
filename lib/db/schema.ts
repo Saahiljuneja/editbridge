@@ -207,6 +207,21 @@ export const editors = pgTable("editors", {
   vacationUntil: timestamp("vacation_until", { mode: "date" }),
   activeFrame: text("active_frame"),    // active profile frame key, e.g. "frame_gold"
   rankScore: real("rank_score"),        // 0–1 composite score updated nightly by cron
+
+  // ── Account Health ────────────────────────────────────────────────────────
+  healthScore: integer("health_score"),           // 0–100 composite health
+  healthStatus: text("health_status"),            // excellent | good | needs_attention | at_risk | critical
+  healthComputedAt: timestamp("health_computed_at", { mode: "date" }),
+  acceptanceRate: integer("acceptance_rate"),     // 0–100 cached for fast eligibility checks
+  noResponseRate: integer("no_response_rate"),    // 0–100
+  responseRate: integer("response_rate"),         // 0–100
+
+  // ── Suspension (admin/moderation action — separate from health score) ─────
+  isSuspended: boolean("is_suspended").notNull().default(false),
+  suspendedAt: timestamp("suspended_at", { mode: "date" }),
+  suspendedBy: text("suspended_by"),    // admin user id
+  suspensionReason: text("suspension_reason"),
+
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 }, (t) => [

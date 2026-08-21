@@ -5,6 +5,8 @@ import { orders, editors, notifications, packages } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { createOrderEvent } from "@/lib/order-events";
+import { canEditorAcceptOrder } from "@/lib/eligibility";
+import { persistEditorHealth } from "@/lib/health";
 
 const schema = z.object({
   note: z.string().max(500).optional(),
@@ -27,16 +29,38 @@ export async function POST(
   }
   const { note } = parsed.data;
 
+  const editorId = session.user.editorId;
+  if (!editorId) {
+    return NextResponse.json({ error: "Editor profile not found" }, { status: 403 });
+  }
+
+  // Central eligibility check — single source of truth
+  const eligibility = await canEditorAcceptOrder(editorId, id, session.user.userId!);
+  if (!eligibility.eligible) {
+    const statusMap: Record<string, number> = {
+      NOT_AUTHENTICATED:  403,
+      ACCOUNT_INACTIVE:   403,
+      SUSPENDED:          403,
+      KYC_NOT_APPROVED:   403,
+      CRITICAL_HEALTH:    403,
+      ORDER_NOT_FOUND:    404,
+      NOT_ASSIGNED:       403,
+      ORDER_NOT_PENDING:  409,
+      WINDOW_EXPIRED:     409,
+    };
+    return NextResponse.json(
+      { error: eligibility.reason ?? "Not eligible to accept this order.", code: eligibility.code },
+      { status: statusMap[eligibility.code] ?? 400 },
+    );
+  }
+
+  // Fetch package delivery days (still needed for deadline computation)
   const [order] = await db
     .select({
-      id: orders.id,
-      status: orders.status,
-      editorId: orders.editorId,
-      clientId: orders.clientId,
-      packageId: orders.packageId,
-      createdAt: orders.createdAt,
+      id:         orders.id,
+      clientId:   orders.clientId,
+      packageId:  orders.packageId,
       deliveryDays: packages.deliveryDays,
-      revisionCount: packages.revisionCount,
       packageTitle: packages.title,
     })
     .from(orders)
@@ -44,38 +68,13 @@ export async function POST(
     .where(eq(orders.id, id))
     .limit(1);
 
-  if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
-  if (order.status !== "pending") {
-    return NextResponse.json({ error: "Only pending orders can be accepted" }, { status: 409 });
-  }
-
-  // Check 24-hour acceptance window hasn't expired
-  const acceptanceDeadline = new Date(order.createdAt.getTime() + 24 * 60 * 60 * 1000);
-  if (new Date() > acceptanceDeadline) {
-    return NextResponse.json({ error: "Acceptance window has expired" }, { status: 409 });
-  }
-
-  const [editorRow] = await db
-    .select({ id: editors.id, kycStatus: editors.kycStatus, isAvailable: editors.isAvailable })
-    .from(editors)
-    .where(and(eq(editors.id, order.editorId), eq(editors.userId, session.user.userId!)))
-    .limit(1);
-
-  if (!editorRow) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  if (editorRow.kycStatus !== "approved") {
-    return NextResponse.json({ error: "KYC verification required to accept orders" }, { status: 403 });
-  }
-
-  const acceptedAt = new Date();
-
-  // Compute deadline: acceptedAt + deliveryDays. For quote-based orders with no package,
-  // fall back to the deadline already set at checkout.
-  const deliveryDays = order.deliveryDays ?? null;
-  const deadline = deliveryDays != null
+  const acceptedAt    = new Date();
+  const deliveryDays  = order?.deliveryDays ?? null;
+  const deadline      = deliveryDays != null
     ? new Date(acceptedAt.getTime() + deliveryDays * 24 * 60 * 60 * 1000)
     : undefined;
 
-  // Atomic update: only succeeds if the order is still pending (guards against race with cron)
+  // Atomic update — guards against race with cron auto-cancel
   const updated = await db
     .update(orders)
     .set({
@@ -103,7 +102,7 @@ export async function POST(
     : null;
 
   await db.insert(notifications).values({
-    userId: order.clientId,
+    userId: order!.clientId,
     type: "order_accepted",
     title: "Order accepted!",
     body: deadlineStr
@@ -111,6 +110,9 @@ export async function POST(
       : (note ?? "Your editor has accepted the order and started working on it."),
     link: `/orders/${id}`,
   });
+
+  // Recalculate health async (acceptance improves acceptance rate)
+  persistEditorHealth(editorId).catch(() => {});
 
   return NextResponse.json({ ok: true, acceptedAt, ...(deadline ? { deadline } : {}) });
 }
