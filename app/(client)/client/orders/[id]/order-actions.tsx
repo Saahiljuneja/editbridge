@@ -238,18 +238,27 @@ export function OrderActions({
 
       {/* Pending — cancel */}
       {status === "pending" && (
-        <div className="flex justify-end">
+        <section className="rounded-xl border border-neutral-200/60 bg-white p-5 space-y-3">
+          <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-wider">
+            Changed your mind?
+          </p>
+          <p className="text-sm text-neutral-500">
+            Since the editor hasn&apos;t started work yet, you can cancel now
+            and receive a{" "}
+            <span className="font-semibold text-neutral-700">full refund</span>{" "}
+            within 5–7 business days.
+          </p>
           <button
             onClick={() => setShowCancelModal(true)}
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
-              "text-red-600 border-red-200 hover:bg-red-50 gap-2"
+              "w-full justify-center text-red-600 border-red-200 hover:bg-red-50 gap-2"
             )}
           >
             <XCircle className="w-4 h-4" />
-            Cancel order
+            Cancel order &amp; request refund
           </button>
-        </div>
+        </section>
       )}
 
       {/* Cancel modal */}

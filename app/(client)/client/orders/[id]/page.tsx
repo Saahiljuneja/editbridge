@@ -236,6 +236,54 @@ export default async function ClientOrderDetailPage({
           </div>
         </div>
 
+        {/* ── Pending: awaiting editor acceptance ───────────────────────── */}
+        {order.status === "pending" && (() => {
+          const acceptanceDeadline = new Date(
+            order.createdAt.getTime() + 24 * 60 * 60 * 1000
+          );
+          return (
+            <div className="rounded-3xl border border-sky-200 bg-sky-50/60 p-5 space-y-4 shadow-sm">
+              {/* Header row */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 text-[#0EA5E9]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-extrabold text-sky-900 text-sm tracking-tight">
+                    Waiting for editor acceptance
+                  </p>
+                  <p className="text-xs text-sky-700 mt-1 leading-relaxed">
+                    {editorName} has up to 24 hours to accept your order. If
+                    they don&apos;t respond, your order will be automatically
+                    cancelled and a full refund will be initiated.
+                  </p>
+                </div>
+              </div>
+
+              {/* Countdown pill */}
+              <div className="flex items-center justify-between rounded-2xl border border-sky-200 bg-white px-4 py-3">
+                <span className="text-[10px] font-extrabold text-sky-400 uppercase tracking-wider">
+                  Response window
+                </span>
+                <DeadlineCountdown deadline={acceptanceDeadline.toISOString()} />
+              </div>
+
+              {/* Payment safety note */}
+              <div className="flex items-center gap-2.5 px-1">
+                <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <svg className="w-2.5 h-2.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Your payment is held securely and will only be released once
+                  you approve the final delivery.
+                </p>
+              </div>
+            </div>
+          );
+        })()}
+
         <div className="grid md:grid-cols-[1fr_300px] gap-6 items-start">
           {/* Left column */}
           <div className="space-y-6">
