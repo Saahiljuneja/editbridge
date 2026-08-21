@@ -120,7 +120,7 @@ export default async function TransactionsPage({
                 className={cn(
                   "px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border shadow-sm",
                   active
-                    ? "bg-[#0EA5E9] border-[#0EA5E9] text-white"
+                    ? "bg-[#1e40af] border-[#1e40af] text-white"
                     : "bg-white border-neutral-200/60 text-neutral-600 hover:bg-neutral-50"
                 )}
               >
