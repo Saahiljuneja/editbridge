@@ -19,6 +19,7 @@ import {
   Palette,
   ExternalLink,
   CheckCircle2,
+  Check,
   Loader,
   XCircle,
   AlertTriangle,
@@ -221,6 +222,84 @@ export default async function EditorOrderDetailPage({
         <div className="grid md:grid-cols-[1fr_280px] gap-6 items-start">
           {/* Main content */}
           <div className="space-y-5">
+            {/* ── Pending: action-required card ─────────────────────────── */}
+            {order.status === "pending" && (
+              <section className="rounded-xl border-2 border-amber-300 bg-amber-50/80 overflow-hidden shadow-sm">
+                {/* Header */}
+                <div className="px-5 py-4 border-b border-amber-200 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-amber-200 flex items-center justify-center shrink-0">
+                      <Clock className="w-4 h-4 text-amber-800" />
+                    </div>
+                    <p className="font-bold text-amber-900 text-sm">
+                      Action required — respond before the window closes
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs text-amber-700 font-medium">Time left:</span>
+                    <DeadlineCountdown deadline={acceptanceDeadline.toISOString()} />
+                  </div>
+                </div>
+
+                {/* Commitments + CTAs */}
+                <div className="px-5 py-4 space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                      Accepting commits you to:
+                    </p>
+                    <ul className="space-y-1.5">
+                      <li className="flex items-start gap-2 text-sm text-amber-900">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        Complete all deliverables for{" "}
+                        <strong className="ml-0.5">{order.packageTitle}</strong>
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-amber-900">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        Deliver within{" "}
+                        <strong className="mx-0.5">{order.packageDeliveryDays}</strong>{" "}
+                        day{order.packageDeliveryDays !== 1 ? "s" : ""} of acceptance
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-amber-900">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        Provide{" "}
+                        {computedRevisionCount === -1
+                          ? "unlimited revisions"
+                          : `${computedRevisionCount} revision${computedRevisionCount !== 1 ? "s" : ""}`}{" "}
+                        as specified
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-amber-900">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        Follow the client&apos;s brief below
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Inline accept / decline — serves mobile where sidebar is below the fold */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <div className="flex-1">
+                      <AcceptOrderButton
+                        orderId={order.id}
+                        deliveryDays={order.packageDeliveryDays}
+                        revisionCount={computedRevisionCount}
+                        packageTitle={order.packageTitle}
+                      />
+                    </div>
+                    <div className="sm:w-48">
+                      <DeclineOrderButton orderId={order.id} />
+                    </div>
+                  </div>
+
+                  {/* Payout note */}
+                  <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                    <Banknote className="w-3.5 h-3.5 shrink-0" />
+                    Your payout of{" "}
+                    <strong className="mx-0.5">{formatCurrency(payout)}</strong>{" "}
+                    will be released after the client approves delivery.
+                  </p>
+                </div>
+              </section>
+            )}
+
             {/* Client brief */}
             <section className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
