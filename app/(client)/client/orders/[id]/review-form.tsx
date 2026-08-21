@@ -99,7 +99,7 @@ export function ReviewForm({ orderId, editorName }: ReviewFormProps) {
         <button
           type="submit"
           disabled={submitting || rating === 0}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1e40af] hover:bg-brand-primary transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0EA5E9] hover:bg-sky-600 transition-colors disabled:opacity-50"
         >
           {submitting ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</>

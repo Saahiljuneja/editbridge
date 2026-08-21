@@ -19,8 +19,7 @@ import { OrderStatusBadge } from "@/components/orders/order-status-badge";
 import { OrderActions } from "./order-actions";
 import { ReviewForm } from "./review-form";
 import { DisputeForm } from "./dispute-form";
-import { formatCurrency, formatDate, formatDateTime, displayNameFromFull } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { formatCurrency, formatDate, displayNameFromFull } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { TopoBackground } from "@/components/common/topo-background";
 import {
@@ -41,11 +40,11 @@ import Link from "next/link";
 import { OrderTimeline } from "@/components/client/order-timeline";
 import { OrderEventTimeline } from "@/components/order/order-event-timeline";
 import { ChatWindow } from "@/components/chat/chat-window";
-import { DeliveryComments } from "@/components/orders/delivery-comments";
 import { DeadlineCountdown } from "@/components/orders/deadline-countdown";
 import { ExtensionPanel } from "@/components/orders/extension-panel";
 import { DownloadAllButton } from "@/components/orders/download-all-button";
 import { OrderReferences } from "@/components/client/order-references";
+import { DeliveryVideoSection } from "@/components/orders/delivery-video-section";
 
 type BriefData = {
   mood?: string[];
@@ -448,54 +447,23 @@ export default async function ClientOrderDetailPage({
                   <h2 className="font-extrabold text-neutral-900 text-xs uppercase tracking-wider">Deliveries</h2>
                   <DownloadAllButton orderId={order.id} />
                 </div>
-                {orderDeliveries.map((d) => {
-                  const publicUrl = getPublicUrl(d.fileUrl);
-                  const isVideo =
-                    /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(d.fileUrl);
-                  return (
-                    <div key={d.id} className="space-y-3">
-                      <div className="flex items-center justify-between bg-neutral-50/50 rounded-2xl px-4 py-3.5 border border-neutral-200/50">
-                        <div className="min-w-0 mr-3">
-                          <p className="text-sm font-bold text-neutral-900 truncate">
-                            {d.fileName}
-                          </p>
-                          <p className="text-xs text-neutral-400 font-semibold mt-0.5">
-                            v{d.versionNumber} · {formatDateTime(d.createdAt)}
-                          </p>
-                        </div>
-                        <a
-                          href={publicUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3.5 py-1.5 rounded-xl border border-neutral-200 bg-[#ffffff] hover:bg-neutral-50 text-xs font-bold text-neutral-700 transition-colors shadow-sm inline-flex items-center gap-1.5 shrink-0"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          Download
-                        </a>
-                      </div>
-                      {isVideo && (
-                        <div className="rounded-2xl overflow-hidden bg-black aspect-video">
-                          <video
-                            src={publicUrl}
-                            controls
-                            preload="metadata"
-                            className="w-full h-full"
-                            id={`video-${d.id}`}
-                          />
-                        </div>
-                      )}
-                      <DeliveryComments
-                        deliveryId={d.id}
-                        currentUserId={order.clientId}
-                      />
-                    </div>
-                  );
-                })}
+                {orderDeliveries.map((d) => (
+                  <DeliveryVideoSection
+                    key={d.id}
+                    deliveryId={d.id}
+                    fileName={d.fileName}
+                    fileUrl={getPublicUrl(d.fileUrl)}
+                    versionNumber={d.versionNumber}
+                    createdAt={d.createdAt.toISOString()}
+                    currentUserId={order.clientId}
+                    isVideo={/\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(d.fileUrl)}
+                  />
+                ))}
               </section>
             )}
 
-            {/* Extension request panel */}
-            {order.extensionStatus && (
+            {/* Extension request panel — only show pending requests (client approves/rejects) */}
+            {order.extensionStatus === "pending" && (
               <ExtensionPanel
                 orderId={order.id}
                 viewerRole="client"
